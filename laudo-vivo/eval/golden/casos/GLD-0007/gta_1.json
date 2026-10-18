@@ -1,0 +1,61 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "778291",
+  "serie": "A",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "M",
+      "faixa_etaria": "25-36",
+      "quantidade": 1
+    }
+  ],
+  "total": 1,
+  "total_por_extenso": "UM BOVINOS",
+  "marca_rebanho": "MARCA TESTE 06",
+  "origem": {
+    "documento": "99999999500674",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 07 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 07",
+    "codigo_estabelecimento": "TESTE-5213707-9006",
+    "codigo_exploracao": "TESTE-5213707-9006-BOV",
+    "municipio_nome": "MONTES CLAROS DE GOIÁS",
+    "municipio_ibge": "5213707",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000010669",
+    "nome": "PRODUTOR TESTE 07",
+    "estabelecimento": "FAZENDA TESTE 07",
+    "codigo_estabelecimento": "TESTE-5206404-0007",
+    "codigo_exploracao": "TESTE-5206404-0007-BOV",
+    "municipio_nome": "CRIXÁS",
+    "municipio_ibge": "5206404",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST3E76"
+  },
+  "vacinacoes": [],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE MONTES CLAROS DE GOIÁS"
+  },
+  "emissao": {
+    "local_municipio": "MONTES CLAROS DE GOIÁS",
+    "data": "2026-07-19",
+    "hora": "13:52",
+    "validade": "2026-07-22"
+  },
+  "nfe_chaves": [
+    "52260799999999500674550010000072631177220359"
+  ],
+  "codigo_barras": "SINTGOA778291",
+  "sintetico": true
+}

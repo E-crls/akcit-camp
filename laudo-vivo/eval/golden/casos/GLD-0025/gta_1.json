@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "546441",
+  "serie": "AB",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "13-24",
+      "quantidade": 34
+    }
+  ],
+  "total": 34,
+  "total_por_extenso": "TRINTA E QUATRO BOVINOS",
+  "marca_rebanho": "MARCA TESTE 24",
+  "origem": {
+    "documento": "99999999502456",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 25 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 25",
+    "codigo_estabelecimento": "TESTE-5206404-9024",
+    "codigo_exploracao": "TESTE-5206404-9024-BOV",
+    "municipio_nome": "CRIXÁS",
+    "municipio_ibge": "5206404",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999102431",
+    "nome": "AGROPECUARIA TOMADORA TESTE 25 LTDA",
+    "estabelecimento": "FAZENDA TESTE 25",
+    "codigo_estabelecimento": "TESTE-5213103-0025",
+    "codigo_exploracao": "TESTE-5213103-0025-BOV",
+    "municipio_nome": "MINEIROS",
+    "municipio_ibge": "5213103",
+    "uf": "GO"
+  },
+  "finalidade": "ENGORDA",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST1G54"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2025-07-24"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE CRIXÁS"
+  },
+  "emissao": {
+    "local_municipio": "CRIXÁS",
+    "data": "2026-07-30",
+    "hora": "17:30",
+    "validade": "2026-07-31"
+  },
+  "nfe_chaves": [
+    "52260799999999502456550010000075101195312624"
+  ],
+  "codigo_barras": "SINTGOAB546441",
+  "sintetico": true
+}

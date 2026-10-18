@@ -1,0 +1,65 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "520201",
+  "serie": "A",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "13-24",
+      "quantidade": 40
+    }
+  ],
+  "total": 40,
+  "total_por_extenso": "QUARENTA BOVINOS",
+  "marca_rebanho": "MARCA TESTE PUB 01",
+  "origem": {
+    "documento": "99999999070130",
+    "documento_sha256": null,
+    "nome": "AGROPECUARIA VENDEDORA TESTE PUB 01 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE PUB 01",
+    "codigo_estabelecimento": "TESTE-5207535-9001",
+    "codigo_exploracao": null,
+    "municipio_nome": "FAINA",
+    "municipio_ibge": "5207535",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000070130",
+    "documento_sha256": null,
+    "nome": "PRODUTOR TESTE PUB 01",
+    "estabelecimento": "FAZENDA TESTE PUB 01",
+    "codigo_estabelecimento": "TESTE-5212204-0001",
+    "codigo_exploracao": null,
+    "municipio_nome": "JUSSARA",
+    "municipio_ibge": "5212204",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST1A01"
+  },
+  "vacinacoes": [],
+  "exames": [],
+  "observacao": "CARGA 1 DE 4",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE FAINA"
+  },
+  "emissao": {
+    "local_municipio": "FAINA",
+    "data": "2026-07-20",
+    "hora": "11:15",
+    "validade": "2026-07-22"
+  },
+  "nfe_chaves": [
+    "52260799999999070130550010000070011012424867"
+  ],
+  "codigo_barras": "SINTGOA520201",
+  "sintetico": true,
+  "fonte": "json",
+  "ilegiveis": []
+}

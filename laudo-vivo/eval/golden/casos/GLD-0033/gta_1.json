@@ -1,0 +1,61 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "828651",
+  "serie": "B",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "M",
+      "faixa_etaria": "25-36",
+      "quantidade": 4
+    }
+  ],
+  "total": 4,
+  "total_por_extenso": "QUATRO BOVINOS",
+  "marca_rebanho": "MARCA TESTE 32",
+  "origem": {
+    "documento": "99999999503266",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 33 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 33",
+    "codigo_estabelecimento": "TESTE-5202502-9032",
+    "codigo_exploracao": "TESTE-5202502-9032-BOV",
+    "municipio_nome": "ARUANÃ",
+    "municipio_ibge": "5202502",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000013250",
+    "nome": "PRODUTOR TESTE 33",
+    "estabelecimento": "FAZENDA TESTE 33",
+    "codigo_estabelecimento": "TESTE-5204409-0033",
+    "codigo_exploracao": "TESTE-5204409-0033-BOV",
+    "municipio_nome": "CAIAPÔNIA",
+    "municipio_ibge": "5204409",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST5G33"
+  },
+  "vacinacoes": [],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE ARUANÃ"
+  },
+  "emissao": {
+    "local_municipio": "ARUANÃ",
+    "data": "2026-07-31",
+    "hora": "09:57",
+    "validade": "2026-08-03"
+  },
+  "nfe_chaves": [
+    "52260799999999503266550010000085901460679425"
+  ],
+  "codigo_barras": "SINTGOB828651",
+  "sintetico": true
+}

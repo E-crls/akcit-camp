@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "814864",
+  "serie": "B",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 15
+    }
+  ],
+  "total": 15,
+  "total_por_extenso": "QUINZE BOVINOS",
+  "marca_rebanho": "MARCA TESTE 37",
+  "origem": {
+    "documento": "99999999503770",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 38 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 38",
+    "codigo_estabelecimento": "TESTE-5204409-9037",
+    "codigo_exploracao": "TESTE-5204409-9037-BOV",
+    "municipio_nome": "CAIAPÔNIA",
+    "municipio_ibge": "5204409",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999103756",
+    "nome": "AGROPECUARIA TOMADORA TESTE 38 LTDA",
+    "estabelecimento": "FAZENDA TESTE 38",
+    "codigo_estabelecimento": "TESTE-5204409-0038",
+    "codigo_exploracao": "TESTE-5204409-0038-BOV",
+    "municipio_nome": "CAIAPÔNIA",
+    "municipio_ibge": "5204409",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST9H92"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2025-07-23"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE CAIAPÔNIA"
+  },
+  "emissao": {
+    "local_municipio": "CAIAPÔNIA",
+    "data": "2026-08-06",
+    "hora": "09:31",
+    "validade": "2026-08-07"
+  },
+  "nfe_chaves": [
+    "52260899999999503770550010000032561371330121"
+  ],
+  "codigo_barras": "SINTGOB814864",
+  "sintetico": true
+}

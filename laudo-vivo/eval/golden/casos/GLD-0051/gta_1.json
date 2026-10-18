@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "822986",
+  "serie": "GO",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 20
+    }
+  ],
+  "total": 20,
+  "total_por_extenso": "VINTE BOVINOS",
+  "marca_rebanho": "MARCA TESTE 00",
+  "origem": {
+    "documento": "99999999505048",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 51 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 51",
+    "codigo_estabelecimento": "TESTE-5218300-9050",
+    "codigo_exploracao": "TESTE-5218300-9050-BOV",
+    "municipio_nome": "POSSE",
+    "municipio_ibge": "5218300",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999105023",
+    "nome": "AGROPECUARIA TOMADORA TESTE 51 LTDA",
+    "estabelecimento": "FAZENDA TESTE 51",
+    "codigo_estabelecimento": "TESTE-5218805-0051",
+    "codigo_exploracao": "TESTE-5218805-0051-BOV",
+    "municipio_nome": "RIO VERDE",
+    "municipio_ibge": "5218805",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST5H90"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-03-03"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE POSSE"
+  },
+  "emissao": {
+    "local_municipio": "POSSE",
+    "data": "2026-07-30",
+    "hora": "12:40",
+    "validade": "2026-08-02"
+  },
+  "nfe_chaves": [
+    "52260799999999505048550010000007171532504880"
+  ],
+  "codigo_barras": "SINTGOGO822986",
+  "sintetico": true
+}

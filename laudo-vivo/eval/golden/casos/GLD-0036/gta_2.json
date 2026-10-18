@@ -1,0 +1,64 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "MT",
+  "numero": "261579",
+  "serie": "A",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "25-36",
+      "quantidade": 37
+    }
+  ],
+  "total": 37,
+  "total_por_extenso": "TRINTA E SETE BOVINOS",
+  "marca_rebanho": "MARCA TESTE 35",
+  "origem": {
+    "documento": "99999999503509",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 36 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 36",
+    "codigo_estabelecimento": "TESTE-5103106-9035",
+    "codigo_exploracao": "TESTE-5103106-9035-BOV",
+    "municipio_nome": "COCALINHO",
+    "municipio_ibge": "5103106",
+    "uf": "MT"
+  },
+  "destino": {
+    "documento": "99999999103594",
+    "nome": "AGROPECUARIA TOMADORA TESTE 36 LTDA",
+    "estabelecimento": "FAZENDA TESTE 36",
+    "codigo_estabelecimento": "TESTE-5214002-0036",
+    "codigo_exploracao": "TESTE-5214002-0036-BOV",
+    "municipio_nome": "MOZARLÂNDIA",
+    "municipio_ibge": "5214002",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST8J16"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-02-14"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 2 DE 2",
+  "emitente": {
+    "tipo": "FUNCIONARIO_AUTORIZADO",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE COCALINHO"
+  },
+  "emissao": {
+    "local_municipio": "COCALINHO",
+    "data": "2026-07-14",
+    "hora": "07:20",
+    "validade": "2026-07-16"
+  },
+  "nfe_chaves": [],
+  "codigo_barras": "SINTMTA261579",
+  "sintetico": true
+}

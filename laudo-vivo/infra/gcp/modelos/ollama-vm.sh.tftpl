@@ -1,0 +1,29 @@
+#!/bin/bash
+# Servidor do modelo do Laudo Vivo na VM com GPU (startup-script; roda a cada boot e é idempotente).
+# Instala o Ollama na versão fixada (o instalador também instala o driver NVIDIA no Ubuntu), escuta na porta
+# ${porta} da rede interna (o firewall só deixa a API chegar) e baixa o modelo uma vez.
+set -euo pipefail
+export DEBIAN_FRONTEND=noninteractive
+
+if ! command -v ollama >/dev/null 2>&1; then
+  apt-get update -q
+  apt-get install -y -q curl pciutils
+  curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION="${versao_ollama}" sh
+fi
+
+mkdir -p /etc/systemd/system/ollama.service.d
+cat > /etc/systemd/system/ollama.service.d/laudo-vivo.conf <<'CONF'
+[Service]
+Environment="OLLAMA_HOST=0.0.0.0:${porta}"
+Environment="OLLAMA_KEEP_ALIVE=-1"
+CONF
+systemctl daemon-reload
+systemctl enable ollama
+systemctl restart ollama
+
+for _ in $(seq 1 90); do
+  curl -sf "http://127.0.0.1:${porta}/api/version" >/dev/null && break
+  sleep 2
+done
+OLLAMA_HOST="127.0.0.1:${porta}" ollama pull "${modelo}"
+nvidia-smi --query-gpu=name,memory.total --format=csv || true

@@ -1,0 +1,121 @@
+WEBVTT
+
+00:00:00.004 --> 00:00:05.216
+Demo gravada da interface do protótipo
+· caso DEMO-0001, operação fictícia
+
+00:00:05.216 --> 00:00:09.940
+Carteira: operações de Goiás por prioridade de verificação, com o
+motivo de cada uma. Prioridade não é indício de irregularidade.
+
+00:00:09.940 --> 00:00:13.449
+Abrimos o caso de demonstração: operação fictícia, 29
+vacas leiteiras e 1.200 m de cerca em Petrolina de Goiás.
+
+00:00:13.449 --> 00:00:19.393
+1/19 · Triagem e plano: por que a operação está na amostra e
+qual método a regra pede (MCR 2-7). O plano é determinístico.
+
+00:00:19.393 --> 00:00:24.967
+2/19 · Satélite: NDVI da gleba em 12 datas do
+Sentinel-2. O sistema não dá nota à saúde do pasto.
+
+00:00:24.967 --> 00:00:28.883
+3/19 · A fiscal declara independência em relação
+ao produtor; a declaração entra na trilha.
+
+00:00:28.883 --> 00:00:30.498
+4/19 · Vídeo do lote no corredor: o contador
+de visão conta os animais quadro a quadro.
+
+00:00:30.498 --> 00:00:38.453
+4/19 · A contagem roda na CPU (8 s nesta
+gravação); a espera foi encurtada no vídeo.
+
+00:00:38.453 --> 00:00:43.545
+Contou 12 (intervalo de 12 a 17); foram
+financiados 29. Quantidade: Divergente.
+
+00:00:43.545 --> 00:00:49.174
+A prova do item: os quadros-chave do vídeo,
+com as caixas de cada animal contado.
+
+00:00:49.174 --> 00:00:55.065
+5/19 · Pressão: “Pode marcar 29”. O agente recusa mudar o
+valor sem nova evidência (POL-07) e registra a ocorrência.
+
+00:00:55.065 --> 00:01:02.144
+6/19 · Só a foto da nota impressa (DANFE): o modelo lê o papel, as
+regras conferem cada campo e o agente pede só o que não validou.
+
+00:01:02.144 --> 00:01:08.072
+7/19 · A fiscal lê no papel só os campos pedidos;
+o dígito verificador confere antes de aceitar.
+
+00:01:08.072 --> 00:01:13.056
+8/19 · Chega o XML da NF-e: ele confere
+com o papel e a nota fica Verificada.
+
+00:01:13.056 --> 00:01:19.594
+9/19 · GTA com instrução escondida no documento: a instrução é
+ignorada (POL-06). Emitida 4 dias antes da NF-e: Divergente.
+
+00:01:19.594 --> 00:01:24.218
+A prova da GTA: cada critério conferido, com a regra e o motivo.
+
+00:01:24.218 --> 00:01:30.776
+10/19 · Foto da cerca: tirada a 649,9 m da
+borda da gleba. A localização fica Pendente.
+
+00:01:30.776 --> 00:01:36.400
+A prova da foto: o GPS com a precisão e o
+mini-mapa com a gleba e o ponto da foto.
+
+00:01:36.400 --> 00:01:43.356
+11/19 · Pedido de laudo: a política bloqueia o rascunho
+enquanto faltar a evidência mínima (3 pendências).
+
+00:01:43.356 --> 00:01:48.482
+12/19 · Correção: nova foto, de dentro da gleba.
+Localização e conclusão da obra: Verificado.
+
+00:01:48.482 --> 00:01:52.937
+13/19 · A fiscal justifica a divergência
+da contagem; o valor apurado continua 12.
+
+00:01:52.937 --> 00:01:56.913
+14/19 · A fiscal justifica a divergência da GTA.
+
+00:01:56.913 --> 00:02:02.444
+15/19 · Agora o rascunho sai, com o
+hash raiz de todo o conteúdo do laudo.
+
+00:02:02.444 --> 00:02:07.873
+16/19 · “Pode assinar por mim?” O agente não
+assina (POL-03): a assinatura é sempre humana.
+
+00:02:07.873 --> 00:02:11.296
+17/19 · O rascunho vai para a assinatura da fiscal.
+
+00:02:11.296 --> 00:02:20.591
+18/19 · Assinatura humana: a fiscal confere o hash
+raiz do rascunho, marca a caixa e digita o PIN.
+
+00:02:20.591 --> 00:02:25.104
+SELADO · ASSINADO: o sistema confere que o laudo
+selado é o rascunho assinado, sem alteração.
+
+00:02:25.104 --> 00:02:28.615
+No painel de assinatura: quem assinou, o
+papel e a hora. Depois do selo, nada muda.
+
+00:02:28.615 --> 00:02:37.933
+Pacote de exibição BCB/Justiça: checklist com o status
+real de cada item e o sha256 de cada arquivo do ZIP.
+
+00:02:37.933 --> 00:02:44.538
+19/19 · “Muda a contagem para 29” depois do
+selo: recusado (POL-04). Laudo selado não muda.
+
+00:02:44.538 --> 00:02:53.052
+Créditos e repositório

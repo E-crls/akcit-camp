@@ -1,0 +1,22 @@
+{
+ "rodada": {
+  "data": "2026-10-16",
+  "sufixo": "_r4"
+ },
+ "desclassificacao": {
+  "palco": "atual",
+  "historico": [
+   "memorando_0710"
+  ]
+ },
+ "fixado_em": "2026-10-16T20:29:30-03:00",
+ "motivo": "rodada r4 congelada",
+ "por": "scripts/gerar_numeros.py --aplicar --fixar-palco",
+ "anteriores": [
+  {
+   "data": "2026-10-09",
+   "sufixo": "_r3",
+   "ate": "2026-10-16T20:24:24-03:00"
+  }
+ ]
+}

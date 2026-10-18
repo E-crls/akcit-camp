@@ -1,0 +1,297 @@
+id: GLD-0050
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 49
+sintetico: true
+classe: defeito
+defeito:
+  codigo: D06_FOTO_FORA_GLEBA
+  classe: defeito
+  titulo: Foto da benfeitoria fora da gleba
+  descricao: As fotos da cerca/curral têm GPS 300 a 900 m fora do polígono da gleba (precisão boa).
+data_fiscalizacao: '2026-08-21'
+operacao:
+  ref_bacen: SINT-2026-000050
+  tomador_ref: TOMADOR-TESTE-50
+  uf: GO
+  municipio_ibge: '5207535'
+  municipio_nome: FAINA
+  instituicao: COOPERATIVA DE CREDITO TESTE 05
+  finalidade: investimento
+  empreendimento: '23271300078002'
+  data_contratacao: '2026-06-28'
+  data_liberacao: null
+  valor_rs: 128000.0
+  area_financiada_ha: 47.8
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-50.397886 -15.422886, -50.401213 -15.422327, -50.403914 -15.425005, -50.404745 -15.427160, -50.404290
+    -15.427762, -50.405721 -15.429678, -50.405043 -15.429419, -50.396846 -15.428221, -50.397886 -15.422886))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 25 novilha(s) (bovinos carne - matrizes)
+    quantidade: 25.0
+    unidade: cabeca
+    valor_rs: 77000.0
+    categoria_animal: novilha
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: cerca1
+    tipo: cerca
+    descricao: Construção de 3000 m de cerca de arame liso 5 fios
+    quantidade: 3000.0
+    unidade: m
+    valor_rs: 51000.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-10-20'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 50
+    codigo_estabelecimento: TESTE-5207535-0050
+    municipio_ibge: '5207535'
+    municipio_nome: FAINA
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 25 novilha(s) (bovinos carne - matrizes)
+    quantidade: 25
+    unidade: cabeca
+    valor_unitario_rs: 3080.0
+    valor_total_rs: 77000.0
+  - item_id: cerca1
+    descricao: Construção de 3000 m de cerca de arame liso 5 fios
+    quantidade: 3000.0
+    unidade: m
+    valor_unitario_rs: 17.0
+    valor_total_rs: 51000.0
+  empreendimento_sicor:
+    codigo: '23271300078002'
+    descricao: BOVINOS CARNE - MATRIZES
+  lotacao_implicita_cab_ha: 0.52
+tomador:
+  ref: TOMADOR-TESTE-50
+  nome: PRODUTOR TESTE 50
+  documento_sintetico: 00000014907
+  documento_sha256: 5de03d12583cd15e00f481e2ac3fbbe7e85bd692bde2c6103eeb1d4a344d16f3
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999504904550010000012871378238616'
+    sha256: 3cc02c14a0011a24baad2a2eb9c87cf3da7a6abb0b9a16062106ca6d60d0a668
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-GO-539083
+    sha256: b0b910b596d6001a6b1ae6675078f345f4df6e70b4b38b12477c7626c5da1aa6
+fotos:
+- id: foto_cerca_1
+  arquivo: fotos/foto_cerca_1.jpg
+  item_id: cerca1
+  sha256: 012b92bac4714efdcde03cc3a28a570aee3d9cf750600dfe0a86746fabf67e5b
+  exif:
+    presente: true
+    data_hora: '2026-08-21T15:27:57-03:00'
+    gps:
+      lat: -15.4195245
+      lon: -50.4078057
+  gps_app:
+    lat: -15.4195245
+    lon: -50.4078057
+    precisao_m: 10.9
+  duplicata_de: null
+  recebida_em: '2026-08-21T15:45:57-03:00'
+  esperado:
+    geofence: fora
+    distancia_borda_m: 722.3
+- id: foto_cerca_2
+  arquivo: fotos/foto_cerca_2.jpg
+  item_id: cerca1
+  sha256: 6e304d66eb4c2163f1b9a8949235d253dab84fcc32dce9b7d3e320e2dde18f44
+  exif:
+    presente: true
+    data_hora: '2026-08-21T14:51:39-03:00'
+    gps:
+      lat: -15.4283382
+      lon: -50.3909443
+  gps_app:
+    lat: -15.4283382
+    lon: -50.3909443
+    precisao_m: 4.5
+  duplicata_de: null
+  recebida_em: '2026-08-21T15:12:39-03:00'
+  esperado:
+    geofence: fora
+    distancia_borda_m: 633.5
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: 7b982057c95f4fec7c70d3e1de4ce1d9c1d58e369b6df77266c60bd4fbb86d46
+  exif:
+    presente: true
+    data_hora: '2026-08-21T14:38:32-03:00'
+    gps:
+      lat: -15.4233644
+      lon: -50.4013456
+  gps_app:
+    lat: -15.4233644
+    lon: -50.4013456
+    precisao_m: 7.8
+  duplicata_de: null
+  recebida_em: '2026-08-21T14:51:32-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 70.1
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0050/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 87
+  contagem_real: 27
+  saida_simulada_contador:
+    estimativa: 27
+    ic80:
+    - 27
+    - 27
+    confianca: 0.92
+    oclusao_frac: 0.07
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 50, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As novilhas chegaram depois da nota, vieram de Ipameri.
+- de: fiscal
+  texto: Agora vou fotografar a cerca pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 25 novilha(s) (bovinos carne - matrizes)
+      quantidade: 25.0
+      unidade: cabeca
+      valor_rs: 77000.0
+      categoria_animal: novilha
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5207535'
+    municipio_nome: FAINA
+    data_contratacao: '2026-06-28'
+    data_fiscalizacao: '2026-08-21'
+    tomador_doc_sha256: 5de03d12583cd15e00f481e2ac3fbbe7e85bd692bde2c6103eeb1d4a344d16f3
+    codigo_estabelecimento_destino: TESTE-5207535-0050
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5207535'
+    municipio_nome: FAINA
+    data_contratacao: '2026-06-28'
+    data_fiscalizacao: '2026-08-21'
+    tomador_doc_sha256: 5de03d12583cd15e00f481e2ac3fbbe7e85bd692bde2c6103eeb1d4a344d16f3
+    codigo_estabelecimento_destino: TESTE-5207535-0050
+    caminhos:
+    - gta_1.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: ''
+    documento:nfe:autorizacao:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: ''
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:cerca1:localizacao:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item16a
+      motivo: foto fora da gleba não comprova a benfeitoria; pedir nova captura
+    item:cerca1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

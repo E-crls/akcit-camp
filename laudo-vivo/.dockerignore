@@ -1,0 +1,32 @@
+# Contexto do docker build: só o que a imagem da demo usa. Dados locais, ambientes, caches e o vídeo do pitch
+# ficam de fora (a imagem prepara o dados_locais/ dela com scripts/preparar_demo.py).
+.git
+.venv
+venv
+dados_locais
+eval-ci
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.ruff_cache
+.mypy_cache
+.hypothesis
+htmlcov
+.coverage
+.coverage.*
+*.egg-info
+build
+dist
+**/node_modules
+**/*.onnx
+**/*.part
+docs/entregaveis/video
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+infra/**/.terraform/
+infra/**/*.tfstate*
+infra/**/*.tfplan
+infra/**/terraform.tfvars

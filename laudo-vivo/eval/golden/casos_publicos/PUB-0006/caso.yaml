@@ -1,0 +1,144 @@
+id: PUB-0006
+versao_gerador: 0.2.1
+split: casos_publicos
+sintetico: true
+classe: defeito
+titulo: 'Custeio de engorda: contagem muito abaixo da GTA (25% do documentado)'
+inspiracao:
+  caso: 'Esquema de gado ''fantasma'' em confinamento nos EUA (TX/KY): 89.522 cabeças declaradas como garantia em
+    dez/2022 (37.992 em fev/2023) e 10.559 encontradas na auditoria do credor (cerca de 12% e 28%, respectivamente)'
+  fonte: Western Livestock Journal
+  url: https://www.wlj.net/ky-cattle-fraud-scheme-exposed/
+  acesso: '2026-10-16'
+  data_noticia: '2023-05-19'
+  item_normativo: OP-perfil-custeio-animais (MCR 2-7-1-c); OP-bovinos-contagem-tolerancia
+  o_que_prova: GTA e NF-e somando o lote inteiro não substituem a contagem no curral
+  o_que_nao_prova: nada sobre o crédito rural brasileiro (caso estrangeiro, só mecanismo)
+  adaptacao: custeio de aquisição para engorda (perfil 0.4.0); 120 na NF-e e na GTA, 100 financiadas, 30 contadas
+data_fiscalizacao: '2026-09-15'
+operacao:
+  ref_bacen: SINT-PUB-2026-000006
+  tomador_ref: TOMADOR-TESTE-PUB-06
+  tomador_doc_sha256: null
+  uf: GO
+  municipio_ibge: '5213707'
+  municipio_nome: MONTES CLAROS DE GOIÁS
+  instituicao: COOPERATIVA DE CREDITO TESTE PUB 01
+  finalidade: custeio
+  empreendimento: null
+  data_contratacao: '2026-07-01'
+  data_liberacao: null
+  valor_rs: 260000.0
+  area_financiada_ha: 90.0
+  area_informada_ha: 90.0
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt: []
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Custeio de aquisição de 100 garrotes para engorda
+    quantidade: 100.0
+    unidade: cabeca
+    valor_rs: 260000.0
+    categoria_animal: garrote
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE PUB 06
+    codigo_estabelecimento: TESTE-5213707-0006
+    municipio_ibge: '5213707'
+    municipio_nome: MONTES CLAROS DE GOIÁS
+  lotacao_implicita_cab_ha: 1.11
+tomador:
+  ref: TOMADOR-TESTE-PUB-06
+  nome: PRODUTOR TESTE PUB 06
+  documento_sintetico: '00000070645'
+  documento_sha256: f48a16af054a368256b36360eecf34dcfa1929ecdde6906773830f49ea5722e5
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999070645550010000070061012820819'
+    sha256: c7ca347c5660920424946274be953f9fb66ad7f170d0c74bc4ecb45ed1d213f5
+    grupo_zf: GO-A-570701
+  gta:
+  - arquivo_json: gta_1.json
+    identificador: GO-A-570701
+    sha256: db7d696ce0ecd9f74145a4db0608978fbf3e1d373b3b18fc9fa41583e329d38c
+  - arquivo_json: gta_2.json
+    identificador: GO-A-570702
+    sha256: 1dc6555842a493980d506165ae3abc2f95b107e472000c1d9b6bced4011c0e83
+  - arquivo_json: gta_3.json
+    identificador: GO-A-570703
+    sha256: 0c579fe3dc396ceb5b1075db5ffaed0f730aa79c3cd754f66ef0b683c75b3358
+pre_indice: null
+video:
+  id: video_curral_1
+  ref: sintetico://videos/PUB-0006/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  saida_simulada_contador:
+    estimativa: 30
+    ic80:
+    - 28
+    - 32
+    confianca: 0.92
+    oclusao_frac: 0.04
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Custeio de aquisição de 100 garrotes para engorda
+      quantidade: 100.0
+      unidade: cabeca
+      valor_rs: 260000.0
+      categoria_animal: garrote
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5213707'
+    municipio_nome: MONTES CLAROS DE GOIÁS
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: f48a16af054a368256b36360eecf34dcfa1929ecdde6906773830f49ea5722e5
+    codigo_estabelecimento_destino: TESTE-5213707-0006
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5213707'
+    municipio_nome: MONTES CLAROS DE GOIÁS
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: f48a16af054a368256b36360eecf34dcfa1929ecdde6906773830f49ea5722e5
+    codigo_estabelecimento_destino: TESTE-5213707-0006
+    caminhos:
+    - gta_1.json
+    - gta_2.json
+    - gta_3.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  laudo:
+    item:bov1:quantidade: divergente
+    item:bov1:comprovante_nfe: verificado
+    item:bov1:gta: verificado
+    item:bov1:lotacao: verificado
+    item:bov1:metodo_if: verificado
+    item:bov1: divergente
+  finos:
+    documento:gta:nfe_guia: verificado
+  ausentes: []
+notas: null

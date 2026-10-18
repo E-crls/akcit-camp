@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "176416",
+  "serie": "AB",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 35
+    }
+  ],
+  "total": 35,
+  "total_por_extenso": "TRINTA E CINCO BOVINOS",
+  "marca_rebanho": "MARCA TESTE 46",
+  "origem": {
+    "documento": "99999999504661",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 47 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 47",
+    "codigo_estabelecimento": "TESTE-5214606-9046",
+    "codigo_exploracao": "TESTE-5214606-9046-BOV",
+    "municipio_nome": "NIQUELÂNDIA",
+    "municipio_ibge": "5214606",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999104647",
+    "nome": "AGROPECUARIA TOMADORA TESTE 47 LTDA",
+    "estabelecimento": "FAZENDA TESTE 47",
+    "codigo_estabelecimento": "TESTE-5210109-0047",
+    "codigo_exploracao": "TESTE-5210109-0047-BOV",
+    "municipio_nome": "IPAMERI",
+    "municipio_ibge": "5210109",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST8C40"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2025-08-24"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE NIQUELÂNDIA"
+  },
+  "emissao": {
+    "local_municipio": "NIQUELÂNDIA",
+    "data": "2026-07-27",
+    "hora": "08:08",
+    "validade": "2026-07-30"
+  },
+  "nfe_chaves": [
+    "52260799999999504661550010000078441719537434"
+  ],
+  "codigo_barras": "SINTGOAB176416",
+  "sintetico": true
+}

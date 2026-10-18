@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "539083",
+  "serie": "GO",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "25-36",
+      "quantidade": 25
+    }
+  ],
+  "total": 25,
+  "total_por_extenso": "VINTE E CINCO BOVINOS",
+  "marca_rebanho": "MARCA TESTE 49",
+  "origem": {
+    "documento": "99999999504904",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 50 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 50",
+    "codigo_estabelecimento": "TESTE-5210109-9049",
+    "codigo_exploracao": "TESTE-5210109-9049-BOV",
+    "municipio_nome": "IPAMERI",
+    "municipio_ibge": "5210109",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000014907",
+    "nome": "PRODUTOR TESTE 50",
+    "estabelecimento": "FAZENDA TESTE 50",
+    "codigo_estabelecimento": "TESTE-5207535-0050",
+    "codigo_exploracao": "TESTE-5207535-0050-BOV",
+    "municipio_nome": "FAINA",
+    "municipio_ibge": "5207535",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST4J30"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-01-05"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE IPAMERI"
+  },
+  "emissao": {
+    "local_municipio": "IPAMERI",
+    "data": "2026-07-21",
+    "hora": "09:14",
+    "validade": "2026-07-22"
+  },
+  "nfe_chaves": [
+    "52260799999999504904550010000012871378238616"
+  ],
+  "codigo_barras": "SINTGOGO539083",
+  "sintetico": true
+}

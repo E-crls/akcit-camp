@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BMC Laudo Vivo</title>
+<!--
+  Business Model Canvas v1 do Laudo Vivo (regional de 24/10/2026). Fonte em texto: bmc-v1.md (mesmo conteúdo).
+  PDF de 1 página A4 paisagem: `node scripts/gerar_pdf_bmc.cjs` (na raiz do laudo-vivo; ver o cabeçalho do script).
+  Números de avaliação e de custo medido ficam entre marcadores "n:chave" (numeros.md): depois da r4,
+  `scripts/py.sh scripts/gerar_numeros.py --aplicar` atualiza este arquivo e o PDF é gerado de novo. Os de
+  mercado ficam entre marcadores "f:chave", conferidos por `scripts/py.sh scripts/checar_numeros_fixos.py`.
+-->
+<style>
+  :root {
+    --bg: #f6f5f1;
+    --paper: #ffffff;
+    --ink: #1d2320;
+    --muted: #5b6460;
+    --line: #cfd6d1;
+    --accent: #2f6b4f;
+    --accent-soft: #e5f0ea;
+    --warn: #8a5a12;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141816;
+      --paper: #1c2220;
+      --ink: #e6ebe8;
+      --muted: #a2aca7;
+      --line: #36403b;
+      --accent: #7cc4a0;
+      --accent-soft: #23302a;
+      --warn: #e0b46a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141816;
+    --paper: #1c2220;
+    --ink: #e6ebe8;
+    --muted: #a2aca7;
+    --line: #36403b;
+    --accent: #7cc4a0;
+    --accent-soft: #23302a;
+    --warn: #e0b46a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 13px/1.38 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    padding: 16px;
+  }
+  header {
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+    gap: 4px 16px; margin: 0 auto 10px; max-width: 1400px;
+  }
+  header h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
+  header h1 span { color: var(--accent); }
+  header p { margin: 0; color: var(--muted); font-size: 12px; }
+  .canvas {
+    max-width: 1400px; margin: 0 auto;
+    display: grid; gap: 6px;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    grid-template-areas:
+      "par par ati ati pro pro rel rel seg seg"
+      "par par rec rec pro pro can can seg seg"
+      "cus cus cus cus cus rev rev rev rev rev";
+  }
+  .box {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px;
+    padding: 9px 11px 10px; min-width: 0;
+  }
+  .box h2 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--accent); margin: 0 0 6px; font-weight: 700;
+  }
+  .box h2 b { color: var(--muted); font-weight: 600; margin-right: 4px; }
+  ul { margin: 0; padding-left: 15px; }
+  li { margin: 0 0 3px; }
+  li::marker { color: var(--accent); }
+  .key { background: var(--accent-soft); border-radius: 4px; padding: 6px 8px; margin-top: 6px; }
+  .nao { color: var(--warn); font-weight: 600; }
+  table { border-collapse: collapse; width: 100%; font-size: 12px; }
+  td { padding: 2px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:last-child { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  .par { grid-area: par; } .ati { grid-area: ati; } .rec { grid-area: rec; }
+  .pro { grid-area: pro; } .rel { grid-area: rel; } .can { grid-area: can; }
+  .seg { grid-area: seg; } .cus { grid-area: cus; } .rev { grid-area: rev; }
+  .pro { border-color: var(--accent); border-width: 2px; }
+  footer { max-width: 1400px; margin: 8px auto 0; color: var(--muted); font-size: 11px; }
+  @media (max-width: 900px) {
+    .canvas {
+      grid-template-columns: 1fr;
+      grid-template-areas: "pro" "seg" "can" "rel" "rev" "ati" "rec" "par" "cus";
+    }
+  }
+  /* Impressão: 1 página A4 paisagem (283 × 196 mm úteis com margem de 7 mm). O grid tem altura fixa para
+     nunca empurrar a linha de custos e receita para a página 2; `node scripts/gerar_pdf_bmc.cjs` confere. */
+  @page { size: A4 landscape; margin: 7mm; }
+  @media print {
+    :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+      --bg: #fff; --paper: #fff; --ink: #111; --muted: #444; --line: #b9c2bc;
+      --accent: #1f5a3f; --accent-soft: #eef5f1; --warn: #7a4a00;
+    }
+    html, body { width: 283mm; height: 196mm; overflow: hidden; }
+    body { padding: 0; font-size: 8pt; line-height: 1.24; }
+    header { margin: 0 0 1.6mm; max-width: none; }
+    header h1 { font-size: 12.5pt; }
+    header p { font-size: 7pt; }
+    .canvas {
+      max-width: none; height: 178mm; gap: 1.4mm;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      grid-template-rows: auto 1fr auto;
+      grid-template-areas:
+        "par par ati ati pro pro rel rel seg seg"
+        "par par rec rec pro pro can can seg seg"
+        "cus cus cus cus cus rev rev rev rev rev";
+    }
+    .box { padding: 1.6mm 2mm; border-radius: 1mm; overflow: hidden; }
+    .box h2 { font-size: 7.8pt; margin-bottom: 1mm; }
+    ul { padding-left: 3.4mm; }
+    li { margin-bottom: 0.7mm; }
+    .key { padding: 1.2mm 1.6mm; margin-top: 1.2mm; }
+    table { font-size: 7.8pt; }
+    td { padding: 0.45mm 1mm; }
+    footer { max-width: none; font-size: 6.2pt; margin-top: 1.2mm; line-height: 1.25; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Laudo Vivo <span>· prova auditável do crédito rural, do satélite ao curral</span></h1>
+  <p>Business Model Canvas v1 · regional AKCIT Camp 2026 (24/10) · cunha: fiscalização de operações com animais (MCR 2-7, Res. CMN 5.267)</p>
+</header>
+
+<main class="canvas">
+  <section class="box par">
+    <h2><b>8</b>Parcerias-chave</h2>
+    <ul>
+      <li><b>Nenhuma firmada até 16/10/2026</b>: a lista é de quem o modelo precisa</li>
+      <li>Credenciadas e agrônomos revisores com ART (a formar)</li>
+      <li>Cooperativas-piloto de GO (nenhuma ainda)</li>
+      <li>Dados públicos: BCB/Sicor, Sentinel-2 (AWS Open Data), IBGE PPM, lista MCR do MMA</li>
+      <li>Agrodefesa (GTA): integração a buscar</li>
+      <li>CEIA-UFG/AKCIT e Escola de Agronomia da UFG (avaliação e fazenda para filmagem)</li>
+      <li>AWS (créditos) para a camada de nuvem opcional</li>
+      <li>Fornecedores de monitoramento remoto: consumimos o alerta deles</li>
+    </ul>
+  </section>
+
+  <section class="box ati">
+    <h2><b>7</b>Atividades-chave</h2>
+    <ul>
+      <li>Conduzir, verificar e selar fiscalizações; emitir o pacote de exibição</li>
+      <li>Manter o MCR como código a cada resolução do CMN</li>
+      <li>Avaliar o agente: golden set (teste congelado em 16/10/2026), red team, alarme de degradação</li>
+      <li>Vender e implantar em cooperativas; formar a rede de credenciadas</li>
+      <li>Rotular desfechos (aceito, devolvido, desclassificado); LGPD: mascaramento, hash com sal, expurgo</li>
+    </ul>
+  </section>
+
+  <section class="box rec">
+    <h2><b>6</b>Recursos-chave</h2>
+    <ul>
+      <li><b>Fiscal-GO 2026</b>: carteira de GO com polígono, lotação e NDVI (prioridade de verificação)</li>
+      <li><b>Golden set</b>: <!--n:golden.n_total.valor-->60<!--/n--> fiscalizações sintéticas, <!--n:golden.n_teste.valor-->24<!--/n--> no teste (congelado em 16/10/2026); leitura de papel: <!--n:ab2.leitura_campos.valor-->5.025<!--/n--> campos de DANFE e GTA</li>
+      <li>MCR 2-7 e 2-9 como código, com o item citado em cada regra; servidor MCP mínimo (Apache-2.0)</li>
+      <li>Política que bloqueia por padrão, verificador independente e trilha com hash</li>
+      <li><span class="nao">Ainda não temos:</span> vídeo de curral goiano anotado (contagem avaliada em <!--f:visao.videos_reais-->5<!--/f--> vídeos reais e <!--f:visao.videos_semissinteticos-->5<!--/f--> semissintéticos) nem agrônomo parceiro com ART</li>
+    </ul>
+  </section>
+
+  <section class="box pro">
+    <h2><b>2</b>Proposta de valor</h2>
+    <ul>
+      <li><b>Cooperativa:</b> cada item da fiscalização aponta para a sua prova (vídeo, foto georreferenciada, NF-e, GTA, satélite, regra do MCR); o pacote de exibição que o BCB e a Justiça pedem sai em um clique, depois do selo. Visita presencial só onde há divergência.</li>
+      <li><b>Fiscal:</b> coleta guiada por voz; não digita o papel: fotografa a nota e a GTA, a IA lê, as regras conferem e o agente pede só o que faltou. No teste congelado, com fiscal simulado, a IA não conciliou mais que o formulário digitado (<!--n:ab2_teste.residual.kn-->17/24<!--/n--> contra <!--n:ab2_teste.formulario.kn-->14/24<!--/n-->); o ganho é poupar a digitação (<!--n:ab2_teste.toques_residual.valor-->12<!--/n--> toques contra <!--n:ab2_teste.toques_formulario.valor-->304<!--/n-->). No dev, onde o A/B foi desenvolvido, <!--n:ab2.residual.valor-->97%<!--/n--> contra <!--n:ab2.formulario.valor-->42%<!--/n-->, que não se repetiu no teste. O agente recusa "pode marcar 29" e registra; quem assina é ela.</li>
+      <li><b>Credenciada:</b> mais fiscalizações por fiscal (hipótese: o tempo da fiscal só foi modelado, no teste <!--n:ab2_teste.tempo_residual.uma_casa-->34,5 s<!--/n--> contra <!--n:ab2_teste.tempo_formulario.valor-->215 s<!--/n-->; nenhum fiscal cronometrado ainda).</li>
+    </ul>
+    <div class="key">Os outros apontam o que o satélite vê. Nós fechamos a prova do que ele não vê, item a item: verificado, divergente, pendente ou abstenção.</div>
+  </section>
+
+  <section class="box rel">
+    <h2><b>4</b>Relacionamento</h2>
+    <ul>
+      <li>Piloto Fundador de 90 dias com garantia de aceitação</li>
+      <li>Sucesso do cliente por cooperativa; treino em campo</li>
+      <li>Relatório mensal: aceitação, abstenção, visitas evitadas</li>
+      <li>Comunidade de fiscais</li>
+    </ul>
+  </section>
+
+  <section class="box can">
+    <h2><b>3</b>Canais</h2>
+    <ul>
+      <li>Venda consultiva a cooperativas de GO (teste retroativo → piloto → contrato)</li>
+      <li>Credenciadas: licença por fiscal (acesso ao volume de BB e Caixa)</li>
+      <li>Indicação entre cooperativas; CREA-GO; eventos do sistema</li>
+      <li>Código aberto como vitrine; depois centrais (API e marca branca)</li>
+    </ul>
+  </section>
+
+  <section class="box seg">
+    <h2><b>1</b>Segmentos de clientes</h2>
+    <ul>
+      <li><b>Paga:</b> cooperativas de crédito com carteira pecuária. Perfil ideal: <!--f:mercado.singulares_perfil-->109<!--/f--> singulares com ≥ 300 itens físicos/ano &gt; R$ 20 mil (<!--f:mercado.pct_itens_perfil-->82%<!--/f--> desses itens nas singulares; Sicor 2025)</li>
+      <li><b>Paga (canal):</b> credenciadas que fiscalizam para cooperativas, Caixa e bancos</li>
+      <li><b>Usa:</b> "Paula", fiscal de campo (técnica agrícola ou agrônoma; persona composta de fontes públicas, não entrevistada)</li>
+      <li><b>Depois:</b> centrais, bancos médios; credor privado do agro ("Lastro")</li>
+      <li><b>Piloto:</b> Goiás, <!--f:mercado.itens_go-->34.890<!--/f--> itens físicos &gt; R$ 20 mil em 2025; <!--f:mercado.singulares_go_100-->16<!--/f--> singulares com &gt; 100 itens</li>
+    </ul>
+  </section>
+
+  <section class="box cus">
+    <h2><b>9</b>Estrutura de custos</h2>
+    <ul>
+      <li><b>Pessoas</b> (maior custo): engenharia, vendas e sucesso do cliente, agrônomos revisores</li>
+      <li><b>Tecnologia por fiscalização:</b> LLM medido no trace da demo (<!--n:custo.tokens_entrada_mil.valor-->135 mil<!--/n--> tokens): <!--n:custo.local_rs.valor-->R$ 0,0035<!--/n--> de energia local, <!--n:custo.nuvem_min_rs.valor-->R$ 0,04<!--/n-->–<!--n:custo.nuvem_max_rs.valor-->R$ 0,28<!--/n--> em nuvem; com voz, visão e guarda por 5 anos, <!--f:mercado.tec_local-->~R$ 0,50–3<!--/f--> local e <!--f:mercado.tec_nuvem-->~R$ 1–6<!--/f--> em nuvem (estimado). Inferência &lt; <!--f:mercado.inferencia_pct-->5%<!--/f--> do preço</li>
+      <li><b>Revisão humana:</b> <!--f:mercado.revisao_amostral-->~R$ 2<!--/f--> (QA amostral, software); <!--f:mercado.revisao_servico-->~R$ 42<!--/f--> + visita de exceção (serviço)</li>
+      <li><b>Campo e risco:</b> pilotos, filmagens, ART por contrato, seguro de RC profissional</li>
+      <li><b>CAC</b> (estimado): <!--f:mercado.cac_cooperativa-->R$ 15–30 mil<!--/f--> por cooperativa; <!--f:mercado.cac_credenciada-->R$ 2–5 mil<!--/f--> por credenciada</li>
+    </ul>
+    <div class="key">Margem bruta estimada: <!--f:mercado.margem_software-->82–92%<!--/f--> software · <!--f:mercado.margem_servico-->~56%<!--/f--> serviço · <!--f:mercado.margem_mix-->~80%<!--/f--> mix do ano 2</div>
+  </section>
+
+  <section class="box rev">
+    <h2><b>5</b>Fontes de receita (preços-alvo, nenhum testado com cliente)</h2>
+    <table>
+      <tr><td>Fiscalização assistida, por fiscalização concluída</td><td><!--f:mercado.preco_fiscalizacao-->R$ 79<!--/f--> (preço-alvo)</td></tr>
+      <tr><td>Licença de credenciada, por fiscal/mês (15 incluídas)</td><td><!--f:mercado.preco_licenca-->R$ 590<!--/f--></td></tr>
+      <tr><td>Triagem de carteira pecuária, por operação/ano</td><td><!--f:mercado.preco_triagem-->R$ 8<!--/f--></td></tr>
+      <tr><td>Exceção socioambiental resolvida (final, MCR 2-9)</td><td><!--f:mercado.preco_excecao-->R$ 490<!--/f--></td></tr>
+      <tr><td>Fiscalização remota-first como serviço (fase 2)</td><td><!--f:mercado.preco_servico-->R$ 290<!--/f--></td></tr>
+      <tr><td>Piloto Fundador (90 dias, até 150 fiscalizações)</td><td><!--f:mercado.preco_piloto-->R$ 5.900<!--/f--></td></tr>
+    </table>
+    <div class="key">Âncora: piso de <!--f:mercado.piso_visita-->R$ 669<!--/f--> por visita presencial (tabela de honorários AEA-MS 2024, outro estado). Nenhum preço foi perguntado a cliente: o Piloto Fundador é o teste.</div>
+  </section>
+</main>
+
+<footer>
+  Fontes e contas: docs/entregaveis/mercado.md (Sicor/BCB 2025, cálculo próprio; custo e margem estimados na seção 8) e docs/decisao.md. Números de avaliação e custo medido: docs/entregaveis/numeros.md (rodada <!--n:versao.sufixo.valor-->r4<!--/n-->; atualizados pela r4). "Paula" é persona composta de fontes públicas. Até 16/10/2026 não há entrevista registrada, carta de intenção, piloto nem cliente. Versão de 08/10/2026, revista em 09/10 e 16/10/2026.
+</footer>
+</body>
+</html>

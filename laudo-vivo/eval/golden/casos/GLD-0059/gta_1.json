@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "472551",
+  "serie": "B",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "13-24",
+      "quantidade": 28
+    }
+  ],
+  "total": 28,
+  "total_por_extenso": "VINTE E OITO BOVINOS",
+  "marca_rebanho": "MARCA TESTE 08",
+  "origem": {
+    "documento": "99999999505803",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 59 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 59",
+    "codigo_estabelecimento": "TESTE-5202502-9058",
+    "codigo_exploracao": "TESTE-5202502-9058-BOV",
+    "municipio_nome": "ARUANÃ",
+    "municipio_ibge": "5202502",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999105880",
+    "nome": "AGROPECUARIA TOMADORA TESTE 59 LTDA",
+    "estabelecimento": "FAZENDA TESTE 59",
+    "codigo_estabelecimento": "TESTE-5218508-0059",
+    "codigo_exploracao": "TESTE-5218508-0059-BOV",
+    "municipio_nome": "QUIRINÓPOLIS",
+    "municipio_ibge": "5218508",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST8G54"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-01-16"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 1 DE 2",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE ARUANÃ"
+  },
+  "emissao": {
+    "local_municipio": "ARUANÃ",
+    "data": "2026-07-19",
+    "hora": "15:15",
+    "validade": "2026-07-20"
+  },
+  "nfe_chaves": [
+    "52260799999999505803550010000010031340724293"
+  ],
+  "codigo_barras": "SINTGOB472551",
+  "sintetico": true
+}

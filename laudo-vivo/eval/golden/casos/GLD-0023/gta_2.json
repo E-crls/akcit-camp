@@ -1,0 +1,64 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "MT",
+  "numero": "570783",
+  "serie": "MT",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "25-36",
+      "quantidade": 25
+    }
+  ],
+  "total": 25,
+  "total_por_extenso": "VINTE E CINCO BOVINOS",
+  "marca_rebanho": "MARCA TESTE 22",
+  "origem": {
+    "documento": "99999999502294",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 23 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 23",
+    "codigo_estabelecimento": "TESTE-5101803-9022",
+    "codigo_exploracao": "TESTE-5101803-9022-BOV",
+    "municipio_nome": "BARRA DO GARÇAS",
+    "municipio_ibge": "5101803",
+    "uf": "MT"
+  },
+  "destino": {
+    "documento": "00000012289",
+    "nome": "PRODUTOR TESTE 23",
+    "estabelecimento": "FAZENDA TESTE 23",
+    "codigo_estabelecimento": "TESTE-5218300-0023",
+    "codigo_exploracao": "TESTE-5218300-0023-BOV",
+    "municipio_nome": "POSSE",
+    "municipio_ibge": "5218300",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST8J24"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-03-19"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 2 DE 2",
+  "emitente": {
+    "tipo": "FUNCIONARIO_AUTORIZADO",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE BARRA DO GARÇAS"
+  },
+  "emissao": {
+    "local_municipio": "BARRA DO GARÇAS",
+    "data": "2026-07-28",
+    "hora": "08:57",
+    "validade": "2026-07-29"
+  },
+  "nfe_chaves": [],
+  "codigo_barras": "SINTMTMT570783",
+  "sintetico": true
+}

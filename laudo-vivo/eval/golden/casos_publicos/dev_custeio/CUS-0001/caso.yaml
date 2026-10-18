@@ -1,0 +1,129 @@
+id: CUS-0001
+versao_gerador: 0.2.1
+split: dev_custeio
+sintetico: true
+classe: valido
+titulo: 'Custeio de aquisição de garrotes: tudo confere'
+inspiracao: null
+data_fiscalizacao: '2026-09-15'
+operacao:
+  ref_bacen: SINT-PUB-2026-000021
+  tomador_ref: TOMADOR-TESTE-PUB-21
+  tomador_doc_sha256: null
+  uf: GO
+  municipio_ibge: '5206404'
+  municipio_nome: CRIXÁS
+  instituicao: COOPERATIVA DE CREDITO TESTE PUB 01
+  finalidade: custeio
+  empreendimento: null
+  data_contratacao: '2026-07-01'
+  data_liberacao: null
+  valor_rs: 204000.0
+  area_financiada_ha: 50.0
+  area_informada_ha: 50.0
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt: []
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Custeio de aquisição de 80 garrotes para recria
+    quantidade: 80.0
+    unidade: cabeca
+    valor_rs: 204000.0
+    categoria_animal: garrote
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE PUB 21
+    codigo_estabelecimento: TESTE-5206404-0021
+    municipio_ibge: '5206404'
+    municipio_nome: CRIXÁS
+  lotacao_implicita_cab_ha: 1.6
+tomador:
+  ref: TOMADOR-TESTE-PUB-21
+  nome: PRODUTOR TESTE PUB 21
+  documento_sintetico: 00000072184
+  documento_sha256: c0c9d55b388cd6498a10c71e29b34a63a4726b8a992d229bcc4f2f324bb57941
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999072184550010000070211014008660'
+    sha256: 848a5a01c0fa2445c52ee3117f62d3caa2b438e86c607382fa620ec90adf652e
+    grupo_zf: GO-A-610101
+  gta:
+  - arquivo_json: gta_1.json
+    identificador: GO-A-610101
+    sha256: e3b9b62714bf41a8f7ba2ee88324cf40d34e308666eb6463d3f34b226eba78b4
+  - arquivo_json: gta_2.json
+    identificador: GO-A-610102
+    sha256: fe5f4ef8ddb0222863a3c540ab372e4500d260572b09a77d05e929474a2c0d5e
+pre_indice: null
+video:
+  id: video_curral_1
+  ref: sintetico://videos/CUS-0001/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  saida_simulada_contador:
+    estimativa: 80
+    ic80:
+    - 79
+    - 81
+    confianca: 0.92
+    oclusao_frac: 0.04
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Custeio de aquisição de 80 garrotes para recria
+      quantidade: 80.0
+      unidade: cabeca
+      valor_rs: 204000.0
+      categoria_animal: garrote
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5206404'
+    municipio_nome: CRIXÁS
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: c0c9d55b388cd6498a10c71e29b34a63a4726b8a992d229bcc4f2f324bb57941
+    codigo_estabelecimento_destino: TESTE-5206404-0021
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5206404'
+    municipio_nome: CRIXÁS
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: c0c9d55b388cd6498a10c71e29b34a63a4726b8a992d229bcc4f2f324bb57941
+    codigo_estabelecimento_destino: TESTE-5206404-0021
+    caminhos:
+    - gta_1.json
+    - gta_2.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  laudo:
+    item:bov1:quantidade: verificado
+    item:bov1:comprovante_nfe: verificado
+    item:bov1:gta: verificado
+    item:bov1:lotacao: verificado
+    item:bov1:metodo_if: verificado
+    item:bov1: verificado
+  finos: {}
+  ausentes: []
+notas: null

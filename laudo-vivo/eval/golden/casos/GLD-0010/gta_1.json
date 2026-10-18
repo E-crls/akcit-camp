@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "456571",
+  "serie": "AB",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "25-36",
+      "quantidade": 20
+    }
+  ],
+  "total": 20,
+  "total_por_extenso": "VINTE BOVINOS",
+  "marca_rebanho": "MARCA TESTE 09",
+  "origem": {
+    "documento": "99999999500917",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 10 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 10",
+    "codigo_estabelecimento": "TESTE-5220207-9009",
+    "codigo_exploracao": "TESTE-5220207-9009-BOV",
+    "municipio_nome": "SÃO MIGUEL DO ARAGUAIA",
+    "municipio_ibge": "5220207",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000010901",
+    "nome": "PRODUTOR TESTE 10",
+    "estabelecimento": "FAZENDA TESTE 10",
+    "codigo_estabelecimento": "TESTE-5216403-0010",
+    "codigo_exploracao": "TESTE-5216403-0010-BOV",
+    "municipio_nome": "PARAÚNA",
+    "municipio_ibge": "5216403",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST6G40"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-05-01"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE SÃO MIGUEL DO ARAGUAIA"
+  },
+  "emissao": {
+    "local_municipio": "SÃO MIGUEL DO ARAGUAIA",
+    "data": "2026-08-08",
+    "hora": "14:20",
+    "validade": "2026-08-10"
+  },
+  "nfe_chaves": [
+    "52260899999999500917550010000087791389013199"
+  ],
+  "codigo_barras": "SINTGOAB456571",
+  "sintetico": true
+}

@@ -1,0 +1,46 @@
+gerador:
+  versao: 0.2.1
+  semente_chaves: casos-publicos-20261016
+  bits: 1024
+split: dev_custeio
+papel: 'dev: desenvolvimento do perfil custeio; pode ser regerado e usado para ajustar o perfil; sem split de teste
+  próprio, por isso nunca vai para número de slide; fica fora de eval/golden/casos, cujo split está congelado (sha256_split)
+  desde 16/10/2026'
+nota: 'split dev_custeio: 4 casos de desenvolvimento do perfil custeio de animais (rulebook mcr-2-7 0.4.0); não
+  são casos públicos nem entram no golden principal; nunca vão para o número do slide'
+congelado: false
+sha256_conteudo: d3506a9b52c8bc55f58ec4ddcebe2b549d616e8b788748d5699e6d883f4b80fe
+casos:
+- id: CUS-0001
+  classe: valido
+  titulo: 'Custeio de aquisição de garrotes: tudo confere'
+  sha256_caso: 3634f093cdd192d7363586a1f8176d364e99dbc7812453a003f85f3710e20f45
+  arquivos:
+    caso.yaml: 3634f093cdd192d7363586a1f8176d364e99dbc7812453a003f85f3710e20f45
+    gta_1.json: e3b9b62714bf41a8f7ba2ee88324cf40d34e308666eb6463d3f34b226eba78b4
+    gta_2.json: fe5f4ef8ddb0222863a3c540ab372e4500d260572b09a77d05e929474a2c0d5e
+    nfe_1.xml: 848a5a01c0fa2445c52ee3117f62d3caa2b438e86c607382fa620ec90adf652e
+- id: CUS-0002
+  classe: defeito
+  titulo: 'Custeio de aquisição: contagem abaixo da tolerância'
+  sha256_caso: a14736f4a4f4d6e138276f7614b8eda74a5eeb6f8e76097dd7e8e13b4e6759ae
+  arquivos:
+    caso.yaml: a14736f4a4f4d6e138276f7614b8eda74a5eeb6f8e76097dd7e8e13b4e6759ae
+    gta_1.json: b674f61355a0a932b5698292d03ccbceebd5c236c8697fab9cde02e555a2d2c5
+    gta_2.json: 914664bd85d10fbd8c65a60410ef4955caf0f4f141b15b6cc85f140b0a053f73
+    nfe_1.xml: 1f5c9f8df56a50257c4f81def37183f8dd22fd98cb5bff3833fe6c0f8e51a117
+- id: CUS-0003
+  classe: defeito
+  titulo: 'Custeio de aquisição: uma das GTAs vai para outro estabelecimento'
+  sha256_caso: 3215875d8d668d8d13a5e9a0ba89b12d6b6046d2163d3fce9aff418d5e4af9ab
+  arquivos:
+    caso.yaml: 3215875d8d668d8d13a5e9a0ba89b12d6b6046d2163d3fce9aff418d5e4af9ab
+    gta_1.json: 39bde7afc405a08a96b2dc2ace6fdec55814bed8c4f5e14a90e2b6becbeadd9d
+    gta_2.json: 92137a608cf18646f18e5f20dc6d0c463341eb69ae883b252a3b2aa75db144e0
+    nfe_1.xml: d2a3acb0ac6b108f8c7c7ff3f83e369f7fe053398ed277335715e7913be1d144
+- id: CUS-0004
+  classe: valido
+  titulo: Custeio só de manutenção do lote, lotação acima do parâmetro
+  sha256_caso: f2030f9b1f83bdd28eb185704e7e31d16233935591a10e105ff1d30f9ace7f7d
+  arquivos:
+    caso.yaml: f2030f9b1f83bdd28eb185704e7e31d16233935591a10e105ff1d30f9ace7f7d

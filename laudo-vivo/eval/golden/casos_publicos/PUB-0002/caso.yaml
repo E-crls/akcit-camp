@@ -1,0 +1,132 @@
+id: PUB-0002
+versao_gerador: 0.2.1
+split: casos_publicos
+sintetico: true
+classe: ambiguo
+titulo: 'GTA de papel: as GTAs apresentadas não são a citada no grupo ZF da NF-e'
+inspiracao:
+  caso: 'Operação Boi de Papel (PF/TO): GTAs falsas simulando compra de gado inexistente; R$ 94 mi é o crédito concedido,
+    não o prejuízo'
+  fonte: CompreRural
+  url: https://comprerural.com/boi-de-papel-fraude-deixa-prejuizo-de-r-94-milhoes/
+  acesso: '2026-10-16'
+  data_noticia: '2024-03-08'
+  item_normativo: 'NT 2024.003 v1.03 grupo ZF (guiaTransito: uma guia por NF-e; nGuia, série, UF); OP-bovinos-gta;
+    MCR 2-5-10-b'
+  o_que_prova: 'a GTA só vale cruzada com a nota: quando nenhuma GTA apresentada é a citada no grupo ZF, o laudo
+    não fecha (pendência até a GTA citada aparecer)'
+  o_que_nao_prova: 'falsidade da GTA (autenticidade só no SIDAGO/BDU, fora do escopo offline); nem que a GTA é de
+    outra venda: o fiscal pode só não ter enviado a GTA citada, por isso é pendência e não acusação'
+  adaptacao: fiscalização documental (sem vídeo); duas GTAs apresentadas (cargas 1 e 2) e a NF-e cita no grupo ZF
+    uma terceira guia, de outra série
+data_fiscalizacao: '2026-09-15'
+operacao:
+  ref_bacen: SINT-PUB-2026-000002
+  tomador_ref: TOMADOR-TESTE-PUB-02
+  tomador_doc_sha256: null
+  uf: GO
+  municipio_ibge: '5210208'
+  municipio_nome: IPORÁ
+  instituicao: COOPERATIVA DE CREDITO TESTE PUB 03
+  finalidade: investimento
+  empreendimento: null
+  data_contratacao: '2026-07-01'
+  data_liberacao: null
+  valor_rs: 328000.0
+  area_financiada_ha: 150.0
+  area_informada_ha: 150.0
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt: []
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 80 vacas (bovinos carne - matrizes)
+    quantidade: 80.0
+    unidade: cabeca
+    valor_rs: 328000.0
+    categoria_animal: vaca
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE PUB 02
+    codigo_estabelecimento: TESTE-5210208-0002
+    municipio_ibge: '5210208'
+    municipio_nome: IPORÁ
+  lotacao_implicita_cab_ha: 0.53
+tomador:
+  ref: TOMADOR-TESTE-PUB-02
+  nome: PRODUTOR TESTE PUB 02
+  documento_sintetico: '00000070211'
+  documento_sha256: 7d81c0818bc54cb90c00cf5c4b7225b677ed9814820c04e252d954c3ce85a904
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999070211550010000070021012504054'
+    sha256: 613ab815e13abd4584544bfb0d0c5c0248f12f8c5c3ec51122251285ced7eb64
+    grupo_zf: GO-B-538801
+  gta:
+  - arquivo_json: gta_1.json
+    identificador: GO-A-530301
+    sha256: 92ef7a7bbd7fe25770480df0c2dbe30d6fa86794ff94d6b9196b45b8664933f7
+  - arquivo_json: gta_2.json
+    identificador: GO-A-530302
+    sha256: 0b764c8b097b815765be2d6289784890f64e5c02046426c033776d88a9f203a8
+pre_indice: null
+video: null
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 80 vacas (bovinos carne - matrizes)
+      quantidade: 80.0
+      unidade: cabeca
+      valor_rs: 328000.0
+      categoria_animal: vaca
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5210208'
+    municipio_nome: IPORÁ
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: 7d81c0818bc54cb90c00cf5c4b7225b677ed9814820c04e252d954c3ce85a904
+    codigo_estabelecimento_destino: TESTE-5210208-0002
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5210208'
+    municipio_nome: IPORÁ
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: 7d81c0818bc54cb90c00cf5c4b7225b677ed9814820c04e252d954c3ce85a904
+    codigo_estabelecimento_destino: TESTE-5210208-0002
+    caminhos:
+    - gta_1.json
+    - gta_2.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  laudo:
+    item:bov1:quantidade: pendente
+    item:bov1:comprovante_nfe: verificado
+    item:bov1:gta: pendente
+    item:bov1: pendente
+  finos:
+    documento:gta:nfe_guia: pendente
+    item:bov1:gta_quantidade: verificado
+  ausentes: []
+notas: null

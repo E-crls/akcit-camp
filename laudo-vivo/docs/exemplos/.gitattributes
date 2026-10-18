@@ -1,0 +1,10 @@
+# Arquivos gerados com hash registrado (SHA256SUMS, gerado_com.json e o laudo selado dentro do ZIP, que
+# conferir_exemplo.py compara byte a byte): ficam no git exatamente como saíram da geração. O laudo selado sai
+# com CRLF no Windows, e a regra da raiz (`* text=auto eol=lf`) o converteria para LF no commit; o clone
+# acusaria "mudou depois da geração". Os scripts e o README desta pasta seguem a regra da raiz.
+laudo_selado.json -text
+laudo_selado.html -text
+laudo_selado.pdf binary
+DEMONSTRACAO_pacote_exibicao.zip binary
+SHA256SUMS -text
+gerado_com.json -text

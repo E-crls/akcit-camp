@@ -1,0 +1,918 @@
+# Rulebook MCR 2-7 (Monitoramento e Fiscalização), Res. CMN 5.267/2025.
+# Esquema: src/laudo/rulebooks/__init__.py. Versionamento e revisão: docs/regras.md.
+# Texto literal das normas citadas: docs/normas/mcr_2_7.md (conferido por teste).
+#
+# Convenções:
+#   origem: norma                 -> o que a norma manda; `citacao` literal obrigatória.
+#   origem: parametro_operacional -> escolha nossa para tornar a norma executável; `justificativa` obrigatória.
+#   avaliador: nulo               -> regra informativa (citável, não executada).
+#   Data de referência sempre explícita (nunca "hoje" implícito dentro da regra).
+#
+# Histórico:
+#   0.5.0 (16/10/2026, onda 3, antes da r4): (1) novo parâmetro PAR-pacote-prazo-contestacao-dias (15 dias
+#         corridos para o mutuário contestar o laudo selado no pacote de exibição; escolha da IF, pendência de
+#         compliance), que era só uma constante de tools/pacote.py. (2) Perfil de custeio: o plano
+#         (planejar_metodo) lista só os componentes do método que se aplicam ao item, como o campo metodo_if
+#         do laudo já fazia; item só de manutenção não lista NF-e nem GTA de compra. (3) Pendente de regra não
+#         bloqueante (lotação, método do perfil) continua "pendente", mas sai marcado à parte: ressalva "não
+#         bloqueante", motivo terminando em "(não bloqueia o laudo)" e lista `nao_bloqueantes` no resultado do
+#         avaliar_regras, fora de `bloqueios`. (4) OP-agregacao-item: o texto diz "exigências bloqueantes"
+#         (o item pode ficar verificado com ponto de atenção pendente, e o motivo do item diz isso). Nenhum
+#         status de caso de teste muda.
+#   0.4.0 (16/10/2026, cunha "operações com animais"): novo perfil OP-perfil-custeio-animais (custeio de
+#         aquisição e manutenção de animais), escolhido por item quando operacao.finalidade = custeio e o item
+#         é de bovinos; fluxo custeio_animais com as mesmas checagens do investimento (contagem, NF-e e GTA da
+#         aquisição) mais a lotação (OP-custeio-lotacao, sinal não bloqueante) e o método documentado pela IF
+#         (MCR-2-7-item1-metodo-documentado-if, item 1-c, citação literal). Item só de manutenção (sem
+#         aquisição) não exige NF-e nem GTA de compra. Novo parâmetro PAR-custeio-lotacao-atencao-cab-ha. A
+#         marcação dos animais (MCR 3-3-10-b, investimento) deixa de ser recomendada em operação de custeio.
+#         Operações de investimento ou sem finalidade conhecida: nenhum status muda (mesmo fluxo bovinos).
+#         Revisão de 16/10 (antes da r4): o método do item lista só os componentes que se aplicam a ele
+#         (`efeito.campos` liga cada componente ao campo do fluxo; item só de manutenção não lista NF-e nem
+#         GTA).
+#   0.3.0 (09/10/2026, rodada 3): (1) OP-benfeitoria-geofence: foto fora da gleba com posição medida entre
+#         PAR-geofence-perto-m e PAR-geofence-longe-m é PENDENTE (nova captura de dentro da gleba ou justificativa
+#         do fiscal), não "inconclusiva": duas capturas consistentes nessa faixa não viram abstenção; abstenção
+#         fica para GPS impreciso/indeterminado (PAR-tentativas-inconclusivas-max). A justificativa do fiscal
+#         resolve a pendência (o campo continua pendente no laudo, com as palavras dele). (2) Nova regra
+#         OP-alegacao-declaracao-x-evidencia: o laudo confronta cada alegação da fala com a evidência e diz a
+#         origem de cada valor (XML, foto validada, completado pela fiscal, vídeo, satélite); não muda status.
+#         (3) MCR-2-7-item16-benfeitorias-conclusao: classificar_foto só conta se a classe da foto for a do item.
+#   0.2.0 (08/10/2026, integração): na agregação `qualquer_divergente` (integridade e localização da foto), uma
+#         captura inconclusiva só é superada por uma captura verificada POSTERIOR (foto duplicada na mesma
+#         fiscalização deixa o campo pendente, como decidido pelo coordenador; a foto refeita de dentro da gleba
+#         resolve a anterior). Checagem com `resultado.substitui` (NF-e/GTA reconciliadas com todos os documentos
+#         do item) tira as substituídas da agregação.
+#   0.1.0 (08/10/2026): versão inicial.
+
+id: mcr-2-7
+titulo: "MCR 2-7 — Monitoramento e Fiscalização (fluxo do regional: operações com animais)"
+versao: 0.5.0
+vigencia_inicio: 2026-03-01
+vigencia_fim: null
+norma_base: "Resolução CMN nº 5.267, de 28/11/2025 (DOU 01/12/2025), anexo — nova Seção 7 do Capítulo 2 do MCR"
+texto_normativo: docs/normas/mcr_2_7.md
+
+fontes:
+  - id: res-5267
+    descricao: "Resolução CMN nº 5.267/2025 (texto oficial, API de normativos do BCB)"
+    url: "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20CMN&numero=5267"
+    acesso: 2026-10-08
+  - id: mcr-sgm
+    descricao: "MCR vigente no Sistema de Gestão de Manuais do BCB (seções 2-2, 2-5, 2-7, 2-8, 3-3)"
+    url: "https://manuais.bcb.gov.br/app/manual/mcr/publico"
+    acesso: 2026-10-08
+    observacao: "Seção 2-7 com cabeçalho 'Resolução CMN nº 5.267'; nenhuma resolução até a 5.343 altera o 2-7."
+
+revisao:
+  estado: rascunho_tecnico
+  revisores: []
+  pendencias:
+    - "Agrônomo/compliance: validar tolerância de contagem (PAR-contagem-tolerancia-pct) e o uso só para menos."
+    - "Compliance: validar o enquadramento de 'autofiscalização assistida' como método documental (item 3-b)."
+    - "Compliance: confirmar se 'área total' (item 5-b) pode ser aproximada pela área financiada do Sicor."
+    - "Agrônomo: calibrar distâncias de geofence para curral na sede, fora da gleba financiada."
+    - "Jurídico: confirmar a fonte sanitária da GTA (fora do MCR) e os campos mínimos de conciliação."
+    - >-
+      Compliance: validar o perfil de custeio de animais (OP-perfil-custeio-animais) como o método
+      documentado pela IF (item 1-c).
+    - >-
+      Agrônomo: calibrar PAR-custeio-lotacao-atencao-cab-ha (recria/engorda a pasto, semiconfinamento) e o
+      critério de item só de manutenção.
+    - >-
+      Compliance/jurídico: confirmar PAR-pacote-prazo-contestacao-dias (15 dias corridos da ciência) e a forma
+      da ciência do mutuário no termo do pacote de exibição; o MCR não fixa prazo de contestação.
+
+parametros:
+  - id: PAR-contagem-tolerancia-pct
+    valor: 5
+    unidade: "%"
+    justificativa: >-
+      A norma não fixa tolerância de contagem (MCR 2-7-1-c pede critérios consistentes e verificáveis).
+      Contagem em curral/corredor tem erro de alguns por cento (animais sobrepostos, refugo, bezerro ao pé).
+      Aplicamos a tolerância só para baixo: encontrar mais animais que o financiado não indica desvio na
+      aplicação, porque o rebanho próprio pode estar no mesmo lote. Valor inicial, a calibrar no golden set.
+    base_normativa: ["MCR 2-7-1-c", "MCR 2-7-2-a-I"]
+    calibrar: "golden set de vídeos anotados; meta de falso divergente < 2%"
+  - id: PAR-tentativas-inconclusivas-max
+    valor: 2
+    unidade: "tentativas"
+    justificativa: >-
+      Depois de duas checagens inconclusivas do mesmo campo (ex.: contagem com oclusão), o sistema deixa de
+      pedir nova coleta e se abstém, devolvendo a decisão ao humano. Isso evita o laço infinito de refilmagem
+      e o "recontar até passar".
+    base_normativa: ["MCR 2-7-10"]
+  - id: PAR-geofence-perto-m
+    valor: 100
+    unidade: "m"
+    justificativa: >-
+      Distância máxima entre a foto e a borda da gleba para aceitá-la como do empreendimento. Cobre o erro de
+      GPS de celular (5 a 30 m) e cercas na divisa fotografadas do lado de fora. A norma não fixa distância.
+    calibrar: "fotos reais de cerca/curral em Goiás; checar curral na sede fora da gleba do Sicor"
+  - id: PAR-geofence-longe-m
+    valor: 1000
+    unidade: "m"
+    justificativa: >-
+      Acima desta distância da gleba, a foto é tratada como divergente (provável outra estrutura/imóvel). Entre
+      PAR-geofence-perto-m e este valor, o campo fica pendente: refazer a foto ou justificar (ex.: curral na
+      sede). Assim evitamos acusar divergência por imprecisão de polígono. A pendência dessa faixa não conta
+      como captura inconclusiva (a posição foi medida): não leva à abstenção (rulebook 0.3.0).
+  - id: PAR-area-total-usa-financiada
+    valor: true
+    justificativa: >-
+      O Sicor público traz a área financiada, não a "área total" do item 5-b. Sem a área total, há dois casos.
+      Se a financiada passa de 300 ha, a obrigatoriedade é certa, porque a área total é maior ou igual à
+      financiada. Se fica em até 300 ha, este parâmetro manda usar a financiada como aproximação e emitir
+      aviso. A aproximação pode subestimar a obrigatoriedade. Com o parâmetro em false, o caso fica
+      indeterminado e o campo vira pendente até alguém informar a área total.
+    base_normativa: ["MCR 2-7-5-b"]
+  - id: PAR-custeio-lotacao-atencao-cab-ha
+    valor: 3
+    unidade: "cab/ha"
+    justificativa: >-
+      Lotação (cabeças do lote financiado por hectare de pasto) acima da qual o custeio de aquisição e
+      manutenção de animais vira ponto de atenção do fiscal. É o mesmo limiar da triagem da carteira para
+      custeio (geo/triagem.py, lot_cust_1 = 3 cab/ha), para que triagem e laudo falem a mesma língua. A norma
+      não fixa lotação: o valor só gera pendência não bloqueante (confirmar piquetes, arrendamento ou
+      semiconfinamento), nunca divergência. A área usada é a informada; sem ela, a financiada (que é
+      proporcional ao crédito, não é o pasto), com aviso.
+    base_normativa: ["MCR 2-7-1-c", "MCR 2-7-2-b-II", "MCR 2-7-9"]
+    calibrar: "dev do perfil custeio e casos reais de recria/engorda em GO (meta: sinal em < 20% dos válidos)"
+  - id: PAR-pacote-prazo-contestacao-dias
+    valor: 15
+    unidade: "dias corridos"
+    justificativa: >-
+      Prazo que o pacote de exibição dá ao mutuário para contestar o resultado do laudo selado, contado da
+      data da ciência registrada no termo (tools/pacote.py, PRAZO_CONTESTACAO_DIAS). O MCR não fixa prazo de
+      contestação: o 2-8-3 dá à IF até 60 dias, contados da data em que ficou ciente do fato, para adotar as
+      medidas da desclassificação, e o 2-7-18 diz quando o mutuário pode ser responsabilizado pelas despesas
+      da fiscalização. Quinze dias deixam à IF tempo para examinar a contestação dentro desses 60 dias; a
+      contestação aceita vira nova fiscalização, com nova evidência e nova assinatura humana (o laudo selado
+      não muda). É escolha operacional da IF, não direito do mutuário previsto no MCR: pendência de
+      compliance/jurídico em revisao.pendencias.
+    base_normativa: ["MCR 2-8-3", "MCR 2-7-18"]
+    calibrar: "compliance/jurídico da IF: prazo e forma da ciência (o pacote aceita de 5 a 60 dias)"
+
+regras:
+  # ------------------------------------------------------------------ método
+  - id: MCR-2-7-item1-registro-verificacoes
+    item: "MCR 2-7-1-c e 2-7-1-d"
+    tipo: requisito_laudo
+    origem: norma
+    titulo: "Método e verificações registrados"
+    citacao: "d) o necessário registro das verificações realizadas"
+    citacoes_adicionais:
+      - "a aplicação de critérios e métodos consistentes, verificáveis e passíveis de avaliação pelo Banco Central do Brasil"
+    resumo: "O laudo precisa registrar o método adotado e cada verificação feita (item → evidência → checagem)."
+    aplica_a: [laudo]
+    avaliador: metodo_registrado
+    usado_por: [avaliar_regras]
+    pedido: "registrar o método de fiscalização adotado (remoto, documental, presencial ou autofiscalização assistida)"
+    criterios:
+      verificado: "fiscalização com método registrado"
+      pendente: "método não registrado"
+
+  - id: MCR-2-7-item3-metodos-admitidos
+    item: "MCR 2-7-3"
+    tipo: requisito_metodo
+    origem: norma
+    titulo: "Métodos admitidos: sensoriamento remoto, documental e presencial"
+    citacao: "é admitido o uso dos seguintes métodos de análise, de forma individual ou combinada em uma mesma operação"
+    citacoes_adicionais:
+      - "b) documental, que consiste na análise de documentação comprobatória"
+      - "c) presencial, que consiste no exame do empreendimento no local onde se desenvolve a atividade financiada ou onde se encontra o bem ou o produto financiado"
+    aplica_a: [operacao]
+    efeito: {metodos_admitidos: [remoto, documental, presencial]}
+    usado_por: [planejar_metodo]
+
+  - id: OP-metodo-autofiscalizacao-enquadramento
+    item: "operacional"
+    tipo: requisito_metodo
+    origem: parametro_operacional
+    titulo: "Autofiscalização assistida = método documental"
+    justificativa: >-
+      A norma admite três métodos (item 3) e não fala em autofiscalização. A captura guiada pelo produtor no
+      app (foto/vídeo com integridade, GPS e hash) é documentação comprobatória analisada pela IF ou pela
+      credenciada. Por isso a enquadramos como documental (item 3-b). Quem conclui é sempre o fiscal da IF,
+      nunca o técnico contratado pelo mutuário (item 15). Interpretação a validar por compliance.
+    base_normativa: ["MCR 2-7-3-b", "MCR 2-7-15"]
+    aplica_a: [operacao]
+    efeito: {enquadramento: {autofiscalizacao_assistida: documental, remoto: remoto, documental: documental, presencial: presencial}}
+    usado_por: [planejar_metodo]
+
+  - id: OP-metodo-escolha-por-item
+    item: "operacional"
+    tipo: requisito_metodo
+    origem: parametro_operacional
+    titulo: "Escolha do método por tipo de item e prioridade de verificação"
+    justificativa: >-
+      O item 1-b manda considerar a efetividade do procedimento "em vista das características do
+      empreendimento". O satélite não prova o animal financiado (contagem por satélite é facultada, item 9),
+      então bovinos de prioridade alta ou desconhecida vão para presencial. Benfeitoria e máquina admitem
+      captura guiada. Em prioridade alta, tudo vai para presencial. A prioridade vem da triagem da carteira.
+    base_normativa: ["MCR 2-7-1-b", "MCR 2-7-9", "MCR 2-7-10"]
+    aplica_a: [bovinos, cerca, curral, galpao, maquina]
+    efeito:
+      ordem_rigor: [presencial, autofiscalizacao_assistida, documental, remoto]
+      por_fluxo:
+        bovinos: {alta: presencial, media: autofiscalizacao_assistida, baixa: autofiscalizacao_assistida, desconhecida: presencial}
+        custeio_animais: {alta: presencial, media: autofiscalizacao_assistida,
+                          baixa: autofiscalizacao_assistida, desconhecida: presencial}
+        benfeitoria: {alta: presencial, media: autofiscalizacao_assistida, baixa: autofiscalizacao_assistida, desconhecida: autofiscalizacao_assistida}
+        maquina: {alta: presencial, media: autofiscalizacao_assistida, baixa: autofiscalizacao_assistida, desconhecida: autofiscalizacao_assistida}
+      escalonamento: "se o campo ficar inconclusivo após PAR-tentativas-inconclusivas-max, escalar para presencial"
+    parametros: [PAR-tentativas-inconclusivas-max]
+    usado_por: [planejar_metodo]
+
+  # ---------------------------------------------------- sensoriamento remoto
+  - id: MCR-2-7-item4-qualidade-imagens
+    item: "MCR 2-7-4-a e 2-7-4-c"
+    tipo: requisito_metodo
+    origem: norma
+    titulo: "Imagens com qualidade suficiente e captura conforme a finalidade"
+    citacao: "as imagens utilizadas devem ter qualidade suficiente, determinada por parâmetros de resolução espacial, temporal, espectral e radiométrica"
+    citacoes_adicionais:
+      - "c) a captura das imagens deve ser efetuada conforme a finalidade das operações"
+    aplica_a: [operacao]
+    resumo: "Informativa: a adequação da imagem é responsabilidade da ferramenta de sensoriamento (serie_ndvi)."
+
+  - id: MCR-2-7-item4-metadados-sr
+    item: "MCR 2-7-4-b-I a III"
+    tipo: requisito_laudo
+    origem: norma
+    titulo: "Laudo com satélite, sensor, datas, resoluções, bandas e metodologia"
+    citacao: "satélite imageador e sensor utilizado, data das imagens, resolução espacial, resolução radiométrica e bandas utilizadas"
+    citacoes_adicionais:
+      - "metodologia utilizada para realizar o pré-processamento e o processamento da imagem"
+      - "explicações acerca do modo como as imagens foram utilizadas para monitorar e fiscalizar as operações"
+    resumo: "Toda checagem de sensoriamento remoto usada no laudo precisa carregar estes metadados."
+    aplica_a: [laudo]
+    avaliador: metadados_sensoriamento
+    ferramentas: [serie_ndvi, anomalia_ndvi, sensoriamento_remoto]
+    efeito:
+      # Onde ler: resultado.metadados_laudo (serie_ndvi), resultado.metadados_sr ou o próprio resultado.
+      blocos_metadados: [metadados_laudo, metadados_sr]
+      campos_exigidos:
+        satelite: {inciso: "4-b-I", aceita: [satelite, plataforma]}
+        sensor: {inciso: "4-b-I", aceita: [sensor]}
+        datas_imagens: {inciso: "4-b-I", aceita: [datas_imagens, datas]}
+        resolucao_espacial: {inciso: "4-b-I", aceita: [resolucao_espacial_m, resolucao_m]}
+        resolucao_radiometrica: {inciso: "4-b-I", aceita: [resolucao_radiometrica_bits, resolucao_radiometrica]}
+        bandas: {inciso: "4-b-I", aceita: [bandas]}
+        metodologia: {inciso: "4-b-II", aceita: [metodologia_processamento, metodologia]}
+        uso_na_fiscalizacao: {inciso: "4-b-III", aceita: [uso_na_fiscalizacao, uso]}
+    usado_por: [avaliar_regras]
+    pedido: "completar os metadados de sensoriamento remoto da checagem (satélite, sensor, datas, resoluções, bandas, metodologia, uso)"
+    criterios:
+      verificado: "todas as checagens de sensoriamento têm os 8 metadados"
+      pendente: "alguma checagem de sensoriamento sem metadado exigido"
+
+  - id: MCR-2-7-item5-remoto-obrigatorio-300ha
+    item: "MCR 2-7-5"
+    tipo: requisito_metodo
+    origem: norma
+    titulo: "Sensoriamento remoto obrigatório: custeio/investimento, contratado a partir de 01/03/2026, área total > 300 ha"
+    citacao: "os empreendimentos de custeio e investimento que, cumulativamente: a) forem financiados em operações contratadas a partir de 1º de março de 2026; e b) tenham área total superior a trezentos hectares."
+    aplica_a: [operacao]
+    condicao:
+      todas:
+        - {campo: operacao.finalidade, op: in, valor: [custeio, investimento]}
+        - {campo: operacao.data_contratacao, op: gte, valor: 2026-03-01}
+        - {campo: operacao.area_total_ha, op: gt, valor: 300}
+    efeito: {metodo_obrigatorio: remoto}
+    avaliador: sensoriamento_obrigatorio
+    ferramentas: [serie_ndvi, anomalia_ndvi, sensoriamento_remoto]
+    parametros: [PAR-area-total-usa-financiada, PAR-tentativas-inconclusivas-max]
+    usado_por: [planejar_metodo, avaliar_regras]
+    pedido: "executar a checagem de sensoriamento remoto da gleba (pastagem e instalações, item 9)"
+    criterios:
+      verificado: "obrigatório e há checagem de sensoriamento conclusiva sem divergência"
+      divergente: "checagem de sensoriamento conclusiva indica incompatibilidade (ex.: sem pastagem)"
+      pendente: "obrigatório e sem checagem; ou inconclusiva (item 10: complementar com outro método); ou área desconhecida"
+      abstencao: "inconclusiva após o máximo de tentativas"
+
+  - id: MCR-2-7-item6-verificacoes-previas
+    item: "MCR 2-7-6"
+    tipo: requisito_metodo
+    origem: norma
+    titulo: "Verificações remotas prévias à formalização (aptidão, duplicidade, vegetação nativa)"
+    citacao: "previamente à formalização da operação, a instituição financeira deve adotar o método de sensoriamento remoto"
+    resumo: "Informativa: etapa de concessão, fora da fiscalização em campo; o laudo pode citar o dossiê."
+    aplica_a: [operacao]
+
+  - id: MCR-2-7-item7-verificacoes-curso
+    item: "MCR 2-7-7"
+    tipo: requisito_metodo
+    origem: norma
+    titulo: "Verificações remotas ao longo da operação (inclui áreas vedadas do MCR 2-9)"
+    citacao: "ao longo do curso da operação, a instituição financeira deve adotar o método de sensoriamento remoto"
+    citacoes_adicionais:
+      - "se há indícios de condução inadequada do empreendimento ou de não aplicação dos recursos do financiamento"
+    resumo: "Informativa no regional; a alínea 'f'/'g' conecta com o rulebook mcr-2-9."
+    aplica_a: [operacao]
+
+  - id: MCR-2-7-item9-pecuaria-pastagem-instalacoes
+    item: "MCR 2-7-9"
+    tipo: requisito_evidencia
+    origem: norma
+    titulo: "Pecuária: apurar pastagem e instalações; contagem por satélite é facultada"
+    citacao: "devendo ser apurada a existência de pastagem e de instalações compatíveis com o empreendimento, conforme o caso, facultada a contagem de animais por sensoriamento remoto"
+    resumo: "Quando o item 5 se aplica a operação pecuária, o sensoriamento deve cobrir pastagem e instalações."
+    aplica_a: [bovinos, cerca, curral, galpao]
+    efeito: {objetos_sensoriamento: [pastagem, instalacoes], contagem_por_satelite: facultativa}
+    evidencias: [satelite]
+    usado_por: [planejar_metodo]
+
+  - id: MCR-2-7-item10-inconclusivo-outros-metodos
+    item: "MCR 2-7-10"
+    tipo: requisito_metodo
+    origem: norma
+    titulo: "Sensoriamento inconclusivo exige outro método"
+    citacao: "não dispensam a instituição financeira de adotar os demais métodos de que trata o item 3, em vista de informações inconclusivas levantadas pelo sensoriamento remoto"
+    aplica_a: [operacao]
+    efeito: {se_inconclusivo: [documental, presencial]}
+    usado_por: [planejar_metodo, avaliar_regras]
+
+  # ------------------------------------------------- gestão e independência
+  - id: MCR-2-7-item12-amostragem
+    item: "MCR 2-7-12"
+    tipo: requisito_metodo
+    origem: norma
+    titulo: "Amostragem com critérios estatísticos"
+    citacao: "o processo de amostragem deve observar critérios estatísticos"
+    resumo: "Informativa: nível de carteira (triar_carteira), não de uma fiscalização."
+    aplica_a: [carteira]
+
+  - id: MCR-2-7-item14-terceirizacao
+    item: "MCR 2-7-14"
+    tipo: requisito_metodo
+    origem: norma
+    titulo: "IF pode contratar pessoas especializadas, sem perder a responsabilidade"
+    citacao: "a instituição financeira pode contratar pessoas especializadas para a execução de seus trabalhos de monitoramento e fiscalização"
+    aplica_a: [operacao]
+
+  - id: MCR-2-7-item15-independencia-fiscal
+    item: "MCR 2-7-15"
+    tipo: requisito_laudo
+    origem: norma
+    titulo: "Fiscal independente do mutuário (vedação)"
+    citacao: "por pessoa física ou jurídica contratada diretamente pelo mutuário para a prestação de assistência técnica ao empreendimento"
+    citacoes_adicionais:
+      - "b) por empresa da qual o mutuário participe direta ou indiretamente"
+    resumo: >-
+      A vedação é norma. O meio de prova (declaração do fiscal no app, evidência tipo 'declaracao' com
+      meta.assunto = 'independencia_fiscal' e meta.conflito = false) é escolha nossa.
+    aplica_a: [laudo]
+    avaliador: declaracao_independencia
+    evidencias: [declaracao]
+    efeito: {assunto: independencia_fiscal}
+    usado_por: [avaliar_regras]
+    pedido: "o fiscal deve declarar no app que não presta assistência técnica ao mutuário nem a empresa dele"
+    criterios:
+      verificado: "declaração de independência registrada, sem conflito"
+      divergente: "declaração registra conflito (fiscal vedado pelo item 15)"
+      pendente: "sem declaração"
+
+  # ------------------------------------------------------------ benfeitorias
+  - id: MCR-2-7-item16-benfeitorias-cronograma
+    item: "MCR 2-7-16-a"
+    tipo: prazo
+    origem: norma
+    titulo: "Benfeitorias: fiscalizar ao menos uma vez até o fim do cronograma do projeto"
+    citacao: "as ações de monitoramento e fiscalização devem ocorrer pelo menos uma vez até o término do cronograma de execução previsto no projeto"
+    aplica_a: [cerca, curral, galpao]
+    efeito: {limite: cronograma_fim, inclusivo: true}
+    avaliador: prazo_ate_data
+    usado_por: [planejar_metodo, avaliar_regras]
+    pedido: "informar a data de término do cronograma de execução do projeto"
+    criterios:
+      verificado: "data da fiscalização ≤ término do cronograma"
+      divergente: "fiscalização depois do término do cronograma (exige justificativa humana)"
+      pendente: "cronograma ou data da fiscalização desconhecidos"
+
+  - id: MCR-2-7-item16-benfeitorias-conclusao
+    item: "MCR 2-7-16-a"
+    tipo: requisito_evidencia
+    origem: norma
+    titulo: "Benfeitorias: verificar a completa conclusão das obras"
+    citacao: "para verificar a completa conclusão das obras e instalações"
+    aplica_a: [cerca, curral, galpao]
+    avaliador: status_checagem
+    ferramentas: [classificar_foto, declaracao_conclusao]
+    evidencias: [foto]
+    parametros: [PAR-tentativas-inconclusivas-max]
+    usado_por: [planejar_metodo, avaliar_regras]
+    pedido: "foto da estrutura inteira (cerca: trecho com mourões e fios; curral: brete, tronco e porteiras) mostrando a obra concluída, ou a declaração do fiscal de que a obra está concluída"
+    criterios:
+      verificado: "checagem de conclusão ok (foto classificada pelo VLM como a estrutura do item, ou declaração do fiscal)"
+      divergente: "estrutura ausente ou inacabada"
+      pendente: "sem checagem, erro, conflito entre checagens ou inconclusiva (pedir nova foto)"
+      abstencao: "inconclusiva após o máximo de tentativas"
+
+  - id: OP-evidencia-integridade-foto
+    item: "operacional"
+    tipo: criterio_status
+    origem: parametro_operacional
+    titulo: "Integridade da foto (EXIF, GPS, horário, duplicata, foto de tela)"
+    justificativa: >-
+      O MCR 2-7 não fixa requisitos de foto, mas exige critérios verificáveis (item 1-c). Uma foto sem EXIF,
+      reaproveitada ou fotografada de uma tela não prova a benfeitoria. Basta uma foto adulterada para marcar
+      divergência, e o humano decide (agregação qualquer_divergente).
+    base_normativa: ["MCR 2-7-1-c", "MCR 2-7-1-d"]
+    aplica_a: [cerca, curral, galpao]
+    avaliador: status_checagem
+    agregacao: qualquer_divergente
+    ferramentas: [integridade_foto]
+    evidencias: [foto]
+    parametros: [PAR-tentativas-inconclusivas-max]
+    usado_por: [avaliar_regras]
+    pedido: "capturar a foto pelo app (com EXIF e GPS), sem reaproveitar imagem"
+    criterios:
+      verificado: "todas as fotos íntegras, ou a falha de captura foi superada por foto íntegra posterior"
+      divergente: "alguma foto duplicada, de tela ou com metadados incoerentes"
+      pendente: "sem checagem de integridade ou foto sem EXIF (capturar no app)"
+      abstencao: "inconclusiva após o máximo de tentativas"
+
+  - id: OP-benfeitoria-geofence
+    item: "operacional"
+    tipo: criterio_status
+    origem: parametro_operacional
+    titulo: "Foto georreferenciada dentro ou perto da gleba"
+    justificativa: >-
+      A localização liga a foto ao empreendimento financiado (MCR 2-7-2-a-I). A norma não fixa distância.
+      Usamos três faixas: até PAR-geofence-perto-m verifica, até PAR-geofence-longe-m fica pendente
+      (refazer ou justificar) e acima disso diverge. Basta uma foto muito longe para marcar divergência.
+      Na faixa intermediária a posição foi medida com precisão: é pendência resolvível por nova captura ou
+      justificativa do fiscal, nunca abstenção (que fica para GPS impreciso ou indeterminado).
+    base_normativa: ["MCR 2-7-2-a-I", "MCR 2-7-3-c"]
+    aplica_a: [cerca, curral, galpao]
+    avaliador: geofence_distancia
+    agregacao: qualquer_divergente
+    ferramentas: [geofence]
+    evidencias: [foto]
+    parametros: [PAR-geofence-perto-m, PAR-geofence-longe-m, PAR-tentativas-inconclusivas-max]
+    usado_por: [avaliar_regras]
+    pedido: "foto da benfeitoria tirada de dentro da gleba (ou a até 100 m da borda), com GPS ligado"
+    criterios:
+      verificado: "dentro da gleba, ou fora a até PAR-geofence-perto-m da borda"
+      divergente: "fora a mais de PAR-geofence-longe-m da borda"
+      pendente: "fora entre as duas distâncias (nova captura ou justificativa do fiscal; quantas capturas forem), GPS impreciso (indeterminado) abaixo do máximo de tentativas, ou sem checagem"
+      abstencao: "GPS impreciso/indeterminado após o máximo de tentativas (nunca a faixa intermediária medida)"
+
+  # --------------------------------------------------------------- máquinas
+  - id: MCR-2-7-item16-maquinas-numero-serie
+    item: "MCR 2-7-16-b-I"
+    tipo: requisito_evidencia
+    origem: norma
+    titulo: "Máquinas: identificação por numeração de fábrica"
+    citacao: "os itens devem ser identificados por numeração de fábrica, quando couber"
+    aplica_a: [maquina]
+    avaliador: status_checagem
+    ferramentas: [conferir_numero_serie]
+    evidencias: [foto]
+    parametros: [PAR-tentativas-inconclusivas-max]
+    usado_por: [planejar_metodo, avaliar_regras]
+    pedido: "foto legível da plaqueta/numeração de fábrica (chassi/série) da máquina"
+    criterios:
+      verificado: "número lido na foto confere com a NF-e"
+      divergente: "número lido difere da NF-e"
+      pendente: "sem foto/checagem, ilegível (nova foto) ou erro"
+      abstencao: "ilegível após o máximo de tentativas"
+
+  - id: MCR-2-7-item16-maquinas-60d
+    item: "MCR 2-7-16-b-II"
+    tipo: prazo
+    origem: norma
+    titulo: "Máquinas: fiscalizar até 60 dias da liberação"
+    citacao: "as ações de monitoramento e fiscalização devem ocorrer até sessenta dias da liberação do crédito"
+    aplica_a: [maquina]
+    efeito: {ancora: data_liberacao, dias: 60, inclusivo: true}
+    avaliador: prazo_dias_apos
+    usado_por: [planejar_metodo, avaliar_regras]
+    pedido: "informar a data de liberação do crédito"
+    criterios:
+      verificado: "fiscalização até o 60º dia após a liberação (inclusive)"
+      divergente: "fiscalização a partir do 61º dia (exige justificativa humana)"
+      pendente: "data de liberação ou da fiscalização desconhecida"
+
+  - id: MCR-2-7-item16-maquinas-nfe
+    item: "MCR 2-7-16-b-II"
+    tipo: requisito_evidencia
+    origem: norma
+    titulo: "Máquinas: NF de aquisição com bem, comprador e identificação da IF"
+    citacao: "a nota fiscal de aquisição com a discriminação do bem financiado e do comprador, com a identificação da instituição financeira"
+    aplica_a: [maquina]
+    avaliador: status_checagem
+    ferramentas: [conciliar_nfe]
+    evidencias: [nfe_xml]
+    efeito: {requisitos: [discriminacao_bem, comprador, identificacao_if]}
+    parametros: [PAR-tentativas-inconclusivas-max]
+    usado_por: [planejar_metodo, avaliar_regras]
+    pedido: "XML da NF-e de aquisição com a descrição do bem, o comprador e a identificação da instituição financeira"
+    criterios:
+      verificado: "NF-e conciliada e com os três requisitos"
+      divergente: "NF-e não confere com o item (bem, valor, comprador)"
+      pendente: "sem NF-e, XML inválido ou faltando requisito da norma (pedir NF correta)"
+      abstencao: "inconclusiva após o máximo de tentativas"
+
+  - id: MCR-2-7-item16-insumos-cooperados-prazo
+    item: "MCR 2-7-16-c"
+    tipo: prazo
+    origem: norma
+    titulo: "Insumos a cooperados: após registro no Sicor e até 60 dias antes do vencimento"
+    citacao: "devem ocorrer após o registro da relação de cooperados no Sicor e até sessenta dias antes do vencimento da operação"
+    resumo: "Informativa: fora do fluxo do regional."
+    aplica_a: [operacao]
+
+  # ----------------------------------------------------- bovinos (aquisição)
+  - id: MCR-2-5-item10-comprovante-aquisicao
+    item: "MCR 2-5-10-b"
+    tipo: requisito_evidencia
+    origem: norma
+    titulo: "Animais/máquinas: documento comprobatório da aquisição"
+    citacao: "os documentos comprobatórios da aquisição de veículos, máquinas, equipamentos e animais"
+    citacoes_adicionais:
+      - "Comprova-se o uso adequado de recursos pela verificação de que o empreendimento foi correta e tempestivamente executado"
+    resumo: "No fluxo de bovinos, o comprovante é a NF-e de compra, conciliada com o item financiado."
+    aplica_a: [bovinos]
+    avaliador: status_checagem
+    ferramentas: [conciliar_nfe]
+    evidencias: [nfe_xml]
+    efeito: {requisitos: [especie_bovina, quantidade, data_emissao]}
+    parametros: [PAR-tentativas-inconclusivas-max]
+    usado_por: [planejar_metodo, avaliar_regras]
+    pedido: "XML da NF-e de compra dos animais (NCM 0102, quantidade e data)"
+    criterios:
+      verificado: "NF-e conciliada com o item (espécie, quantidade, data)"
+      divergente: "NF-e não confere (quantidade, espécie, valor ou data incompatíveis)"
+      pendente: "sem NF-e, XML inválido, erro ou requisito ausente"
+      abstencao: "inconclusiva após o máximo de tentativas"
+
+  - id: MCR-2-5-item10-comprovantes-30d
+    item: "MCR 2-5-10-b"
+    tipo: prazo
+    origem: norma
+    titulo: "Mutuário entrega comprovantes em 30 dias da liberação"
+    citacao: "entregar ao financiador, no prazo de 30 (trinta) dias a contar da liberação, os documentos comprobatórios da aquisição de veículos, máquinas, equipamentos e animais"
+    resumo: "Prazo do mutuário (não da IF). Gera alerta quando vencido sem comprovante; não muda status sozinho."
+    aplica_a: [bovinos, maquina]
+    efeito: {ancora: data_liberacao, dias: 30, inclusivo: true}
+    usado_por: [planejar_metodo, avaliar_regras]
+
+  - id: OP-bovinos-contagem-tolerancia
+    item: "operacional"
+    tipo: criterio_status
+    origem: parametro_operacional
+    titulo: "Contagem de bovinos com intervalo contra a quantidade financiada"
+    justificativa: >-
+      A norma pede verificar a aplicação do crédito (MCR 2-7-2-a-I e 2-5-10) e não fixa como contar. A contagem
+      (vídeo ou manual) traz um intervalo [inferior, superior]. Com Q financiado e tolerância t, o limite é
+      L = Q × (1 − t). Se inferior ≥ L, verifica. Se superior < L, diverge. Se o intervalo cruza L, fica
+      inconclusiva e pendente. Contagem que se abstém nunca vira divergência.
+    base_normativa: ["MCR 2-7-1-c", "MCR 2-7-2-a-I", "MCR 2-7-9", "MCR 2-5-10-b"]
+    aplica_a: [bovinos]
+    avaliador: contagem_intervalo
+    ferramentas: [contar_bovinos_video, contagem_manual]
+    evidencias: [video]
+    parametros: [PAR-contagem-tolerancia-pct, PAR-tentativas-inconclusivas-max]
+    usado_por: [planejar_metodo, avaliar_regras]
+    pedido: "vídeo do lote passando em fila pelo corredor/brete do curral, câmera parada, de cima se possível"
+    criterios:
+      verificado: "limite inferior do intervalo ≥ Q × (1 − tolerância) (no limite conta como dentro)"
+      divergente: "limite superior do intervalo < Q × (1 − tolerância)"
+      pendente: "intervalo cruza o limite, contagem abstida/indeterminada, erro, sem vídeo ou contagens conclusivas conflitantes"
+      abstencao: "inconclusiva após o máximo de tentativas"
+
+  - id: OP-bovinos-gta
+    item: "operacional"
+    tipo: requisito_evidencia
+    origem: parametro_operacional
+    titulo: "GTA da compra dos animais conciliada com NF-e e item"
+    justificativa: >-
+      A GTA não está no MCR. Ela é exigida pela defesa sanitária animal para o trânsito de bovinos (fonte
+      secundária, não verificada nesta sessão) e é a prova que falta nos casos conhecidos como "boi de papel" (GTA
+      falsa, rebanho inexistente). O MCR 2-5-10-b pede documentos comprobatórios da aquisição. Exigimos a GTA
+      como um deles, conciliada em espécie, quantidade, origem/destino e data.
+    base_normativa: ["MCR 2-5-10-b", "MCR 3-3-10-a"]
+    aplica_a: [bovinos]
+    avaliador: status_checagem
+    ferramentas: [conciliar_gta]
+    evidencias: [gta]
+    parametros: [PAR-tentativas-inconclusivas-max]
+    usado_por: [planejar_metodo, avaliar_regras]
+    pedido: "GTA da compra (foto legível ou PDF), com espécie, quantidade, origem e destino"
+    criterios:
+      verificado: "GTA confere com NF-e e item"
+      divergente: "GTA não confere (quantidade, destino, data)"
+      pendente: "sem GTA, ilegível, erro ou requisito ausente"
+      abstencao: "ilegível após o máximo de tentativas"
+
+  - id: MCR-3-3-item10-marcacao-animais
+    item: "MCR 3-3-10-b"
+    tipo: requisito_evidencia
+    origem: norma
+    titulo: "Investimento pecuário: marcação dos animais"
+    citacao: "efetuar a marcação dos animais, com observância das normas legais"
+    resumo: "Obrigação do mutuário; a foto da marcação/brinco é evidência recomendada, não bloqueante."
+    aplica_a: [bovinos]
+    # 0.4.0: o 3-3-10 é do crédito de investimento
+    condicao: {campo: operacao.finalidade, op: ne, valor: custeio}
+    evidencias: [foto]
+    bloqueante: false
+    usado_por: [planejar_metodo]
+
+  - id: MCR-3-3-item3-animais-semifixo
+    item: "MCR 3-3-3-a"
+    tipo: requisito_evidencia
+    origem: norma
+    titulo: "Aquisição de animais para reprodução ou cria é investimento semifixo"
+    citacao: "a) aquisição de animais para reprodução ou cria"
+    resumo: "Informativa: classifica o item financiado."
+    aplica_a: [bovinos]
+
+  - id: MCR-3-3-item2-benfeitorias-fixo
+    item: "MCR 3-3-2-a"
+    tipo: requisito_evidencia
+    origem: norma
+    titulo: "Benfeitorias e instalações permanentes são investimento fixo"
+    citacao: "a) construção, reforma ou ampliação de benfeitorias e instalações permanentes"
+    resumo: "Informativa: cerca e curral entram no MCR 2-7-16-a."
+    aplica_a: [cerca, curral, galpao]
+
+  # ------------------------------------- custeio de aquisição e manutenção de animais (perfil, 0.4.0)
+  - id: OP-perfil-custeio-animais
+    item: "operacional"
+    tipo: requisito_metodo
+    origem: parametro_operacional
+    titulo: "Perfil custeio de aquisição e manutenção de animais: o método documentado pela IF"
+    justificativa: >-
+      O MCR 2-7 não tem alínea própria para o custeio pecuário: o item 16 trata de benfeitorias, máquinas e
+      insumos a cooperados. O item 1 deixa à IF "definir os procedimentos aplicados" e o 1-c exige critérios
+      e métodos consistentes, verificáveis e avaliáveis pelo BCB. Este perfil é esse procedimento, escrito e
+      versionado: para operação de custeio com item de bovinos (compra para recria/engorda e manutenção do
+      lote), as mesmas checagens do investimento (contagem com a mesma tolerância, NF-e e GTA da aquisição
+      conciliadas) mais a lotação do lote na área (sinal não bloqueante, OP-custeio-lotacao). O animal é bem
+      móvel e fungível e o custeio não deixa benfeitoria para fotografar: a prova é o lote no curral, a nota
+      e o trânsito. Item só de manutenção (sem compra) não tem NF-e nem GTA de aquisição; os comprovantes de
+      insumos ficam retidos pelo produtor (MCR 2-5-10-a). O laudo registra o método por item
+      (MCR-2-7-item1-metodo-documentado-if).
+    base_normativa: ["MCR 2-7-1", "MCR 2-7-1-c", "MCR 2-7-1-d", "MCR 2-7-11-b", "MCR 2-5-10-a",
+                     "MCR 2-5-10-b"]
+    aplica_a: [bovinos]
+    condicao:
+      todas:
+        - {campo: operacao.finalidade, op: eq, valor: custeio}
+        - {campo: item.tipo, op: in, valor: [bovinos]}
+    efeito:
+      fluxo: custeio_animais
+      metodo:
+        contagem: >-
+          vídeo do lote no corredor (contar_bovinos_video) ou contagem manual; intervalo contra Q × (1 −
+          PAR-contagem-tolerancia-pct), só para menos (OP-bovinos-contagem-tolerancia)
+        nfe: >-
+          XML da NF-e de aquisição conciliado com o item (conciliar_nfe: NCM 01.02, quantidade, valor, data
+          entre contratação e fiscalização, partes), quando o item é de aquisição
+        gta: >-
+          GTA conciliada com a NF-e e o item (conciliar_gta: espécie e sexo, quantidade, destino, origem,
+          finalidade, data, grupo ZF da NF-e e índice de documentos de laudos selados), quando o item é de
+          aquisição
+        lotacao: >-
+          cabeças do lote ÷ área de pasto contra PAR-custeio-lotacao-atencao-cab-ha (OP-custeio-lotacao):
+          ponto de atenção, nunca divergência
+        manutencao: >-
+          item só de manutenção (descrição sem aquisição/compra): NF-e e GTA de compra não se aplicam;
+          contagem e lotação continuam
+    usado_por: [planejar_metodo, avaliar_regras]
+
+  - id: MCR-2-7-item1-metodo-documentado-if
+    item: "MCR 2-7-1-c"
+    tipo: requisito_laudo
+    origem: norma
+    titulo: >-
+      Procedimento definido pela IF, com critérios consistentes e verificáveis (método do perfil no laudo)
+    citacao: >-
+      a aplicação de critérios e métodos consistentes, verificáveis e passíveis de avaliação pelo Banco
+      Central do Brasil
+    citacoes_adicionais:
+      - >-
+        A instituição financeira é responsável pelo monitoramento e pela fiscalização das operações de
+        crédito rural, cabendo-lhe definir os procedimentos aplicados
+    resumo: >-
+      Para o perfil sem alínea própria no 2-7 (custeio de animais), o laudo registra, por item, o método que a
+      IF documentou: perfil, versão e sha256 do rulebook, checagens e parâmetros (item 1-c; o registro das
+      verificações é o item 1-d). Não bloqueia: o método de campo já é exigido em laudo:metodo.
+    aplica_a: [bovinos]
+    avaliador: metodo_documentado
+    efeito:
+      perfil: OP-perfil-custeio-animais
+      componentes: [contagem, nfe, gta, lotacao]
+      # componente -> campo do fluxo custeio_animais que o executa: condição falsa = não se aplica ao item
+      campos: {contagem: quantidade, nfe: comprovante_nfe, gta: gta, lotacao: lotacao}
+    usado_por: [planejar_metodo, avaliar_regras]
+    bloqueante: false
+    pedido: >-
+      registrar o método de fiscalização adotado (o método do perfil só vale com o método de campo
+      registrado)
+    criterios:
+      verificado: "perfil com os componentes que se aplicam ao item documentados e método de campo registrado"
+      pendente: "perfil sem algum componente documentado, ou método de campo não registrado (não bloqueia)"
+
+  - id: OP-custeio-lotacao
+    item: "operacional"
+    tipo: criterio_status
+    origem: parametro_operacional
+    titulo: "Custeio de animais: lotação do lote na área (sinal para o fiscal, nunca divergência)"
+    justificativa: >-
+      No custeio de manutenção o lote vive no pasto da operação; cabeças demais para a área pedem atenção
+      (área de pasto não informada, arrendamento, piquete rotacionado ou semiconfinamento) e o item 2-b-II do
+      2-7 pede cruzamento de informações e indicadores de risco. A conta é a mesma da triagem
+      (checar_lotacao) e o limiar é PAR-custeio-lotacao-atencao-cab-ha. Lotação alta não prova desvio: o
+      campo fica pendente sem bloquear o laudo e não entra no status agregado do item.
+    base_normativa: ["MCR 2-7-1-c", "MCR 2-7-2-b-II", "MCR 2-7-9"]
+    aplica_a: [bovinos]
+    avaliador: lotacao_sinal
+    ferramentas: [checar_lotacao]
+    parametros: [PAR-custeio-lotacao-atencao-cab-ha]
+    bloqueante: false
+    usado_por: [planejar_metodo, avaliar_regras]
+    pedido: "confirmar a área de pasto que recebe o lote (piquetes, arrendamento ou semiconfinamento)"
+    criterios:
+      verificado: >-
+        lotação ≤ PAR-custeio-lotacao-atencao-cab-ha, ou confinamento (lotação por área não se aplica)
+      pendente: >-
+        lotação acima do parâmetro, ou sem área para calcular (ponto de atenção; não bloqueia nem entra no
+        status do item)
+
+  # --------------------------------------------------- consequências (humano)
+  - id: MCR-2-7-item21-comunicacao-ilicitos
+    item: "MCR 2-7-21"
+    tipo: requisito_laudo
+    origem: norma
+    titulo: "Ilícito penal ou fraude fiscal: IF comunica MP/autoridade tributária"
+    citacao: "deve a instituição financeira comunicar os fatos ao Ministério Público ou às autoridades tributárias"
+    resumo: "Informativa: decisão humana da IF; o agente nunca qualifica fato como ilícito."
+    aplica_a: [operacao]
+    efeito: {decisao_humana: true}
+
+  - id: MCR-2-7-item23-guarda-documentacao
+    item: "MCR 2-7-23"
+    tipo: requisito_laudo
+    origem: norma
+    titulo: "Documentação da fiscalização à disposição do BCB"
+    citacao: "manter a documentação gerada no processo de fiscalização e monitoramento à disposição do Banco Central do Brasil"
+    resumo: "Atendida pela trilha append-only com hash (área de auditoria)."
+    aplica_a: [laudo]
+
+  - id: MCR-2-8-item2-aplicacao-nao-comprovada
+    item: "MCR 2-8-2-i"
+    tipo: requisito_laudo
+    origem: norma
+    titulo: "Aplicação não comprovada pode levar à desclassificação"
+    citacao: "i) aplicação não comprovada de recursos"
+    resumo: "Informativa: campo divergente/pendente informa a IF; desclassificar é decisão humana (MCR 2-7-19)."
+    aplica_a: [operacao]
+    efeito: {decisao_humana: true}
+
+  - id: MCR-2-8-item3-prazo-desclassificacao
+    item: "MCR 2-8-3"
+    tipo: prazo
+    origem: norma
+    titulo: "Desclassificação em até 60 dias da ciência do fato"
+    citacao: "em até 60 (sessenta) dias a contar da data em que ficou ciente do fato passível de ser caracterizado como irregularidade"
+    resumo: "Informativa: prazo da IF depois do laudo assinado."
+    aplica_a: [operacao]
+
+  # ------------------------------------------------ agregação e abstenção
+  - id: OP-status-mapeamento-checagem
+    item: "operacional"
+    tipo: criterio_status
+    origem: parametro_operacional
+    titulo: "Como checagens viram status de campo"
+    justificativa: >-
+      Ferramentas devolvem ok/divergente/indeterminado/erro. O campo precisa de um status do laudo. A
+      ferramenta calcula e a regra decide, com critério explícito para que o mesmo estado sempre dê o mesmo
+      laudo (MCR 2-7-1-c).
+    base_normativa: ["MCR 2-7-1-c"]
+    aplica_a: [bovinos, cerca, curral, galpao, maquina, laudo]
+    avaliador: status_checagem
+    efeito:
+      checagem: {ok: verificado, divergente: divergente, indeterminado: inconclusivo, erro: erro}
+      requisitos_ausentes: inconclusivo
+    criterios:
+      verificado: "todas as checagens conclusivas são ok (e nenhuma divergente)"
+      divergente: "consenso: todas as conclusivas divergentes; qualquer_divergente: ao menos uma divergente"
+      pendente: "nenhuma checagem; só erro; inconclusiva abaixo do máximo de tentativas; conclusivas conflitantes (consenso)"
+      abstencao: "só inconclusivas, em número ≥ PAR-tentativas-inconclusivas-max"
+
+  - id: OP-alegacao-declaracao-x-evidencia
+    item: "operacional"
+    tipo: requisito_laudo
+    origem: parametro_operacional
+    titulo: "Alegação da fala × evidência, com a origem de cada valor"
+    justificativa: >-
+      O laudo precisa registrar as verificações realizadas com critério verificável (MCR 2-7-1-c e 1-d). O que a
+      fiscal disse no campo ("contei 29", "a cerca tem 800 m") é declaração, não prova: o laudo mostra cada
+      alegação ao lado da evidência que a confronta (vídeo, NF-e, projeto, outra declaração) e o status da
+      confrontação (confere, divergente, pendente, registro, sem evidência), sem mudar o status de campo nenhum
+      (quem decide é o verificador). Cada valor apurado diz de onde veio: XML autorizado, lido de foto e validado
+      por dígito verificador/somas, lido de foto e completado pela fiscal (validado pelas mesmas regras), vídeo,
+      satélite ou declaração. Divergência entre alegação e evidência pede justificativa no texto do laudo.
+    resumo: "Informativa (não executada pelo avaliar_regras): lida por conciliar_alegacoes e mostrada na seção alegações × evidência do laudo."
+    base_normativa: ["MCR 2-7-1-c", "MCR 2-7-1-d", "MCR 2-7-2-a-I"]
+    aplica_a: [laudo]
+    ferramentas: [conciliar_alegacoes]
+    bloqueante: false
+    criterios:
+      confere: "a alegação bate com a evidência (dentro do intervalo da contagem, igual à NF-e, ≥ projeto)"
+      divergente: "a alegação não bate com a evidência, ou duas declarações não batem: o laudo mostra as duas"
+      pendente: "declaração contra o projeto sem evidência física que resolva (ex.: obra declarada incompleta)"
+      registro: "menção a item não financiado ou número sem objeto financiado: registrada, não confrontada"
+      sem_evidencia: "ainda não há checagem para confrontar"
+
+  - id: OP-agregacao-item
+    item: "operacional"
+    tipo: criterio_status
+    origem: parametro_operacional
+    titulo: "Status do item = pior status entre seus campos"
+    justificativa: >-
+      Um item só fica verificado quando todas as exigências bloqueantes estão verificadas. A precedência é
+      divergente > pendente > abstenção > verificado: a divergência é o achado mais relevante para a IF e
+      precisa de justificativa humana (POL-02). Desde a 0.4.0, campo de regra não bloqueante (lotação, método
+      do perfil de custeio) aparece no valor do item, mas não decide o status dele; se estiver pendente, o
+      motivo do item diz "ponto de atenção não bloqueante" em vez de "todas as exigências verificadas".
+    base_normativa: ["MCR 2-7-1-d"]
+    aplica_a: [bovinos, cerca, curral, galpao, maquina]
+    avaliador: agregacao_item
+    efeito: {precedencia: [divergente, pendente, abstencao, verificado]}
+    criterios:
+      verificado: >-
+        todos os campos bloqueantes do item verificados (ponto de atenção não bloqueante pendente aparece no
+        motivo do item)
+      divergente: "algum campo bloqueante divergente"
+      pendente: "algum campo bloqueante pendente e nenhum divergente"
+      abstencao: "algum campo bloqueante em abstenção, nenhum pendente ou divergente"
+
+  - id: OP-escopo-itens-regional
+    item: "operacional"
+    tipo: requisito_laudo
+    origem: parametro_operacional
+    titulo: "Item sem fluxo no rulebook bloqueia o laudo (default-deny)"
+    justificativa: >-
+      O rulebook do regional cobre bovinos, cerca/curral/galpão e máquina. Um item financiado de outro tipo
+      (lavoura, pastagem, outro) não pode ser dado como comprovado sem regra, então bloqueia até haver regra
+      ou decisão humana registrada.
+    base_normativa: ["MCR 2-7-1-a"]
+    aplica_a: [lavoura, pastagem, outro]
+    avaliador: escopo
+    usado_por: [avaliar_regras]
+    pedido: "item fora do escopo do rulebook: registrar verificação humana ou aguardar rulebook específico"
+    criterios:
+      pendente: "item financiado sem fluxo de regras"
+
+fluxos:
+  bovinos:
+    descricao: "Aquisição de bovinos (investimento semifixo, MCR 3-3-3-a)"
+    tipos_item: [bovinos]
+    campos:
+      - {campo: quantidade, regra: OP-bovinos-contagem-tolerancia}
+      - {campo: comprovante_nfe, regra: MCR-2-5-item10-comprovante-aquisicao}
+      - {campo: gta, regra: OP-bovinos-gta}
+  # 0.4.0: escolhido por OP-perfil-custeio-animais (operação de custeio); nunca por tipo de item sozinho.
+  custeio_animais:
+    descricao: >-
+      Custeio de aquisição e manutenção de animais (OP-perfil-custeio-animais; método documentado pela IF,
+      MCR 2-7-1-c)
+    tipos_item: [bovinos]
+    campos:
+      - {campo: quantidade, regra: OP-bovinos-contagem-tolerancia}
+      - campo: comprovante_nfe
+        regra: MCR-2-5-item10-comprovante-aquisicao
+        condicao: {campo: item.aquisicao, op: eq, valor: true}
+      - campo: gta
+        regra: OP-bovinos-gta
+        condicao: {campo: item.aquisicao, op: eq, valor: true}
+      - {campo: lotacao, regra: OP-custeio-lotacao}
+      - {campo: metodo_if, regra: MCR-2-7-item1-metodo-documentado-if}
+  benfeitoria:
+    descricao: "Construção/reforma de benfeitorias (MCR 2-7-16-a; investimento fixo, MCR 3-3-2-a)"
+    tipos_item: [cerca, curral, galpao]
+    campos:
+      - {campo: integridade_foto, regra: OP-evidencia-integridade-foto}
+      - {campo: localizacao, regra: OP-benfeitoria-geofence}
+      - {campo: conclusao, regra: MCR-2-7-item16-benfeitorias-conclusao}
+      - {campo: prazo_cronograma, regra: MCR-2-7-item16-benfeitorias-cronograma}
+  maquina:
+    descricao: "Aquisição de máquinas e equipamentos (MCR 2-7-16-b)"
+    tipos_item: [maquina]
+    campos:
+      - {campo: prazo_60d, regra: MCR-2-7-item16-maquinas-60d}
+      - {campo: nfe, regra: MCR-2-7-item16-maquinas-nfe}
+      - campo: numero_serie
+        regra: MCR-2-7-item16-maquinas-numero-serie
+        condicao: {campo: item.exige_numero_serie, op: eq, valor: true}
+
+campos_laudo:
+  - {campo: "laudo:metodo", regra: MCR-2-7-item1-registro-verificacoes}
+  - {campo: "laudo:independencia_fiscal", regra: MCR-2-7-item15-independencia-fiscal}
+  - {campo: "laudo:sensoriamento_remoto", regra: MCR-2-7-item5-remoto-obrigatorio-300ha}
+  - {campo: "laudo:metadados_sensoriamento", regra: MCR-2-7-item4-metadados-sr}

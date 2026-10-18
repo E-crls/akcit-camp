@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "164591",
+  "serie": "AB",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 10
+    }
+  ],
+  "total": 10,
+  "total_por_extenso": "DEZ BOVINOS",
+  "marca_rebanho": "MARCA TESTE 38",
+  "origem": {
+    "documento": "99999999503851",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 39 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 39",
+    "codigo_estabelecimento": "TESTE-5218805-9038",
+    "codigo_exploracao": "TESTE-5218805-9038-BOV",
+    "municipio_nome": "RIO VERDE",
+    "municipio_ibge": "5218805",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000013846",
+    "nome": "PRODUTOR TESTE 39",
+    "estabelecimento": "FAZENDA TESTE 39",
+    "codigo_estabelecimento": "TESTE-5211909-0039",
+    "codigo_exploracao": "TESTE-5211909-0039-BOV",
+    "municipio_nome": "JATAÍ",
+    "municipio_ibge": "5211909",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST5A39"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-02-23"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE RIO VERDE"
+  },
+  "emissao": {
+    "local_municipio": "RIO VERDE",
+    "data": "2026-06-10",
+    "hora": "06:02",
+    "validade": "2026-06-13"
+  },
+  "nfe_chaves": [
+    "52260699999999503851550010000027591180915893"
+  ],
+  "codigo_barras": "SINTGOAB164591",
+  "sintetico": true
+}

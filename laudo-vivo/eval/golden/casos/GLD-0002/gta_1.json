@@ -1,0 +1,61 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "253001",
+  "serie": "AB",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "M",
+      "faixa_etaria": "25-36",
+      "quantidade": 4
+    }
+  ],
+  "total": 4,
+  "total_por_extenso": "QUATRO BOVINOS",
+  "marca_rebanho": "MARCA TESTE 01",
+  "origem": {
+    "documento": "99999999500160",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 02 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 02",
+    "codigo_estabelecimento": "TESTE-5214606-9001",
+    "codigo_exploracao": "TESTE-5214606-9001-BOV",
+    "municipio_nome": "NIQUELÂNDIA",
+    "municipio_ibge": "5214606",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000010154",
+    "nome": "PRODUTOR TESTE 02",
+    "estabelecimento": "FAZENDA TESTE 02",
+    "codigo_estabelecimento": "TESTE-5216403-0002",
+    "codigo_exploracao": "TESTE-5216403-0002-BOV",
+    "municipio_nome": "PARAÚNA",
+    "municipio_ibge": "5216403",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST0E20"
+  },
+  "vacinacoes": [],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE NIQUELÂNDIA"
+  },
+  "emissao": {
+    "local_municipio": "NIQUELÂNDIA",
+    "data": "2026-07-24",
+    "hora": "07:30",
+    "validade": "2026-07-26"
+  },
+  "nfe_chaves": [
+    "52260799999999500160550010000040511627121456"
+  ],
+  "codigo_barras": "SINTGOAB253001",
+  "sintetico": true
+}

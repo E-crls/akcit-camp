@@ -1,0 +1,51 @@
+# Copie para terraform.tfvars (fora do git) e ajuste. Só "projeto" é obrigatório; o resto mostra o padrão
+# ou uma alternativa comum. Ver variables.tf para a descrição de cada variável.
+
+projeto  = "meu-projeto-laudo-vivo"
+regiao   = "southamerica-east1" # dados, API, chaves, segredos e logs no Brasil
+ambiente = "producao"
+
+labels = {
+  centro-de-custo = "fiscalizacao-rural"
+}
+
+# Quem abre a interface (login Google pelo IAP). Use grupos, não pessoas, sempre que der.
+acesso_api     = "iap"
+membros_acesso = ["group:fiscais@example.com"]
+
+# Imagem da API construída com o Dockerfile do repositório e enviada ao Artifact Registry (ver README).
+imagem_api_tag = "r4.1"
+
+# Servidor do modelo ------------------------------------------------------------------------------------
+# Padrão: VM com GPU T4 em São Paulo, ligada de segunda a sábado, das 6h às 20h (fuso America/Sao_Paulo).
+servidor_modelo  = "gce"
+gce_tipo_maquina = "n1-standard-4"
+gce_acelerador   = "nvidia-tesla-t4"
+gce_agenda = {
+  ligar    = "0 6 * * 1-6"
+  desligar = "0 20 * * 1-6"
+}
+
+# Alternativa: Cloud Run com GPU L4, escala a zero. Confira antes as regiões com GPU no Cloud Run e avalie
+# com o encarregado de dados a inferência fora do Brasil (variável regiao_modelo).
+# servidor_modelo = "cloud_run"
+# regiao_modelo   = "<regiao-com-gpu-no-cloud-run>"
+# modelo_gpu      = "nvidia-l4"
+
+# Demonstração sem GPU (o agente usa a conversa gravada do caso DEMO-0001):
+# servidor_modelo = "nenhum"
+
+# Retenção e expurgo (a instituição define os prazos) -----------------------------------------------------
+dias_retencao_brutos = 90 # brutos cifrados e chave apagada 90 dias depois do selo
+dias_versoes_antigas = 7
+dias_retencao_arquivo   = 0     # ex.: o prazo de guarda dos laudos definido pela instituição, em dias
+travar_retencao_arquivo = false # true é irreversível
+
+# Migração de uma instalação existente: o sal de dados_locais/config/instalacao.json (64 hex). Passe por
+# variável de ambiente para não gravar em arquivo: export TF_VAR_sal_instalacao=...
+# PIN da assinatura: se omitido, é gerado; leia com o comando do output comando_ler_pin.
+
+# Orçamento (opcional) -----------------------------------------------------------------------------------
+# conta_faturamento = "000000-000000-000000"
+# orcamento_mensal  = 1000
+# moeda_orcamento   = "BRL"

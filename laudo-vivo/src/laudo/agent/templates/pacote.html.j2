@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if p.demonstracao %}[DEMONSTRAÇÃO] {% endif %}Pacote de exibição {{ p.operacao.ref_bacen }}</title>
+<style>
+  :root { --tinta: #1d232b; --suave: #5b6570; --linha: #d9dee3; --fundo: #ffffff; --faixa: #f5f7f9;
+          --ok: #1f6f43; --ok-bg: #e6f2eb; --div: #a32020; --div-bg: #fbe9e9; --pend: #8a5a00; --pend-bg: #fdf3dc;
+          --abs: #4b5563; --abs-bg: #eceff2; --acento: #24527a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--faixa); color: var(--tinta);
+         font: 14px/1.5 "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; }
+  main { max-width: 1040px; margin: 24px auto; background: var(--fundo); padding: 36px 44px; border: 1px solid var(--linha); }
+  h1 { font: 600 22px/1.25 Georgia, "Times New Roman", serif; margin: 0 0 4px; }
+  h2 { font: 600 15px/1.3 "Segoe UI", system-ui, sans-serif; text-transform: uppercase; letter-spacing: .06em;
+       color: var(--acento); border-bottom: 1px solid var(--linha); padding-bottom: 6px; margin: 30px 0 12px; }
+  .sub, .nota { color: var(--suave); }
+  .nota { font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--linha); }
+  th { font-weight: 600; color: var(--suave); background: var(--faixa); }
+  dl.grade { display: grid; grid-template-columns: 230px 1fr; gap: 4px 16px; margin: 0; }
+  dl.grade dt { color: var(--suave); } dl.grade dd { margin: 0; }
+  code, .mono { font-family: Consolas, "SFMono-Regular", Menlo, monospace; font-size: 12px; word-break: break-all; }
+  .st { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px;
+        text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+  .st-presente, .st-verificado, .st-ok, .st-literal, .st-literal_na_base { color: var(--ok); background: var(--ok-bg); }
+  .st-ausente, .st-divergente, .st-sem_citacao { color: var(--div); background: var(--div-bg); }
+  .st-parcial, .st-pendente, .st-resumo, .st-erro { color: var(--pend); background: var(--pend-bg); }
+  .st-nao_aplicavel, .st-abstencao, .st-indeterminado { color: var(--abs); background: var(--abs-bg); }
+  blockquote { margin: 4px 0; padding: 4px 10px; border-left: 3px solid var(--acento); background: var(--faixa); font-size: 12.5px; }
+  .marca-dagua { position: fixed; inset: 0; pointer-events: none; z-index: 5; display: flex; align-items: center;
+                 justify-content: center; overflow: hidden; }
+  .marca-dagua span { transform: rotate(-28deg); font: 800 64px/1.1 "Segoe UI", system-ui, sans-serif;
+                      color: rgba(163, 32, 32, .11); white-space: nowrap; }
+  .demo-faixa { border: 2px solid #b45309; background: #fff7ed; color: #7c2d12; padding: 10px 14px; margin: 0 0 16px; font-weight: 600; }
+  .demo-faixa small { display: block; font-weight: 400; margin-top: 4px; }
+  footer { margin-top: 30px; color: var(--suave); font-size: 11px; border-top: 1px solid var(--linha); padding-top: 10px; }
+  @media print { body { background: #fff; } main { border: 0; margin: 0; padding: 0 8mm; } }
+  @media (max-width: 640px) { main { padding: 22px 16px; } dl.grade { grid-template-columns: 1fr; } table { font-size: 12px; } }
+</style>
+</head>
+<body>
+{% if p.demonstracao %}<div class="marca-dagua" aria-hidden="true"><span>{{ p.demonstracao.marca_dagua }}</span></div>{% endif %}
+<main>
+  {% if p.demonstracao %}<div class="demo-faixa" role="note">{{ p.demonstracao.marca_dagua }}<small>{{ p.demonstracao.aviso }}</small></div>{% endif %}
+  <h1>Pacote de exibição BCB/Justiça</h1>
+  <p class="sub">Operação {{ p.operacao.ref_bacen }} · {{ p.operacao.municipio_nome or "município não informado" }}/{{ p.operacao.uf }}
+    · {{ p.operacao.instituicao or "IF não informada" }} · fiscalização <code>{{ p.fiscalizacao_id }}</code> · gerado em {{ p.gerado_em }}</p>
+
+  <h2>Integridade</h2>
+  <dl class="grade">
+    <dt>Selo do laudo</dt><dd class="mono">{{ p.integridade.selo }} ({{ "confere" if p.integridade.selo_confere else "NÃO CONFERE" }})</dd>
+    <dt>Conteúdo do laudo</dt><dd>{{ "confere com o rascunho assinado" if p.integridade.conteudo_confere else "NÃO CONFERE com o rascunho assinado" }}
+      <span class="nota">({{ p.integridade.verificacao }})</span></dd>
+    <dt>Hash raiz assinado</dt><dd class="mono">{{ p.integridade.hash_raiz_assinado }}</dd>
+    <dt>Raiz da cadeia de evidências</dt><dd class="mono">{{ p.integridade.raiz_cadeia_atual }} ({{ "íntegra" if p.integridade.cadeia_integra else "QUEBRADA" }})</dd>
+    <dt>sha256 do laudo selado (JSON)</dt><dd class="mono">{{ p.integridade.sha256_laudo_selado_json }}</dd>
+    <dt>Assinatura humana</dt><dd>{% for a in p.assinaturas %}{{ a.papel }} · {{ a.nome_ref }} · {{ a.em }}{% if not loop.last %}; {% endif %}{% endfor %}</dd>
+    <dt>Liberação</dt><dd>só depois de SELADO ({{ p.liberacao.regra_id }}); {{ p.liberacao.acao }}</dd>
+  </dl>
+  <p class="nota">Cada arquivo deste pacote tem sha256 e tamanho em <code>manifest.json</code>.</p>
+
+  <h2>Checklist "Ordem JF Rio Verde"</h2>
+  <p class="nota">{{ p.checklist_ordem_jf.referencia }}. {{ p.checklist_ordem_jf.nota }}</p>
+  <table>
+    <tr><th>Item</th><th>Status</th><th>Motivo ou justificativa</th><th>Arquivo</th></tr>
+    {% for it in p.checklist_ordem_jf.itens %}
+    <tr><td>{{ it.titulo }}</td><td><span class="st st-{{ it.status }}">{{ it.rotulo }}</span></td>
+      <td>{{ it.justificativa or it.motivo or "—" }}</td><td>{% for a in it.evidencias %}<code>{{ a }}</code><br>{% else %}—{% endfor %}</td></tr>
+    {% endfor %}
+  </table>
+  <p><strong>{{ p.checklist_ordem_jf.resumo }}.</strong></p>
+
+  <h2>1. Por que a operação caiu na amostra</h2>
+  {% set am = p.por_que_na_amostra %}
+  <p>{{ am.resumo }}</p>
+  {% if am.motivos %}
+  <table>
+    <tr><th>Código</th><th>Motivo</th><th>Pontos</th><th>Critério (laudo.geo.triagem)</th></tr>
+    {% for m in am.motivos %}<tr><td><code>{{ m.codigo }}</code></td><td>{{ m.texto }}</td><td>{{ m.pontos if m.pontos is not none else "—" }}</td><td class="nota">{{ m.criterio }}</td></tr>{% endfor %}
+  </table>
+  {% endif %}
+  {% for o in am.observacoes %}<p class="nota">Observação (não pontua): {{ o }}</p>{% endfor %}
+  <p class="nota">Nível: {{ am.regra_nivel }}. {{ am.nota }} <strong>{{ am.aviso }}</strong></p>
+  {% for f in am.fundamento %}{% if f.citacao_literal %}<blockquote>{{ f.item }}: “{{ f.citacao_literal }}”</blockquote>{% endif %}{% endfor %}
+
+  <h2>2. Vetor da gleba</h2>
+  {% if gleba.features %}
+  <table>
+    <tr><th>Gleba</th><th>Área (ha)</th><th>Centroide (lon, lat)</th><th>Fonte</th></tr>
+    {% for g in gleba.features %}<tr><td>{{ g.properties.gleba }}</td><td>{{ ("%.2f" | format(g.properties.area_ha)) | replace(".", ",") }}</td><td class="mono">{{ g.properties.centroide | join(", ") }}</td><td>{{ g.properties.fonte }}</td></tr>{% endfor %}
+  </table>
+  <p class="nota">Polígonos completos em <code>{{ arq.gleba }}</code> (GeoJSON, WGS84).</p>
+  {% else %}<p>Operação sem polígono da gleba.</p>{% endif %}
+
+  <h2>3. Fotos: coordenadas e horário</h2>
+  {% if fotos.features %}
+  <table>
+    <tr><th>Evidência</th><th>Item</th><th>Lat, lon (±m)</th><th>Captura</th><th>Recebida</th><th>Geofence</th><th>Arquivo</th></tr>
+    {% for f in fotos.features %}{% set pr = f.properties %}
+    <tr><td><code>{{ pr.evidencia_id }}</code></td><td>{{ pr.item_id or "—" }}</td>
+      <td class="mono">{% if f.geometry %}{{ f.geometry.coordinates[1] }}, {{ f.geometry.coordinates[0] }} (±{{ pr.precisao_m if pr.precisao_m is not none else "?" }}){% else %}{{ pr.motivo }}{% endif %}</td>
+      <td>{{ pr.capturada_em or "sem horário" }}</td><td>{{ pr.recebida_em or "—" }}</td>
+      <td>{% if pr.geofence %}<span class="st st-{{ pr.geofence.status }}">{{ pr.geofence.status }}</span> {{ pr.geofence.posicao or "" }}{% if pr.geofence.distancia_borda_m is not none %} · {{ pr.geofence.distancia_borda_m }} m da borda{% endif %}{% else %}—{% endif %}</td>
+      <td>{% if pr.arquivo_no_pacote %}<code>{{ pr.arquivo_no_pacote }}</code>{% else %}—{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}<p>Nenhuma foto de campo nesta fiscalização.</p>{% endif %}
+
+  <h2>4. Satélite: cenas, sensor, resolução e bandas (MCR 2-7-4-b)</h2>
+  {% set sr = p.sensoriamento_remoto %}
+  {% if not sr.aplicavel %}<p>Não aplicável: {{ sr.justificativa }}</p>
+  {% else %}
+    {% for c in sr.checagens %}
+    <dl class="grade"><dt>Checagem</dt><dd><code>{{ c.checagem_id }}</code> · {{ c.status }} · {{ c.fonte_versao }}</dd>
+      <dt>Satélite / sensor</dt><dd>{{ c.satelite if c.satelite is string else c.satelite | join(", ") }} · {{ c.sensor }}{% if c.produto %} · {{ c.produto }}{% endif %}</dd>
+      <dt>Resolução</dt><dd>{{ c.resolucao_espacial_m or "não informada" }} m · {{ c.resolucao_radiometrica_bits or "?" }} bits</dd>
+      <dt>Bandas</dt><dd>{{ c.bandas | join(", ") or "não informadas" }}</dd>
+      <dt>Metodologia</dt><dd>{{ c.metodologia }}</dd><dt>Uso na fiscalização</dt><dd>{{ c.uso_na_fiscalizacao }}</dd></dl>
+    {% endfor %}
+    {% if sr.cenas %}
+    <table style="margin-top:10px">
+      <tr><th>ID da cena</th><th>Data</th><th>Plataforma / tile</th><th>Nuvem (%)</th><th>Limpa</th></tr>
+      {% for c in sr.cenas %}<tr><td class="mono">{% if c.stac_url %}<a href="{{ c.stac_url }}">{{ c.id_cena }}</a>{% else %}{{ c.id_cena or "sem ID" }}{% endif %}</td><td>{{ c.data }}</td><td>{{ c.plataforma or "—" }} / {{ c.tile or "—" }}</td><td>{{ c.nuvem_cena_pct if c.nuvem_cena_pct is not none else "—" }}</td><td>{{ "sim" if c.limpa else "não" }}</td></tr>{% endfor %}
+    </table>
+    {% endif %}
+    {% if sr.motivo %}<p class="nota">{{ sr.motivo }}</p>{% endif %}
+    {% for a in sr.atribuicoes or [] %}<p class="nota"><strong>{{ a }}.</strong></p>{% endfor %}
+  {% endif %}
+
+  <h2>5. Fundamento literal por item</h2>
+  <table>
+    <tr><th>Item / aspecto</th><th>Status</th><th>Regra</th><th>Fundamento</th></tr>
+    {% for x in p.fundamento_por_item %}{% set fd = x.fundamento %}
+    <tr><td><strong>{{ x.item_descricao }}</strong><br><span class="nota">{{ x.aspecto }} · <code>{{ x.campo }}</code></span></td>
+      <td><span class="st st-{{ x.status }}">{{ x.status }}</span></td>
+      <td><code>{{ x.regra_id }}</code><br><span class="st st-{{ fd.status }}">{{ fd.status }}</span></td>
+      <td>{% if fd.citacao_literal %}<blockquote>{{ fd.item }}: “{{ fd.citacao_literal }}”</blockquote>{% endif %}
+        {% if fd.justificativa %}<div class="nota">Parâmetro operacional: {{ fd.justificativa }}</div>{% endif %}
+        {% for b in fd.base_normativa or [] %}{% if b.citacao_literal %}<blockquote>{{ b.item }}: “{{ b.citacao_literal }}”</blockquote>{% else %}<div class="nota">{{ b.item }}: texto literal não encontrado em docs/normas</div>{% endif %}{% endfor %}
+        {% if fd.resumo %}<div class="nota">{{ fd.norma }}: {{ fd.resumo }} (resumo, não literal)</div>{% endif %}
+        {% if fd.status == "sem_citacao" %}<div class="nota">{{ fd.aviso }}</div>{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+  {% if p.fundamento_documentos_fiscais %}
+  <h3>Regras dos documentos fiscais (critérios de NF-e e GTA)</h3>
+  <p class="nota">Regra do catálogo de documentos fiscais vai como <strong>resumo</strong> (não é citação literal) e não conta
+    como fundamento literal no checklist.</p>
+  <table>
+    <tr><th>Regra</th><th>Onde</th><th>Status</th><th>Fundamento</th></tr>
+    {% for x in p.fundamento_documentos_fiscais %}{% set fd = x.fundamento %}
+    <tr><td><code>{{ x.regra_id }}</code></td><td class="nota">{{ x.ferramentas | join(", ") }}{% if x.campos %} · {{ x.campos | join(", ") }}{% endif %}</td>
+      <td><span class="st st-{{ fd.status }}">{{ "resumo (não literal)" if fd.status == "resumo" else fd.status }}</span></td>
+      <td>{% if fd.citacao_literal %}<blockquote>{{ fd.item }}: “{{ fd.citacao_literal }}”</blockquote>{% endif %}
+        {% if fd.resumo %}<div>{{ fd.norma }}: {{ fd.resumo }}</div>{% if fd.url %}<div class="nota">{{ fd.url }}</div>{% endif %}{% endif %}
+        {% if fd.status == "sem_citacao" %}<div class="nota">{{ fd.aviso }}</div>{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+
+  <h2>6. Memória de cálculo</h2>
+  {% set me = p.memoria_de_calculo %}
+  <h3>Contagem × quantidade financiada</h3>
+  {% for c in me.contagem %}{% if c.nao_aplicavel %}<p class="nota">{{ c.motivo }}</p>{% else %}
+  <dl class="grade"><dt>Checagem</dt><dd><code>{{ c.checagem_id }}</code> · item {{ c.item_id }} · {{ c.metodo or "" }} {{ c.modelo or "" }}</dd>
+    <dt>Contagem (intervalo)</dt><dd>{{ c.contagem }} ({{ c.intervalo | join(" a ") if c.intervalo else "—" }})</dd>
+    <dt>Financiado (Q)</dt><dd>{{ c.quantidade_financiada }} {{ c.unidade or "" }}</dd>
+    <dt>Tolerância / limite</dt><dd>{{ c.tolerancia_pct }}% · limite {{ c.limite }} ({{ c.formula }})</dd>
+    <dt>Status no laudo</dt><dd><span class="st st-{{ c.status_campo }}">{{ c.status_campo }}</span> {{ c.motivo_campo or "" }}</dd>
+    {% if c.justificativa_humana %}<dt>Justificativa do fiscal</dt><dd>“{{ c.justificativa_humana }}”</dd>{% endif %}
+    <dt>Quadros-chave</dt><dd>{{ c.quadros_chave | length }}</dd></dl>{% endif %}{% endfor %}
+  <h3>Conciliações (NF-e e GTA)</h3>
+  {% for c in me.conciliacoes %}{% if c.nao_aplicavel %}<p class="nota">{{ c.motivo }}</p>{% else %}
+  <p><code>{{ c.checagem_id }}</code> {{ c.ferramenta }} · <span class="st st-{{ c.status }}">{{ c.status }}</span> {{ c.motivo or "" }}{% if c.simulada %} <span class="nota">(ferramenta simulada)</span>{% endif %}</p>
+  {% if c.criterios %}<table><tr><th>Critério</th><th>Status</th><th>Regra</th><th>Motivo</th></tr>
+    {% for k in c.criterios %}<tr><td class="mono">{{ k.campo }}</td><td><span class="st st-{{ k.status }}">{{ k.status }}</span></td><td class="mono">{{ k.regra_id }}</td><td>{{ k.motivo }}</td></tr>{% endfor %}</table>{% endif %}
+  {% for n in c.nao_verificado_offline %}<p class="nota">Não verificado offline: {{ n.id }} ({{ n.regra_id }}) {{ n.motivo }}</p>{% endfor %}
+  {% endif %}{% endfor %}
+  <h3>Lotação</h3>
+  {% set lo = me.lotacao %}
+  {% if lo.origem == "checar_lotacao" %}{% for c in lo.checagens %}<p>{{ c.texto }}</p>{% endfor %}
+  {% elif lo.lotacao_cab_ha is defined %}<p>{{ lo.formula }}: {{ lo.cabecas }} ÷ {{ lo.area_ha }} ha ({{ lo.area_fonte }}) = <strong>{{ lo.lotacao_cab_ha }}</strong> cab/ha
+    ({{ lo.classe }}; {{ lo.pontos_triagem }} ponto(s) de triagem){% if lo.razao_densidade_municipal %}; {{ lo.razao_densidade_municipal }}× a densidade bovina do município{% endif %}.</p>
+    <p class="nota">{{ lo.ressalva }}</p>
+  {% else %}<p class="nota">{{ lo.motivo }}</p>{% endif %}
+  <p class="nota">{{ me.nota }}</p>
+
+  <h2>7. Ciência do mutuário e prazo de contestação</h2>
+  <p>{{ p.ciencia_mutuario.prazo_regra }}. Termo para assinatura: <code>{{ arq.ciencia_html }}</code>
+    ({{ p.ciencia_mutuario.contestaveis | length }} item(ns) contestável(is)).</p>
+
+  <h2>8. Reversão de desclassificação ({{ p.reversao_desclassificacao.norma }})</h2>
+  {% set rv = p.reversao_desclassificacao %}
+  <p>{{ rv.o_que_pede[:1] | upper }}{{ rv.o_que_pede[1:] }}. {{ rv.leitura }}</p>
+  <p class="nota">{{ rv.aviso }}</p>
+  {% if rv.citacao_conferida and rv.citacao_literal %}<blockquote>{{ rv.localizador or rv.norma }}: “{{ rv.citacao_literal }}”</blockquote>{% endif %}
+  {% for b in rv.base_mcr %}{% if b.citacao_literal %}<blockquote>{{ b.item }}: “{{ b.citacao_literal }}”</blockquote>{% endif %}{% endfor %}
+  <table><tr><th>Documento desta operação</th><th>Arquivos</th></tr>
+    {% for d in rv.documentacao_desta_operacao %}<tr><td>{{ d.documento }}</td><td>{% for a in d.arquivos %}<code>{{ a }}</code><br>{% endfor %}</td></tr>{% endfor %}
+  </table>
+  {% if rv.itens_que_nao_sustentam %}<p class="nota">Não sustentam a aplicação (vão como estão): {% for x in rv.itens_que_nao_sustentam %}<span title="{{ x.campo }}">{{ x.rotulo or x.campo }}</span> ({{ x.status }}){% if not loop.last %}; {% endif %}{% endfor %}.</p>{% endif %}
+
+  <footer>
+    {% if p.demonstracao %}<strong>{{ p.demonstracao.marca_dagua }}.</strong> {{ p.demonstracao.aviso }}<br>{% endif %}
+    {% for a in p.atribuicoes or [] %}{{ a }}.<br>{% endfor %}
+    {{ p.versao }}. Pacote derivado do laudo selado e da trilha; nada aqui foi calculado ou decidido por modelo de linguagem.
+    CPF/CNPJ e chave de acesso da NF-e só mascarados; documentos fiscais e vídeo vão por hash.
+  </footer>
+</main>
+</body>
+</html>

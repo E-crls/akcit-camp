@@ -1,0 +1,97 @@
+# Contagens de referência para o contador de bovinos (visão).
+#
+# Como foi feito: contagem manual por inspeção visual de quadros amostrados (folhas de contato e quadros
+# em resolução cheia, 480p), em 08/10/2026, por um único anotador (agente de visão). Sem segundo anotador:
+# não há kappa. Para os animais parcialmente visíveis ao fundo a própria referência tem incerteza, por isso
+# cada vídeo traz `faixa_referencia`.
+#
+# `esperado`:
+#   contagem  → o contador deve devolver número dentro da faixa (vale para MAE)
+#   abstencao → cena em que nem um humano conta com segurança pelo vídeo (rebanho grande, câmera em
+#               movimento); a resposta correta da ferramenta é abster-se (status "indeterminado")
+#
+# Arquivos em dados_locais/videos/ (fora do git). Fonte e licença em dados_locais/videos/LICENSES.md e
+# docs/modelos.md. Os vídeos são as versões transcodificadas 480p VP9 do Wikimedia Commons.
+
+versao: 1
+data: "2026-10-08"
+anotador: "agente-visao (1 anotador; sem kappa)"
+
+videos:
+  - id: v01_estrada_oregon
+    arquivo: dados_locais/videos/v01_estrada_oregon.webm
+    sha256: 42ded582653b2b739fe22a618ec4ac720ca0c26cd3e634fad3e450c246568d30
+    cena: "boiada numa estrada, filmada de dentro do carro que avança devagar; amanhecer, gado escuro na sombra"
+    modo_recomendado: ids_unicos
+    referencia: null
+    faixa_referencia: [30, 80]
+    esperado: abstencao
+    nota: "dezenas de animais até o horizonte; contagem exata inviável mesmo para humano"
+
+  - id: v02_mata_burro_noite
+    arquivo: dados_locais/videos/v02_mata_burro_noite.webm
+    sha256: 235a098288419d6c0efcdb7333944e6add4312a2d659931d1042d08fcf42503f
+    cena: "uma vaca atravessa um mata-burro à noite, iluminada pelo farol; câmera parada no carro"
+    modo_recomendado: ids_unicos
+    referencia: 1
+    faixa_referencia: [1, 1]
+    referencia_linha: 1  # entra pela esquerda do centro e termina à direita (cruza a linha central 1 vez)
+    esperado: contagem
+    nota: "vídeo muito escuro (luminância média < 35): o contador pode se abster por VIDEO_RUIM, o que também é aceitável"
+
+  - id: v03_zebuinos_estabulo
+    arquivo: dados_locais/videos/v03_zebuinos_estabulo.webm
+    sha256: 857bfe6265c89895092ac0d129642b2cf307e68f111a5de6ae8c6e1441256c91
+    cena: "lote parado de zebuínos (brancos tipo Nelore/Ongole, vermelho, Gir malhado) em estábulo; câmera quase parada"
+    modo_recomendado: ids_unicos
+    referencia: 9
+    faixa_referencia: [8, 10]
+    esperado: contagem
+    nota: "5 animais nítidos na frente; 2 ao fundo do corredor esquerdo e 2 a 3 parcialmente visíveis no corredor direito"
+
+  - id: v04_manejo_a_cavalo
+    arquivo: dados_locais/videos/v04_manejo_a_cavalo.webm
+    sha256: f8fd4702f60292f949ad9bab8f37f0974cac188f0ee1001b908fbf2400a906f6
+    cena: "rebanho misto (Belted Galloway, taurinos vermelhos e pretos) tocado por vaqueiros a cavalo; câmera na cabeça do cavalo, girando"
+    modo_recomendado: ids_unicos
+    referencia: null
+    faixa_referencia: [24, 45]
+    esperado: abstencao
+    nota: "24 bovinos visíveis num único quadro (t=5,6 s); a câmera gira e os animais reentram no quadro; há cavalos"
+
+  - id: v05_bufalas_ordenha
+    arquivo: dados_locais/videos/v05_bufalas_ordenha.webm
+    sha256: 4ce64142f91752cbda6bcfd159ad9dcd80c83d8db3dd7dc06b89af9e168861e4
+    cena: "búfalas em ordenha manual com bezerro; câmera parada (bubalinos, fora da classe COCO 'cow')"
+    modo_recomendado: ids_unicos
+    referencia: 4
+    faixa_referencia: [4, 4]
+    esperado: contagem
+    nota: "2 adultas inteiras, 1 adulta parcial à esquerda, 1 bezerro; uma pessoa agachada ordenhando"
+
+# Contagem manual por quadro (avalia só o detector: detecções com score >= limiar_alto num quadro).
+# `total` inclui animais parcialmente visíveis; `nitidos` são os com >= 50% do corpo visível.
+quadros:
+  - {video: v02_mata_burro_noite, t_s: 0.0, total: 0, nitidos: 0}
+  - {video: v02_mata_burro_noite, t_s: 7.7, total: 1, nitidos: 1}
+  - {video: v02_mata_burro_noite, t_s: 15.4, total: 1, nitidos: 1}
+  - {video: v02_mata_burro_noite, t_s: 30.8, total: 0, nitidos: 0}
+  - {video: v03_zebuinos_estabulo, t_s: 0.5, total: 9, nitidos: 5}
+  - {video: v03_zebuinos_estabulo, t_s: 12.0, total: 9, nitidos: 5}
+  - {video: v03_zebuinos_estabulo, t_s: 20.0, total: 9, nitidos: 5}
+  - {video: v04_manejo_a_cavalo, t_s: 5.6, total: 24, nitidos: 18}
+  - {video: v04_manejo_a_cavalo, t_s: 12.9, total: 15, nitidos: 11}
+  - {video: v05_bufalas_ordenha, t_s: 1.0, total: 4, nitidos: 3}
+  - {video: v05_bufalas_ordenha, t_s: 29.0, total: 4, nitidos: 3}
+
+# Vídeos semissintéticos de corredor (gerados por gerar_semissintetico.py; referência exata, conhecida
+# por construção). Recortes reais de bovinos (v03, v04) andando em fila sobre fundo de pasto com cerca.
+semissinteticos:
+  gerador: eval/golden/visao/gerar_semissintetico.py
+  semente: 20261008
+  cenarios:
+    - {id: s01_fila_espacada, n: 5, gap_s: [1.2, 1.8], velocidade_px_s: [90, 130], faixas: 1}
+    - {id: s02_fila_media, n: 10, gap_s: [0.7, 1.2], velocidade_px_s: [80, 140], faixas: 2}
+    - {id: s03_fila_colada, n: 15, gap_s: [0.35, 0.7], velocidade_px_s: [90, 150], faixas: 2}
+    - {id: s04_lote_grande, n: 25, gap_s: [0.3, 0.9], velocidade_px_s: [70, 160], faixas: 3}
+    - {id: s05_com_volta, n: 8, gap_s: [0.8, 1.3], velocidade_px_s: [90, 130], faixas: 2, voltam: 1}

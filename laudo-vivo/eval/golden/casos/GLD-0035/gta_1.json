@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "419072",
+  "serie": "AC",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "25-36",
+      "quantidade": 40
+    }
+  ],
+  "total": 40,
+  "total_por_extenso": "QUARENTA BOVINOS",
+  "marca_rebanho": "MARCA TESTE 34",
+  "origem": {
+    "documento": "99999999503428",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 35 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 35",
+    "codigo_estabelecimento": "TESTE-5210208-9034",
+    "codigo_exploracao": "TESTE-5210208-9034-BOV",
+    "municipio_nome": "IPORÁ",
+    "municipio_ibge": "5210208",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000013412",
+    "nome": "PRODUTOR TESTE 35",
+    "estabelecimento": "FAZENDA TESTE 35",
+    "codigo_estabelecimento": "TESTE-5216403-0035",
+    "codigo_exploracao": "TESTE-5216403-0035-BOV",
+    "municipio_nome": "PARAÚNA",
+    "municipio_ibge": "5216403",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST6E37"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-02-24"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 1 DE 2",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE IPORÁ"
+  },
+  "emissao": {
+    "local_municipio": "IPORÁ",
+    "data": "2026-08-22",
+    "hora": "09:51",
+    "validade": "2026-08-25"
+  },
+  "nfe_chaves": [
+    "52260899999999503428550010000020491419449893"
+  ],
+  "codigo_barras": "SINTGOAC419072",
+  "sintetico": true
+}

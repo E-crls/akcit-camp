@@ -1,0 +1,298 @@
+id: GLD-0038
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 37
+sintetico: true
+classe: ambiguo
+defeito:
+  codigo: A04_GTA_ORDEM_INVERTIDA_1DIA
+  classe: ambiguo
+  titulo: GTA um dia antes da NF-e
+  descricao: 'GTA emitida 1 dia antes da NF-e. A ordem NF/GTA não é fixa nacionalmente (NT 2024.003 pode exigir
+    a GTA na NF-e; GO exige a NF-e na GTA): desvio pequeno fica pendente.'
+data_fiscalizacao: '2026-09-01'
+operacao:
+  ref_bacen: SINT-2026-000038
+  tomador_ref: TOMADOR-TESTE-38
+  uf: GO
+  municipio_ibge: '5204409'
+  municipio_nome: CAIAPÔNIA
+  instituicao: COOPERATIVA DE CREDITO TESTE 03
+  finalidade: investimento
+  empreendimento: '23271300193002'
+  data_contratacao: '2026-07-08'
+  data_liberacao: null
+  valor_rs: 160100.0
+  area_financiada_ha: 20.0
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-51.950437 -17.027155, -51.953917 -17.028144, -51.954874 -17.029439, -51.953830 -17.029672, -51.950271
+    -17.032058, -51.949204 -17.031351, -51.949421 -17.030828, -51.948355 -17.029887, -51.950437 -17.027155))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 15 vaca leiteira(s) (bovinos leite - matrizes)
+    quantidade: 15.0
+    unidade: cabeca
+    valor_rs: 92100.0
+    categoria_animal: vaca leiteira
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: cerca1
+    tipo: cerca
+    descricao: Construção de 4000 m de cerca de arame liso 5 fios
+    quantidade: 4000.0
+    unidade: m
+    valor_rs: 68000.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-10-31'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 38
+    codigo_estabelecimento: TESTE-5204409-0038
+    municipio_ibge: '5204409'
+    municipio_nome: CAIAPÔNIA
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 15 vaca leiteira(s) (bovinos leite - matrizes)
+    quantidade: 15
+    unidade: cabeca
+    valor_unitario_rs: 6140.0
+    valor_total_rs: 92100.0
+  - item_id: cerca1
+    descricao: Construção de 4000 m de cerca de arame liso 5 fios
+    quantidade: 4000.0
+    unidade: m
+    valor_unitario_rs: 17.0
+    valor_total_rs: 68000.0
+  empreendimento_sicor:
+    codigo: '23271300193002'
+    descricao: BOVINOS LEITE - MATRIZES
+  lotacao_implicita_cab_ha: 0.75
+tomador:
+  ref: TOMADOR-TESTE-38
+  nome: AGROPECUARIA TOMADORA TESTE 38 LTDA
+  documento_sintetico: '99999999103756'
+  documento_sha256: bc4a8a3dc30ad2d267669d023022c5afa539206f733085d31757de75dacd2008
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260899999999503770550010000032561371330121'
+    sha256: 2a292b3c8aba1bd958237fd7f81d0b9c0e3710b19bcd323b11dbe5ccc6df554b
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-B-814864
+    sha256: 45fe377eb0da5c332928b5044e8aa6fa49884a8349de9b9aa34db26a276d3bdc
+fotos:
+- id: foto_cerca_1
+  arquivo: fotos/foto_cerca_1.jpg
+  item_id: cerca1
+  sha256: a7117add1d8686156c2c322bed63011a1376bcd70eadfc36e5dd0c38b9ca3b91
+  exif:
+    presente: true
+    data_hora: '2026-09-01T15:53:16-03:00'
+    gps:
+      lat: -17.0289608
+      lon: -51.9509621
+  gps_app:
+    lat: -17.0289608
+    lon: -51.9509621
+    precisao_m: 12.0
+  duplicata_de: null
+  recebida_em: '2026-09-01T16:19:16-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 163.2
+- id: foto_cerca_2
+  arquivo: fotos/foto_cerca_2.jpg
+  item_id: cerca1
+  sha256: d61f206154b76202eb449cc741d81e96233ab60aad1249b2bb8b7ca562ba984a
+  exif:
+    presente: true
+    data_hora: '2026-09-01T09:03:34-03:00'
+    gps:
+      lat: -17.0295726
+      lon: -51.9524128
+  gps_app:
+    lat: -17.0295726
+    lon: -51.9524128
+    precisao_m: 6.7
+  duplicata_de: null
+  recebida_em: '2026-09-01T09:10:34-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 95.2
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: 02ee693c95db43dd4448238178d44b5725bce42729c52dab668a301174f64e9c
+  exif:
+    presente: true
+    data_hora: '2026-09-01T12:37:24-03:00'
+    gps:
+      lat: -17.0305359
+      lon: -51.9506922
+  gps_app:
+    lat: -17.0305359
+    lon: -51.9506922
+    precisao_m: 11.4
+  duplicata_de: null
+  recebida_em: '2026-09-01T13:12:24-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 112.5
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0038/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 62
+  contagem_real: 17
+  saida_simulada_contador:
+    estimativa: 17
+    ic80:
+    - 17
+    - 17
+    confianca: 0.95
+    oclusao_frac: 0.02
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 38, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As vaca leiteiras chegaram depois da nota, vieram de Caiapônia.
+- de: fiscal
+  texto: Agora vou fotografar a cerca pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 15 vaca leiteira(s) (bovinos leite - matrizes)
+      quantidade: 15.0
+      unidade: cabeca
+      valor_rs: 92100.0
+      categoria_animal: vaca leiteira
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5204409'
+    municipio_nome: CAIAPÔNIA
+    data_contratacao: '2026-07-08'
+    data_fiscalizacao: '2026-09-01'
+    tomador_doc_sha256: bc4a8a3dc30ad2d267669d023022c5afa539206f733085d31757de75dacd2008
+    codigo_estabelecimento_destino: TESTE-5204409-0038
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5204409'
+    municipio_nome: CAIAPÔNIA
+    data_contratacao: '2026-07-08'
+    data_fiscalizacao: '2026-09-01'
+    tomador_doc_sha256: bc4a8a3dc30ad2d267669d023022c5afa539206f733085d31757de75dacd2008
+    codigo_estabelecimento_destino: TESTE-5204409-0038
+    caminhos:
+    - gta_1.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: ''
+    documento:nfe:autorizacao:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: ''
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: pendente
+      regra_id: NT-2024.003-ZF
+      motivo: ordem NF/GTA com desvio de 1 dia
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:cerca1:localizacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item16a
+      motivo: ''
+    item:cerca1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

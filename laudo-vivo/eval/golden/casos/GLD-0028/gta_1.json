@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "326016",
+  "serie": "C",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 33
+    }
+  ],
+  "total": 33,
+  "total_por_extenso": "TRINTA E TRES BOVINOS",
+  "marca_rebanho": "MARCA TESTE 27",
+  "origem": {
+    "documento": "00000052744",
+    "nome": "VENDEDOR TESTE 28",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 28",
+    "codigo_estabelecimento": "TESTE-5208004-9027",
+    "codigo_exploracao": "TESTE-5208004-9027-BOV",
+    "municipio_nome": "FORMOSA",
+    "municipio_ibge": "5208004",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000012793",
+    "nome": "PRODUTOR TESTE 28",
+    "estabelecimento": "FAZENDA TESTE 28",
+    "codigo_estabelecimento": "TESTE-5214838-0028",
+    "codigo_exploracao": "TESTE-5214838-0028-BOV",
+    "municipio_nome": "NOVA CRIXÁS",
+    "municipio_ibge": "5214838",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST6A38"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-02-07"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE FORMOSA"
+  },
+  "emissao": {
+    "local_municipio": "FORMOSA",
+    "data": "2026-08-12",
+    "hora": "12:49",
+    "validade": "2026-08-15"
+  },
+  "nfe_chaves": [
+    "52260800000000052744550010000040621959034227"
+  ],
+  "codigo_barras": "SINTGOC326016",
+  "sintetico": true
+}

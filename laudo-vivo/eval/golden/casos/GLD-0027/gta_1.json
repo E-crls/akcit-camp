@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "706756",
+  "serie": "C",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 10
+    }
+  ],
+  "total": 10,
+  "total_por_extenso": "DEZ BOVINOS",
+  "marca_rebanho": "MARCA TESTE 26",
+  "origem": {
+    "documento": "99999999502618",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 27 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 27",
+    "codigo_estabelecimento": "TESTE-5213103-9026",
+    "codigo_exploracao": "TESTE-5213103-9026-BOV",
+    "municipio_nome": "MINEIROS",
+    "municipio_ibge": "5213103",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000012602",
+    "nome": "PRODUTOR TESTE 27",
+    "estabelecimento": "FAZENDA TESTE 27",
+    "codigo_estabelecimento": "TESTE-5218805-0027",
+    "codigo_exploracao": "TESTE-5218805-0027-BOV",
+    "municipio_nome": "RIO VERDE",
+    "municipio_ibge": "5218805",
+    "uf": "GO"
+  },
+  "finalidade": "ENGORDA",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST7H57"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-02-03"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE MINEIROS"
+  },
+  "emissao": {
+    "local_municipio": "MINEIROS",
+    "data": "2026-07-26",
+    "hora": "06:15",
+    "validade": "2026-07-29"
+  },
+  "nfe_chaves": [
+    "52260799999999502618550010000048901339544283"
+  ],
+  "codigo_barras": "SINTGOC706756",
+  "sintetico": true
+}

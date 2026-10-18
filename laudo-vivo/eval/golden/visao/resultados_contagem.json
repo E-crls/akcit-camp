@@ -1,0 +1,1542 @@
+{
+ "data": "2026-10-08 18:28",
+ "fps_amostragem": 8.0,
+ "reais": [
+  {
+   "id": "v01_estrada_oregon",
+   "modelo": "yolox_s",
+   "modo": "ids_unicos",
+   "recomendado": true,
+   "referencia": null,
+   "faixa": [
+    30,
+    80
+   ],
+   "esperado": "abstencao",
+   "ok": true,
+   "contagem": 18,
+   "intervalo": [
+    17,
+    22
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "CAMERA_EM_MOVIMENTO"
+   ],
+   "s_por_s_video": 0.26,
+   "fps_processado": 8.008,
+   "n_frames": 102,
+   "conf_media": 0.606,
+   "cobertura": 0.838,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_ids_unicos_yolox_s/ids_unicos_4f5905_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_ids_unicos_yolox_s/ids_unicos_4f5905_000026.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_ids_unicos_yolox_s/ids_unicos_4f5905_000123.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_ids_unicos_yolox_s/ids_unicos_4f5905_000378.jpg"
+   ],
+   "latency_ms": 3426
+  },
+  {
+   "id": "v01_estrada_oregon",
+   "modelo": "yolox_s",
+   "modo": "linha",
+   "recomendado": false,
+   "referencia": null,
+   "faixa": [
+    30,
+    80
+   ],
+   "esperado": "abstencao",
+   "ok": true,
+   "contagem": 2,
+   "intervalo": [
+    2,
+    6
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "CAMERA_EM_MOVIMENTO",
+    "INTERVALO_LARGO"
+   ],
+   "s_por_s_video": 0.312,
+   "fps_processado": 8.008,
+   "n_frames": 102,
+   "conf_media": 0.702,
+   "cobertura": 0.799,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_linha_yolox_s/linha_1b7ec1_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_linha_yolox_s/linha_1b7ec1_000041.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_linha_yolox_s/linha_1b7ec1_000086.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_linha_yolox_s/linha_1b7ec1_000378.jpg"
+   ],
+   "latency_ms": 3973
+  },
+  {
+   "id": "v02_mata_burro_noite",
+   "modelo": "yolox_s",
+   "modo": "ids_unicos",
+   "recomendado": true,
+   "referencia": 1,
+   "faixa": [
+    1,
+    1
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 2,
+   "intervalo": [
+    1,
+    2
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "VIDEO_RUIM",
+    "CAMERA_EM_MOVIMENTO"
+   ],
+   "s_por_s_video": 0.278,
+   "fps_processado": 7.996,
+   "n_frames": 247,
+   "conf_media": 0.607,
+   "cobertura": 0.916,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_ids_unicos_yolox_s/ids_unicos_e5a025_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_ids_unicos_yolox_s/ids_unicos_e5a025_000173.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_ids_unicos_yolox_s/ids_unicos_e5a025_000768.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_ids_unicos_yolox_s/ids_unicos_e5a025_000922.jpg"
+   ],
+   "latency_ms": 8603
+  },
+  {
+   "id": "v02_mata_burro_noite",
+   "modelo": "yolox_s",
+   "modo": "linha",
+   "recomendado": false,
+   "referencia": 1,
+   "faixa": [
+    1,
+    1
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 1,
+   "intervalo": [
+    1,
+    2
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "VIDEO_RUIM",
+    "CAMERA_EM_MOVIMENTO"
+   ],
+   "s_por_s_video": 0.276,
+   "fps_processado": 7.996,
+   "n_frames": 247,
+   "conf_media": 0.679,
+   "cobertura": 0.966,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_linha_yolox_s/linha_8cd801_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_linha_yolox_s/linha_8cd801_000173.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_linha_yolox_s/linha_8cd801_000229.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_linha_yolox_s/linha_8cd801_000922.jpg"
+   ],
+   "latency_ms": 8538
+  },
+  {
+   "id": "v03_zebuinos_estabulo",
+   "modelo": "yolox_s",
+   "modo": "ids_unicos",
+   "recomendado": true,
+   "referencia": 9,
+   "faixa": [
+    8,
+    10
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 12,
+   "intervalo": [
+    11,
+    15
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [],
+   "s_por_s_video": 0.31,
+   "fps_processado": 8.0,
+   "n_frames": 205,
+   "conf_media": 0.629,
+   "cobertura": 0.868,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_ids_unicos_yolox_s/ids_unicos_a1b7d9_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_ids_unicos_yolox_s/ids_unicos_a1b7d9_000255.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_ids_unicos_yolox_s/ids_unicos_a1b7d9_000488.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_ids_unicos_yolox_s/ids_unicos_a1b7d9_000765.jpg"
+   ],
+   "latency_ms": 7940
+  },
+  {
+   "id": "v03_zebuinos_estabulo",
+   "modelo": "yolox_s",
+   "modo": "linha",
+   "recomendado": false,
+   "referencia": null,
+   "faixa": [
+    8,
+    10
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 0,
+   "intervalo": [
+    0,
+    1
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "SEM_CRUZAMENTO"
+   ],
+   "s_por_s_video": 0.308,
+   "fps_processado": 8.0,
+   "n_frames": 205,
+   "conf_media": 0.0,
+   "cobertura": 0.0,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_linha_yolox_s/linha_7688cf_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_linha_yolox_s/linha_7688cf_000255.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_linha_yolox_s/linha_7688cf_000510.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_linha_yolox_s/linha_7688cf_000765.jpg"
+   ],
+   "latency_ms": 7904
+  },
+  {
+   "id": "v04_manejo_a_cavalo",
+   "modelo": "yolox_s",
+   "modo": "ids_unicos",
+   "recomendado": true,
+   "referencia": null,
+   "faixa": [
+    24,
+    45
+   ],
+   "esperado": "abstencao",
+   "ok": true,
+   "contagem": 48,
+   "intervalo": [
+    44,
+    73
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "CAMERA_EM_MOVIMENTO",
+    "INTERVALO_LARGO",
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.315,
+   "fps_processado": 7.995,
+   "n_frames": 127,
+   "conf_media": 0.7,
+   "cobertura": 0.878,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_ids_unicos_yolox_s/ids_unicos_874ca2_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_ids_unicos_yolox_s/ids_unicos_874ca2_000107.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_ids_unicos_yolox_s/ids_unicos_874ca2_000132.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_ids_unicos_yolox_s/ids_unicos_874ca2_000394.jpg"
+   ],
+   "latency_ms": 5010
+  },
+  {
+   "id": "v04_manejo_a_cavalo",
+   "modelo": "yolox_s",
+   "modo": "linha",
+   "recomendado": false,
+   "referencia": null,
+   "faixa": [
+    24,
+    45
+   ],
+   "esperado": "abstencao",
+   "ok": true,
+   "contagem": 7,
+   "intervalo": [
+    5,
+    14
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "CAMERA_EM_MOVIMENTO",
+    "INTERVALO_LARGO",
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.317,
+   "fps_processado": 7.995,
+   "n_frames": 127,
+   "conf_media": 0.685,
+   "cobertura": 0.897,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_linha_yolox_s/linha_b7fc5c_000066.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_linha_yolox_s/linha_b7fc5c_000128.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_linha_yolox_s/linha_b7fc5c_000341.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_linha_yolox_s/linha_b7fc5c_000394.jpg"
+   ],
+   "latency_ms": 5033
+  },
+  {
+   "id": "v05_bufalas_ordenha",
+   "modelo": "yolox_s",
+   "modo": "ids_unicos",
+   "recomendado": true,
+   "referencia": 4,
+   "faixa": [
+    4,
+    4
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 8,
+   "intervalo": [
+    8,
+    9
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [],
+   "s_por_s_video": 0.301,
+   "fps_processado": 7.998,
+   "n_frames": 250,
+   "conf_media": 0.612,
+   "cobertura": 0.785,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_ids_unicos_yolox_s/ids_unicos_3b4839_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_ids_unicos_yolox_s/ids_unicos_3b4839_000312.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_ids_unicos_yolox_s/ids_unicos_3b4839_000863.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_ids_unicos_yolox_s/ids_unicos_3b4839_000934.jpg"
+   ],
+   "latency_ms": 9418
+  },
+  {
+   "id": "v05_bufalas_ordenha",
+   "modelo": "yolox_s",
+   "modo": "linha",
+   "recomendado": false,
+   "referencia": null,
+   "faixa": [
+    4,
+    4
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 1,
+   "intervalo": [
+    1,
+    6
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "INTERVALO_LARGO"
+   ],
+   "s_por_s_video": 0.302,
+   "fps_processado": 7.998,
+   "n_frames": 250,
+   "conf_media": 0.835,
+   "cobertura": 0.976,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_linha_yolox_s/linha_65cecc_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_linha_yolox_s/linha_65cecc_000199.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_linha_yolox_s/linha_65cecc_000312.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_linha_yolox_s/linha_65cecc_000934.jpg"
+   ],
+   "latency_ms": 9430
+  },
+  {
+   "id": "v01_estrada_oregon",
+   "modelo": "yolox_m",
+   "modo": "ids_unicos",
+   "recomendado": true,
+   "referencia": null,
+   "faixa": [
+    30,
+    80
+   ],
+   "esperado": "abstencao",
+   "ok": true,
+   "contagem": 21,
+   "intervalo": [
+    20,
+    24
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "CAMERA_EM_MOVIMENTO"
+   ],
+   "s_por_s_video": 0.626,
+   "fps_processado": 8.008,
+   "n_frames": 102,
+   "conf_media": 0.605,
+   "cobertura": 0.906,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_ids_unicos_yolox_m/ids_unicos_09d58b_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_ids_unicos_yolox_m/ids_unicos_09d58b_000063.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_ids_unicos_yolox_m/ids_unicos_09d58b_000123.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_ids_unicos_yolox_m/ids_unicos_09d58b_000378.jpg"
+   ],
+   "latency_ms": 8166
+  },
+  {
+   "id": "v01_estrada_oregon",
+   "modelo": "yolox_m",
+   "modo": "linha",
+   "recomendado": false,
+   "referencia": null,
+   "faixa": [
+    30,
+    80
+   ],
+   "esperado": "abstencao",
+   "ok": true,
+   "contagem": 2,
+   "intervalo": [
+    2,
+    6
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "CAMERA_EM_MOVIMENTO",
+    "INTERVALO_LARGO"
+   ],
+   "s_por_s_video": 0.626,
+   "fps_processado": 8.008,
+   "n_frames": 102,
+   "conf_media": 0.665,
+   "cobertura": 0.9,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_linha_yolox_m/linha_076c4b_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_linha_yolox_m/linha_076c4b_000041.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_linha_yolox_m/linha_076c4b_000086.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v01_estrada_oregon_linha_yolox_m/linha_076c4b_000378.jpg"
+   ],
+   "latency_ms": 7977
+  },
+  {
+   "id": "v02_mata_burro_noite",
+   "modelo": "yolox_m",
+   "modo": "ids_unicos",
+   "recomendado": true,
+   "referencia": 1,
+   "faixa": [
+    1,
+    1
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 1,
+   "intervalo": [
+    1,
+    2
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "VIDEO_RUIM",
+    "CAMERA_EM_MOVIMENTO"
+   ],
+   "s_por_s_video": 0.587,
+   "fps_processado": 7.996,
+   "n_frames": 247,
+   "conf_media": 0.726,
+   "cobertura": 0.895,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_ids_unicos_yolox_m/ids_unicos_50e5a5_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_ids_unicos_yolox_m/ids_unicos_50e5a5_000135.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_ids_unicos_yolox_m/ids_unicos_50e5a5_000810.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_ids_unicos_yolox_m/ids_unicos_50e5a5_000922.jpg"
+   ],
+   "latency_ms": 18131
+  },
+  {
+   "id": "v02_mata_burro_noite",
+   "modelo": "yolox_m",
+   "modo": "linha",
+   "recomendado": false,
+   "referencia": 1,
+   "faixa": [
+    1,
+    1
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 1,
+   "intervalo": [
+    1,
+    1
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "VIDEO_RUIM",
+    "CAMERA_EM_MOVIMENTO"
+   ],
+   "s_por_s_video": 0.586,
+   "fps_processado": 7.996,
+   "n_frames": 247,
+   "conf_media": 0.726,
+   "cobertura": 0.895,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_linha_yolox_m/linha_741363_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_linha_yolox_m/linha_741363_000135.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_linha_yolox_m/linha_741363_000229.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v02_mata_burro_noite_linha_yolox_m/linha_741363_000922.jpg"
+   ],
+   "latency_ms": 18101
+  },
+  {
+   "id": "v03_zebuinos_estabulo",
+   "modelo": "yolox_m",
+   "modo": "ids_unicos",
+   "recomendado": true,
+   "referencia": 9,
+   "faixa": [
+    8,
+    10
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 9,
+   "intervalo": [
+    9,
+    11
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [],
+   "s_por_s_video": 0.63,
+   "fps_processado": 8.0,
+   "n_frames": 205,
+   "conf_media": 0.774,
+   "cobertura": 0.923,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_ids_unicos_yolox_m/ids_unicos_e32df3_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_ids_unicos_yolox_m/ids_unicos_e32df3_000255.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_ids_unicos_yolox_m/ids_unicos_e32df3_000360.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_ids_unicos_yolox_m/ids_unicos_e32df3_000765.jpg"
+   ],
+   "latency_ms": 16138
+  },
+  {
+   "id": "v03_zebuinos_estabulo",
+   "modelo": "yolox_m",
+   "modo": "linha",
+   "recomendado": false,
+   "referencia": null,
+   "faixa": [
+    8,
+    10
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 0,
+   "intervalo": [
+    0,
+    1
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "SEM_CRUZAMENTO"
+   ],
+   "s_por_s_video": 0.63,
+   "fps_processado": 8.0,
+   "n_frames": 205,
+   "conf_media": 0.0,
+   "cobertura": 0.0,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_linha_yolox_m/linha_a8a2d9_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_linha_yolox_m/linha_a8a2d9_000255.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_linha_yolox_m/linha_a8a2d9_000510.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v03_zebuinos_estabulo_linha_yolox_m/linha_a8a2d9_000765.jpg"
+   ],
+   "latency_ms": 16138
+  },
+  {
+   "id": "v04_manejo_a_cavalo",
+   "modelo": "yolox_m",
+   "modo": "ids_unicos",
+   "recomendado": true,
+   "referencia": null,
+   "faixa": [
+    24,
+    45
+   ],
+   "esperado": "abstencao",
+   "ok": true,
+   "contagem": 50,
+   "intervalo": [
+    47,
+    82
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "CAMERA_EM_MOVIMENTO",
+    "INTERVALO_LARGO",
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.634,
+   "fps_processado": 7.995,
+   "n_frames": 127,
+   "conf_media": 0.709,
+   "cobertura": 0.884,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_ids_unicos_yolox_m/ids_unicos_cfec48_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_ids_unicos_yolox_m/ids_unicos_cfec48_000119.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_ids_unicos_yolox_m/ids_unicos_cfec48_000132.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_ids_unicos_yolox_m/ids_unicos_cfec48_000394.jpg"
+   ],
+   "latency_ms": 10080
+  },
+  {
+   "id": "v04_manejo_a_cavalo",
+   "modelo": "yolox_m",
+   "modo": "linha",
+   "recomendado": false,
+   "referencia": null,
+   "faixa": [
+    24,
+    45
+   ],
+   "esperado": "abstencao",
+   "ok": true,
+   "contagem": 5,
+   "intervalo": [
+    3,
+    14
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "CAMERA_EM_MOVIMENTO",
+    "INTERVALO_LARGO",
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.642,
+   "fps_processado": 7.995,
+   "n_frames": 127,
+   "conf_media": 0.706,
+   "cobertura": 0.905,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_linha_yolox_m/linha_01225b_000097.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_linha_yolox_m/linha_01225b_000135.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_linha_yolox_m/linha_01225b_000313.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v04_manejo_a_cavalo_linha_yolox_m/linha_01225b_000394.jpg"
+   ],
+   "latency_ms": 10201
+  },
+  {
+   "id": "v05_bufalas_ordenha",
+   "modelo": "yolox_m",
+   "modo": "ids_unicos",
+   "recomendado": true,
+   "referencia": 4,
+   "faixa": [
+    4,
+    4
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 4,
+   "intervalo": [
+    3,
+    5
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [],
+   "s_por_s_video": 0.624,
+   "fps_processado": 7.998,
+   "n_frames": 250,
+   "conf_media": 0.827,
+   "cobertura": 0.908,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_ids_unicos_yolox_m/ids_unicos_149178_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_ids_unicos_yolox_m/ids_unicos_149178_000008.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_ids_unicos_yolox_m/ids_unicos_149178_000312.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_ids_unicos_yolox_m/ids_unicos_149178_000934.jpg"
+   ],
+   "latency_ms": 19507
+  },
+  {
+   "id": "v05_bufalas_ordenha",
+   "modelo": "yolox_m",
+   "modo": "linha",
+   "recomendado": false,
+   "referencia": null,
+   "faixa": [
+    4,
+    4
+   ],
+   "esperado": "contagem",
+   "ok": true,
+   "contagem": 0,
+   "intervalo": [
+    0,
+    1
+   ],
+   "status": "indeterminado",
+   "abstencao": true,
+   "motivos": [
+    "SEM_CRUZAMENTO"
+   ],
+   "s_por_s_video": 0.624,
+   "fps_processado": 7.998,
+   "n_frames": 250,
+   "conf_media": 0.0,
+   "cobertura": 0.0,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_linha_yolox_m/linha_337a92_000000.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_linha_yolox_m/linha_337a92_000312.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_linha_yolox_m/linha_337a92_000623.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/v05_bufalas_ordenha_linha_yolox_m/linha_337a92_000934.jpg"
+   ],
+   "latency_ms": 19503
+  }
+ ],
+ "semi": [
+  {
+   "id": "s01_fila_espacada",
+   "modelo": "yolox_s",
+   "modo": "linha",
+   "referencia": 5,
+   "ok": true,
+   "contagem": 4,
+   "intervalo": [
+    4,
+    5
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [],
+   "s_por_s_video": 0.3,
+   "fps_processado": 7.985,
+   "n_frames": 141,
+   "conf_media": 0.769,
+   "cobertura": 0.956,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_linha_yolox_s/linha_92b3e1_000090.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_linha_yolox_s/linha_92b3e1_000104.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_linha_yolox_s/linha_92b3e1_000186.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_linha_yolox_s/linha_92b3e1_000263.jpg"
+   ],
+   "latency_ms": 5302
+  },
+  {
+   "id": "s01_fila_espacada",
+   "modelo": "yolox_s",
+   "modo": "ids_unicos",
+   "referencia": 5,
+   "ok": true,
+   "contagem": 5,
+   "intervalo": [
+    5,
+    6
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [],
+   "s_por_s_video": 0.3,
+   "fps_processado": 7.985,
+   "n_frames": 141,
+   "conf_media": 0.738,
+   "cobertura": 0.957,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_ids_unicos_yolox_s/ids_unicos_5e536d_000012.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_ids_unicos_yolox_s/ids_unicos_5e536d_000104.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_ids_unicos_yolox_s/ids_unicos_5e536d_000257.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_ids_unicos_yolox_s/ids_unicos_5e536d_000263.jpg"
+   ],
+   "latency_ms": 5301
+  },
+  {
+   "id": "s02_fila_media",
+   "modelo": "yolox_s",
+   "modo": "linha",
+   "referencia": 10,
+   "ok": true,
+   "contagem": 10,
+   "intervalo": [
+    9,
+    13
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.302,
+   "fps_processado": 8.0,
+   "n_frames": 169,
+   "conf_media": 0.653,
+   "cobertura": 0.878,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_linha_yolox_s/linha_559f6f_000070.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_linha_yolox_s/linha_559f6f_000111.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_linha_yolox_s/linha_559f6f_000224.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_linha_yolox_s/linha_559f6f_000315.jpg"
+   ],
+   "latency_ms": 6380
+  },
+  {
+   "id": "s02_fila_media",
+   "modelo": "yolox_s",
+   "modo": "ids_unicos",
+   "referencia": 10,
+   "ok": true,
+   "contagem": 11,
+   "intervalo": [
+    11,
+    15
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.302,
+   "fps_processado": 8.0,
+   "n_frames": 169,
+   "conf_media": 0.642,
+   "cobertura": 0.859,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_ids_unicos_yolox_s/ids_unicos_89f617_000014.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_ids_unicos_yolox_s/ids_unicos_89f617_000111.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_ids_unicos_yolox_s/ids_unicos_89f617_000304.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_ids_unicos_yolox_s/ids_unicos_89f617_000315.jpg"
+   ],
+   "latency_ms": 6373
+  },
+  {
+   "id": "s03_fila_colada",
+   "modelo": "yolox_s",
+   "modo": "linha",
+   "referencia": 15,
+   "ok": true,
+   "contagem": 12,
+   "intervalo": [
+    12,
+    16
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.304,
+   "fps_processado": 7.996,
+   "n_frames": 138,
+   "conf_media": 0.643,
+   "cobertura": 0.928,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_linha_yolox_s/linha_2c75df_000074.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_linha_yolox_s/linha_2c75df_000117.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_linha_yolox_s/linha_2c75df_000184.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_linha_yolox_s/linha_2c75df_000257.jpg"
+   ],
+   "latency_ms": 5245
+  },
+  {
+   "id": "s03_fila_colada",
+   "modelo": "yolox_s",
+   "modo": "ids_unicos",
+   "referencia": 15,
+   "ok": true,
+   "contagem": 13,
+   "intervalo": [
+    12,
+    18
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.305,
+   "fps_processado": 7.996,
+   "n_frames": 138,
+   "conf_media": 0.646,
+   "cobertura": 0.931,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_ids_unicos_yolox_s/ids_unicos_fe7ec6_000019.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_ids_unicos_yolox_s/ids_unicos_fe7ec6_000117.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_ids_unicos_yolox_s/ids_unicos_fe7ec6_000246.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_ids_unicos_yolox_s/ids_unicos_fe7ec6_000257.jpg"
+   ],
+   "latency_ms": 5270
+  },
+  {
+   "id": "s04_lote_grande",
+   "modelo": "yolox_s",
+   "modo": "linha",
+   "referencia": 25,
+   "ok": true,
+   "contagem": 16,
+   "intervalo": [
+    14,
+    20
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.3,
+   "fps_processado": 7.99,
+   "n_frames": 221,
+   "conf_media": 0.658,
+   "cobertura": 0.939,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_linha_yolox_s/linha_c6dbd5_000087.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_linha_yolox_s/linha_c6dbd5_000224.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_linha_yolox_s/linha_c6dbd5_000310.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_linha_yolox_s/linha_c6dbd5_000413.jpg"
+   ],
+   "latency_ms": 8313
+  },
+  {
+   "id": "s04_lote_grande",
+   "modelo": "yolox_s",
+   "modo": "ids_unicos",
+   "referencia": 25,
+   "ok": true,
+   "contagem": 20,
+   "intervalo": [
+    20,
+    25
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.302,
+   "fps_processado": 7.99,
+   "n_frames": 221,
+   "conf_media": 0.638,
+   "cobertura": 0.944,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_ids_unicos_yolox_s/ids_unicos_2890ac_000014.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_ids_unicos_yolox_s/ids_unicos_2890ac_000224.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_ids_unicos_yolox_s/ids_unicos_2890ac_000398.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_ids_unicos_yolox_s/ids_unicos_2890ac_000413.jpg"
+   ],
+   "latency_ms": 8346
+  },
+  {
+   "id": "s05_com_volta",
+   "modelo": "yolox_s",
+   "modo": "linha",
+   "referencia": 7,
+   "ok": true,
+   "contagem": 7,
+   "intervalo": [
+    7,
+    10
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.301,
+   "fps_processado": 7.99,
+   "n_frames": 156,
+   "conf_media": 0.664,
+   "cobertura": 0.896,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_linha_yolox_s/linha_363980_000070.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_linha_yolox_s/linha_363980_000119.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_linha_yolox_s/linha_363980_000218.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_linha_yolox_s/linha_363980_000291.jpg"
+   ],
+   "latency_ms": 5885
+  },
+  {
+   "id": "s05_com_volta",
+   "modelo": "yolox_s",
+   "modo": "ids_unicos",
+   "referencia": 8,
+   "ok": true,
+   "contagem": 8,
+   "intervalo": [
+    8,
+    10
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.301,
+   "fps_processado": 7.99,
+   "n_frames": 156,
+   "conf_media": 0.679,
+   "cobertura": 0.905,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_ids_unicos_yolox_s/ids_unicos_1eac85_000014.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_ids_unicos_yolox_s/ids_unicos_1eac85_000158.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_ids_unicos_yolox_s/ids_unicos_1eac85_000285.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_ids_unicos_yolox_s/ids_unicos_1eac85_000291.jpg"
+   ],
+   "latency_ms": 5886
+  },
+  {
+   "id": "s01_fila_espacada",
+   "modelo": "yolox_m",
+   "modo": "linha",
+   "referencia": 5,
+   "ok": true,
+   "contagem": 4,
+   "intervalo": [
+    4,
+    5
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [],
+   "s_por_s_video": 0.62,
+   "fps_processado": 7.985,
+   "n_frames": 141,
+   "conf_media": 0.772,
+   "cobertura": 0.939,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_linha_yolox_m/linha_8d4085_000090.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_linha_yolox_m/linha_8d4085_000107.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_linha_yolox_m/linha_8d4085_000186.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_linha_yolox_m/linha_8d4085_000263.jpg"
+   ],
+   "latency_ms": 10944
+  },
+  {
+   "id": "s01_fila_espacada",
+   "modelo": "yolox_m",
+   "modo": "ids_unicos",
+   "referencia": 5,
+   "ok": true,
+   "contagem": 4,
+   "intervalo": [
+    4,
+    5
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [],
+   "s_por_s_video": 0.543,
+   "fps_processado": 7.985,
+   "n_frames": 141,
+   "conf_media": 0.772,
+   "cobertura": 0.939,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_ids_unicos_yolox_m/ids_unicos_4d343d_000042.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_ids_unicos_yolox_m/ids_unicos_4d343d_000107.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_ids_unicos_yolox_m/ids_unicos_4d343d_000257.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s01_fila_espacada_ids_unicos_yolox_m/ids_unicos_4d343d_000263.jpg"
+   ],
+   "latency_ms": 9589
+  },
+  {
+   "id": "s02_fila_media",
+   "modelo": "yolox_m",
+   "modo": "linha",
+   "referencia": 10,
+   "ok": true,
+   "contagem": 11,
+   "intervalo": [
+    10,
+    15
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.459,
+   "fps_processado": 8.0,
+   "n_frames": 169,
+   "conf_media": 0.699,
+   "cobertura": 0.925,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_linha_yolox_m/linha_5d2739_000070.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_linha_yolox_m/linha_5d2739_000139.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_linha_yolox_m/linha_5d2739_000224.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_linha_yolox_m/linha_5d2739_000315.jpg"
+   ],
+   "latency_ms": 9692
+  },
+  {
+   "id": "s02_fila_media",
+   "modelo": "yolox_m",
+   "modo": "ids_unicos",
+   "referencia": 10,
+   "ok": true,
+   "contagem": 11,
+   "intervalo": [
+    11,
+    15
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.631,
+   "fps_processado": 8.0,
+   "n_frames": 169,
+   "conf_media": 0.699,
+   "cobertura": 0.925,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_ids_unicos_yolox_m/ids_unicos_e4f7dc_000030.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_ids_unicos_yolox_m/ids_unicos_e4f7dc_000139.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_ids_unicos_yolox_m/ids_unicos_e4f7dc_000304.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s02_fila_media_ids_unicos_yolox_m/ids_unicos_e4f7dc_000315.jpg"
+   ],
+   "latency_ms": 13336
+  },
+  {
+   "id": "s03_fila_colada",
+   "modelo": "yolox_m",
+   "modo": "linha",
+   "referencia": 15,
+   "ok": true,
+   "contagem": 12,
+   "intervalo": [
+    12,
+    17
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.53,
+   "fps_processado": 7.996,
+   "n_frames": 138,
+   "conf_media": 0.712,
+   "cobertura": 0.936,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_linha_yolox_m/linha_96c8e7_000074.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_linha_yolox_m/linha_96c8e7_000120.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_linha_yolox_m/linha_96c8e7_000184.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_linha_yolox_m/linha_96c8e7_000257.jpg"
+   ],
+   "latency_ms": 9151
+  },
+  {
+   "id": "s03_fila_colada",
+   "modelo": "yolox_m",
+   "modo": "ids_unicos",
+   "referencia": 15,
+   "ok": true,
+   "contagem": 12,
+   "intervalo": [
+    12,
+    18
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.627,
+   "fps_processado": 7.996,
+   "n_frames": 138,
+   "conf_media": 0.712,
+   "cobertura": 0.936,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_ids_unicos_yolox_m/ids_unicos_43b0e6_000025.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_ids_unicos_yolox_m/ids_unicos_43b0e6_000120.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_ids_unicos_yolox_m/ids_unicos_43b0e6_000244.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s03_fila_colada_ids_unicos_yolox_m/ids_unicos_43b0e6_000257.jpg"
+   ],
+   "latency_ms": 10827
+  },
+  {
+   "id": "s04_lote_grande",
+   "modelo": "yolox_m",
+   "modo": "linha",
+   "referencia": 25,
+   "ok": true,
+   "contagem": 22,
+   "intervalo": [
+    21,
+    29
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.624,
+   "fps_processado": 7.99,
+   "n_frames": 221,
+   "conf_media": 0.728,
+   "cobertura": 0.951,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_linha_yolox_m/linha_ce2706_000089.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_linha_yolox_m/linha_ce2706_000145.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_linha_yolox_m/linha_ce2706_000310.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_linha_yolox_m/linha_ce2706_000413.jpg"
+   ],
+   "latency_ms": 17267
+  },
+  {
+   "id": "s04_lote_grande",
+   "modelo": "yolox_m",
+   "modo": "ids_unicos",
+   "referencia": 25,
+   "ok": true,
+   "contagem": 24,
+   "intervalo": [
+    23,
+    33
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [
+    "OCLUSAO"
+   ],
+   "s_por_s_video": 0.637,
+   "fps_processado": 7.99,
+   "n_frames": 221,
+   "conf_media": 0.719,
+   "cobertura": 0.946,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_ids_unicos_yolox_m/ids_unicos_82768a_000017.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_ids_unicos_yolox_m/ids_unicos_82768a_000145.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_ids_unicos_yolox_m/ids_unicos_82768a_000398.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s04_lote_grande_ids_unicos_yolox_m/ids_unicos_82768a_000413.jpg"
+   ],
+   "latency_ms": 17622
+  },
+  {
+   "id": "s05_com_volta",
+   "modelo": "yolox_m",
+   "modo": "linha",
+   "referencia": 7,
+   "ok": true,
+   "contagem": 7,
+   "intervalo": [
+    7,
+    9
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [],
+   "s_por_s_video": 0.635,
+   "fps_processado": 7.99,
+   "n_frames": 156,
+   "conf_media": 0.742,
+   "cobertura": 0.983,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_linha_yolox_m/linha_ce6596_000070.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_linha_yolox_m/linha_ce6596_000117.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_linha_yolox_m/linha_ce6596_000216.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_linha_yolox_m/linha_ce6596_000291.jpg"
+   ],
+   "latency_ms": 12399
+  },
+  {
+   "id": "s05_com_volta",
+   "modelo": "yolox_m",
+   "modo": "ids_unicos",
+   "referencia": 8,
+   "ok": true,
+   "contagem": 8,
+   "intervalo": [
+    8,
+    11
+   ],
+   "status": "ok",
+   "abstencao": false,
+   "motivos": [],
+   "s_por_s_video": 0.635,
+   "fps_processado": 7.99,
+   "n_frames": 156,
+   "conf_media": 0.745,
+   "cobertura": 0.963,
+   "quadros_chave": [
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_ids_unicos_yolox_m/ids_unicos_b81451_000012.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_ids_unicos_yolox_m/ids_unicos_b81451_000117.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_ids_unicos_yolox_m/ids_unicos_b81451_000285.jpg",
+    "C:/trabalho/random/etc2/akcit-camp/laudo-vivo/dados_locais/evidencias/visao/eval/s05_com_volta_ids_unicos_yolox_m/ids_unicos_b81451_000291.jpg"
+   ],
+   "latency_ms": 12405
+  }
+ ],
+ "quadros": [
+  {
+   "video": "v02_mata_burro_noite",
+   "t_s": 0.0,
+   "total": 0,
+   "nitidos": 0,
+   "detectados": 0,
+   "modelo": "yolox_s"
+  },
+  {
+   "video": "v02_mata_burro_noite",
+   "t_s": 7.7,
+   "total": 1,
+   "nitidos": 1,
+   "detectados": 0,
+   "modelo": "yolox_s"
+  },
+  {
+   "video": "v02_mata_burro_noite",
+   "t_s": 15.4,
+   "total": 1,
+   "nitidos": 1,
+   "detectados": 1,
+   "modelo": "yolox_s"
+  },
+  {
+   "video": "v02_mata_burro_noite",
+   "t_s": 30.8,
+   "total": 0,
+   "nitidos": 0,
+   "detectados": 0,
+   "modelo": "yolox_s"
+  },
+  {
+   "video": "v03_zebuinos_estabulo",
+   "t_s": 0.5,
+   "total": 9,
+   "nitidos": 5,
+   "detectados": 6,
+   "modelo": "yolox_s"
+  },
+  {
+   "video": "v03_zebuinos_estabulo",
+   "t_s": 12.0,
+   "total": 9,
+   "nitidos": 5,
+   "detectados": 8,
+   "modelo": "yolox_s"
+  },
+  {
+   "video": "v03_zebuinos_estabulo",
+   "t_s": 20.0,
+   "total": 9,
+   "nitidos": 5,
+   "detectados": 4,
+   "modelo": "yolox_s"
+  },
+  {
+   "video": "v04_manejo_a_cavalo",
+   "t_s": 5.6,
+   "total": 24,
+   "nitidos": 18,
+   "detectados": 11,
+   "modelo": "yolox_s"
+  },
+  {
+   "video": "v04_manejo_a_cavalo",
+   "t_s": 12.9,
+   "total": 15,
+   "nitidos": 11,
+   "detectados": 13,
+   "modelo": "yolox_s"
+  },
+  {
+   "video": "v05_bufalas_ordenha",
+   "t_s": 1.0,
+   "total": 4,
+   "nitidos": 3,
+   "detectados": 3,
+   "modelo": "yolox_s"
+  },
+  {
+   "video": "v05_bufalas_ordenha",
+   "t_s": 29.0,
+   "total": 4,
+   "nitidos": 3,
+   "detectados": 3,
+   "modelo": "yolox_s"
+  },
+  {
+   "video": "v02_mata_burro_noite",
+   "t_s": 0.0,
+   "total": 0,
+   "nitidos": 0,
+   "detectados": 0,
+   "modelo": "yolox_m"
+  },
+  {
+   "video": "v02_mata_burro_noite",
+   "t_s": 7.7,
+   "total": 1,
+   "nitidos": 1,
+   "detectados": 1,
+   "modelo": "yolox_m"
+  },
+  {
+   "video": "v02_mata_burro_noite",
+   "t_s": 15.4,
+   "total": 1,
+   "nitidos": 1,
+   "detectados": 1,
+   "modelo": "yolox_m"
+  },
+  {
+   "video": "v02_mata_burro_noite",
+   "t_s": 30.8,
+   "total": 0,
+   "nitidos": 0,
+   "detectados": 0,
+   "modelo": "yolox_m"
+  },
+  {
+   "video": "v03_zebuinos_estabulo",
+   "t_s": 0.5,
+   "total": 9,
+   "nitidos": 5,
+   "detectados": 5,
+   "modelo": "yolox_m"
+  },
+  {
+   "video": "v03_zebuinos_estabulo",
+   "t_s": 12.0,
+   "total": 9,
+   "nitidos": 5,
+   "detectados": 5,
+   "modelo": "yolox_m"
+  },
+  {
+   "video": "v03_zebuinos_estabulo",
+   "t_s": 20.0,
+   "total": 9,
+   "nitidos": 5,
+   "detectados": 4,
+   "modelo": "yolox_m"
+  },
+  {
+   "video": "v04_manejo_a_cavalo",
+   "t_s": 5.6,
+   "total": 24,
+   "nitidos": 18,
+   "detectados": 16,
+   "modelo": "yolox_m"
+  },
+  {
+   "video": "v04_manejo_a_cavalo",
+   "t_s": 12.9,
+   "total": 15,
+   "nitidos": 11,
+   "detectados": 10,
+   "modelo": "yolox_m"
+  },
+  {
+   "video": "v05_bufalas_ordenha",
+   "t_s": 1.0,
+   "total": 4,
+   "nitidos": 3,
+   "detectados": 2,
+   "modelo": "yolox_m"
+  },
+  {
+   "video": "v05_bufalas_ordenha",
+   "t_s": 29.0,
+   "total": 4,
+   "nitidos": 3,
+   "detectados": 3,
+   "modelo": "yolox_m"
+  }
+ ],
+ "tempo_tiny": {
+  "s_por_s_video": 0.127,
+  "contagem": 7
+ },
+ "resumo": {
+  "yolox_s": {
+   "reais_contaveis_modo_recomendado": {
+    "n": 3,
+    "mae": 2.67,
+    "erro_rel_medio": 0.778,
+    "acertos_exatos": 0,
+    "cobertura_intervalo": "1/3",
+    "abstencoes": 1,
+    "mae_sem_abstencao": 3.5,
+    "n_sem_abstencao": 2
+   },
+   "reais_ambiguos_abstencao_correta": "2/2",
+   "semissinteticos_linha": {
+    "n": 5,
+    "mae": 2.6,
+    "erro_rel_medio": 0.152,
+    "acertos_exatos": 2,
+    "cobertura_intervalo": "4/5",
+    "abstencoes": 0,
+    "mae_sem_abstencao": 2.6,
+    "n_sem_abstencao": 5
+   },
+   "semissinteticos_ids_unicos": {
+    "n": 5,
+    "mae": 1.6,
+    "erro_rel_medio": 0.087,
+    "acertos_exatos": 2,
+    "cobertura_intervalo": "4/5",
+    "abstencoes": 0,
+    "mae_sem_abstencao": 1.6,
+    "n_sem_abstencao": 5
+   },
+   "quadros_mae_vs_total": 2.45,
+   "quadros_mae_vs_nitidos": 1.36,
+   "quadros_n": 11,
+   "s_por_s_video_mediana": 0.302,
+   "s_por_s_video_max": 0.317
+  },
+  "yolox_m": {
+   "reais_contaveis_modo_recomendado": {
+    "n": 3,
+    "mae": 0,
+    "erro_rel_medio": 0.0,
+    "acertos_exatos": 3,
+    "cobertura_intervalo": "3/3",
+    "abstencoes": 1,
+    "mae_sem_abstencao": 0,
+    "n_sem_abstencao": 2
+   },
+   "reais_ambiguos_abstencao_correta": "2/2",
+   "semissinteticos_linha": {
+    "n": 5,
+    "mae": 1.6,
+    "erro_rel_medio": 0.124,
+    "acertos_exatos": 1,
+    "cobertura_intervalo": "5/5",
+    "abstencoes": 0,
+    "mae_sem_abstencao": 1.6,
+    "n_sem_abstencao": 5
+   },
+   "semissinteticos_ids_unicos": {
+    "n": 5,
+    "mae": 1.2,
+    "erro_rel_medio": 0.108,
+    "acertos_exatos": 1,
+    "cobertura_intervalo": "4/5",
+    "abstencoes": 0,
+    "mae_sem_abstencao": 1.2,
+    "n_sem_abstencao": 5
+   },
+   "quadros_mae_vs_total": 2.64,
+   "quadros_mae_vs_nitidos": 0.45,
+   "quadros_n": 11,
+   "s_por_s_video_mediana": 0.626,
+   "s_por_s_video_max": 0.642
+  }
+ }
+}

@@ -1,0 +1,292 @@
+id: GLD-0036
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 35
+sintetico: true
+classe: defeito
+defeito:
+  codigo: D07_FOTO_SEM_EXIF
+  classe: defeito
+  titulo: Foto sem EXIF
+  descricao: Fotos da benfeitoria sem EXIF nem GPS do aplicativo (repassadas por aplicativo de mensagem).
+data_fiscalizacao: '2026-08-17'
+operacao:
+  ref_bacen: SINT-2026-000036
+  tomador_ref: TOMADOR-TESTE-36
+  uf: GO
+  municipio_ibge: '5214002'
+  municipio_nome: MOZARLÂNDIA
+  instituicao: COOPERATIVA DE CREDITO TESTE 01
+  finalidade: investimento
+  empreendimento: '23271300078002'
+  data_contratacao: '2026-06-28'
+  data_liberacao: null
+  valor_rs: 323250.0
+  area_financiada_ha: 62.4
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-50.666083 -14.742708, -50.666939 -14.742129, -50.672076 -14.747708, -50.669263 -14.752472, -50.661973
+    -14.749390, -50.663516 -14.748559, -50.666083 -14.742708))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 75 novilha(s) (bovinos carne - matrizes)
+    quantidade: 75.0
+    unidade: cabeca
+    valor_rs: 273750.0
+    categoria_animal: novilha
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: cerca1
+    tipo: cerca
+    descricao: Construção de 3300 m de cerca de arame liso 5 fios
+    quantidade: 3300.0
+    unidade: m
+    valor_rs: 49500.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-10-16'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 36
+    codigo_estabelecimento: TESTE-5214002-0036
+    municipio_ibge: '5214002'
+    municipio_nome: MOZARLÂNDIA
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 75 novilha(s) (bovinos carne - matrizes)
+    quantidade: 75
+    unidade: cabeca
+    valor_unitario_rs: 3650.0
+    valor_total_rs: 273750.0
+  - item_id: cerca1
+    descricao: Construção de 3300 m de cerca de arame liso 5 fios
+    quantidade: 3300.0
+    unidade: m
+    valor_unitario_rs: 15.0
+    valor_total_rs: 49500.0
+  empreendimento_sicor:
+    codigo: '23271300078002'
+    descricao: BOVINOS CARNE - MATRIZES
+  lotacao_implicita_cab_ha: 1.2
+tomador:
+  ref: TOMADOR-TESTE-36
+  nome: AGROPECUARIA TOMADORA TESTE 36 LTDA
+  documento_sintetico: '99999999103594'
+  documento_sha256: 0c47873db900ab8c21ce126a9b4467f28fe1bf491d8225cb2af2906246efd5d5
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '51260799999999503509550010000015541949619421'
+    sha256: 78e9bec1e1ecc9e02b40b141c222c24fadb99fcaee919f8e535187e3575a3109
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: MT-A-261578
+    sha256: d7b2c7a822ce060021ce1c8682ab0a8f5884d48d0ad65c0a03d6f4c6d1d8449c
+  - arquivo_json: gta_2.json
+    arquivo_html: gta_2.html
+    identificador: MT-A-261579
+    sha256: f64181c0b838d43b2a079b25e8614226c785ec98a93bdfd3ec73068df62eb997
+fotos:
+- id: foto_cerca_1
+  arquivo: fotos/foto_cerca_1.jpg
+  item_id: cerca1
+  sha256: 3eb60856b42b88cd8a0d29b57e1650e8b9a704b80e224a8b971fe281c702bdd0
+  exif:
+    presente: false
+    data_hora: null
+    gps: null
+  gps_app: null
+  duplicata_de: null
+  recebida_em: '2026-08-17T19:30:00-03:00'
+  esperado:
+    geofence: indeterminado
+    distancia_borda_m: null
+- id: foto_cerca_2
+  arquivo: fotos/foto_cerca_2.jpg
+  item_id: cerca1
+  sha256: 2a5768df200cbab473505aa13ccb14333debebe3953195a47f77efb29ceac3cb
+  exif:
+    presente: false
+    data_hora: null
+    gps: null
+  gps_app: null
+  duplicata_de: null
+  recebida_em: '2026-08-17T19:30:00-03:00'
+  esperado:
+    geofence: indeterminado
+    distancia_borda_m: null
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: 36842efaf35cbb3f1dd3ef5d07afa4341b7d36c35463b532e93c9802976dfe47
+  exif:
+    presente: true
+    data_hora: '2026-08-17T11:42:17-03:00'
+    gps:
+      lat: -14.749427
+      lon: -50.6637293
+  gps_app:
+    lat: -14.749427
+    lon: -50.6637293
+    precisao_m: 7.1
+  duplicata_de: null
+  recebida_em: '2026-08-17T12:22:17-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 71.6
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0036/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 72
+  contagem_real: 75
+  saida_simulada_contador:
+    estimativa: 75
+    ic80:
+    - 75
+    - 75
+    confianca: 0.94
+    oclusao_frac: 0.06
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 36, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As novilhas chegaram depois da nota, vieram de Cocalinho.
+- de: fiscal
+  texto: Agora vou fotografar a cerca pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 75 novilha(s) (bovinos carne - matrizes)
+      quantidade: 75.0
+      unidade: cabeca
+      valor_rs: 273750.0
+      categoria_animal: novilha
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5214002'
+    municipio_nome: MOZARLÂNDIA
+    data_contratacao: '2026-06-28'
+    data_fiscalizacao: '2026-08-17'
+    tomador_doc_sha256: 0c47873db900ab8c21ce126a9b4467f28fe1bf491d8225cb2af2906246efd5d5
+    codigo_estabelecimento_destino: TESTE-5214002-0036
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5214002'
+    municipio_nome: MOZARLÂNDIA
+    data_contratacao: '2026-06-28'
+    data_fiscalizacao: '2026-08-17'
+    tomador_doc_sha256: 0c47873db900ab8c21ce126a9b4467f28fe1bf491d8225cb2af2906246efd5d5
+    codigo_estabelecimento_destino: TESTE-5214002-0036
+    caminhos:
+    - gta_1.json
+    - gta_2.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: ''
+    documento:nfe:autorizacao:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: ''
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:cerca1:localizacao:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item16a
+      motivo: sem GPS não há geofence
+    item:cerca1:integridade_foto:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item1
+      motivo: 'sem EXIF: exigir captura no app'
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

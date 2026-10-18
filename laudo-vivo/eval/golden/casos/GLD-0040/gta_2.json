@@ -1,0 +1,64 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "MT",
+  "numero": "449190",
+  "serie": "MT",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "25-36",
+      "quantidade": 25
+    }
+  ],
+  "total": 25,
+  "total_por_extenso": "VINTE E CINCO BOVINOS",
+  "marca_rebanho": "MARCA TESTE 39",
+  "origem": {
+    "documento": "00000053988",
+    "nome": "VENDEDOR TESTE 40",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 40",
+    "codigo_estabelecimento": "TESTE-5103106-9039",
+    "codigo_exploracao": "TESTE-5103106-9039-BOV",
+    "municipio_nome": "COCALINHO",
+    "municipio_ibge": "5103106",
+    "uf": "MT"
+  },
+  "destino": {
+    "documento": "99999999103918",
+    "nome": "AGROPECUARIA TOMADORA TESTE 40 LTDA",
+    "estabelecimento": "FAZENDA TESTE 40",
+    "codigo_estabelecimento": "TESTE-5218508-0040",
+    "codigo_exploracao": "TESTE-5218508-0040-BOV",
+    "municipio_nome": "QUIRINÓPOLIS",
+    "municipio_ibge": "5218508",
+    "uf": "GO"
+  },
+  "finalidade": "ENGORDA",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST8A32"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-01-31"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 2 DE 2",
+  "emitente": {
+    "tipo": "FUNCIONARIO_AUTORIZADO",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE COCALINHO"
+  },
+  "emissao": {
+    "local_municipio": "COCALINHO",
+    "data": "2026-08-02",
+    "hora": "11:33",
+    "validade": "2026-08-05"
+  },
+  "nfe_chaves": [],
+  "codigo_barras": "SINTMTMT449190",
+  "sintetico": true
+}

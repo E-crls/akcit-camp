@@ -1,0 +1,298 @@
+id: GLD-0006
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 5
+sintetico: true
+classe: ambiguo
+defeito:
+  codigo: A05_GTA_CARGA_PARCIAL
+  classe: ambiguo
+  titulo: Só uma das GTAs (carga 1 de 2)
+  descricao: Lote transportado em dois veículos; só a GTA "CARGA 1 DE 2" foi apresentada.
+data_fiscalizacao: '2026-08-16'
+operacao:
+  ref_bacen: SINT-2026-000006
+  tomador_ref: TOMADOR-TESTE-06
+  uf: GO
+  municipio_ibge: '5218003'
+  municipio_nome: PORANGATU
+  instituicao: COOPERATIVA DE CREDITO TESTE 01
+  finalidade: investimento
+  empreendimento: '23271300078002'
+  data_contratacao: '2026-07-18'
+  data_liberacao: null
+  valor_rs: 459200.0
+  area_financiada_ha: 69.4
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-49.209890 -13.514579, -49.210051 -13.514485, -49.209308 -13.513659, -49.213772 -13.510587, -49.214790
+    -13.510746, -49.218590 -13.511344, -49.218697 -13.513896, -49.213800 -13.520373, -49.211461 -13.519939, -49.209890
+    -13.514579))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 80 vaca(s) (bovinos carne - matrizes)
+    quantidade: 80.0
+    unidade: cabeca
+    valor_rs: 355200.0
+    categoria_animal: vaca
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: curral1
+    tipo: curral
+    descricao: Construção de curral de manejo com tronco e brete
+    quantidade: 1.0
+    unidade: un
+    valor_rs: 104000.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-10-15'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 06
+    codigo_estabelecimento: TESTE-5218003-0006
+    municipio_ibge: '5218003'
+    municipio_nome: PORANGATU
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 80 vaca(s) (bovinos carne - matrizes)
+    quantidade: 80
+    unidade: cabeca
+    valor_unitario_rs: 4440.0
+    valor_total_rs: 355200.0
+  - item_id: curral1
+    descricao: Construção de curral de manejo com tronco e brete
+    quantidade: 1.0
+    unidade: un
+    valor_unitario_rs: 104000.0
+    valor_total_rs: 104000.0
+  empreendimento_sicor:
+    codigo: '23271300078002'
+    descricao: BOVINOS CARNE - MATRIZES
+  lotacao_implicita_cab_ha: 1.15
+tomador:
+  ref: TOMADOR-TESTE-06
+  nome: AGROPECUARIA TOMADORA TESTE 06 LTDA
+  documento_sintetico: '99999999100579'
+  documento_sha256: 6b13ac7c20f0ff1819048e4b229cc2d3fec3bb33f513e16160a27e9bcd7690ef
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999500593550010000078051078474464'
+    sha256: 409291c879fcb13e316306f8ce7bb40ce3dc592bb1c5c218b3fedf6f73704635
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-C-304716
+    sha256: acd841b5df470bc0863569084e730b8ac87528d55f1cf56951de2dc54d8a0b73
+fotos:
+- id: foto_curral_1
+  arquivo: fotos/foto_curral_1.jpg
+  item_id: curral1
+  sha256: 1182ebecd0cd1915dd5f9e9eabec69c0a46101fed3a923b46d87e3674c6fb3d7
+  exif:
+    presente: true
+    data_hora: '2026-08-16T09:28:33-03:00'
+    gps:
+      lat: -13.5119139
+      lon: -49.2167341
+  gps_app:
+    lat: -13.5119139
+    lon: -49.2167341
+    precisao_m: 7.3
+  duplicata_de: null
+  recebida_em: '2026-08-16T09:54:33-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 94.1
+- id: foto_curral_2
+  arquivo: fotos/foto_curral_2.jpg
+  item_id: curral1
+  sha256: 0d2a4500b3dd1f145de30076083fb8c248e12d7f074847b68117134a3d68099c
+  exif:
+    presente: true
+    data_hora: '2026-08-16T14:54:03-03:00'
+    gps:
+      lat: -13.514888
+      lon: -49.2142605
+  gps_app:
+    lat: -13.514888
+    lon: -49.2142605
+    precisao_m: 10.5
+  duplicata_de: null
+  recebida_em: '2026-08-16T15:26:03-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 320.7
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: 50d27e8d820cdddfc76ea85305cde2c4f36e1a83a1c90bc8c7cd162f0854b740
+  exif:
+    presente: true
+    data_hora: '2026-08-16T15:51:52-03:00'
+    gps:
+      lat: -13.5156905
+      lon: -49.2140979
+  gps_app:
+    lat: -13.5156905
+    lon: -49.2140979
+    precisao_m: 6.6
+  duplicata_de: null
+  recebida_em: '2026-08-16T16:23:52-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 282.1
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0006/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 53
+  contagem_real: 80
+  saida_simulada_contador:
+    estimativa: 80
+    ic80:
+    - 80
+    - 80
+    confianca: 0.91
+    oclusao_frac: 0.09
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 06, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As vacas chegaram depois da nota, vieram de Jussara.
+- de: fiscal
+  texto: Agora vou fotografar a curral pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 80 vaca(s) (bovinos carne - matrizes)
+      quantidade: 80.0
+      unidade: cabeca
+      valor_rs: 355200.0
+      categoria_animal: vaca
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5218003'
+    municipio_nome: PORANGATU
+    data_contratacao: '2026-07-18'
+    data_fiscalizacao: '2026-08-16'
+    tomador_doc_sha256: 6b13ac7c20f0ff1819048e4b229cc2d3fec3bb33f513e16160a27e9bcd7690ef
+    codigo_estabelecimento_destino: TESTE-5218003-0006
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5218003'
+    municipio_nome: PORANGATU
+    data_contratacao: '2026-07-18'
+    data_fiscalizacao: '2026-08-16'
+    tomador_doc_sha256: 6b13ac7c20f0ff1819048e4b229cc2d3fec3bb33f513e16160a27e9bcd7690ef
+    codigo_estabelecimento_destino: TESTE-5218003-0006
+    caminhos:
+    - gta_1.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: ''
+    documento:nfe:autorizacao:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: ''
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item2b
+      motivo: pedir a GTA complementar
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:curral1:localizacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item16a
+      motivo: ''
+    item:curral1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if p.demonstracao %}[DEMONSTRAÇÃO] {% endif %}Ciência e contestação {{ p.operacao.ref_bacen }}</title>
+<style>
+  :root { --tinta: #1d232b; --suave: #5b6570; --linha: #d9dee3; --acento: #24527a; --faixa: #f5f7f9; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--faixa); color: var(--tinta); font: 14px/1.55 "Segoe UI", system-ui, Arial, sans-serif; }
+  main { max-width: 860px; margin: 24px auto; background: #fff; padding: 36px 44px; border: 1px solid var(--linha); }
+  h1 { font: 600 20px/1.3 Georgia, "Times New Roman", serif; margin: 0 0 6px; }
+  h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .05em; color: var(--acento); margin: 24px 0 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--linha); }
+  th { color: var(--suave); background: var(--faixa); }
+  .nota { color: var(--suave); font-size: 12px; }
+  blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid var(--acento); background: var(--faixa); font-size: 12.5px; }
+  .assin { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 18px; }
+  .caixa { border: 1px solid var(--tinta); min-height: 110px; padding: 10px 12px; }
+  .caixa .lin { border-bottom: 1px solid var(--suave); height: 28px; margin-top: 18px; }
+  .marca-dagua { position: fixed; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .marca-dagua span { transform: rotate(-28deg); font: 800 60px/1.1 "Segoe UI", system-ui, sans-serif; color: rgba(163, 32, 32, .11); white-space: nowrap; }
+  .demo-faixa { border: 2px solid #b45309; background: #fff7ed; color: #7c2d12; padding: 10px 14px; margin: 0 0 16px; font-weight: 600; }
+  .demo-faixa small { display: block; font-weight: 400; margin-top: 4px; }
+  @media print { body { background: #fff; } main { border: 0; margin: 0; padding: 0 8mm; } }
+  @media (max-width: 640px) { main { padding: 22px 16px; } .assin { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+{% if p.demonstracao %}<div class="marca-dagua" aria-hidden="true"><span>{{ p.demonstracao.marca_dagua }}</span></div>{% endif %}
+<main>
+  {% if p.demonstracao %}<div class="demo-faixa" role="note">{{ p.demonstracao.marca_dagua }}<small>{{ p.demonstracao.aviso }}</small></div>{% endif %}
+  {% set ci = p.ciencia_mutuario %}
+  <h1>Termo de ciência do resultado da fiscalização e prazo de contestação</h1>
+  <p class="nota">Operação {{ p.operacao.ref_bacen }} · {{ p.operacao.municipio_nome or "—" }}/{{ p.operacao.uf }} ·
+    {{ p.operacao.instituicao or "IF não informada" }} · tomador (pseudônimo) <code>{{ ci.tomador_ref }}</code> ·
+    laudo selado em {{ ci.selado_em }} · selo <code>{{ p.integridade.selo }}</code></p>
+
+  <h2>Resultado por item</h2>
+  <table>
+    <tr><th>Item / aspecto</th><th>Resultado</th><th>Motivo</th></tr>
+    {% for a in ci.achados %}<tr><td>{{ a.item_descricao }}<br><span class="nota">{{ a.aspecto }}</span></td><td>{{ a.status_rotulo or a.status }}</td>
+      <td>{{ a.motivo or "—" }}{% if a.justificativa_humana %}<div class="nota">Justificativa do fiscal: “{{ a.justificativa_humana }}”</div>{% endif %}</td></tr>{% endfor %}
+  </table>
+
+  <h2>Prazo para contestação</h2>
+  <p>O mutuário pode contestar o resultado em <strong>{{ ci.prazo_contestacao_dias }} dias corridos</strong> contados da data
+    da ciência registrada abaixo ({{ ci.prazo_regra }}).{% if ci.exemplo_data_limite_se_ciente_no_selo %} Exemplo: ciente no dia do
+    selo, o prazo termina em {{ ci.exemplo_data_limite_se_ciente_no_selo }}.{% endif %}</p>
+  <p>{{ ci.como_contestar }}</p>
+  {% if ci.contestaveis %}<p>Itens que podem ser contestados: {% for a in ci.contestaveis %}{{ a.item_descricao }} — {{ a.aspecto }} ({{ a.status_rotulo or a.status }}){% if not loop.last %}; {% endif %}{% endfor %}.</p>
+  {% else %}<p>Nenhum item divergente ou pendente.</p>{% endif %}
+  {% for b in ci.base %}{% if b.citacao_literal %}<blockquote>{{ b.item }}: “{{ b.citacao_literal }}”</blockquote>{% endif %}{% endfor %}
+
+  <h2>Ciência</h2>
+  <div class="assin">
+    <div class="caixa">Ciente em ____/____/________<div class="lin"></div><span class="nota">Assinatura do mutuário ou representante</span></div>
+    <div class="caixa">Recebido pela instituição financeira<div class="lin"></div><span class="nota">Nome, cargo e data</span></div>
+  </div>
+  <p class="nota">{{ ci.nota_pii }}.</p>
+  {% if p.demonstracao %}<p class="nota"><strong>{{ p.demonstracao.marca_dagua }}.</strong> {{ p.demonstracao.aviso }}</p>{% endif %}
+</main>
+</body>
+</html>

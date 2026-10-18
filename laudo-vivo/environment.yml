@@ -1,0 +1,57 @@
+# Ambiente do Laudo Vivo (conda-forge). Traz o que a demo, a interface web, os testes e a avaliação usam:
+# núcleo, satélite (geo), visão, as dependências da voz e as ferramentas de desenvolvimento.
+#
+#   micromamba env create -f environment.yml        # ou: mamba env create / conda env create -f ...
+#   micromamba activate laudo-vivo
+#   export PYTHONPATH=src                             # PowerShell: $env:PYTHONPATH = "src"
+#
+# O instalador (scripts/instalar.sh ou scripts/instalar.ps1) faz isso, prepara os ativos da demo e roda um
+# teste rápido. Os mínimos vêm do pyproject.toml; o teto de versão maior evita mudança de API sem teste.
+# Builds só de CPU (onnxruntime e Arrow) e OpenCV sem interface gráfica: nada aqui exige GPU.
+#
+# Voz (ASR local, modo ao vivo): o faster-whisper e o ctranslate2 não existem no conda-forge. O instalador
+# roda `pip install "faster-whisper>=1.1"` depois (só esses dois vêm do PyPI; o resto está aqui). Sem eles,
+# a fala é digitada na interface, a demo em replay não muda e só os 5 testes de tests/unit/test_voz_asr.py
+# falham (ModuleNotFoundError). Detalhes em docs/COMO_RODAR.md.
+name: laudo-vivo
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  # núcleo (pyproject.toml, dependencies)
+  - pydantic>=2.8,<3
+  - pyyaml>=6
+  - httpx>=0.27,<1
+  - numpy>=2.0,<3
+  - pandas>=2.2,<4
+  - pyarrow>=15
+  - libarrow=*=*cpu*
+  - shapely>=2.0,<3
+  - pyproj>=3.6,<4
+  - jinja2>=3.1,<4
+  - lxml>=5.2
+  - pillow>=10.4,<13
+  - imagehash>=4.3
+  - fastapi>=0.115
+  - uvicorn>=0.30
+  - python-multipart>=0.0.9
+  - opentelemetry-sdk>=1.27,<2
+  # satélite (extra geo)
+  - rasterio>=1.4,<2
+  - pystac-client>=0.8
+  # visão (extra vision): detector YOLOX em CPU, vídeo, rastreador
+  - onnxruntime>=1.19,<2=*cpu*
+  - py-opencv>=4.10,<5=headless*  # o OpenCV 5 muda a saída do HoughLinesP (integridade da foto)
+  - opencv>=4.10,<5=headless*
+  - scipy>=1.13,<2
+  - av>=12,<19  # o faster-whisper 1.2.1 passa ao av.open um argumento que o PyAV 19 removeu
+  # voz (extra voice): as dependências do faster-whisper que existem no conda-forge
+  - pysoundfile>=0.12
+  - tokenizers>=0.13,<1
+  - huggingface_hub>=0.21
+  - tqdm
+  # desenvolvimento (grupo dev)
+  - pytest>=8
+  - ruff>=0.6
+  - hypothesis>=6.100

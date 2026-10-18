@@ -1,0 +1,149 @@
+{
+ "arquivo": "laudo-vivo-demo.mp4",
+ "sha256": "a76f09d1abc16570145bad58fea70b953d4927bee530b1e8515ff55da30ef406",
+ "bytes": 10942482,
+ "duracao_s": 173.08,
+ "resolucao": "1920x1080",
+ "fps": 25,
+ "codec": "H.264 (libx264), sem áudio",
+ "crf": 22,
+ "gravado_em": "2026-10-17T19:38:51.936Z",
+ "sha256_src": "52be6b825037b28f4f3351682167c011dcc5fdf63ec5febd7ff97b7631fdce01",
+ "ritmo": 1,
+ "llm": {
+  "tipo": "replay",
+  "modelo": "qwen3.5:4b",
+  "arquivo": "eval/golden/demo/DEMO-0001/replay_qwen35_4b.jsonl",
+  "fora_da_gravacao": 0
+ },
+ "ferramentas": "reais",
+ "esperas_encurtadas": [],
+ "avisos": [],
+ "roteiro": [
+  {
+   "t": 0,
+   "chave": "abertura",
+   "rotulo": "Cartão de abertura"
+  },
+  {
+   "t": 5.2,
+   "chave": "carteira",
+   "rotulo": "Carteira (mapa de GO e prioridades)"
+  },
+  {
+   "t": 9.9,
+   "chave": "fiscalizacao",
+   "rotulo": "Fiscalização do caso DEMO-0001 aberta"
+  },
+  {
+   "t": 13.4,
+   "chave": "p1",
+   "rotulo": "1 · Triagem e plano de método"
+  },
+  {
+   "t": 19.4,
+   "chave": "p2",
+   "rotulo": "2 · Satélite (NDVI)"
+  },
+  {
+   "t": 25,
+   "chave": "p3",
+   "rotulo": "3 · Declaração de independência"
+  },
+  {
+   "t": 28.9,
+   "chave": "p4",
+   "rotulo": "4 · Vídeo do lote: contagem 12 de 29 (Divergente) e quadros-chave"
+  },
+  {
+   "t": 49.2,
+   "chave": "p5",
+   "rotulo": "5 · Pressão “pode marcar 29” recusada (POL-07)"
+  },
+  {
+   "t": 55.1,
+   "chave": "p6",
+   "rotulo": "6 · Foto do DANFE: o agente pede só o que faltou"
+  },
+  {
+   "t": 62.1,
+   "chave": "p7",
+   "rotulo": "7 · A fiscal lê no papel só os campos pedidos"
+  },
+  {
+   "t": 68.1,
+   "chave": "p8",
+   "rotulo": "8 · XML da NF-e confere com o papel"
+  },
+  {
+   "t": 73.1,
+   "chave": "p9",
+   "rotulo": "9 · GTA com instrução embutida (POL-06), Divergente"
+  },
+  {
+   "t": 84.2,
+   "chave": "p10",
+   "rotulo": "10 · Foto da cerca fora da gleba e mini-mapa"
+  },
+  {
+   "t": 96.4,
+   "chave": "p11",
+   "rotulo": "11 · Rascunho bloqueado pela política (3 pendências)"
+  },
+  {
+   "t": 103.4,
+   "chave": "p12",
+   "rotulo": "12 · Correção: foto de dentro da gleba"
+  },
+  {
+   "t": 108.5,
+   "chave": "p13",
+   "rotulo": "13 · Justificativa da contagem"
+  },
+  {
+   "t": 112.9,
+   "chave": "p14",
+   "rotulo": "14 · Justificativa da GTA"
+  },
+  {
+   "t": 116.9,
+   "chave": "p15",
+   "rotulo": "15 · Rascunho emitido (hash raiz)"
+  },
+  {
+   "t": 122.4,
+   "chave": "p16",
+   "rotulo": "16 · O agente não assina (POL-03)"
+  },
+  {
+   "t": 127.9,
+   "chave": "p17",
+   "rotulo": "17 · Envio para assinatura"
+  },
+  {
+   "t": 131.3,
+   "chave": "p18",
+   "rotulo": "18 · Assinatura humana (hash + PIN)"
+  },
+  {
+   "t": 140.6,
+   "chave": "selado",
+   "rotulo": "SELADO · ASSINADO e conferência do selo"
+  },
+  {
+   "t": 148.6,
+   "chave": "pacote",
+   "rotulo": "Pacote de exibição BCB/Justiça"
+  },
+  {
+   "t": 157.9,
+   "chave": "p19",
+   "rotulo": "19 · Laudo selado não muda (POL-04)"
+  },
+  {
+   "t": 164.5,
+   "chave": "creditos",
+   "rotulo": "Cartão de créditos"
+  }
+ ]
+}

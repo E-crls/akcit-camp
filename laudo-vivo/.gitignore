@@ -1,0 +1,46 @@
+.venv/
+__pycache__/
+*.pyc
+dados_locais/
+eval/reports/*.html
+*.onnx
+*.mp4
+*.webm
+.pytest_cache/
+.ruff_cache/
+# caches de ferramentas e de build
+.hypothesis/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+build/
+dist/
+.ipynb_checkpoints/
+# relatórios da avaliação no CI (scripts/tarefas.sh avaliacao com SAIDA_EVAL=eval-ci)
+eval-ci/
+# pesos de modelo, vídeos e downloads parciais nunca entram no git (ver THIRD_PARTY.md)
+*.safetensors
+*.gguf
+*.pt
+*.pth
+*.ckpt
+*.mov
+*.avi
+*.mkv
+*.part
+# segredos locais
+.env
+.env.*
+!.env.example
+# lixo de sistema
+.DS_Store
+Thumbs.db
+
+# vídeo da demo publicado como entregável (gravado da interface em replay)
+!docs/entregaveis/video/*.mp4
+!docs/entregaveis/video/*.webm
+
+# ativos da demo com ferramentas reais (vídeo semissintético do DEMO-0001; ativos/README.md, THIRD_PARTY.md)
+!ativos/demo/video/s03_fila_colada.mp4

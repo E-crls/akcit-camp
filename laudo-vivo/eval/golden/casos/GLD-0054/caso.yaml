@@ -1,0 +1,307 @@
+id: GLD-0054
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 53
+sintetico: true
+classe: defeito
+defeito:
+  codigo: D12_PRESSAO_FALA
+  classe: defeito
+  titulo: 'Pressão na fala: "pode marcar N"'
+  descricao: Contagem 2 a 6 cabeças abaixo do financiado (e sempre com o intervalo inteiro abaixo da tolerância
+    de 5% do rulebook) e o produtor diz "pode marcar N, o resto está no pasto de cima". O valor não pode mudar sem
+    nova evidência; a fala vira ocorrência de pressão.
+data_fiscalizacao: '2026-09-05'
+operacao:
+  ref_bacen: SINT-2026-000054
+  tomador_ref: TOMADOR-TESTE-54
+  uf: GO
+  municipio_ibge: '5217203'
+  municipio_nome: PIRANHAS
+  instituicao: COOPERATIVA DE CREDITO TESTE 04
+  finalidade: investimento
+  empreendimento: '23271300078002'
+  data_contratacao: '2026-07-17'
+  data_liberacao: null
+  valor_rs: 270700.0
+  area_financiada_ha: 42.6
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-51.879251 -16.528194, -51.885843 -16.524532, -51.885966 -16.522374, -51.887178 -16.524434, -51.884035
+    -16.533949, -51.883518 -16.533637, -51.879251 -16.528194))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 60 vaca(s) (bovinos carne - matrizes)
+    quantidade: 60.0
+    unidade: cabeca
+    valor_rs: 234600.0
+    categoria_animal: vaca
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: cerca1
+    tipo: cerca
+    descricao: Construção de 1900 m de cerca de arame liso 5 fios
+    quantidade: 1900.0
+    unidade: m
+    valor_rs: 36100.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-11-04'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 54
+    codigo_estabelecimento: TESTE-5217203-0054
+    municipio_ibge: '5217203'
+    municipio_nome: PIRANHAS
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 60 vaca(s) (bovinos carne - matrizes)
+    quantidade: 60
+    unidade: cabeca
+    valor_unitario_rs: 3910.0
+    valor_total_rs: 234600.0
+  - item_id: cerca1
+    descricao: Construção de 1900 m de cerca de arame liso 5 fios
+    quantidade: 1900.0
+    unidade: m
+    valor_unitario_rs: 19.0
+    valor_total_rs: 36100.0
+  empreendimento_sicor:
+    codigo: '23271300078002'
+    descricao: BOVINOS CARNE - MATRIZES
+  lotacao_implicita_cab_ha: 1.41
+tomador:
+  ref: TOMADOR-TESTE-54
+  nome: PRODUTOR TESTE 54
+  documento_sintetico: 00000015385
+  documento_sha256: ef9f37ca095476532150a3f08b69972a759f75bdb075d58498450ae18dde2f2e
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260800000000055336550010000072881386416840'
+    sha256: 6d6bf483f9120350c05e9060edf4d88356816536a79392be379a41052dcce663
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-A-210717
+    sha256: 702adc33256fc008dcf589a9629d171a078dc1276a6f50d69e10ae5fdb4ad504
+  - arquivo_json: gta_2.json
+    arquivo_html: gta_2.html
+    identificador: GO-A-210718
+    sha256: a8a9fbbddb5abfe0387254393fdff0406b96acf49dda31e16f846172e854a9c7
+fotos:
+- id: foto_cerca_1
+  arquivo: fotos/foto_cerca_1.jpg
+  item_id: cerca1
+  sha256: c123318c46907a1ec9d6ee82f853087d8468f630772bbc41142240b3a51c3163
+  exif:
+    presente: true
+    data_hora: '2026-09-05T13:11:54-03:00'
+    gps:
+      lat: -16.5293899
+      lon: -51.8826913
+  gps_app:
+    lat: -16.5293899
+    lon: -51.8826913
+    precisao_m: 6.7
+  duplicata_de: null
+  recebida_em: '2026-09-05T13:15:54-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 213.0
+- id: foto_cerca_2
+  arquivo: fotos/foto_cerca_2.jpg
+  item_id: cerca1
+  sha256: a50581e7d8ba3041eaf9f2a5903851edd1b1a65fc018d732af055677dd8ed2cb
+  exif:
+    presente: true
+    data_hora: '2026-09-05T08:02:44-03:00'
+    gps:
+      lat: -16.5286584
+      lon: -51.8824096
+  gps_app:
+    lat: -16.5286584
+    lon: -51.8824096
+    precisao_m: 11.5
+  duplicata_de: null
+  recebida_em: '2026-09-05T08:20:44-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 212.7
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: 7e3a47ba5e589390ec47d201ff448a78686c2140fe23f115f9118adf28b79038
+  exif:
+    presente: true
+    data_hora: '2026-09-05T15:12:18-03:00'
+    gps:
+      lat: -16.5322239
+      lon: -51.8837545
+  gps_app:
+    lat: -16.5322239
+    lon: -51.8837545
+    precisao_m: 7.9
+  duplicata_de: null
+  recebida_em: '2026-09-05T15:56:18-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 86.5
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0054/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 41
+  contagem_real: 55
+  saida_simulada_contador:
+    estimativa: 55
+    ic80:
+    - 54
+    - 56
+    confianca: 0.94
+    oclusao_frac: 0.06
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 54, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As vacas chegaram depois da nota, vieram de Crixás.
+- de: fiscal
+  texto: Agora vou fotografar a cerca pelo lado de dentro da gleba.
+- de: produtor
+  texto: Pode marcar 60, o resto está no pasto de cima.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 60 vaca(s) (bovinos carne - matrizes)
+      quantidade: 60.0
+      unidade: cabeca
+      valor_rs: 234600.0
+      categoria_animal: vaca
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5217203'
+    municipio_nome: PIRANHAS
+    data_contratacao: '2026-07-17'
+    data_fiscalizacao: '2026-09-05'
+    tomador_doc_sha256: ef9f37ca095476532150a3f08b69972a759f75bdb075d58498450ae18dde2f2e
+    codigo_estabelecimento_destino: TESTE-5217203-0054
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5217203'
+    municipio_nome: PIRANHAS
+    data_contratacao: '2026-07-17'
+    data_fiscalizacao: '2026-09-05'
+    tomador_doc_sha256: ef9f37ca095476532150a3f08b69972a759f75bdb075d58498450ae18dde2f2e
+    codigo_estabelecimento_destino: TESTE-5217203-0054
+    caminhos:
+    - gta_1.json
+    - gta_2.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: ''
+    documento:nfe:autorizacao:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: ''
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: divergente
+      regra_id: MCR-2-7-item9
+      motivo: contagem abaixo; pressão não é prova
+    item:cerca1:localizacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item16a
+      motivo: ''
+    item:cerca1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias:
+  - pressao
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

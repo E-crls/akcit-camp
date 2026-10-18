@@ -1,0 +1,303 @@
+id: GLD-0016
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 15
+sintetico: true
+classe: defeito
+defeito:
+  codigo: D11_NFE_CHAVE_DV_ERRADO
+  classe: defeito
+  titulo: Chave de acesso com DV errado
+  descricao: Chave de 44 posições com dígito verificador inválido (Id, cDV e chNFe coerentes entre si).
+data_fiscalizacao: '2026-10-01'
+operacao:
+  ref_bacen: SINT-2026-000016
+  tomador_ref: TOMADOR-TESTE-16
+  uf: GO
+  municipio_ibge: '5202502'
+  municipio_nome: ARUANÃ
+  instituicao: COOPERATIVA DE CREDITO TESTE 01
+  finalidade: investimento
+  empreendimento: '23271300078002'
+  data_contratacao: '2026-08-19'
+  data_liberacao: null
+  valor_rs: 255000.0
+  area_financiada_ha: 45.0
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-51.008389 -14.891315, -51.007788 -14.890546, -51.012548 -14.887941, -51.012527 -14.888271, -51.014761
+    -14.889643, -51.015054 -14.893159, -51.012656 -14.895364, -51.009755 -14.895421, -51.008450 -14.893446, -51.008389
+    -14.891315))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 60 novilha(s) (bovinos carne - matrizes)
+    quantidade: 60.0
+    unidade: cabeca
+    valor_rs: 186000.0
+    categoria_animal: novilha
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: curral1
+    tipo: curral
+    descricao: Construção de curral de manejo com tronco e brete
+    quantidade: 1.0
+    unidade: un
+    valor_rs: 69000.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-11-30'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 16
+    codigo_estabelecimento: TESTE-5202502-0016
+    municipio_ibge: '5202502'
+    municipio_nome: ARUANÃ
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 60 novilha(s) (bovinos carne - matrizes)
+    quantidade: 60
+    unidade: cabeca
+    valor_unitario_rs: 3100.0
+    valor_total_rs: 186000.0
+  - item_id: curral1
+    descricao: Construção de curral de manejo com tronco e brete
+    quantidade: 1.0
+    unidade: un
+    valor_unitario_rs: 69000.0
+    valor_total_rs: 69000.0
+  empreendimento_sicor:
+    codigo: '23271300078002'
+    descricao: BOVINOS CARNE - MATRIZES
+  lotacao_implicita_cab_ha: 1.33
+tomador:
+  ref: TOMADOR-TESTE-16
+  nome: PRODUTOR TESTE 16
+  documento_sintetico: '00000011550'
+  documento_sha256: ef444d416672632be8f92ac77602e669c46f388eabf3a24a3ff75a2a2e30ef7a
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260800000000051500550010000046731020370030'
+    sha256: ae292e04169e40277080c629d4849738ba270240f4f8f71fa80820990ebfcaf3
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-AB-758898
+    sha256: 58a525f5618dc2559662c1b06c8a3c10f11e958697d3d9f410becb418da668b7
+  - arquivo_json: gta_2.json
+    arquivo_html: gta_2.html
+    identificador: GO-AB-758899
+    sha256: 2da2a7bb2bcf9ddafda2ec18cd50540e0463d0f877bc22344c8ee71db5576e1b
+fotos:
+- id: foto_curral_1
+  arquivo: fotos/foto_curral_1.jpg
+  item_id: curral1
+  sha256: 56a1949223fdadb41359097fe3c1663dd7d85a62e36c5d30dca22045a0e97001
+  exif:
+    presente: true
+    data_hora: '2026-10-01T15:22:27-03:00'
+    gps:
+      lat: -14.893307
+      lon: -51.0115817
+  gps_app:
+    lat: -14.893307
+    lon: -51.0115817
+    precisao_m: 10.1
+  duplicata_de: null
+  recebida_em: '2026-10-01T16:02:27-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 229.8
+- id: foto_curral_2
+  arquivo: fotos/foto_curral_2.jpg
+  item_id: curral1
+  sha256: 1e60a7f181d26f4f0053450c298a5b629e0c2070982f60d7d35bf94d0dbe17cb
+  exif:
+    presente: true
+    data_hora: '2026-10-01T10:07:50-03:00'
+    gps:
+      lat: -14.8923174
+      lon: -51.0114565
+  gps_app:
+    lat: -14.8923174
+    lon: -51.0114565
+    precisao_m: 9.1
+  duplicata_de: null
+  recebida_em: '2026-10-01T10:13:50-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 326.8
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: ae1582b3b1639b7fafd8186ee88877547dd24d6609451e95ff28a04454193d9c
+  exif:
+    presente: true
+    data_hora: '2026-10-01T10:30:41-03:00'
+    gps:
+      lat: -14.8924468
+      lon: -51.0128277
+  gps_app:
+    lat: -14.8924468
+    lon: -51.0128277
+    precisao_m: 10.5
+  duplicata_de: null
+  recebida_em: '2026-10-01T11:09:41-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 221.7
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0016/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 53
+  contagem_real: 62
+  saida_simulada_contador:
+    estimativa: 62
+    ic80:
+    - 62
+    - 62
+    confianca: 0.97
+    oclusao_frac: 0.05
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 16, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As novilhas chegaram depois da nota, vieram de Jussara.
+- de: fiscal
+  texto: Agora vou fotografar a curral pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 60 novilha(s) (bovinos carne - matrizes)
+      quantidade: 60.0
+      unidade: cabeca
+      valor_rs: 186000.0
+      categoria_animal: novilha
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5202502'
+    municipio_nome: ARUANÃ
+    data_contratacao: '2026-08-19'
+    data_fiscalizacao: '2026-10-01'
+    tomador_doc_sha256: ef444d416672632be8f92ac77602e669c46f388eabf3a24a3ff75a2a2e30ef7a
+    codigo_estabelecimento_destino: TESTE-5202502-0016
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5202502'
+    municipio_nome: ARUANÃ
+    data_contratacao: '2026-08-19'
+    data_fiscalizacao: '2026-10-01'
+    tomador_doc_sha256: ef444d416672632be8f92ac77602e669c46f388eabf3a24a3ff75a2a2e30ef7a
+    codigo_estabelecimento_destino: TESTE-5202502-0016
+    caminhos:
+    - gta_1.json
+    - gta_2.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: divergente
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: DV da chave inválido
+    documento:nfe:autorizacao:
+      status_esperado: pendente
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: protocolo não cobre o conteúdo apresentado
+    item:bov1:nfe_especie:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item2b
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    item:bov1:nfe_quantidade:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item2b
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    item:bov1:nfe_valor:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item2b
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    item:bov1:nfe_data:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item6
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    item:bov1:nfe_partes:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item6
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    item:bov1:nfe_operacao:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item2b
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:curral1:localizacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item16a
+      motivo: ''
+    item:curral1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

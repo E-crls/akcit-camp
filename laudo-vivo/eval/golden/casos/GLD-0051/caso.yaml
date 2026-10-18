@@ -1,0 +1,297 @@
+id: GLD-0051
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 50
+sintetico: true
+classe: ambiguo
+defeito:
+  codigo: A03_NFE_SEM_PROTOCOLO
+  classe: ambiguo
+  titulo: NF-e sem protocolo de autorização
+  descricao: XML assinado e íntegro, mas sem protNFe (arquivo exportado antes do retorno da SEFAZ).
+data_fiscalizacao: '2026-09-08'
+operacao:
+  ref_bacen: SINT-2026-000051
+  tomador_ref: TOMADOR-TESTE-51
+  uf: GO
+  municipio_ibge: '5218805'
+  municipio_nome: RIO VERDE
+  instituicao: COOPERATIVA DE CREDITO TESTE 01
+  finalidade: investimento
+  empreendimento: '23271300078002'
+  data_contratacao: '2026-06-21'
+  data_liberacao: null
+  valor_rs: 139200.0
+  area_financiada_ha: 20.0
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-50.959297 -17.687077, -50.962777 -17.685089, -50.965382 -17.686782, -50.963894 -17.689558, -50.962598
+    -17.689632, -50.962368 -17.689685, -50.959675 -17.688137, -50.959297 -17.687077))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 20 vaca(s) (bovinos carne - matrizes)
+    quantidade: 20.0
+    unidade: cabeca
+    valor_rs: 74200.0
+    categoria_animal: vaca
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: curral1
+    tipo: curral
+    descricao: Construção de curral de manejo com tronco e brete
+    quantidade: 1.0
+    unidade: un
+    valor_rs: 65000.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-11-07'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 51
+    codigo_estabelecimento: TESTE-5218805-0051
+    municipio_ibge: '5218805'
+    municipio_nome: RIO VERDE
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 20 vaca(s) (bovinos carne - matrizes)
+    quantidade: 20
+    unidade: cabeca
+    valor_unitario_rs: 3710.0
+    valor_total_rs: 74200.0
+  - item_id: curral1
+    descricao: Construção de curral de manejo com tronco e brete
+    quantidade: 1.0
+    unidade: un
+    valor_unitario_rs: 65000.0
+    valor_total_rs: 65000.0
+  empreendimento_sicor:
+    codigo: '23271300078002'
+    descricao: BOVINOS CARNE - MATRIZES
+  lotacao_implicita_cab_ha: 1.0
+tomador:
+  ref: TOMADOR-TESTE-51
+  nome: AGROPECUARIA TOMADORA TESTE 51 LTDA
+  documento_sintetico: '99999999105023'
+  documento_sha256: 98c8a41faac36d66940e5b2233b06a413a775c953418d2e9e8efffe85214008b
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999505048550010000007171532504880'
+    sha256: ce56a7e2755705ffc613799e9fd7e39ba97b23b669d55910744cea519603e883
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-GO-822986
+    sha256: dead5abf879b2e8dc7aac6e0c595e440f899690be4495bf71320f5e9393d025c
+fotos:
+- id: foto_curral_1
+  arquivo: fotos/foto_curral_1.jpg
+  item_id: curral1
+  sha256: 5cb491c54c5a6ef6d718667d608fdbd1e4c964071963d5a3c34b17c4c8cdaf33
+  exif:
+    presente: true
+    data_hora: '2026-09-08T16:14:24-03:00'
+    gps:
+      lat: -17.6883135
+      lon: -50.9632472
+  gps_app:
+    lat: -17.6883135
+    lon: -50.9632472
+    precisao_m: 10.3
+  duplicata_de: null
+  recebida_em: '2026-09-08T16:44:24-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 123.9
+- id: foto_curral_2
+  arquivo: fotos/foto_curral_2.jpg
+  item_id: curral1
+  sha256: e6403acad36c5a54cb98e77d8369601625214da5073dc7ae86c5401e2ce52d15
+  exif:
+    presente: true
+    data_hora: '2026-09-08T15:22:22-03:00'
+    gps:
+      lat: -17.6873835
+      lon: -50.9625481
+  gps_app:
+    lat: -17.6873835
+    lon: -50.9625481
+    precisao_m: 10.4
+  duplicata_de: null
+  recebida_em: '2026-09-08T15:46:22-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 205.6
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: b668c36803f3152e1bcc28535483a221baa5be5de7560876f5358d36aa336036
+  exif:
+    presente: true
+    data_hora: '2026-09-08T13:13:27-03:00'
+    gps:
+      lat: -17.6874054
+      lon: -50.9627506
+  gps_app:
+    lat: -17.6874054
+    lon: -50.9627506
+    precisao_m: 6.6
+  duplicata_de: null
+  recebida_em: '2026-09-08T13:46:27-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 213.6
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0051/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 52
+  contagem_real: 22
+  saida_simulada_contador:
+    estimativa: 22
+    ic80:
+    - 22
+    - 22
+    confianca: 0.92
+    oclusao_frac: 0.02
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 51, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As vacas chegaram depois da nota, vieram de Posse.
+- de: fiscal
+  texto: Agora vou fotografar a curral pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 20 vaca(s) (bovinos carne - matrizes)
+      quantidade: 20.0
+      unidade: cabeca
+      valor_rs: 74200.0
+      categoria_animal: vaca
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5218805'
+    municipio_nome: RIO VERDE
+    data_contratacao: '2026-06-21'
+    data_fiscalizacao: '2026-09-08'
+    tomador_doc_sha256: 98c8a41faac36d66940e5b2233b06a413a775c953418d2e9e8efffe85214008b
+    codigo_estabelecimento_destino: TESTE-5218805-0051
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5218805'
+    municipio_nome: RIO VERDE
+    data_contratacao: '2026-06-21'
+    data_fiscalizacao: '2026-09-08'
+    tomador_doc_sha256: 98c8a41faac36d66940e5b2233b06a413a775c953418d2e9e8efffe85214008b
+    codigo_estabelecimento_destino: TESTE-5218805-0051
+    caminhos:
+    - gta_1.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: ''
+    documento:nfe:autorizacao:
+      status_esperado: pendente
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: pedir o procNFe
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:curral1:localizacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item16a
+      motivo: ''
+    item:curral1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

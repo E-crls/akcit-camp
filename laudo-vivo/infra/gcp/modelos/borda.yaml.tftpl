@@ -1,0 +1,136 @@
+# Envoy da borda do serviço da API (renderizado pelo Terraform, passado em --config-yaml).
+#
+# Ouvinte "entrada" (porta do Cloud Run, HTTP/2 sem TLS, h2c): repassa ao uvicorn em 127.0.0.1. Com
+# HTTP/2 de ponta a ponta o Cloud Run não aplica o limite de 32 MiB por requisição do HTTP/1, e o vídeo do
+# lote (até 600 MB, servico.LIMITE_UPLOAD_MB) e o pacote.zip passam inteiros.
+#
+# Ouvinte "modelo" (127.0.0.1:${porta_modelo}, só dentro da instância): é o endereço do Ollama que o
+# produto usa (OLLAMA_HOST e a leitura de foto); repassa ao servidor do modelo desta implantação. No modo
+# cloud_run, o filtro gcp_authn pede ao servidor de metadados um token de identidade da conta de serviço da
+# API e o põe em Authorization: o serviço de modelo só aceita quem tem roles/run.invoker nele.
+static_resources:
+  listeners:
+  - name: entrada
+    address:
+      socket_address: { address: 0.0.0.0, port_value: ${porta_entrada} }
+    filter_chains:
+    - filters:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          "@type": ${tipo_hcm}
+          stat_prefix: entrada
+          codec_type: AUTO
+          stream_idle_timeout: ${tempo_limite}
+          route_config:
+            name: entrada
+            virtual_hosts:
+            - name: api
+              domains: ["*"]
+              routes:
+              - match: { prefix: "/" }
+                route: { cluster: api, timeout: 0s }
+          http_filters:
+          - name: envoy.filters.http.router
+            typed_config:
+              "@type": ${tipo_router}
+%{ if modo_modelo != "nenhum" ~}
+  - name: modelo
+    address:
+      socket_address: { address: 127.0.0.1, port_value: ${porta_modelo} }
+    filter_chains:
+    - filters:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          "@type": ${tipo_hcm}
+          stat_prefix: modelo
+          codec_type: AUTO
+          stream_idle_timeout: ${tempo_limite}
+          route_config:
+            name: modelo
+            virtual_hosts:
+            - name: modelo
+              domains: ["*"]
+              routes:
+              - match: { prefix: "/" }
+                route:
+                  cluster: modelo
+                  timeout: 0s
+%{ if modo_modelo == "cloud_run" ~}
+                  host_rewrite_literal: ${host_modelo}
+%{ endif ~}
+          http_filters:
+%{ if modo_modelo == "cloud_run" ~}
+          - name: envoy.filters.http.gcp_authn
+            typed_config:
+              "@type": ${tipo_gcp_authn}
+              cluster: metadados
+              timeout: 10s
+              cache_config: { cache_size: 10 }
+%{ endif ~}
+          - name: envoy.filters.http.router
+            typed_config:
+              "@type": ${tipo_router}
+%{ endif ~}
+  clusters:
+  - name: api
+    type: STATIC
+    connect_timeout: 5s
+    load_assignment:
+      cluster_name: api
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address: { address: 127.0.0.1, port_value: ${porta_api} }
+%{ if modo_modelo == "gce" ~}
+  - name: modelo
+    type: STATIC
+    connect_timeout: 10s
+    load_assignment:
+      cluster_name: modelo
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address: { address: ${host_modelo}, port_value: ${porta_modelo} }
+%{ endif ~}
+%{ if modo_modelo == "cloud_run" ~}
+  - name: modelo
+    type: LOGICAL_DNS
+    dns_lookup_family: V4_ONLY
+    connect_timeout: 10s
+    load_assignment:
+      cluster_name: modelo
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address: { address: ${host_modelo}, port_value: 443 }
+    transport_socket:
+      name: envoy.transport_sockets.tls
+      typed_config:
+        "@type": ${tipo_tls}
+        sni: ${host_modelo}
+        common_tls_context:
+          validation_context:
+            trusted_ca: { filename: /etc/ssl/certs/ca-certificates.crt }
+            match_typed_subject_alt_names:
+            - san_type: DNS
+              matcher: { suffix: ".run.app" }
+    metadata:
+      typed_filter_metadata:
+        envoy.filters.http.gcp_authn:
+          "@type": ${tipo_audience}
+          url: https://${host_modelo}
+  - name: metadados
+    type: STRICT_DNS
+    dns_lookup_family: V4_ONLY
+    connect_timeout: 5s
+    load_assignment:
+      cluster_name: metadados
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address: { address: metadata.google.internal, port_value: 80 }
+%{ endif ~}

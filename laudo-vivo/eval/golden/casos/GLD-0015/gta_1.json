@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "187191",
+  "serie": "C",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 23
+    }
+  ],
+  "total": 23,
+  "total_por_extenso": "VINTE E TRES BOVINOS",
+  "marca_rebanho": "MARCA TESTE 14",
+  "origem": {
+    "documento": "00000051420",
+    "nome": "VENDEDOR TESTE 15",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 15",
+    "codigo_estabelecimento": "TESTE-5218805-9014",
+    "codigo_exploracao": "TESTE-5218805-9014-BOV",
+    "municipio_nome": "RIO VERDE",
+    "municipio_ibge": "5218805",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000011479",
+    "nome": "PRODUTOR TESTE 15",
+    "estabelecimento": "FAZENDA TESTE 15",
+    "codigo_estabelecimento": "TESTE-5214838-0015",
+    "codigo_exploracao": "TESTE-5214838-0015-BOV",
+    "municipio_nome": "NOVA CRIXÁS",
+    "municipio_ibge": "5214838",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST8H70"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2025-07-29"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 1 DE 2",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE RIO VERDE"
+  },
+  "emissao": {
+    "local_municipio": "RIO VERDE",
+    "data": "2026-08-13",
+    "hora": "08:04",
+    "validade": "2026-08-16"
+  },
+  "nfe_chaves": [
+    "52260800000000051420550010000035081674385761"
+  ],
+  "codigo_barras": "SINTGOC187191",
+  "sintetico": true
+}

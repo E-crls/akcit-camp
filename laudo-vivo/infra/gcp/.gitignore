@@ -1,0 +1,8 @@
+# Estado, planos e variáveis locais do Terraform (o lock file .terraform.lock.hcl é versionado)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+terraform.tfvars
+*.auto.tfvars

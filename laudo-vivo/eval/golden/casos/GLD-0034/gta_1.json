@@ -1,0 +1,61 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "260978",
+  "serie": "AC",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "M",
+      "faixa_etaria": ">36",
+      "quantidade": 1
+    }
+  ],
+  "total": 1,
+  "total_por_extenso": "UM BOVINOS",
+  "marca_rebanho": "MARCA TESTE 33",
+  "origem": {
+    "documento": "00000053392",
+    "nome": "VENDEDOR TESTE 34",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 34",
+    "codigo_estabelecimento": "TESTE-5216403-9033",
+    "codigo_exploracao": "TESTE-5216403-9033-BOV",
+    "municipio_nome": "PARAÚNA",
+    "municipio_ibge": "5216403",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000013331",
+    "nome": "PRODUTOR TESTE 34",
+    "estabelecimento": "FAZENDA TESTE 34",
+    "codigo_estabelecimento": "TESTE-5213707-0034",
+    "codigo_exploracao": "TESTE-5213707-0034-BOV",
+    "municipio_nome": "MONTES CLAROS DE GOIÁS",
+    "municipio_ibge": "5213707",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST6F73"
+  },
+  "vacinacoes": [],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE PARAÚNA"
+  },
+  "emissao": {
+    "local_municipio": "PARAÚNA",
+    "data": "2026-07-31",
+    "hora": "15:30",
+    "validade": "2026-08-03"
+  },
+  "nfe_chaves": [
+    "52260700000000053392550010000069461079027080"
+  ],
+  "codigo_barras": "SINTGOAC260978",
+  "sintetico": true
+}

@@ -1,0 +1,208 @@
+# Matriz de evidências de Problema e Validação (memorando interno de 16/10/2026, seção 3; REQ-56).
+# Uma entrada por linha da matriz de validacao/README.md. Campos:
+#   id, evidencia, url (lista; vazia = URL completa não registrada no repositório), data (da fonte),
+#   prova, nao_prova, tipo (norma | dado_oficial | decisao_judicial | relatorio_tecnico | pesquisa |
+#   mercado | caso_publico | imprensa | retroteste), reproducao (script ou arquivo do repositório, se houver),
+#   estado: reproduzido (o script do repositório gera o número) | citado (vem da pesquisa do memorando;
+#   reconferir a fonte antes de levar ao palco) | pendente.
+# Datas no formato AAAA-MM-DD. Conferido em 2026-10-16.
+
+conferido_em: 2026-10-16
+evidencias:
+  - id: 1
+    evidencia: "Voto 166/2025-BCB (Voto do CMN 78/2025), itens 8, 13, 14 e 32"
+    url: ["https://normativos.bcb.gov.br/Votos/CMN/202578/Voto_do_CMN_78_2025.pdf"]
+    data: 2025-11-12
+    prova: >-
+      As IFs evoluíram pouco na verificação remota; o sensoriamento remoto não dispensa a verificação presencial
+      e documental quando é inconclusivo; contar animais por satélite é facultativo.
+    nao_prova: "O tamanho do desvio na aplicação do crédito."
+    tipo: norma
+    reproducao: null
+    estado: citado
+
+  - id: 2
+    evidencia: "Res. CMN 5.267/2025 (itens 1, 14, 15, 18 e 23 do MCR 2-7) e IN BCB 758/2026"
+    url:
+      - "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20CMN&numero=5267"
+      - "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Instru%C3%A7%C3%A3o%20Normativa%20BCB&numero=758"
+      - "https://www.bcb.gov.br/api/conteudo/app/normativos/exibenormativo?p1=Instru%C3%A7%C3%A3o%20Normativa%20BCB&p2=758"
+    data: 2025-11-28
+    data_complementar: {in_bcb_758_dou: 2026-07-10}
+    prova: >-
+      A IF paga e responde pela fiscalização, e a documentação fica à disposição do BCB; para reverter uma
+      desclassificação, a IF precisa de documentação por operação.
+    nao_prova: "Disposição de pagar pelo nosso produto."
+    tipo: norma
+    reproducao: "docs/normas/mcr_2_7.md; docs/normas/in_bcb_758.md; src/laudo/rulebooks/mcr_2_7.yaml"
+    estado: citado
+    observacao: >-
+      IN BCB 758, de 08/07/2026 (DOU 10/07/2026, seção 1, p. 196), conferida em 2026-10-16 pela API do buscador
+      de normativos: altera o MCR - Documento 1 (Sicor). Nota do campo 60-B, alínea c: o diretor responsável
+      "deve registrar, para cada operação, a documentação comprobatória das justificativas para a reversão";
+      alínea e: essa documentação fica "à disposição do BC". Texto literal (área de Regras) em
+      docs/normas/in_bcb_758.md.
+
+  - id: 3
+    evidencia: "Análise própria do Sicor: desclassificações registradas por ano e motivo"
+    url:
+      - "https://www.bcb.gov.br/htms/sicor/DadosBrutos/sicor_desclassificacao.gz"
+      - "https://www.bcb.gov.br/htms/sicor/MotivoDesclassificacao.csv"
+    data: 2026-10-14  # Last-Modified da versão atual; a do memorando é de 2026-10-07 (snapshot)
+    prova: >-
+      Versão do memorando (07/10/2026): 4.553 desclassificações registradas em 2026 até 06/10 contra 4.072 em todo
+      2025; motivo 013 ("aplicação não comprovada"): 349 em 2025 e 364 em 2026. Versão de 14/10/2026: 4.599 até
+      13/10 contra 4.075; motivo 013: 349 e 368.
+    nao_prova: >-
+      Ilícito nem crescimento de comportamento: a série tem quebra de registro (2022 com 118 registros; motivo 999
+      "Outro" cai de 64% para 29%). Dizer "desclassificações registradas" e comparar só 2026 parcial com 2025
+      inteiro, sem multiplicadores.
+    tipo: dado_oficial
+    reproducao: "bench/desclassificacao/build.py; chaves desc.* e desc.memorando.* de docs/entregaveis/numeros.md"
+    estado: reproduzido
+
+  - id: 4
+    evidencia: "Recorte GO do Sicor (desclassificações de 2024 a 2026)"
+    url: ["https://www.bcb.gov.br/htms/sicor/DadosBrutos/sicor_desclassificacao.gz",
+          "https://www.bcb.gov.br/htms/sicor/DadosBrutos/"]
+    data: 2026-10-16  # data do cálculo
+    prova: >-
+      Motivo 013 é 14,5% dos registros de GO (82 de 564) contra 7,8% no país; custeio de aquisição e manutenção
+      de animais em GO: 158 registros, R$ 169,5 mi desclassificados (2024 a 2026). No país, o custeio de
+      aquisição desclassifica 5,2 operações por mil (coortes 2022–2024), 3,7 vezes a média; a compra de gado por
+      investimento, 0,6 por mil, abaixo da média.
+    nao_prova: >-
+      Que o gado concentre as desclassificações: a pecuária tem 54% das operações e 58% dos registros
+      (proporcional). Dentro dela, a aquisição de animais é sobrerrepresentada (26% das operações, 38% das
+      operações desclassificadas), puxada pelo custeio de aquisição; a compra por investimento é
+      sub-representada.
+    tipo: dado_oficial
+    reproducao: "bench/desclassificacao/resumo.json (versoes.*.janela_2024_2026, taxas_por_coorte, participacao)"
+    estado: reproduzido
+
+  - id: 5
+    evidencia: "Fiscal-GO 2026: operações bovinas acima de 300 ha (MCR 2-7 item 5)"
+    url: ["https://www.bcb.gov.br/htms/sicor/DadosBrutos/SICOR_OPERACAO_BASICA_ESTADO_2026.gz"]
+    data: 2026-10-16  # reconferência
+    prova: >-
+      Só 301 de 19.009 operações bovinas de GO em 2026 caem no item 5 (sensoriamento remoto obrigatório: acima
+      de 300 ha e emitidas a partir de 01/03/2026); as outras 98,4%, que são 90,3% do valor, ficam no espaço
+      documental e presencial. Os 97,8% (87,4% do valor) são das operações até 300 ha (414 acima).
+    nao_prova: "Que as operações fora do item 5 tenham problema."
+    tipo: dado_oficial
+    reproducao: >-
+      bench/fiscal_go/fiscal_go_2026.parquet (colunas eh_pecuaria_bovina, exige_sensoriamento_remoto,
+      acima_300ha, valor_rs)
+    estado: reproduzido
+    observacao: >-
+      Reconferido em 2026-10-16 no parquet do repositório (301 e 414 de 19.009; 98,4%/90,3% e 97,8%/87,4%). O
+      memorando juntou as duas leituras; no palco, "mais de 97%" vale para as duas. O observatório confirma a
+      ordem de grandeza pelos itens com animais de GO: 97,3% até 300 ha em 2025 e 97,9% em 2026 (area_animais
+      em bench/desclassificacao/resumo.json).
+
+  - id: 6
+    evidencia: "Decisão da JF de Rio Verde/GO, proc. 1004865-40.2026.4.01.3503"
+    url: ["https://rotajuridica.com.br/?p=179233", "https://www.migalhas.com.br/quentes/466258"]
+    data: 2026-10-07
+    data_complementar: {migalhas: 2026-10-09}
+    prova: >-
+      Fiscalização sem trilha exibível vira passivo da IF: cobrança suspensa e ordem de exibir vetor,
+      coordenadas, imagens com data, meteorologia e fundamento.
+    nao_prova: "Algo sobre gado: o caso é de lavoura e a decisão é liminar. Não validou produto nenhum."
+    tipo: decisao_judicial
+    reproducao: null
+    estado: citado
+    observacao: "A íntegra da decisão não foi lida (só a imprensa jurídica). Nome do produtor nunca."
+
+  - id: 7
+    evidencia: "TCU/Panoptes com o Lapig-UFG (relatório técnico)"
+    url: ["https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2026/07/Relatorio_Tecnico_Projeto_Panoptes_Completo_com_anexo-Leonardo-Leao.pdf"]
+    data: 2026-07-01  # relatório de mar/2026, publicado em jul/2026
+    prova: >-
+      Fiscalização manual, amostral e de baixa cobertura; 26,6% de irregularidade flagrante em 3.694 operações
+      de recuperação de pastagem.
+    nao_prova: >-
+      Não é acórdão nem achado de ilícito. A licença CC BY-NC-SA impede reusar o material (só citar).
+    tipo: relatorio_tecnico
+    reproducao: null
+    estado: citado
+
+  - id: 8
+    evidencia: "Pesquisa MAPA \"Perfil dos Peritos\" (2.173 respondentes)"
+    url: ["https://www.gov.br/agricultura/pt-br/assuntos/riscos-seguro/seguro-rural/publicacoes-seguro-rural/perfil-dos-peritos-a-percepcao-dos-profissionais-sobre-o-seguro-rural-e-proagro.pdf"]
+    data: 2022-01-01  # publicação de 2022; coleta de 2021
+    prova: "76% relatam intimidação e 72% trabalham sozinhos: sustenta a recusa de pressão e a trilha de prova."
+    nao_prova: "São peritos de perda (seguro e Proagro), coleta de 2021; não são fiscais de aplicação do crédito."
+    tipo: pesquisa
+    reproducao: null
+    estado: citado
+
+  - id: 9
+    evidencia: "Demanda revelada: já se paga por fiscalização e vistoria"
+    url:
+      - "https://bnb.gov.br/documents/45839/85449/Aviso%20-%20RFP%202021-003.odt/d2df03d5-bee6-ad32-1b22-413c3c7732dd"
+      - "https://www.confea.org.br/node/224212"
+      - "https://www.agtechgarage.news/sicredi-seleciona-startup-para-desenvolver-solucao-de-monitoramento-e-fiscalizacao-do-credito-rural/"
+      - "https://creams.org.br/wp-content/uploads/2024/08/Tabela-de-Honorarios-Agronomia-2024.pdf"
+      - "https://www.agrobase.com.br/oportunidades/2026/04/avaliador-de-imoveis-rurais-risco-agricola-sao-paulo-sp/"
+      - "https://softfocusassist.com.br/#planos"
+      - "https://www.pwc.com.br/pt/consultoria/agtech-innovation/agtech-innovation-news/materias/2022/sicredi-seleciona-startup-para-desenvolver-solucao-de-monitoramento-e-fiscalizacao-do-credito-rural.html"
+    data: 2026-10-16  # consulta do preço da Softfocus Assist; demais de 2021 a 2026
+    prova: >-
+      RFP BNB 2021/003; credenciamento Caixa com hora técnica sem reajuste desde 2014; desafio Sicredi com 38
+      startups (PwC, 04/2022); Softfocus Assist de R$ 49,90 a R$ 487,40 por mês (o teto é o mensal da
+      assinatura anual; softfocusassist.com.br, 16/10/2026); piso AEA-MS de R$ 669 por visita (08/2024); vagas de 2026 na Agrobase.
+    nao_prova: "Intenção de compra do nosso cliente; o nosso preço é preço-alvo."
+    tipo: mercado
+    reproducao: null
+    estado: citado
+    observacao: >-
+      Softfocus Assist conferida em 2026-10-16 (seção #planos da página inicial: Plano Gestão R$ 49,90 por mês;
+      Planos 100 a 300 de R$ 222,90 a R$ 487,40 por mês na assinatura anual). PwC: matéria de 05/04/2022 sobre o
+      desafio Sicredi com a AgTech Garage (38 startups inscritas).
+
+  - id: 10
+    evidencia: "Casos públicos no golden separado (casos_publicos)"
+    url:
+      - "https://comprerural.com/boi-de-papel-fraude-deixa-prejuizo-de-r-94-milhoes/"
+      - "https://comprerural.com/gta-teria-sido-usada-para-legalizar-transporte-de-gado-furtado-em-goias-agrodefesa-investiga/"
+      - "https://www.wlj.net/ky-cattle-fraud-scheme-exposed/"
+      - "https://comprerural.com/fraude-em-financiamentos-rurais-de-r-18-milhao-faz-politico-virar-reu-na-justica-federal/"
+    data: 2026-09-17  # casos de 19/05/2023 (WLJ) a 17/09/2026
+    prova: >-
+      GTA é necessária, mas não suficiente: Pains/MG (1.553 financiados, 47 achados); Boi de Papel (R$ 94 mi é o
+      crédito concedido, não o prejuízo); GTA com origem falsa em Orizona/Vianópolis; McClain (89.522 no papel,
+      10.559 achados; WLJ, 19/05/2023, conferido em 2026-10-16).
+    nao_prova: "Frequência: são casos escolhidos, não amostra."
+    tipo: caso_publico
+    reproducao: "eval/golden/casos_publicos/ (Trilha B)"
+    estado: citado
+    observacao: "Pains/MG: CompreRural, 09/01/2026 (a mesma URL do PUB-0001 do split casos_publicos)."
+
+  - id: 11
+    evidencia: "Serasa Experian, Mapa da Soja"
+    url: ["https://www.serasaexperian.com.br/sala-de-imprensa/agronegocios/mapa-da-soja-cerca-de-83-por-cento-das-operacoes-analisadas-indicam-o-uso-adequado-do-credito-rural-para-o-cultivo-financiado-mostra-estudo-da-serasa-experian/"]
+    data: 2026-08-25
+    prova: >-
+      A triagem remota sinaliza 17,4% de divergência, e a própria Serasa diz que divergência não prova
+      irregularidade: é o espaço "da triagem à prova".
+    nao_prova: "Pecuária (o estudo é de soja)."
+    tipo: mercado
+    reproducao: null
+    estado: citado
+
+  - id: 12
+    evidencia: "Retro-teste pré-registrado da triagem (só se passar no limiar)"
+    url: []
+    data: 2026-10-16
+    prova: >-
+      Se o limite inferior do IC95 do lift@10% da análise primária passar de 1,5: a priorização por dado público
+      acha mais desclassificações registradas que a amostra aleatória do item 12.
+    nao_prova: "Previsão de ilícito: o rótulo tem viés de fiscalização."
+    tipo: retroteste
+    reproducao: "eval/retroteste/PROTOCOLO.md, rodar.py, RELATORIO.md e resultado.json; chaves retro.*"
+    estado: reproduzido
+    resultado: >-
+      Versão 1 (protocolo sha256 e48cf6edbecc2656..., registrado em 2026-10-16 01:06): NÃO passou. Lift@10% da
+      análise primária 1,33 [1,23–1,43] (IC95 inferior abaixo de 1,5); "só valor" 2,03 [1,90–2,18]. Fica fora do
+      palco; no Q&A, "fizemos um retro-teste pré-registrado; não passou no limiar que fixamos; está publicado".

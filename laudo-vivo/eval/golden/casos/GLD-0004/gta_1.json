@@ -1,0 +1,59 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "MT",
+  "numero": "181242",
+  "serie": "A",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "M",
+      "faixa_etaria": ">36",
+      "quantidade": 4
+    }
+  ],
+  "total": 4,
+  "total_por_extenso": "QUATRO BOVINOS",
+  "marca_rebanho": "MARCA TESTE 03",
+  "origem": {
+    "documento": "00000050377",
+    "nome": "VENDEDOR TESTE 04",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 04",
+    "codigo_estabelecimento": "TESTE-5101803-9003",
+    "codigo_exploracao": "TESTE-5101803-9003-BOV",
+    "municipio_nome": "BARRA DO GARÇAS",
+    "municipio_ibge": "5101803",
+    "uf": "MT"
+  },
+  "destino": {
+    "documento": "00000010316",
+    "nome": "PRODUTOR TESTE 04",
+    "estabelecimento": "FAZENDA TESTE 04",
+    "codigo_estabelecimento": "TESTE-5218300-0004",
+    "codigo_exploracao": "TESTE-5218300-0004-BOV",
+    "municipio_nome": "POSSE",
+    "municipio_ibge": "5218300",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST8E41"
+  },
+  "vacinacoes": [],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "FUNCIONARIO_AUTORIZADO",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE BARRA DO GARÇAS"
+  },
+  "emissao": {
+    "local_municipio": "BARRA DO GARÇAS",
+    "data": "2026-08-03",
+    "hora": "06:17",
+    "validade": "2026-08-06"
+  },
+  "nfe_chaves": [],
+  "codigo_barras": "SINTMTA181242",
+  "sintetico": true
+}

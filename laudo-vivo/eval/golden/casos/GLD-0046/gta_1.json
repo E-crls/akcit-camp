@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "798864",
+  "serie": "C",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "13-24",
+      "quantidade": 33
+    }
+  ],
+  "total": 33,
+  "total_por_extenso": "TRINTA E TRES BOVINOS",
+  "marca_rebanho": "MARCA TESTE 45",
+  "origem": {
+    "documento": "99999999504580",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 46 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 46",
+    "codigo_estabelecimento": "TESTE-5220207-9045",
+    "codigo_exploracao": "TESTE-5220207-9045-BOV",
+    "municipio_nome": "SÃO MIGUEL DO ARAGUAIA",
+    "municipio_ibge": "5220207",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000014575",
+    "nome": "PRODUTOR TESTE 46",
+    "estabelecimento": "FAZENDA TESTE 46",
+    "codigo_estabelecimento": "TESTE-5220207-0046",
+    "codigo_exploracao": "TESTE-5220207-0046-BOV",
+    "municipio_nome": "SÃO MIGUEL DO ARAGUAIA",
+    "municipio_ibge": "5220207",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST8C34"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-03-16"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 1 DE 2",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE SÃO MIGUEL DO ARAGUAIA"
+  },
+  "emissao": {
+    "local_municipio": "SÃO MIGUEL DO ARAGUAIA",
+    "data": "2026-07-18",
+    "hora": "07:46",
+    "validade": "2026-07-20"
+  },
+  "nfe_chaves": [
+    "52260799999999504580550010000076671285363149"
+  ],
+  "codigo_barras": "SINTGOC798864",
+  "sintetico": true
+}

@@ -1,0 +1,42 @@
+{
+ "gerado_em": "2026-10-16T23:11:01-03:00",
+ "comando": "bash docs/exemplos/gerar_exemplo.sh --passos 19",
+ "passos_do_roteiro": 19,
+ "caminho": "com a foto do DANFE (roteiro do palco)",
+ "fixture_replay": {
+  "arquivo": "tests/unit/dados_agente/replay_demo_real_qwen35_4b.jsonl",
+  "sha256": "77d4825382a8a4aadb62593ec14332ac11a3fd7b71059f6fb1f30c9bfa170fc2"
+ },
+ "sha256_src": "52be6b825037b28f4f3351682167c011dcc5fdf63ec5febd7ff97b7631fdce01",
+ "sha256_src_no_registro": "52be6b825037b28f4f3351682167c011dcc5fdf63ec5febd7ff97b7631fdce01",
+ "sha256_src_lf": "5ddd97c65616470f11c2c5b09a9879915741b06730de13629a30083758205979",
+ "fiscalizacao_id": "fis_demo_0001",
+ "hash_raiz_assinado": "95656812f69472061103a79f8f5e05b9cc79fa87abe6bfba32ac97c05f187365",
+ "selo": "f3cdaccae1aad15e905e31127c3d770a96c6d3787a92dfc970998a6c58badb8f",
+ "template_sha256": "f20f9d261c016caaff1fd3a78c2881c4c05797929cf266cf64a197a16d3eb149",
+ "conferencia_na_instalacao": {
+  "valido": true,
+  "selo_confere": true,
+  "assinatura_confere": true,
+  "conteudo_confere": true,
+  "cadeia_confere": true,
+  "html_confere": true,
+  "aprovacoes_conferem": true,
+  "origem_conteudo": "conteudo_assinado",
+  "divergencias": [],
+  "avisos": [],
+  "motivo": "laudo selado confere"
+ },
+ "arquivos": {
+  "laudo_selado.json": "31af85dfeda10192b6d67c45a455fb9c62ee9b028f3be72a8408a8c6a11d4b76",
+  "laudo_selado.html": "c26269d454b7f4ee72730e9fb7723884cfba1531f97655228c75190c00e19e4a",
+  "laudo_selado.pdf": "140b732b9885279c289487e6eb3ddaf55c423881f8bac8d29659c2d12371e852",
+  "DEMONSTRACAO_pacote_exibicao.zip": "eea3ff73386b94327d44c7b93cc38e634f7c45a9817f0dac814daefc3ae9fbb9"
+ },
+ "versao_dos_numeros": {
+  "data": "2026-10-16",
+  "sufixo": "r4",
+  "sha256_src": "1154df4aceffbf203ac0e4b8dc81b4ba1eb1b328e649006b75e46e7821a90dbf",
+  "mesmo_codigo": false
+ }
+}

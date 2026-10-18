@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "359986",
+  "serie": "AC",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 20
+    }
+  ],
+  "total": 20,
+  "total_por_extenso": "VINTE BOVINOS",
+  "marca_rebanho": "MARCA TESTE 07",
+  "origem": {
+    "documento": "99999999505714",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 58 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 58",
+    "codigo_estabelecimento": "TESTE-5214606-9057",
+    "codigo_exploracao": "TESTE-5214606-9057-BOV",
+    "municipio_nome": "NIQUELÂNDIA",
+    "municipio_ibge": "5214606",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000015709",
+    "nome": "PRODUTOR TESTE 58",
+    "estabelecimento": "FAZENDA TESTE 58",
+    "codigo_estabelecimento": "TESTE-5206404-0058",
+    "codigo_exploracao": "TESTE-5206404-0058-BOV",
+    "municipio_nome": "CRIXÁS",
+    "municipio_ibge": "5206404",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST3B17"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-03-07"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE NIQUELÂNDIA"
+  },
+  "emissao": {
+    "local_municipio": "NIQUELÂNDIA",
+    "data": "2026-08-19",
+    "hora": "08:06",
+    "validade": "2026-08-21"
+  },
+  "nfe_chaves": [
+    "52260899999999505714550010000006111475329135"
+  ],
+  "codigo_barras": "SINTGOAC359986",
+  "sintetico": true
+}

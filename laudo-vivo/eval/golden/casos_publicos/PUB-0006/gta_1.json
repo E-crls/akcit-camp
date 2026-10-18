@@ -1,0 +1,65 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "570701",
+  "serie": "A",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "M",
+      "faixa_etaria": "13-24",
+      "quantidade": 40
+    }
+  ],
+  "total": 40,
+  "total_por_extenso": "QUARENTA BOVINOS",
+  "marca_rebanho": "MARCA TESTE PUB 06",
+  "origem": {
+    "documento": "99999999070645",
+    "documento_sha256": null,
+    "nome": "AGROPECUARIA VENDEDORA TESTE PUB 06 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE PUB 06",
+    "codigo_estabelecimento": "TESTE-5202502-9006",
+    "codigo_exploracao": null,
+    "municipio_nome": "ARUANÃ",
+    "municipio_ibge": "5202502",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000070645",
+    "documento_sha256": null,
+    "nome": "PRODUTOR TESTE PUB 06",
+    "estabelecimento": "FAZENDA TESTE PUB 06",
+    "codigo_estabelecimento": "TESTE-5213707-0006",
+    "codigo_exploracao": null,
+    "municipio_nome": "MONTES CLAROS DE GOIÁS",
+    "municipio_ibge": "5213707",
+    "uf": "GO"
+  },
+  "finalidade": "ENGORDA",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST6A01"
+  },
+  "vacinacoes": [],
+  "exames": [],
+  "observacao": "CARGA 1 DE 3",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE ARUANÃ"
+  },
+  "emissao": {
+    "local_municipio": "ARUANÃ",
+    "data": "2026-07-20",
+    "hora": "11:15",
+    "validade": "2026-07-22"
+  },
+  "nfe_chaves": [
+    "52260799999999070645550010000070061012820819"
+  ],
+  "codigo_barras": "SINTGOA570701",
+  "sintetico": true,
+  "fonte": "json",
+  "ilegiveis": []
+}

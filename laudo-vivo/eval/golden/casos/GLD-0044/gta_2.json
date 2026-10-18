@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "639863",
+  "serie": "A",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "13-24",
+      "quantidade": 22
+    }
+  ],
+  "total": 22,
+  "total_por_extenso": "VINTE E DOIS BOVINOS",
+  "marca_rebanho": "MARCA TESTE 43",
+  "origem": {
+    "documento": "00000054364",
+    "nome": "VENDEDOR TESTE 44",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 44",
+    "codigo_estabelecimento": "TESTE-5207535-9043",
+    "codigo_exploracao": "TESTE-5207535-9043-BOV",
+    "municipio_nome": "FAINA",
+    "municipio_ibge": "5207535",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999104302",
+    "nome": "AGROPECUARIA TOMADORA TESTE 44 LTDA",
+    "estabelecimento": "FAZENDA TESTE 44",
+    "codigo_estabelecimento": "TESTE-5217203-0044",
+    "codigo_exploracao": "TESTE-5217203-0044-BOV",
+    "municipio_nome": "PIRANHAS",
+    "municipio_ibge": "5217203",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST8J14"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-01-28"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 2 DE 2",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE FAINA"
+  },
+  "emissao": {
+    "local_municipio": "FAINA",
+    "data": "2026-08-28",
+    "hora": "18:31",
+    "validade": "2026-08-29"
+  },
+  "nfe_chaves": [
+    "52260800000000054364550010000057821855401636"
+  ],
+  "codigo_barras": "SINTGOA639863",
+  "sintetico": true
+}

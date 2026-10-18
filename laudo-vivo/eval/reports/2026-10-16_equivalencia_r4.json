@@ -1,0 +1,79 @@
+{
+ "data": "16/10/2026 23:01",
+ "referencia": {
+  "data": "2026-10-16",
+  "sufixo": "_r4",
+  "sha256_src": "1154df4aceffbf203ac0e4b8dc81b4ba1eb1b328e649006b75e46e7821a90dbf"
+ },
+ "sha256_src_atual": "52be6b825037b28f4f3351682167c011dcc5fdf63ec5febd7ff97b7631fdce01",
+ "sha256_eval_atual": "1b0c120f7d3a1ab88f2771a610471d0f212e15ea96fd29f89f5552c32788c0e1",
+ "manifesto": {
+  "arquivo": "eval/golden/casos/MANIFESTO.yaml",
+  "sha256_manifesto": "19850e2d567086199ae359212c14f88ded58e5afc6910a606642d7b250478aea",
+  "sha256_arquivos_test": "445ef2caf26c8301044995a1fb3bd31cd3c07e50752b11075c60111100a873a4",
+  "sha256_arquivos_dev": "03ee8e29c5230764d0100e56e0da774b36ec41b598ad64fbbce24c93fd4e96c9",
+  "n_arquivos": 460,
+  "conferido": "ok"
+ },
+ "motivo": "r4.1 (versao final, depois da revisao do P1): equivalencia apos correcoes de declaracao e PIN motivadas pelo red-team cego v3 e pela revisao; a rodada completa com o LLM fica para a r5 (o congelamento citado na conclusao padrao do script foi a r4)",
+ "conferencias": [
+  {
+   "nome": "golden set sem LLM (todas as métricas por split)",
+   "resultado": "igual",
+   "comparado": [
+    "splits"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "red-team sem LLM (resumo)",
+   "resultado": "igual",
+   "comparado": [
+    "resumo"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "A/B v2 (leituras e alegações gravadas; tudo menos config)",
+   "resultado": "igual",
+   "comparado": [
+    "principal",
+    "estabilidade_replicacoes",
+    "sensibilidade",
+    "leitura",
+    "fala",
+    "sanidade_oraculo",
+    "episodios"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "replay da demo na CLI, 19 passos com a foto do DANFE (gravado no código novo)",
+   "resultado": "igual",
+   "comparado": [
+    "requisições ao LLM fora da gravação",
+    "etapa final"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "replay da demo na CLI, só o XML, 17 passos (gravado em 08/10, antes das mudanças)",
+   "resultado": "igual",
+   "comparado": [
+    "requisições ao LLM fora da gravação",
+    "etapa final"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "contingência da interface, 19 passos pela API (gravada no código novo)",
+   "resultado": "igual",
+   "comparado": [
+    "requisições ao LLM fora da gravação",
+    "etapa final"
+   ],
+   "diferencas": []
+  }
+ ],
+ "conclusao": "métricas sem LLM idênticas e o contexto do LLM inalterado nas gravações: os números da referência continuam valendo para o código atual; a rodada completa com o LLM fica para o congelamento"
+}

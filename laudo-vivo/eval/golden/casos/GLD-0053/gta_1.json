@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "700052",
+  "serie": "GO",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 20
+    }
+  ],
+  "total": 20,
+  "total_por_extenso": "VINTE BOVINOS",
+  "marca_rebanho": "MARCA TESTE 02",
+  "origem": {
+    "documento": "00000055255",
+    "nome": "VENDEDOR TESTE 53",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 53",
+    "codigo_estabelecimento": "TESTE-5218003-9052",
+    "codigo_exploracao": "TESTE-5218003-9052-BOV",
+    "municipio_nome": "PORANGATU",
+    "municipio_ibge": "5218003",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000015202",
+    "nome": "PRODUTOR TESTE 53",
+    "estabelecimento": "FAZENDA TESTE 53",
+    "codigo_estabelecimento": "TESTE-5207535-0053",
+    "codigo_exploracao": "TESTE-5207535-0053-BOV",
+    "municipio_nome": "FAINA",
+    "municipio_ibge": "5207535",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST1H57"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-04-16"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE PORANGATU"
+  },
+  "emissao": {
+    "local_municipio": "PORANGATU",
+    "data": "2026-07-17",
+    "hora": "06:35",
+    "validade": "2026-07-19"
+  },
+  "nfe_chaves": [
+    "52260700000000055255550010000047431348861900"
+  ],
+  "codigo_barras": "SINTGOGO700052",
+  "sintetico": true
+}

@@ -1,0 +1,210 @@
+<!doctype html>
+{# filtro sem_ids v1 (laudo.formatacao.texto_sem_ids): mudar o filtro = mudar esta linha (sha256 do template) #}
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if l.demonstracao %}[DEMONSTRAÇÃO] {% endif %}Laudo de fiscalização {{ l.operacao.ref_bacen }}</title>
+<style>
+  :root {
+    --tinta: #1d232b; --suave: #5b6570; --linha: #d9dee3; --fundo: #ffffff; --faixa: #f5f7f9;
+    --ok: #1f6f43; --ok-bg: #e6f2eb; --div: #a32020; --div-bg: #fbe9e9;
+    --pend: #8a5a00; --pend-bg: #fdf3dc; --abs: #4b5563; --abs-bg: #eceff2; --acento: #24527a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--faixa); color: var(--tinta);
+         font: 14px/1.5 "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; }
+  main { max-width: 980px; margin: 24px auto; background: var(--fundo); padding: 40px 48px;
+         border: 1px solid var(--linha); position: relative; }
+  h1 { font: 600 22px/1.25 Georgia, "Times New Roman", serif; margin: 0 0 4px; }
+  h2 { font: 600 15px/1.3 "Segoe UI", system-ui, sans-serif; text-transform: uppercase; letter-spacing: .06em;
+       color: var(--acento); border-bottom: 1px solid var(--linha); padding-bottom: 6px; margin: 32px 0 12px; }
+  .sub { color: var(--suave); margin: 0 0 16px; }
+  .marca { position: absolute; top: 18px; right: 24px; font-size: 11px; font-weight: 700; letter-spacing: .12em;
+           color: var(--div); border: 1.5px solid var(--div); padding: 3px 8px; border-radius: 3px; }
+  .marca.selado { color: var(--ok); border-color: var(--ok); }
+  dl.grade { display: grid; grid-template-columns: 220px 1fr; gap: 4px 16px; margin: 0; }
+  dl.grade dt { color: var(--suave); }
+  dl.grade dd { margin: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; vertical-align: top; padding: 7px 8px; border-bottom: 1px solid var(--linha); }
+  th { font-weight: 600; color: var(--suave); background: var(--faixa); }
+  .st { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px;
+        text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+  .st-verificado, .st-ok { color: var(--ok); background: var(--ok-bg); }
+  .st-divergente { color: var(--div); background: var(--div-bg); }
+  .st-pendente, .st-erro { color: var(--pend); background: var(--pend-bg); }
+  .st-abstencao, .st-indeterminado { color: var(--abs); background: var(--abs-bg); }
+  code, .mono { font-family: Consolas, "SFMono-Regular", Menlo, monospace; font-size: 12px; }
+  .mono { overflow-wrap: anywhere; }
+  tr.agregado td { background: var(--faixa); }
+  a { color: var(--acento); }
+  .nota { color: var(--suave); font-size: 12px; }
+  .just { margin-top: 4px; font-size: 12px; border-left: 3px solid var(--acento); padding-left: 8px; }
+  .resumo { background: var(--faixa); border-left: 3px solid var(--acento); padding: 10px 14px; }
+  .assin { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 12px; }
+  .caixa { border: 1px solid var(--tinta); min-height: 120px; padding: 10px 12px; }
+  .caixa .lin { border-bottom: 1px solid var(--suave); height: 28px; margin-top: 18px; }
+  footer { margin-top: 32px; color: var(--suave); font-size: 11px; border-top: 1px solid var(--linha);
+           padding-top: 10px; }
+  .marca-dagua { position: fixed; inset: 0; pointer-events: none; z-index: 5; display: flex; align-items: center;
+                 justify-content: center; overflow: hidden; }
+  .marca-dagua span { transform: rotate(-28deg); font: 800 64px/1.1 "Segoe UI", system-ui, sans-serif;
+                      color: rgba(163, 32, 32, .11); white-space: nowrap; letter-spacing: .04em; }
+  .demo-faixa { border: 2px solid #b45309; background: #fff7ed; color: #7c2d12; padding: 10px 14px; margin: 0 0 16px;
+                font-weight: 600; }
+  .demo-faixa small { display: block; font-weight: 400; margin-top: 4px; color: #7c2d12; }
+  @media print { body { background: #fff; } main { border: 0; margin: 0; padding: 0 8mm; }
+                 a { color: var(--tinta); text-decoration: none; } }
+  @media (max-width: 640px) { main { padding: 24px 16px; } dl.grade { grid-template-columns: 1fr; }
+                              .assin { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+{% if l.demonstracao %}<div class="marca-dagua" aria-hidden="true"><span>{{ l.demonstracao.marca_dagua }}</span></div>{% endif %}
+<main>
+  {% if l.tipo == "selado" %}<div class="marca selado">SELADO · ASSINADO</div>
+  {% else %}<div class="marca">RASCUNHO · NÃO ASSINADO</div>{% endif %}
+  {% if l.demonstracao %}<div class="demo-faixa" role="note">{{ l.demonstracao.marca_dagua }}
+    <small>{{ l.demonstracao.aviso }}</small></div>{% endif %}
+  <h1>Laudo de fiscalização de crédito rural</h1>
+  <p class="sub">Operação {{ l.operacao.ref_bacen }} · {{ l.operacao.municipio_nome or "município não informado" }}/{{ l.operacao.uf }}
+    · referência {{ l.data_referencia }} · fiscalização <code>{{ l.fiscalizacao_id }}</code></p>
+
+  <div class="resumo">{{ l.resumo.texto }}</div>
+  {% if l.resumo.origem != "llm" %}<p class="nota">Texto gerado por template{% if l.resumo.motivo %} ({{ l.resumo.motivo | sem_ids }}){% endif %}.</p>{% endif %}
+
+  <h2>1. Identificação da operação</h2>
+  <dl class="grade">
+    <dt>Referência Bacen (Sicor)</dt><dd>{{ l.operacao.ref_bacen }}</dd>
+    <dt>Tomador (pseudônimo)</dt><dd>{{ l.operacao.tomador_ref }}</dd>
+    <dt>Instituição financeira</dt><dd>{{ l.operacao.instituicao or "não informada" }}</dd>
+    <dt>Finalidade / empreendimento</dt><dd>{{ l.operacao.finalidade or "—" }} / {{ l.operacao.empreendimento or "—" }}</dd>
+    <dt>Município (IBGE)</dt><dd>{{ l.operacao.municipio_nome or "—" }} ({{ l.operacao.municipio_ibge or "—" }}) – {{ l.operacao.uf }}</dd>
+    <dt>Data de contratação</dt><dd>{{ l.operacao.data_contratacao or "não informada" }}</dd>
+    <dt>Valor contratado</dt><dd>{{ l.operacao.valor_fmt }}</dd>
+    <dt>Área financiada</dt><dd>{{ l.operacao.area_fmt }}</dd>
+    <dt>Fonte dos dados</dt><dd>{{ l.operacao.fonte }}</dd>
+    {% set gj = l.operacao.glebas_geojson %}
+    <dt>Vetor da gleba (WGS84)</dt><dd>{% if gj and gj.features %}{% for g in gj.features %}gleba {{ g.properties.gleba }}: {{ ("%.2f" | format(g.properties.area_ha)) | replace(".", ",") }} ha, centroide <span class="mono">{{ g.properties.centroide | join(", ") }}</span>{% if not loop.last %}; {% endif %}{% endfor %}
+      <span class="nota">(polígono completo em GeoJSON no JSON deste laudo e no pacote de exibição)</span>{% else %}sem polígono da gleba{% endif %}</dd>
+  </dl>
+  {% if l.fotos_georreferenciadas %}
+  {% set desc_item = {} %}{% for it in l.itens %}{% if it.item_id %}{% set _ = desc_item.update({it.item_id: it.item_descricao}) %}{% endif %}{% endfor %}
+  <p class="nota">Fotos de campo: coordenadas e horário como registrados na evidência.</p>
+  <table>
+    <tr><th>Evidência</th><th>Item</th><th>Lat, lon (precisão)</th><th>Captura</th><th>Recebida</th></tr>
+    {% for f in l.fotos_georreferenciadas %}<tr><td><code>{{ f.evidencia_id }}</code></td><td title="{{ f.item_id or '' }}">{{ (desc_item.get(f.item_id) or f.item_id or "—").split(" (")[0] }}</td>
+      <td class="mono">{% if f.lat is not none %}{{ f.lat }}, {{ f.lon }} (±{{ f.precisao_m if f.precisao_m is not none else "?" }} m){% else %}sem GPS{% endif %}</td>
+      <td>{{ f.capturada_em or "sem horário" }}</td><td>{{ f.recebida_em or "—" }}</td></tr>{% endfor %}
+  </table>
+  {% endif %}
+
+  <h2>2. Método e metadados</h2>
+  <dl class="grade">
+    <dt>Método de fiscalização</dt><dd>{{ l.metodo.rotulo or l.metodo.metodo or "não definido" }}</dd>
+    {% if l.metodo.justificativa %}<dt>Justificativa do método</dt><dd>{{ l.metodo.justificativa | sem_ids }}</dd>{% endif %}
+    <dt>Rulebook</dt><dd>{{ l.metodo.rulebook_versao or "não informado" }}</dd>
+    <dt>Verificação de status</dt><dd>{{ l.metodo.verificacao }}{% if l.metodo.provisoria %} <span class="st st-pendente">regra provisória</span>{% endif %}</dd>
+  </dl>
+  {% if l.sensoriamento_remoto %}
+  <p class="nota">Sensoriamento remoto (MCR 2-7-4-b: satélite e sensor, datas, resoluções espacial e radiométrica, bandas, metodologia e uso das imagens na fiscalização).</p>
+  <table>
+    <tr><th>Checagem</th><th>Satélite / sensor</th><th>Datas</th><th>Resolução</th><th>Bandas</th><th>Metodologia</th><th>Uso na fiscalização</th></tr>
+    {% for s in l.sensoriamento_remoto %}
+    <tr><td><a href="#{{ s.checagem_id }}"><code>{{ s.checagem_id }}</code></a></td><td>{{ s.satelite }} · {{ s.sensor }}</td>
+        <td>{{ s.datas }}</td><td>{{ s.resolucao }} · {{ s.resolucao_radiometrica }}</td><td>{{ s.bandas }}</td>
+        <td>{{ s.metodologia }}</td><td>{{ s.uso }}</td></tr>
+    {% endfor %}
+  </table>
+  {% for a in l.atribuicoes or [] %}<p class="nota"><strong>{{ a }}.</strong></p>{% endfor %}
+  {% else %}<p class="nota">Nenhuma checagem por sensoriamento remoto nesta fiscalização.</p>{% endif %}
+
+  <h2>3. Itens financiados e prova</h2>
+  <table>
+    <tr><th>Item / aspecto</th><th>Status</th><th>Valor apurado</th><th>Origem do valor</th><th>Evidências</th><th>Checagens (trace)</th></tr>
+    {% for it in l.itens %}
+    <tr title="{{ it.campo }}"{% if it.agregado %} class="agregado"{% endif %}>
+      <td><strong>{{ it.item_descricao }}</strong><br><span class="nota">{{ it.aspecto }} · {{ it.regra_id }}</span>
+        {% if it.motivo %}<div class="nota">{{ it.motivo | sem_ids }}</div>{% endif %}
+        {% if it.justificativa_humana %}<div class="just">Justificativa do fiscal: “{{ it.justificativa_humana }}”</div>{% endif %}</td>
+      <td><span class="st st-{{ it.status }}">{{ it.status_rotulo }}</span></td>
+      <td>{{ it.valor_fmt }}</td>
+      <td class="nota">{{ it.proveniencia | join("; ") if it.proveniencia else "—" }}</td>
+      <td>{% for e in it.evidencias %}<a href="{{ e.uri }}" title="{{ e.id }}">{{ rotulo_tipo.get(e.tipo, e.tipo) }} {{ loop.index }}</a><br>{% else %}<span class="nota">—</span>{% endfor %}</td>
+      <td>{% for c in it.checagens %}<a href="#{{ c.id }}" title="{{ c.id }}">{{ rotulo_ferramenta.get(c.ferramenta, c.ferramenta) }}</a> <span class="st st-{{ c.status }}">{{ c.status }}</span>{% if c.span_id %} <a class="nota" href="{{ l.trace.uri }}#{{ c.span_id }}">trace {{ loop.index }}</a>{% endif %}<br>{% else %}<span class="nota">—</span>{% endfor %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h2>4. Ocorrências</h2>
+  {% if l.ocorrencias %}
+  <table>
+    <tr><th>Id</th><th>Tipo</th><th>Descrição</th><th>Quando</th></tr>
+    {% for o in l.ocorrencias %}<tr><td><code>{{ o.id }}</code></td><td>{{ o.tipo }}</td><td>{{ o.descricao }}</td><td>{{ o.em }}</td></tr>{% endfor %}
+  </table>
+  {% else %}<p class="nota">Nenhuma ocorrência registrada.</p>{% endif %}
+
+  <h2>5. Alegações × evidência</h2>
+  {% if l.alegacoes_x_evidencia %}
+  <p class="nota">O que o fiscal disse no campo, ao lado da prova que confronta cada afirmação ({{ l.regra_alegacoes }}).
+    A alegação nunca define o status de um campo: quem decide é o verificador, a partir das checagens.</p>
+  <table>
+    <tr><th>Trecho da fala</th><th>Valor alegado</th><th>Confronto</th><th>Evidência e motivo</th><th>Regra</th></tr>
+    {% for a in l.alegacoes_x_evidencia %}<tr><td>“{{ a.trecho }}”</td><td>{{ a.valor_fmt }}</td>
+      <td><span class="st st-{{ 'verificado' if a.status == 'confere' else ('divergente' if a.status == 'divergente' else 'pendente') }}">{{ a.status_rotulo }}</span></td>
+      <td>{{ a.motivo | sem_ids }}</td><td class="nota">{{ a.regra_id }}</td></tr>{% endfor %}
+  </table>
+  {% endif %}
+  <h3>Alegações registradas (com ponteiro para a fala)</h3>
+  {% if l.alegacoes %}
+  <table>
+    <tr><th>Id</th><th>Grandeza</th><th>Valor alegado</th><th>Trecho</th><th>Fonte</th></tr>
+    {% for a in l.alegacoes %}<tr><td><code>{{ a.id }}</code></td><td>{{ a.grandeza }}</td><td>{{ a.valor_fmt }} {{ a.unidade or "" }}</td>
+      <td>“{{ a.trecho }}”</td><td><code>{{ a.ponteiro.evidencia_id }}</code> [{{ a.ponteiro.inicio }}:{{ a.ponteiro.fim }}]</td></tr>{% endfor %}
+  </table>
+  <p class="nota">Alegação não define status: o status vem das checagens das ferramentas.</p>
+  {% else %}<p class="nota">Nenhuma alegação numérica extraída da fala.</p>{% endif %}
+
+  <h2>6. Checagens</h2>
+  <table>
+    <tr><th>Id</th><th>Ferramenta</th><th>Status</th><th>Entrada (hash)</th><th>Span</th><th>Fonte/versão</th></tr>
+    {% for c in l.checagens %}
+    <tr id="{{ c.id }}"><td><code>{{ c.id }}</code></td><td>{{ rotulo_ferramenta.get(c.ferramenta, c.ferramenta) }} <span class="nota">({{ c.ferramenta }})</span></td><td><span class="st st-{{ c.status }}">{{ c.status }}</span></td>
+      <td class="mono">{{ c.entrada_hash }}</td><td>{% if c.span_id %}<a class="mono" href="{{ l.trace.uri }}#{{ c.span_id }}">{{ c.span_id }}</a>{% else %}—{% endif %}</td>
+      <td class="nota">{{ c.fonte_versao or "—" }}</td></tr>
+    {% endfor %}
+  </table>
+
+  <h2>7. Integridade</h2>
+  <dl class="grade">
+    <dt>Evidências na cadeia</dt><dd>{{ l.cadeia.n }} ({{ "íntegra" if l.cadeia.integra else "QUEBRADA" }})</dd>
+    <dt>Raiz da cadeia</dt><dd class="mono">{{ l.cadeia.raiz }}</dd>
+    <dt>Hash raiz do laudo</dt><dd class="mono"><strong>{{ l.hash_raiz }}</strong></dd>
+    <dt>Trace (OpenTelemetry, JSONL)</dt><dd><a class="mono" href="{{ l.trace.uri }}">{{ l.trace.arquivo }}</a></dd>
+  </dl>
+
+  <h2>8. Assinatura humana</h2>
+  {% if l.assinaturas %}
+    {% for a in l.assinaturas %}
+    <dl class="grade"><dt>Papel</dt><dd>{{ a.papel }}</dd><dt>Responsável (ref.)</dt><dd>{{ a.nome_ref }}</dd>
+      <dt>Assinado em</dt><dd>{{ a.em }}</dd><dt>Hash assinado</dt><dd class="mono">{{ a.hash_assinado }}</dd></dl>
+    {% endfor %}
+    <p class="nota">Selo: <span class="mono">{{ l.selo }}</span></p>
+  {% else %}
+  <p class="nota">O agente não assina (POL-03). Confira o hash raiz acima antes de assinar.</p>
+  <div class="assin">
+    <div class="caixa">Fiscal responsável<div class="lin"></div><span class="nota">Nome, registro e data</span></div>
+    <div class="caixa">Agrônomo responsável (ART)<div class="lin"></div><span class="nota">Nome, CREA/ART e data</span></div>
+  </div>
+  {% endif %}
+
+  <footer>
+    {% if l.demonstracao %}<strong>{{ l.demonstracao.marca_dagua }}.</strong> {{ l.demonstracao.aviso }}<br>{% endif %}
+    {% for a in l.atribuicoes or [] %}{{ a }}.<br>{% endfor %}
+    Gerado por Laudo Vivo {{ l.versao }} em {{ l.gerado_em }}. Status atribuído pelo verificador ({{ l.metodo.verificacao }}),
+    nunca pelo modelo de linguagem. Cada item aponta para a evidência, a checagem e o span do trace.
+  </footer>
+</main>
+</body>
+</html>

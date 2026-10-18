@@ -1,0 +1,93 @@
+{
+ "data": "16/10/2026 01:47",
+ "referencia": {
+  "data": "2026-10-09",
+  "sufixo": "_r3",
+  "sha256_src": "c297955f9b44ad3792fbbe5f07044650cae1d188c3cbad3d5cc7292563cd62d5"
+ },
+ "sha256_src_atual": "52b82f0bf2168d4fac2d1dd5ab1b9407a85a4dab51ebb7f58c055586ebdbae94",
+ "motivo": "congelamento do split de teste em 16/10/2026; codigo das frentes da madrugada de 16/10",
+ "conferencias": [
+  {
+   "nome": "golden set sem LLM (todas as métricas por split)",
+   "resultado": "igual",
+   "comparado": [
+    "splits"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "red-team sem LLM (resumo)",
+   "resultado": "igual",
+   "comparado": [
+    "resumo"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "A/B v2 (leituras e alegações gravadas; tudo menos config)",
+   "resultado": "igual",
+   "comparado": [
+    "principal",
+    "estabilidade_replicacoes",
+    "sensibilidade",
+    "leitura",
+    "fala",
+    "sanidade_oraculo",
+    "episodios"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "replay da demo na CLI, 19 passos com a foto do DANFE (gravado no código novo)",
+   "resultado": "igual",
+   "comparado": [
+    "requisições ao LLM fora da gravação",
+    "etapa final"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "replay da demo na CLI, só o XML, 17 passos (gravado em 08/10, antes das mudanças)",
+   "resultado": "igual",
+   "comparado": [
+    "requisições ao LLM fora da gravação",
+    "etapa final"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "contingência da interface, 19 passos pela API (gravada no código novo)",
+   "resultado": "igual",
+   "comparado": [
+    "requisições ao LLM fora da gravação",
+    "etapa final"
+   ],
+   "diferencas": []
+  }
+ ],
+ "conclusao": "métricas sem LLM idênticas e o contexto do LLM inalterado nas gravações: os números da referência continuam valendo para o código atual; a rodada completa com o LLM fica para o congelamento",
+ "historico": [
+  {
+   "data": "16/10/2026 01:02",
+   "sha256_src_atual": "48f0d4f9253706498f295900d7970308f307a1d3f13a59f752aa90752dddff85",
+   "resultado": {
+    "golden set sem LLM (todas as métricas por split)": "igual",
+    "red-team sem LLM (resumo)": "igual",
+    "A/B v2 (leituras e alegações gravadas; tudo menos config)": "igual",
+    "replay da demo na CLI, 19 passos com a foto do DANFE (gravado no código novo)": "igual",
+    "replay da demo na CLI, só o XML, 17 passos (gravado em 08/10, antes das mudanças)": "igual",
+    "contingência da interface, 19 passos pela API (gravada no código novo)": "DIFERENTE"
+   },
+   "diferencas": {
+    "contingência da interface, 19 passos pela API (gravada no código novo)": [
+     [
+      "[18] Assinatura humana (PIN + hash):"
+     ]
+    ]
+   },
+   "causa": "relógio: a API carimbava Evidencia.recebida_em com a hora da máquina; as fotos da cerca do DEMO-0001 têm EXIF de 08/10/2026 e passaram de 72 h, o rascunho não saía e o passo 18 (assinatura) quebrava. Corrigido por outra frente em src/laudo/api/casos.py (16/10, 01:24): o recebimento vem do caso (recebida_em do caso.yaml), como na CLI."
+  }
+ ],
+ "nota": "Executado com uma cópia de eval/conferir_equivalencia.py que grava fora do repositório, para não sobrescrever eval/reports/2026-10-09_equivalencia_r3.*, que scripts/gerar_numeros.py cita."
+}

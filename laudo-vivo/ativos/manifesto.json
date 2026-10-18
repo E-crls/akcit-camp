@@ -1,0 +1,119 @@
+{
+ "descricao": "Ativos da demo com ferramentas reais (DEMO-0001), copiados de ativos/demo/ para dados_locais/ por scripts/preparar_demo.py. Nada aqui é dado pessoal.",
+ "grupos": [
+  {
+   "prefixo": "video/",
+   "o_que_e": "vídeo semissintético de corredor do curral (15 bovinos, 17,3 s) do caso DEMO-0001",
+   "origem": "eval/golden/visao/gerar_semissintetico.py (semente 20261008) sobre recortes dos vídeos 'Cows at Dharmasthala (2025) 01.webm' (Gpkp, CC BY-SA 4.0) e 'Herding the cows video.webm' (Marie Nouvellon, CC BY 2.0), do Wikimedia Commons",
+   "licenca": "CC BY-SA 4.0 (obra derivada; ver THIRD_PARTY.md)",
+   "atribuicao": "Gpkp (CC BY-SA 4.0) e Marie Nouvellon (CC BY 2.0), via Wikimedia Commons"
+  },
+  {
+   "prefixo": "ndvi/",
+   "o_que_e": "busca STAC e estatísticas de NDVI por data da gleba do DEMO-0001 (hash da geometria dda9cb9b2585de90, período 2026-03-16 a 2026-10-08)",
+   "origem": "laudo.geo.ndvi.serie_ndvi sobre Sentinel-2 L2A (coleção sentinel-2-c1-l2a do Earth Search, Element 84, AWS Open Data)",
+   "licenca": "Sentinel Data Legal Notice (Copernicus): uso livre, completo e aberto",
+   "atribuicao": "Contém dados Copernicus Sentinel modificados (2026)"
+  }
+ ],
+ "arquivos": [
+  {
+   "caminho": "video/s03_fila_colada.mp4",
+   "destino": "dados_locais/videos/sinteticos/s03_fila_colada.mp4",
+   "sha256": "928260d7c838b86507e584d081061fdd76fea9bab53eb582ed45beef098c963f",
+   "bytes": 1171672,
+   "grupo": "video/"
+  },
+  {
+   "caminho": "ndvi/2026-04-06.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-04-06/S2B_T22LFH_20260406T133546_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "014cddb3559b44e1e307e6ca38dda3420632ed0d0ffd34d46d02021d14333da0",
+   "bytes": 357,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/2026-04-23.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-04-23/S2A_T22LFH_20260423T133252_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "05e0ffb053f5a56d51511f53178f40cc230a3b5e84d176a2f0c3fafd6ab3b636",
+   "bytes": 357,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/2026-04-26.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-04-26/S2B_T22LFH_20260426T133141_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "c491640b0b94fc5b9a3c3258dcb4f492822cf09aa2ccf47df400cdd3c906a77e",
+   "bytes": 358,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/2026-05-21.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-05-21/S2C_T22LFH_20260521T133144_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "d0af71d78866e8443cddab619957b98bdf90dd3e2849528d049dcc484576db6f",
+   "bytes": 360,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/2026-06-05.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-06-05/S2B_T22LFH_20260605T133359_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "4b32d0bd80ca5ec57ff6f79709f2a924168d93935d0eb5641affcf0784e6a8ff",
+   "bytes": 357,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/2026-06-30.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-06-30/S2C_T22LFH_20260630T133143_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "c0eea566de5baa84e8ccbc0e12db4c2cf53df3adfef5a018e464ec65cb65318e",
+   "bytes": 355,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/2026-07-02.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-07-02/S2A_T22LFH_20260702T133239_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "420468de8826434ed351183c4e1d14129b7963aa82db4315f9a914584d9e4bae",
+   "bytes": 358,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/2026-07-20.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-07-20/S2C_T22LFH_20260720T133146_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "d18dc3ff6d3273a5f0d4aa6d298be6b1bc3438be99280b2fbfa1c3fa35090ec7",
+   "bytes": 358,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/2026-08-19.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-08-19/S2C_T22LFH_20260819T133142_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "04f89aff79efedd485d96576480b8218e8e59d2bf35b8e3cd4c425b2b0dda1d2",
+   "bytes": 359,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/2026-08-31.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-08-31/S2A_T22LFH_20260831T133237_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "bd3723b7a2b5ad6d895b49cb525889e52903d256f6793b3da23e1892653efb45",
+   "bytes": 359,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/2026-09-20.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-09-20/S2A_T22LFH_20260920T133236_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "89c22a8c930c6c255ffc61c2c7f85c77e37248dd1930cef003317ab3d030b0fe",
+   "bytes": 357,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/2026-09-28.json",
+   "destino": "dados_locais/ndvi_cache/22LFH/2026-09-28/S2C_T22LFH_20260928T133352_L2A_dda9cb9b2585de90_ndvi-s2c1-scl456-v1.json",
+   "sha256": "5d313e05e73f1514a8f7f4920fe5a7d7b1126f4246a83ccb4e6dbd29bde9f72b",
+   "bytes": 358,
+   "grupo": "ndvi/"
+  },
+  {
+   "caminho": "ndvi/stac_dda9cb9b2585de90.json",
+   "destino": "dados_locais/ndvi_cache/stac/dda9cb9b2585de90_2026-03-16_2026-10-08_sentinel-2-c1-l2a_80.json",
+   "sha256": "4f4a2e4536a2d8ed78d40beeecafa6e6e2a20a4231d3f2fde86d2053162b2521",
+   "bytes": 62109,
+   "grupo": "ndvi/"
+  }
+ ]
+}

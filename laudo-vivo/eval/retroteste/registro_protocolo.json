@@ -1,0 +1,6 @@
+{
+ "protocolo": "eval/retroteste/PROTOCOLO.md",
+ "sha256": "e48cf6edbecc2656b8cc8f0896df392ede161a116b44264b6d0afc984d32d5cc",
+ "registrado_em": "2026-10-16T01:06:42-0300",
+ "observacao": "hash gravado antes de qualquer cruzamento entre pontuacao e rotulo; rodar.py confere"
+}

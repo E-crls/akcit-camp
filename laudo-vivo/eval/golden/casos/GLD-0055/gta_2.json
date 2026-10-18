@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "682690",
+  "serie": "AC",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "13-24",
+      "quantidade": 30
+    }
+  ],
+  "total": 30,
+  "total_por_extenso": "TRINTA BOVINOS",
+  "marca_rebanho": "MARCA TESTE 04",
+  "origem": {
+    "documento": "99999999505471",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 55 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 55",
+    "codigo_estabelecimento": "TESTE-5202502-9054",
+    "codigo_exploracao": "TESTE-5202502-9054-BOV",
+    "municipio_nome": "ARUANÃ",
+    "municipio_ibge": "5202502",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999105457",
+    "nome": "AGROPECUARIA TOMADORA TESTE 55 LTDA",
+    "estabelecimento": "FAZENDA TESTE 55",
+    "codigo_estabelecimento": "TESTE-5220207-0055",
+    "codigo_exploracao": "TESTE-5220207-0055-BOV",
+    "municipio_nome": "SÃO MIGUEL DO ARAGUAIA",
+    "municipio_ibge": "5220207",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST2A98"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2025-07-27"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 2 DE 2",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE ARUANÃ"
+  },
+  "emissao": {
+    "local_municipio": "ARUANÃ",
+    "data": "2026-08-22",
+    "hora": "18:38",
+    "validade": "2026-08-25"
+  },
+  "nfe_chaves": [
+    "52260899999999505471550010000040081166360714"
+  ],
+  "codigo_barras": "SINTGOAC682690",
+  "sintetico": true
+}

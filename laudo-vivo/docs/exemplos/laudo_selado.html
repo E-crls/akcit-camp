@@ -1,0 +1,375 @@
+<!doctype html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[DEMONSTRAÇÃO] Laudo de fiscalização 000000001</title>
+<style>
+  :root {
+    --tinta: #1d232b; --suave: #5b6570; --linha: #d9dee3; --fundo: #ffffff; --faixa: #f5f7f9;
+    --ok: #1f6f43; --ok-bg: #e6f2eb; --div: #a32020; --div-bg: #fbe9e9;
+    --pend: #8a5a00; --pend-bg: #fdf3dc; --abs: #4b5563; --abs-bg: #eceff2; --acento: #24527a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--faixa); color: var(--tinta);
+         font: 14px/1.5 "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; }
+  main { max-width: 980px; margin: 24px auto; background: var(--fundo); padding: 40px 48px;
+         border: 1px solid var(--linha); position: relative; }
+  h1 { font: 600 22px/1.25 Georgia, "Times New Roman", serif; margin: 0 0 4px; }
+  h2 { font: 600 15px/1.3 "Segoe UI", system-ui, sans-serif; text-transform: uppercase; letter-spacing: .06em;
+       color: var(--acento); border-bottom: 1px solid var(--linha); padding-bottom: 6px; margin: 32px 0 12px; }
+  .sub { color: var(--suave); margin: 0 0 16px; }
+  .marca { position: absolute; top: 18px; right: 24px; font-size: 11px; font-weight: 700; letter-spacing: .12em;
+           color: var(--div); border: 1.5px solid var(--div); padding: 3px 8px; border-radius: 3px; }
+  .marca.selado { color: var(--ok); border-color: var(--ok); }
+  dl.grade { display: grid; grid-template-columns: 220px 1fr; gap: 4px 16px; margin: 0; }
+  dl.grade dt { color: var(--suave); }
+  dl.grade dd { margin: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; vertical-align: top; padding: 7px 8px; border-bottom: 1px solid var(--linha); }
+  th { font-weight: 600; color: var(--suave); background: var(--faixa); }
+  .st { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px;
+        text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+  .st-verificado, .st-ok { color: var(--ok); background: var(--ok-bg); }
+  .st-divergente { color: var(--div); background: var(--div-bg); }
+  .st-pendente, .st-erro { color: var(--pend); background: var(--pend-bg); }
+  .st-abstencao, .st-indeterminado { color: var(--abs); background: var(--abs-bg); }
+  code, .mono { font-family: Consolas, "SFMono-Regular", Menlo, monospace; font-size: 12px; }
+  .mono { overflow-wrap: anywhere; }
+  tr.agregado td { background: var(--faixa); }
+  a { color: var(--acento); }
+  .nota { color: var(--suave); font-size: 12px; }
+  .just { margin-top: 4px; font-size: 12px; border-left: 3px solid var(--acento); padding-left: 8px; }
+  .resumo { background: var(--faixa); border-left: 3px solid var(--acento); padding: 10px 14px; }
+  .assin { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 12px; }
+  .caixa { border: 1px solid var(--tinta); min-height: 120px; padding: 10px 12px; }
+  .caixa .lin { border-bottom: 1px solid var(--suave); height: 28px; margin-top: 18px; }
+  footer { margin-top: 32px; color: var(--suave); font-size: 11px; border-top: 1px solid var(--linha);
+           padding-top: 10px; }
+  .marca-dagua { position: fixed; inset: 0; pointer-events: none; z-index: 5; display: flex; align-items: center;
+                 justify-content: center; overflow: hidden; }
+  .marca-dagua span { transform: rotate(-28deg); font: 800 64px/1.1 "Segoe UI", system-ui, sans-serif;
+                      color: rgba(163, 32, 32, .11); white-space: nowrap; letter-spacing: .04em; }
+  .demo-faixa { border: 2px solid #b45309; background: #fff7ed; color: #7c2d12; padding: 10px 14px; margin: 0 0 16px;
+                font-weight: 600; }
+  .demo-faixa small { display: block; font-weight: 400; margin-top: 4px; color: #7c2d12; }
+  @media print { body { background: #fff; } main { border: 0; margin: 0; padding: 0 8mm; }
+                 a { color: var(--tinta); text-decoration: none; } }
+  @media (max-width: 640px) { main { padding: 24px 16px; } dl.grade { grid-template-columns: 1fr; }
+                              .assin { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="marca-dagua" aria-hidden="true"><span>DEMONSTRAÇÃO — dados sintéticos</span></div>
+<main>
+  <div class="marca selado">SELADO · ASSINADO</div>
+  
+  <div class="demo-faixa" role="note">DEMONSTRAÇÃO — dados sintéticos
+    <small>Operação fictícia de demonstração: REF, instituição, datas, valores, área e geometria foram alterados a partir de um registro público do Sicor/BCB; dados de campo (vídeo, fotos, falas), documentos (NF-e, GTA) e todos os defeitos são sintéticos e plantados. Não descreve nenhuma operação, propriedade ou produtor real.</small></div>
+  <h1>Laudo de fiscalização de crédito rural</h1>
+  <p class="sub">Operação 000000001 · Petrolina de Goiás/GO
+    · referência 2026-10-08 · fiscalização <code>fis_demo_0001</code></p>
+
+  <div class="resumo">Fiscalização autofiscalização assistida da operação 000000001: 8 aspecto(s) verificado(s), 2 divergente(s) (2 com justificativa do fiscal). 2 ocorrência(s) registrada(s). Cada item abaixo aponta para a evidência, a checagem e o trace; o status foi atribuído pelo verificador, não pelo modelo de linguagem.</div>
+  <p class="nota">Texto gerado por template.</p>
+
+  <h2>1. Identificação da operação</h2>
+  <dl class="grade">
+    <dt>Referência Bacen (Sicor)</dt><dd>000000001</dd>
+    <dt>Tomador (pseudônimo)</dt><dd>hmac:3c5cc6c1f4e844a27d0aa97849671242998719c61e50d24ce97c51bdd6ca37ea</dd>
+    <dt>Instituição financeira</dt><dd>COOPERATIVA DE CRÉDITO DEMONSTRAÇÃO (fictícia)</dd>
+    <dt>Finalidade / empreendimento</dt><dd>investimento / Investimento · Pecuário(a) · AQUISIÇÃO DE ANIMAIS · BOVINOS</dd>
+    <dt>Município (IBGE)</dt><dd>Petrolina de Goiás (5216809) – GO</dd>
+    <dt>Data de contratação</dt><dd>2026-03-16</dd>
+    <dt>Valor contratado</dt><dd>R$ 250.800</dd>
+    <dt>Área financiada</dt><dd>4,86 ha</dd>
+    <dt>Fonte dos dados</dt><dd>sintetico+sicor_derivado</dd>
+    
+    <dt>Vetor da gleba (WGS84)</dt><dd>gleba 1: 4,82 ha, centroide <span class="mono">-49.4084322, -16.1151182</span>
+      <span class="nota">(polígono completo em GeoJSON no JSON deste laudo e no pacote de exibição)</span></dd>
+  </dl>
+  
+  
+  <p class="nota">Fotos de campo: coordenadas e horário como registrados na evidência.</p>
+  <table>
+    <tr><th>Evidência</th><th>Item</th><th>Lat, lon (precisão)</th><th>Captura</th><th>Recebida</th></tr>
+    <tr><td><code>ev_87670a2ba6</code></td><td title="cerca1">Construção de 1200 m de cerca de arame liso 5 fios</td>
+      <td class="mono">-16.1196436, -49.4143369 (±6.5 m)</td>
+      <td>2026-10-08T10:12:05-03:00</td><td>2026-10-08T10:32:05-03:00</td></tr><tr><td><code>ev_7ebf34f29d</code></td><td title="cerca1">Construção de 1200 m de cerca de arame liso 5 fios</td>
+      <td class="mono">-16.1156661, -49.4094048 (±5.8 m)</td>
+      <td>2026-10-08T11:05:40-03:00</td><td>2026-10-08T11:16:40-03:00</td></tr>
+  </table>
+  
+
+  <h2>2. Método e metadados</h2>
+  <dl class="grade">
+    <dt>Método de fiscalização</dt><dd>autofiscalização assistida</dd>
+    <dt>Justificativa do método</dt><dd>Aquisição de 29 vacas leiteiras (matrizes): autofiscalização assistida (prioridade média; enquadramento documental); Construção de 1200 m de cerca de arame liso 5 fios: autofiscalização assistida (prioridade média; não obrigatório: finalidade=investimento; contratação=2026-03-16; área total=4,86 ha</dd>
+    <dt>Rulebook</dt><dd>rulebook-mcr-2-7@0.5.0</dd>
+    <dt>Verificação de status</dt><dd>rulebook-mcr-2-7@0.5.0</dd>
+  </dl>
+  
+  <p class="nota">Sensoriamento remoto (MCR 2-7-4-b: satélite e sensor, datas, resoluções espacial e radiométrica, bandas, metodologia e uso das imagens na fiscalização).</p>
+  <table>
+    <tr><th>Checagem</th><th>Satélite / sensor</th><th>Datas</th><th>Resolução</th><th>Bandas</th><th>Metodologia</th><th>Uso na fiscalização</th></tr>
+    
+    <tr><td><a href="#chk_90376cae15"><code>chk_90376cae15</code></a></td><td>sentinel-2a, sentinel-2b, sentinel-2c · MSI (MultiSpectral Instrument) — Sentinel-2 L2A, coleção sentinel-2-c1-l2a (Earth Search / Element 84, COG)</td>
+        <td>2026-04-06, 2026-04-23, 2026-04-26, 2026-05-21, 2026-06-05, 2026-06-30, 2026-07-02, 2026-07-20, 2026-08-19, 2026-08-31, 2026-09-20, 2026-09-28</td><td>10 m · 12 bits</td><td>B04: vermelho, 665 nm, 10 m; B08: infravermelho próximo, 842 nm, 10 m; SCL: classificação de cena, 20 m (replicada para 10 m)</td>
+        <td>ndvi-s2c1-scl456-v1: NDVI=(B08-B04)/(B08+B04) sobre reflectância de superfície; pixels com centro no polígono; limpos = SCL [4, 5, 6]; NDVI em SCL [4, 5]; data limpa se fração limpa &gt;= 0.6; até 12 datas (menos nublada por faixa do período); nuvem da cena &lt;= 80.0%</td><td>A série de NDVI da gleba (mediana p50 por data limpa) indica presença e vigor de vegetação (pastagem) ao longo do período, para apurar a existência de pastagem compatível com o empreendimento pecuário (MCR 2-7-9). Não conta animais nem identifica benfeitorias; se for inconclusiva, a fiscalização segue pelos métodos documental e presencial (MCR 2-7-10).</td></tr>
+    
+  </table>
+  <p class="nota"><strong>Contém dados Copernicus Sentinel modificados (2026).</strong></p>
+  
+
+  <h2>3. Itens financiados e prova</h2>
+  <table>
+    <tr><th>Item / aspecto</th><th>Status</th><th>Valor apurado</th><th>Origem do valor</th><th>Evidências</th><th>Checagens (trace)</th></tr>
+    
+    <tr title="item:bov1:quantidade">
+      <td><strong>Aquisição de 29 vacas leiteiras (matrizes) — Sicor: AQUISIÇÃO DE ANIMAIS — BOVINOS (LEITE - MATRIZES  (VACAS E CRIAS FÊMEAS PARA POVOAMENTO))</strong><br><span class="nota">Quantidade (contagem) · OP-bovinos-contagem-tolerancia</span>
+        <div class="nota">contagem 12 [12, 17] vs financiado 29 (limite 27,55): abaixo do limite mesmo no extremo superior</div>
+        <div class="just">Justificativa do fiscal: “Confirmo a divergência na contagem: no curral só estava o lote filmado e o produtor não apresentou as vacas do pasto de cima.”</div></td>
+      <td><span class="st st-divergente">divergente</span></td>
+      <td>12 (12 a 17)</td>
+      <td class="nota">vídeo (contagem por visão computacional); justificativa do fiscal</td>
+      <td><a href="../../../laudo-vivo/dados_locais/videos/sinteticos/s03_fila_colada.mp4" title="ev_c17c6be178">Vídeo 1</a><br><a href="../../evidencias/visao/928260d7c838/linha_5e2466_000074.jpg" title="ev_160f4a8312">Quadro-chave 2</a><br><a href="../../evidencias/visao/928260d7c838/linha_5e2466_000120.jpg" title="ev_cea0a94ffd">Quadro-chave 3</a><br><a href="../../evidencias/visao/928260d7c838/linha_5e2466_000184.jpg" title="ev_6a0360a644">Quadro-chave 4</a><br><a href="../../evidencias/visao/928260d7c838/linha_5e2466_000257.jpg" title="ev_4ceae84d6a">Quadro-chave 5</a><br></td>
+      <td><a href="#chk_6d2b36962b" title="chk_6d2b36962b">Contagem no vídeo</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#4fb4c90923c2b8a5">trace 1</a><br></td>
+    </tr>
+    
+    <tr title="item:bov1:comprovante_nfe">
+      <td><strong>Aquisição de 29 vacas leiteiras (matrizes) — Sicor: AQUISIÇÃO DE ANIMAIS — BOVINOS (LEITE - MATRIZES  (VACAS E CRIAS FÊMEAS PARA POVOAMENTO))</strong><br><span class="nota">Comprovante de aquisição (NF-e) · MCR-2-5-item10-comprovante-aquisicao</span>
+        <div class="nota">todos os critérios conferem</div>
+        </td>
+      <td><span class="st st-verificado">verificado</span></td>
+      <td>—</td>
+      <td class="nota">XML da NF-e</td>
+      <td><a href="../../../laudo-vivo/eval/golden/demo/DEMO-0001/nfe_1.xml" title="ev_b9edcd3dcc">NF-e (XML) 1</a><br></td>
+      <td><a href="#chk_e88fe77d76" title="chk_e88fe77d76">Conciliação da NF-e</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#124baf2a086143b7">trace 1</a><br></td>
+    </tr>
+    
+    <tr title="item:bov1:gta">
+      <td><strong>Aquisição de 29 vacas leiteiras (matrizes) — Sicor: AQUISIÇÃO DE ANIMAIS — BOVINOS (LEITE - MATRIZES  (VACAS E CRIAS FÊMEAS PARA POVOAMENTO))</strong><br><span class="nota">GTA · OP-bovinos-gta</span>
+        <div class="nota">divergente (GTA GO-B-418038 emitida 4 dias antes da NF-e; em GO a chave da NF-e é exigida no SIDAGO para autorizar a GTA (desde 31/03/2025))</div>
+        <div class="just">Justificativa do fiscal: “Confirmo a divergência da GTA: ela foi emitida antes da nota fiscal; a cooperativa vai pedir a explicação ao vendedor.”</div></td>
+      <td><span class="st st-divergente">divergente</span></td>
+      <td>—</td>
+      <td class="nota">e-GTA (JSON); justificativa do fiscal</td>
+      <td><a href="../../../laudo-vivo/eval/golden/demo/DEMO-0001/gta_1.json" title="ev_b5ba47325f">e-GTA 1</a><br></td>
+      <td><a href="#chk_af3d0e6261" title="chk_af3d0e6261">Conciliação da GTA</a> <span class="st st-divergente">divergente</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#cbe1cc25f752561d">trace 1</a><br></td>
+    </tr>
+    
+    <tr title="item:bov1" class="agregado">
+      <td><strong>Aquisição de 29 vacas leiteiras (matrizes) — Sicor: AQUISIÇÃO DE ANIMAIS — BOVINOS (LEITE - MATRIZES  (VACAS E CRIAS FÊMEAS PARA POVOAMENTO))</strong><br><span class="nota">Resultado do item · OP-agregacao-item</span>
+        <div class="nota">divergente: quantidade, gta</div>
+        </td>
+      <td><span class="st st-divergente">divergente</span></td>
+      <td>—</td>
+      <td class="nota">XML da NF-e; e-GTA (JSON); vídeo (contagem por visão computacional)</td>
+      <td><a href="../../../laudo-vivo/dados_locais/videos/sinteticos/s03_fila_colada.mp4" title="ev_c17c6be178">Vídeo 1</a><br><a href="../../evidencias/visao/928260d7c838/linha_5e2466_000074.jpg" title="ev_160f4a8312">Quadro-chave 2</a><br><a href="../../evidencias/visao/928260d7c838/linha_5e2466_000120.jpg" title="ev_cea0a94ffd">Quadro-chave 3</a><br><a href="../../evidencias/visao/928260d7c838/linha_5e2466_000184.jpg" title="ev_6a0360a644">Quadro-chave 4</a><br><a href="../../evidencias/visao/928260d7c838/linha_5e2466_000257.jpg" title="ev_4ceae84d6a">Quadro-chave 5</a><br><a href="../../../laudo-vivo/eval/golden/demo/DEMO-0001/nfe_1.xml" title="ev_b9edcd3dcc">NF-e (XML) 6</a><br><a href="../../../laudo-vivo/eval/golden/demo/DEMO-0001/gta_1.json" title="ev_b5ba47325f">e-GTA 7</a><br></td>
+      <td><a href="#chk_6d2b36962b" title="chk_6d2b36962b">Contagem no vídeo</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#4fb4c90923c2b8a5">trace 1</a><br><a href="#chk_e88fe77d76" title="chk_e88fe77d76">Conciliação da NF-e</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#124baf2a086143b7">trace 2</a><br><a href="#chk_af3d0e6261" title="chk_af3d0e6261">Conciliação da GTA</a> <span class="st st-divergente">divergente</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#cbe1cc25f752561d">trace 3</a><br></td>
+    </tr>
+    
+    <tr title="item:cerca1:integridade_foto">
+      <td><strong>Construção de 1200 m de cerca de arame liso 5 fios (projeto sintético; Sicor: Benfeitorias (terraços, porteiras, mata-burros, currais, cochos ou cercas; o Sicor não discrimina o tipo, confirmar no projeto))</strong><br><span class="nota">Integridade da foto · OP-evidencia-integridade-foto</span>
+        <div class="nota">Integridade da foto: ok</div>
+        </td>
+      <td><span class="st st-verificado">verificado</span></td>
+      <td>—</td>
+      <td class="nota">foto georreferenciada</td>
+      <td><a href="../../../laudo-vivo/eval/golden/demo/DEMO-0001/fotos/foto_cerca_1.jpg" title="ev_87670a2ba6">Foto 1</a><br><a href="../../../laudo-vivo/eval/golden/demo/DEMO-0001/fotos/foto_cerca_2.jpg" title="ev_7ebf34f29d">Foto 2</a><br></td>
+      <td><a href="#chk_644e9b1fce" title="chk_644e9b1fce">Integridade da foto</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#b4b305b9bfd026ad">trace 1</a><br><a href="#chk_213edc6a36" title="chk_213edc6a36">Integridade da foto</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#eebd9d755d4edc0f">trace 2</a><br></td>
+    </tr>
+    
+    <tr title="item:cerca1:localizacao">
+      <td><strong>Construção de 1200 m de cerca de arame liso 5 fios (projeto sintético; Sicor: Benfeitorias (terraços, porteiras, mata-burros, currais, cochos ou cercas; o Sicor não discrimina o tipo, confirmar no projeto))</strong><br><span class="nota">Localização (foto na gleba) · OP-benfeitoria-geofence</span>
+        <div class="nota">foto dentro da gleba</div>
+        </td>
+      <td><span class="st st-verificado">verificado</span></td>
+      <td>—</td>
+      <td class="nota">foto georreferenciada</td>
+      <td><a href="../../../laudo-vivo/eval/golden/demo/DEMO-0001/fotos/foto_cerca_2.jpg" title="ev_7ebf34f29d">Foto 1</a><br></td>
+      <td><a href="#chk_f4d54eed4c" title="chk_f4d54eed4c">Foto na gleba</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#4377c7d943e6bf7a">trace 1</a><br></td>
+    </tr>
+    
+    <tr title="item:cerca1:conclusao">
+      <td><strong>Construção de 1200 m de cerca de arame liso 5 fios (projeto sintético; Sicor: Benfeitorias (terraços, porteiras, mata-burros, currais, cochos ou cercas; o Sicor não discrimina o tipo, confirmar no projeto))</strong><br><span class="nota">Conclusão da obra · MCR-2-7-item16-benfeitorias-conclusao</span>
+        <div class="nota">a foto mostra cerca (VLM, concordância 1); o fiscal atestou em campo que a obra está concluída</div>
+        </td>
+      <td><span class="st st-verificado">verificado</span></td>
+      <td>—</td>
+      <td class="nota">foto classificada pelo VLM; declaração do fiscal</td>
+      <td><a href="../../../laudo-vivo/eval/golden/demo/DEMO-0001/fotos/foto_cerca_1.jpg" title="ev_87670a2ba6">Foto 1</a><br><a href="#" title="ev_bd6461f6df">Fala do fiscal 2</a><br><a href="../../../laudo-vivo/eval/golden/demo/DEMO-0001/fotos/foto_cerca_2.jpg" title="ev_7ebf34f29d">Foto 3</a><br></td>
+      <td><a href="#chk_599b269d18" title="chk_599b269d18">Classificação da foto</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#04f8d4778b6872ac">trace 1</a><br><a href="#chk_90e7eee080" title="chk_90e7eee080">Declaração do fiscal</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#3baae531fbd40b54">trace 2</a><br><a href="#chk_e227c7018d" title="chk_e227c7018d">Classificação da foto</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#0679a3bdb219ba8f">trace 3</a><br></td>
+    </tr>
+    
+    <tr title="item:cerca1:prazo_cronograma">
+      <td><strong>Construção de 1200 m de cerca de arame liso 5 fios (projeto sintético; Sicor: Benfeitorias (terraços, porteiras, mata-burros, currais, cochos ou cercas; o Sicor não discrimina o tipo, confirmar no projeto))</strong><br><span class="nota">Prazo do cronograma · MCR-2-7-item16-benfeitorias-cronograma</span>
+        <div class="nota">fiscalização em 2026-10-08, dentro do prazo (até o término do cronograma do projeto)</div>
+        </td>
+      <td><span class="st st-verificado">verificado</span></td>
+      <td>até 2026-11-30</td>
+      <td class="nota">—</td>
+      <td><span class="nota">—</span></td>
+      <td><span class="nota">—</span></td>
+    </tr>
+    
+    <tr title="item:cerca1" class="agregado">
+      <td><strong>Construção de 1200 m de cerca de arame liso 5 fios (projeto sintético; Sicor: Benfeitorias (terraços, porteiras, mata-burros, currais, cochos ou cercas; o Sicor não discrimina o tipo, confirmar no projeto))</strong><br><span class="nota">Resultado do item · OP-agregacao-item</span>
+        <div class="nota">todas as exigências verificadas</div>
+        </td>
+      <td><span class="st st-verificado">verificado</span></td>
+      <td>—</td>
+      <td class="nota">foto georreferenciada; foto classificada pelo VLM; declaração do fiscal</td>
+      <td><a href="../../../laudo-vivo/eval/golden/demo/DEMO-0001/fotos/foto_cerca_1.jpg" title="ev_87670a2ba6">Foto 1</a><br><a href="../../../laudo-vivo/eval/golden/demo/DEMO-0001/fotos/foto_cerca_2.jpg" title="ev_7ebf34f29d">Foto 2</a><br><a href="#" title="ev_bd6461f6df">Fala do fiscal 3</a><br></td>
+      <td><a href="#chk_644e9b1fce" title="chk_644e9b1fce">Integridade da foto</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#b4b305b9bfd026ad">trace 1</a><br><a href="#chk_213edc6a36" title="chk_213edc6a36">Integridade da foto</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#eebd9d755d4edc0f">trace 2</a><br><a href="#chk_f4d54eed4c" title="chk_f4d54eed4c">Foto na gleba</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#4377c7d943e6bf7a">trace 3</a><br><a href="#chk_599b269d18" title="chk_599b269d18">Classificação da foto</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#04f8d4778b6872ac">trace 4</a><br><a href="#chk_90e7eee080" title="chk_90e7eee080">Declaração do fiscal</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#3baae531fbd40b54">trace 5</a><br><a href="#chk_e227c7018d" title="chk_e227c7018d">Classificação da foto</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#0679a3bdb219ba8f">trace 6</a><br></td>
+    </tr>
+    
+    <tr title="laudo:metodo">
+      <td><strong>Operação</strong><br><span class="nota">Método de fiscalização · MCR-2-7-item1-registro-verificacoes</span>
+        <div class="nota">método registrado: autofiscalização assistida</div>
+        </td>
+      <td><span class="st st-verificado">verificado</span></td>
+      <td>autofiscalização assistida</td>
+      <td class="nota">—</td>
+      <td><span class="nota">—</span></td>
+      <td><span class="nota">—</span></td>
+    </tr>
+    
+    <tr title="laudo:independencia_fiscal">
+      <td><strong>Operação</strong><br><span class="nota">Independência do fiscal · MCR-2-7-item15-independencia-fiscal</span>
+        <div class="nota">declaração de independência registrada</div>
+        </td>
+      <td><span class="st st-verificado">verificado</span></td>
+      <td>—</td>
+      <td class="nota">declaração do fiscal</td>
+      <td><a href="#" title="ev_83356118a2">Fala do fiscal 1</a><br></td>
+      <td><span class="nota">—</span></td>
+    </tr>
+    
+    <tr title="laudo:metadados_sensoriamento">
+      <td><strong>Operação</strong><br><span class="nota">Metadados do sensoriamento (MCR 2-7-4-b) · MCR-2-7-item4-metadados-sr</span>
+        <div class="nota">1 checagem(ns) de sensoriamento com os metadados do item 4-b</div>
+        </td>
+      <td><span class="st st-verificado">verificado</span></td>
+      <td>—</td>
+      <td class="nota">satélite (Sentinel-2)</td>
+      <td><span class="nota">—</span></td>
+      <td><a href="#chk_90376cae15" title="chk_90376cae15">Série NDVI (satélite)</a> <span class="st st-ok">ok</span> <a class="nota" href="../../traces/fis_demo_0001.jsonl#f9caf1df7c3ce59b">trace 1</a><br></td>
+    </tr>
+    
+  </table>
+
+  <h2>4. Ocorrências</h2>
+  
+  <table>
+    <tr><th>Id</th><th>Tipo</th><th>Descrição</th><th>Quando</th></tr>
+    <tr><td><code>oc_7313f62bbe</code></td><td>pressao</td><td>POL-07: pedido de alterar valor sem nova evidência (alterar_valor): &#39;marcar 29&#39;</td><td>16/10/2026 23:10</td></tr><tr><td><code>oc_50bf5eb1a7</code></td><td>injecao</td><td>POL-06: instrução embutida em gta1.observacao tratada como dado (padrões: ignorar_regras, aprovar_laudo)</td><td>16/10/2026 23:10</td></tr>
+  </table>
+  
+
+  <h2>5. Alegações × evidência</h2>
+  
+  <h3>Alegações registradas (com ponteiro para a fala)</h3>
+  <p class="nota">Nenhuma alegação numérica extraída da fala.</p>
+
+  <h2>6. Checagens</h2>
+  <table>
+    <tr><th>Id</th><th>Ferramenta</th><th>Status</th><th>Entrada (hash)</th><th>Span</th><th>Fonte/versão</th></tr>
+    
+    <tr id="chk_d833ebab02"><td><code>chk_d833ebab02</code></td><td>Operação (Sicor) <span class="nota">(carregar_operacao)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">93501d987e6cbd28</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#c44ff6bb199ffb23">c44ff6bb199ffb23</a></td>
+      <td class="nota">sicor@2026-10-07;ibge-ppm@2025;demo-mascarado@1</td></tr>
+    
+    <tr id="chk_b38d9c9503"><td><code>chk_b38d9c9503</code></td><td>Plano de método <span class="nota">(planejar_metodo)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">e32ac3b0750d0f58</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#7ee016b6d5453037">7ee016b6d5453037</a></td>
+      <td class="nota">rulebook-mcr-2-7@0.5.0</td></tr>
+    
+    <tr id="chk_90376cae15"><td><code>chk_90376cae15</code></td><td>Série NDVI (satélite) <span class="nota">(serie_ndvi)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">bdc131b62200cbab</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#f9caf1df7c3ce59b">f9caf1df7c3ce59b</a></td>
+      <td class="nota">earth-search:sentinel-2-c1-l2a@2026-10-17</td></tr>
+    
+    <tr id="chk_6d2b36962b"><td><code>chk_6d2b36962b</code></td><td>Contagem no vídeo <span class="nota">(contar_bovinos_video)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">758971ca792b69b6</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#4fb4c90923c2b8a5">4fb4c90923c2b8a5</a></td>
+      <td class="nota">yolox_m@0.1.1rc0+contador@0.2.0</td></tr>
+    
+    <tr id="chk_2822682e67"><td><code>chk_2822682e67</code></td><td>Leitura da foto do documento <span class="nota">(ler_documento_foto)</span></td><td><span class="st st-indeterminado">indeterminado</span></td>
+      <td class="mono">26e1b3b17eaa5c4c</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#419bddf7c189ff76">419bddf7c189ff76</a></td>
+      <td class="nota">leitura_documentos@0.1.0;vlm=qwen3.5:4b;recortes=2;k=2-3</td></tr>
+    
+    <tr id="chk_ee2ca7c287"><td><code>chk_ee2ca7c287</code></td><td>Conciliação da NF-e <span class="nota">(conciliar_nfe)</span></td><td><span class="st st-indeterminado">indeterminado</span></td>
+      <td class="mono">3471703ffdbe0cba</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#d1250f382bb8908d">d1250f382bb8908d</a></td>
+      <td class="nota">docs_fiscais@0.2.0;ncm=TEC-Res.Gecex-272/2021;nfe=MOC-4.00;gta=IN-MAPA-09-2021</td></tr>
+    
+    <tr id="chk_754a9866d3"><td><code>chk_754a9866d3</code></td><td>Campos lidos pela fiscal <span class="nota">(completar_leitura_documento)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">4af02e5c4347ed63</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#0bbe39cdcb6af5c9">0bbe39cdcb6af5c9</a></td>
+      <td class="nota">residual@0.1.0</td></tr>
+    
+    <tr id="chk_1869be7b21"><td><code>chk_1869be7b21</code></td><td>Conciliação da NF-e <span class="nota">(conciliar_nfe)</span></td><td><span class="st st-indeterminado">indeterminado</span></td>
+      <td class="mono">38347c2be4db3d82</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#41e73bf13ac3228c">41e73bf13ac3228c</a></td>
+      <td class="nota">docs_fiscais@0.2.0;ncm=TEC-Res.Gecex-272/2021;nfe=MOC-4.00;gta=IN-MAPA-09-2021</td></tr>
+    
+    <tr id="chk_e88fe77d76"><td><code>chk_e88fe77d76</code></td><td>Conciliação da NF-e <span class="nota">(conciliar_nfe)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">70af71b784eba51a</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#124baf2a086143b7">124baf2a086143b7</a></td>
+      <td class="nota">docs_fiscais@0.2.0;ncm=TEC-Res.Gecex-272/2021;nfe=MOC-4.00;gta=IN-MAPA-09-2021</td></tr>
+    
+    <tr id="chk_af3d0e6261"><td><code>chk_af3d0e6261</code></td><td>Conciliação da GTA <span class="nota">(conciliar_gta)</span></td><td><span class="st st-divergente">divergente</span></td>
+      <td class="mono">01c9c5cc525f7da4</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#cbe1cc25f752561d">cbe1cc25f752561d</a></td>
+      <td class="nota">docs_fiscais@0.2.0;ncm=TEC-Res.Gecex-272/2021;nfe=MOC-4.00;gta=IN-MAPA-09-2021</td></tr>
+    
+    <tr id="chk_644e9b1fce"><td><code>chk_644e9b1fce</code></td><td>Integridade da foto <span class="nota">(integridade_foto)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">946b6da79ec0b277</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#b4b305b9bfd026ad">b4b305b9bfd026ad</a></td>
+      <td class="nota">integridade@0.1.1</td></tr>
+    
+    <tr id="chk_2d88ee1829"><td><code>chk_2d88ee1829</code></td><td>Foto na gleba <span class="nota">(geofence)</span></td><td><span class="st st-divergente">divergente</span></td>
+      <td class="mono">159b70e68972f317</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#846bce33295456f3">846bce33295456f3</a></td>
+      <td class="nota">geofence@0.1.1</td></tr>
+    
+    <tr id="chk_599b269d18"><td><code>chk_599b269d18</code></td><td>Classificação da foto <span class="nota">(classificar_foto)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">308af850470f2842</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#04f8d4778b6872ac">04f8d4778b6872ac</a></td>
+      <td class="nota">qwen3.5:4b+vlm@0.2.0</td></tr>
+    
+    <tr id="chk_90e7eee080"><td><code>chk_90e7eee080</code></td><td>Declaração do fiscal <span class="nota">(declaracao_conclusao)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">9409cf62a8e41fb3</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#3baae531fbd40b54">3baae531fbd40b54</a></td>
+      <td class="nota">declaracao-conclusao@0.1.0</td></tr>
+    
+    <tr id="chk_213edc6a36"><td><code>chk_213edc6a36</code></td><td>Integridade da foto <span class="nota">(integridade_foto)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">f534ec12f7690749</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#eebd9d755d4edc0f">eebd9d755d4edc0f</a></td>
+      <td class="nota">integridade@0.1.1</td></tr>
+    
+    <tr id="chk_f4d54eed4c"><td><code>chk_f4d54eed4c</code></td><td>Foto na gleba <span class="nota">(geofence)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">ad1a406a38db7201</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#4377c7d943e6bf7a">4377c7d943e6bf7a</a></td>
+      <td class="nota">geofence@0.1.1</td></tr>
+    
+    <tr id="chk_e227c7018d"><td><code>chk_e227c7018d</code></td><td>Classificação da foto <span class="nota">(classificar_foto)</span></td><td><span class="st st-ok">ok</span></td>
+      <td class="mono">108ea2157b53107e</td><td><a class="mono" href="../../traces/fis_demo_0001.jsonl#0679a3bdb219ba8f">0679a3bdb219ba8f</a></td>
+      <td class="nota">qwen3.5:4b+vlm@0.2.0</td></tr>
+    
+  </table>
+
+  <h2>7. Integridade</h2>
+  <dl class="grade">
+    <dt>Evidências na cadeia</dt><dd>28 (íntegra)</dd>
+    <dt>Raiz da cadeia</dt><dd class="mono">da87747a5b4c2abb8cba5fb842158f214387427d95c2926df136b6af4997baff</dd>
+    <dt>Hash raiz do laudo</dt><dd class="mono"><strong>95656812f69472061103a79f8f5e05b9cc79fa87abe6bfba32ac97c05f187365</strong></dd>
+    <dt>Trace (OpenTelemetry, JSONL)</dt><dd><a class="mono" href="../../traces/fis_demo_0001.jsonl">../../traces/fis_demo_0001.jsonl</a></dd>
+  </dl>
+
+  <h2>8. Assinatura humana</h2>
+  
+    
+    <dl class="grade"><dt>Papel</dt><dd>fiscal</dd><dt>Responsável (ref.)</dt><dd>fiscal-sintetico-01</dd>
+      <dt>Assinado em</dt><dd>2026-10-16T23:10:57.392104</dd><dt>Hash assinado</dt><dd class="mono">95656812f69472061103a79f8f5e05b9cc79fa87abe6bfba32ac97c05f187365</dd></dl>
+    
+    <p class="nota">Selo: <span class="mono">f3cdaccae1aad15e905e31127c3d770a96c6d3787a92dfc970998a6c58badb8f</span></p>
+  
+
+  <footer>
+    <strong>DEMONSTRAÇÃO — dados sintéticos.</strong> Operação fictícia de demonstração: REF, instituição, datas, valores, área e geometria foram alterados a partir de um registro público do Sicor/BCB; dados de campo (vídeo, fotos, falas), documentos (NF-e, GTA) e todos os defeitos são sintéticos e plantados. Não descreve nenhuma operação, propriedade ou produtor real.<br>
+    Contém dados Copernicus Sentinel modificados (2026).<br>
+    Gerado por Laudo Vivo laudo-vivo@0.1.0 em 2026-10-16T23:10:57-03:00. Status atribuído pelo verificador (rulebook-mcr-2-7@0.5.0),
+    nunca pelo modelo de linguagem. Cada item aponta para a evidência, a checagem e o span do trace.
+  </footer>
+</main>
+</body>
+</html>

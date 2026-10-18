@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laudo Vivo · pitch regional</title>
+<meta name="description"
+  content="Slides do pitch de 3 minutos do Laudo Vivo (AKCIT Camp 2026, regional de Goiânia, 24/10/2026).">
+<!--
+  Deck do pitch regional (L17). Fala: docs/entregaveis/pitch-regional-3min.md. Leia deck/README.md.
+  Números: só entre marcadores de docs/entregaveis/numeros.json (gerar_numeros.py --aplicar reescreve todos).
+  Único marcador da equipe: o slide de Equipe (⚠ PREENCHER). PDF: node scripts/gerar_pdf.cjs.
+  Teclas: → / PageDown / espaço avançam; ← / PageUp voltam; Home e End; F alterna a tela cheia.
+-->
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #101a15;
+    --muted: #34423b;
+    --soft: #55645d;
+    --line: #c3cec8;
+    --bg: #ffffff;
+    --panel: #f2f5f3;
+    --accent: #1d5a3d;
+    --accent-soft: #e2eee7;
+    --red: #8c1c1c;
+    --red-soft: #fbe9e9;
+    --amber: #6f4300;
+    --amber-soft: #fff2d4;
+    --demo: #8a3507;
+    --demo-soft: #fff0e3;
+    --demo-line: #b4530f;
+    --fill: #5c3b00;
+    --fill-soft: #fff8de;
+    --fill-line: #a86f00;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #e9ecea;
+    color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  #palco { counter-reset: tela; width: 1920px; margin: 0 auto; }
+  .slide {
+    counter-increment: tela;
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: var(--bg);
+    padding: 56px 88px 0;
+    margin: 0 0 24px;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Modo palco (com JavaScript): uma tela por vez, escalada para caber na janela, fundo preto. */
+  html.palco, html.palco body { height: 100%; overflow: hidden; background: #000; }
+  html.palco #palco {
+    position: fixed; left: 50%; top: 50%; width: 1920px; height: 1080px; margin: 0;
+    transform: translate(-50%, -50%) scale(var(--escala, 1));
+  }
+  html.palco .slide { position: absolute; inset: 0; margin: 0; display: none; }
+  html.palco .slide.ativa { display: flex; }
+
+  .topo {
+    display: flex; align-items: center; gap: 28px; margin-bottom: 18px;
+    font-size: 24px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .marca {
+    color: var(--ink); font-size: 28px; font-weight: 800; letter-spacing: 0.02em; text-transform: none;
+  }
+  .marca::before {
+    content: ""; display: inline-block; width: 22px; height: 22px; margin-right: 12px;
+    vertical-align: -3px; border-radius: 5px; background: var(--accent);
+  }
+  .topo .kicker { padding-left: 28px; border-left: 3px solid var(--line); }
+  .topo .selo-demo, .topo .preencher-selo { margin-left: auto; }
+  h1 { font-size: 60px; line-height: 1.1; letter-spacing: -0.015em; margin: 0 0 30px; font-weight: 800; }
+  h2 { font-size: 30px; line-height: 1.2; margin: 0 0 20px; font-weight: 700; color: var(--accent); }
+  h3 { font-size: 34px; line-height: 1.18; margin: 0 0 8px; font-weight: 750; }
+  p { margin: 0; }
+  b { font-weight: 750; }
+  code { font-family: Consolas, "Cascadia Mono", "Courier New", monospace; font-size: 0.92em; }
+  .sem-quebra { white-space: nowrap; }
+  .corpo { flex: 1; min-height: 0; }
+  .rodape {
+    display: flex; align-items: flex-end; gap: 40px;
+    border-top: 2px solid var(--line); padding: 14px 0 26px; margin-top: 18px;
+    font-size: 20px; line-height: 1.35; color: var(--muted);
+  }
+  .rodape p { flex: 1; }
+  .rodape::after {
+    content: counter(tela); min-width: 32px; text-align: right;
+    font-size: 22px; font-weight: 700; color: var(--soft);
+  }
+  /* no modo palco as telas escondidas não contam no counter(): o número vem do JavaScript */
+  .rodape[data-n]::after { content: attr(data-n); }
+  .selo-demo {
+    display: inline-block; padding: 6px 14px; border: 2px solid var(--demo-line); border-radius: 8px;
+    background: var(--demo-soft); color: var(--demo);
+    font-size: 22px; font-weight: 800; letter-spacing: 0.02em; text-transform: none;
+  }
+
+  /* Tela 1: problema */
+  .s1 .corpo { display: grid; grid-template-columns: 1fr 520px; gap: 56px; }
+  .lead { font-size: 42px; line-height: 1.22; font-weight: 600; margin-bottom: 34px; }
+  .lead b { color: var(--accent); }
+  .cartoes { display: grid; gap: 22px; }
+  .cartao {
+    padding: 20px 28px; border-left: 8px solid var(--accent); border-radius: 0 10px 10px 0;
+    background: var(--panel);
+  }
+  .cartao p { font-size: 29px; line-height: 1.3; color: var(--muted); }
+  .cartao.alerta { border-left-color: var(--red); background: var(--red-soft); }
+  .cartao.alerta h3 { color: var(--red); }
+  .persona {
+    align-self: start; padding: 34px 34px 30px; border: 2px solid var(--line); border-radius: 16px;
+    background: #fbfcfb;
+  }
+  .avatar {
+    display: grid; place-items: center; width: 112px; height: 112px; margin-bottom: 20px;
+    border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+  }
+  .persona h3 { font-size: 40px; }
+  .persona .papel { font-size: 29px; line-height: 1.3; color: var(--muted); margin-bottom: 22px; }
+  .persona .pergunta { font-size: 29px; line-height: 1.3; font-weight: 650; margin-bottom: 24px; }
+  .persona .nota {
+    padding-top: 16px; border-top: 2px solid var(--line);
+    font-size: 21px; line-height: 1.35; color: var(--soft);
+  }
+
+  /* Tela 2: validação */
+  .s2 h1 { font-size: 54px; }
+  .s2 .corpo { display: grid; grid-template-columns: 1fr 760px; gap: 56px; }
+  .escritos { display: grid; gap: 28px; grid-auto-rows: 1fr; }
+  .escrito {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 28px 36px; border: 2px solid var(--line); border-radius: 14px;
+  }
+  .quem {
+    display: inline-block; margin-bottom: 10px; color: var(--accent);
+    font-size: 22px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .escrito p { font-size: 40px; line-height: 1.22; font-weight: 600; }
+  .escrito .de { margin-top: 12px; font-size: 22px; font-weight: 400; color: var(--soft); }
+  .microdados {
+    display: flex; flex-direction: column; padding: 28px 40px 26px; border-radius: 16px;
+    background: var(--panel);
+  }
+  .nums { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .numero {
+    display: grid; grid-template-columns: 270px 1fr; align-items: baseline; gap: 26px; padding: 26px 0;
+  }
+  .numero + .numero { border-top: 2px solid var(--line); }
+  .numero b {
+    font-size: 84px; line-height: 1; font-weight: 800; letter-spacing: -0.02em; text-align: right;
+    font-variant-numeric: tabular-nums; color: var(--ink);
+  }
+  .numero span { font-size: 29px; line-height: 1.25; color: var(--muted); }
+  .microdados .fonte {
+    margin-top: auto; padding-top: 14px; font-size: 21px; line-height: 1.35; color: var(--soft);
+  }
+
+  /* Tela 3: demo */
+  .s3 h1 { font-size: 52px; margin-bottom: 22px; }
+  .linhas { display: grid; grid-template-rows: repeat(4, 1fr); gap: 14px; height: 100%; }
+  .linha {
+    display: grid; grid-template-columns: 640px 1fr; gap: 36px; align-items: center;
+    padding-top: 12px; border-top: 2px solid var(--line);
+  }
+  .passo h3 { font-size: 31px; margin-bottom: 4px; }
+  .passo p { font-size: 24px; line-height: 1.3; color: var(--muted); }
+  .tag {
+    display: inline-block; padding: 3px 10px; margin-bottom: 6px; border-radius: 6px;
+    font-size: 19px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .tag.ia { background: #e7ecf8; color: #23397a; }
+  .tag.regra { background: var(--accent-soft); color: var(--accent); }
+  .tag.humano { background: var(--amber-soft); color: var(--amber); }
+  .captura {
+    position: relative; justify-self: start; margin: 0;
+    display: flex; flex-direction: column; gap: 8px; align-items: flex-start;
+  }
+  .captura img {
+    display: block; border: 2px solid var(--line); border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+  .captura .selo-demo {
+    position: absolute; right: -10px; top: -14px; padding: 3px 10px; font-size: 16px;
+  }
+  .lado { display: flex; gap: 18px; align-items: center; }
+
+  /* Tela 4: avaliação */
+  .s4 .corpo { display: grid; grid-template-columns: 1fr 760px; gap: 44px; }
+  .painel {
+    display: flex; flex-direction: column; padding: 28px 34px; border-radius: 16px;
+    background: var(--panel);
+  }
+  .painel h2 { font-size: 28px; }
+  .metricas { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .m {
+    display: flex; flex-direction: column; justify-content: center; gap: 4px;
+    padding: 18px 20px; border: 2px solid var(--line); border-radius: 12px; background: #fff;
+  }
+  .m .rot { font-size: 23px; font-weight: 700; color: var(--muted); }
+  .m b {
+    font-size: 68px; line-height: 1.05; font-weight: 800; letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .m .ic { font-size: 23px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .m .exp { margin-top: 10px; font-size: 21px; line-height: 1.25; color: var(--soft); }
+  .m.semllm { border-color: var(--accent); background: var(--accent-soft); }
+  table.ab { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  table.ab th, table.ab td {
+    padding: 14px 10px; border-bottom: 2px solid var(--line); text-align: left; vertical-align: baseline;
+  }
+  table.ab thead th {
+    padding-top: 0; font-size: 21px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--soft);
+  }
+  table.ab tbody th { width: 45%; font-size: 24px; line-height: 1.25; font-weight: 600; color: var(--muted); }
+  table.ab tbody th small {
+    display: block; margin-top: 4px; font-size: 20px; font-weight: 500; color: var(--soft);
+  }
+  table.ab td { font-size: 40px; font-weight: 800; white-space: nowrap; }
+  table.ab td small { display: block; font-size: 21px; font-weight: 500; color: var(--soft); }
+  table.ab td.ag { color: var(--accent); }
+  .frase-ia {
+    margin-top: auto; padding-top: 18px; font-size: 27px; line-height: 1.3; font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* Tela 5: diferencial */
+  table.dif { width: 100%; border-collapse: collapse; }
+  table.dif th, table.dif td {
+    padding: 16px 18px; border-bottom: 2px solid var(--line); text-align: left; vertical-align: top;
+  }
+  table.dif thead th {
+    font-size: 22px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--soft);
+  }
+  table.dif tbody th { width: 340px; font-size: 32px; font-weight: 800; }
+  table.dif td { font-size: 28px; line-height: 1.28; color: var(--muted); }
+  table.dif td.nos { color: var(--ink); font-weight: 600; }
+  .faixa {
+    margin-top: 28px; padding: 24px 32px; border-radius: 14px; background: var(--accent); color: #fff;
+    font-size: 31px; line-height: 1.3; font-weight: 600;
+  }
+
+  /* Tela 6: equipe (o único marcador da equipe no deck) */
+  .preencher-selo {
+    display: inline-block; padding: 6px 16px; border: 3px dashed var(--fill-line); border-radius: 10px;
+    background: #fff6cc; color: var(--fill); font-size: 26px; font-weight: 800; letter-spacing: 0.02em;
+    text-transform: none;
+  }
+  .s6 .corpo { display: grid; grid-template-columns: 1fr 640px; gap: 44px; }
+  .pessoas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-content: start; }
+  .pessoa { padding: 22px; border: 3px dashed #c9a24a; border-radius: 14px; background: #fffdf3; }
+  .foto {
+    display: grid; place-items: center; width: 120px; height: 120px; margin-bottom: 14px;
+    border-radius: 50%; background: #f1e8c8; color: #6b4d00;
+    font-size: 19px; font-weight: 700; text-align: center;
+  }
+  .pessoa p { font-size: 24px; line-height: 1.3; color: #4a3a10; }
+  .pessoa p + p { margin-top: 6px; }
+  .extra { margin-top: 22px; font-size: 26px; line-height: 1.35; color: #4a3a10; }
+  .extra p + p { margin-top: 10px; }
+  .instrucao {
+    padding: 24px 28px; border: 3px solid var(--fill-line); border-radius: 14px; background: var(--fill-soft);
+    font-size: 22px; line-height: 1.38; color: #3d2c00;
+  }
+  .instrucao h3 { font-size: 27px; margin-bottom: 10px; }
+  .instrucao ol { margin: 0; padding-left: 28px; }
+  .instrucao li + li { margin-top: 6px; }
+  .instrucao .fim { margin-top: 12px; }
+
+  /* Tela 7: modelo e pedido */
+  .s7 h1 { font-size: 58px; }
+  .s7 .corpo { display: grid; grid-template-columns: 1fr 640px; gap: 52px; }
+  .modelo { display: grid; gap: 18px; align-content: start; }
+  .item-modelo {
+    display: grid; grid-template-columns: 250px 1fr; gap: 24px;
+    padding-bottom: 16px; border-bottom: 2px solid var(--line);
+  }
+  .item-modelo .rot {
+    padding-top: 6px; color: var(--accent);
+    font-size: 23px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .item-modelo p { font-size: 29px; line-height: 1.3; color: var(--muted); }
+  .item-modelo p b { color: var(--ink); }
+  .pedido {
+    align-self: start; display: flex; flex-direction: column; gap: 14px;
+    padding: 32px 40px; border-radius: 18px; background: var(--accent); color: #fff;
+  }
+  .pedido .quem { margin-bottom: 0; color: #cfe6d9; }
+  .pedido .quem.depois { margin-top: 6px; }
+  .pedido .grande { font-size: 42px; line-height: 1.18; font-weight: 800; }
+  .pedido p { font-size: 25px; line-height: 1.35; color: #e6f2eb; }
+  .pedido ul { margin: 0; padding-left: 30px; font-size: 25px; line-height: 1.35; color: #e6f2eb; }
+  .pedido li + li { margin-top: 4px; }
+  .pedido .abre { margin-top: 6px; padding-top: 16px; border-top: 2px solid rgba(255, 255, 255, 0.35); }
+
+  @page { size: 1920px 1080px; margin: 0; }
+  @media print {
+    html, body, html.palco, html.palco body { height: auto; overflow: visible; background: #fff; }
+    #palco, html.palco #palco { position: static; transform: none; width: 1920px; height: auto; margin: 0; }
+    .slide, html.palco .slide {
+      position: relative; display: flex !important; margin: 0; break-after: page; page-break-after: always;
+    }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+  }
+</style>
+</head>
+<body>
+<main id="palco">
+
+<!-- Tela 1 = S1. Problema e por que agora (pitch 0:00–0:21) -->
+<section class="slide s1" id="s1" aria-label="Problema">
+  <div class="topo">
+    <span class="marca">Laudo Vivo</span><span class="kicker">Problema · por que agora</span>
+  </div>
+  <h1>Quem prova cada operação fiscalizada?</h1>
+  <div class="corpo">
+    <div>
+      <p class="lead">Desde <b>01/03/2026</b>, a cooperativa prova ao Banco Central cada operação de
+        crédito rural que fiscaliza.</p>
+      <div class="cartoes">
+        <div class="cartao">
+          <h3>A norma está em vigor</h3>
+          <p>Res. CMN 5.267 (MCR 2-7): a instituição financeira fiscaliza, paga e responde pela
+            fiscalização, e a documentação fica à disposição do BCB.</p>
+        </div>
+        <div class="cartao alerta">
+          <h3>Prova sem trilha já virou passivo</h3>
+          <p>JF de Rio Verde/GO: cobrança suspensa porque o banco não exibiu a trilha da fiscalização
+            (liminar noticiada em 07/10/2026).</p>
+        </div>
+        <div class="cartao">
+          <h3>O satélite não fecha a prova</h3>
+          <p>O satélite pode contar cabeças, mas não prova que são as financiadas nem confere a nota
+            fiscal e a GTA.</p>
+        </div>
+      </div>
+    </div>
+    <aside class="persona">
+      <div class="avatar" aria-hidden="true">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="currentColor"
+          stroke-width="4" stroke-linecap="round">
+          <circle cx="32" cy="22" r="11"/><path d="M12 56c2-11 10-17 20-17s18 6 20 17"/>
+        </svg>
+      </div>
+      <h3>Paula</h3>
+      <p class="papel">fiscal de crédito rural numa cooperativa goiana</p>
+      <p class="pergunta">No curral, com o celular: como provar que o crédito virou o que foi
+        financiado, item a item?</p>
+      <p class="nota">Paula é uma persona composta de fontes públicas, não uma entrevistada.</p>
+    </aside>
+  </div>
+  <footer class="rodape">
+    <p>Fontes: Res. CMN 5.267, de 28/11/2025, em vigor desde 01/03/2026; liminar da JF de Rio Verde/GO
+      noticiada pela Rota Jurídica (07/10/2026) e pelo Migalhas (09/10/2026), caso de lavoura. Matriz de
+      evidências: <code>validacao/README.md</code>.</p>
+  </footer>
+</section>
+
+<!-- Tela 2 = S2. Validação por dados públicos (pitch 0:21–0:33): só os 3 números desc.*, com a data -->
+<section class="slide s2" id="s2" aria-label="Validação">
+  <div class="topo">
+    <span class="marca">Laudo Vivo</span>
+    <span class="kicker">Validação · registro público, reprodutível no repositório</span>
+  </div>
+  <h1>O que o regulador e o auditor escreveram, e o que os microdados do BCB mostram</h1>
+  <div class="corpo">
+    <div class="escritos">
+      <div class="escrito">
+        <span class="quem">Regulador</span>
+        <p>Satélite inconclusivo não dispensa a fiscalização presencial nem a documental.</p>
+        <p class="de">Voto 166/2025-BCB, 12/11/2025</p>
+      </div>
+      <div class="escrito">
+        <span class="quem">Auditor</span>
+        <p>A fiscalização do crédito rural é manual, amostral e de baixa cobertura.</p>
+        <p class="de">TCU/Panoptes com o Lapig-UFG, relatório técnico, jul/2026</p>
+      </div>
+    </div>
+    <div class="microdados">
+      <span class="quem">Microdados do BCB (Sicor)</span>
+      <div class="nums">
+        <div class="numero">
+          <b><!--n:desc.ano_2026.valor-->4.599<!--/n--></b>
+          <span>desclassificações registradas em 2026, até <!--n:desc.ate.valor-->13/10/2026<!--/n--></span>
+        </div>
+        <div class="numero">
+          <b><!--n:desc.ano_2025.valor-->4.075<!--/n--></b>
+          <span>em todo o ano de 2025</span>
+        </div>
+        <div class="numero">
+          <b><!--n:desc.motivo013_2026.valor-->368<!--/n--></b>
+          <span>em 2026, por aplicação não comprovada (motivo 013)</span>
+        </div>
+      </div>
+      <p class="fonte">Arquivo <code>sicor_desclassificacao.gz</code> do BCB, versão de
+        <!--n:desc.fonte_last_modified.valor-->14/10/2026<!--/n-->; conta em
+        <code>bench/desclassificacao/</code>.</p>
+    </div>
+  </div>
+  <footer class="rodape">
+    <p>Desclassificação registrada não é acusação. 2026 é parcial; como a série tem quebra antes de 2023, a
+      única comparação que fazemos é 2026 parcial contra 2025 inteiro. Fontes e o que cada uma não prova:
+      <code>validacao/README.md</code>.</p>
+  </footer>
+</section>
+
+<!-- Tela 3 = S3 (demo). A demo e o que a IA faz (pitch 0:33–1:48): apoio e plano B da demo ao vivo -->
+<section class="slide s3" id="s3" aria-label="Demo">
+  <div class="topo">
+    <span class="marca">Laudo Vivo</span><span class="kicker">Solução e IA · demo</span>
+    <span class="selo-demo">DEMONSTRAÇÃO — dados sintéticos</span>
+  </div>
+  <h1>A IA lê o papel e a fala; as regras, sem IA, decidem; o humano assina.</h1>
+  <div class="corpo">
+    <div class="linhas">
+      <div class="linha">
+        <div class="passo">
+          <span class="tag ia">IA lê</span>
+          <h3>Lê a nota impressa e pede só o que faltou</h3>
+          <p>A fiscal fotografa o DANFE; o que não validou, ela lê no papel. O XML, quando chega, confere
+            com a foto.</p>
+        </div>
+        <figure class="captura">
+          <span class="selo-demo">DEMONSTRAÇÃO — dados sintéticos</span>
+          <img src="img/demo-papel-pedido.png" width="604" height="178"
+            alt="Cartão da demo: complete a nota (DANFE), lendo no papel só a chave e o CNPJ/CPF do emitente">
+          <img src="img/demo-papel-xml.png" width="691" height="46"
+            alt="Prova da NF-e na demo: DANFE fotografado confere com o XML">
+        </figure>
+      </div>
+      <div class="linha">
+        <div class="passo">
+          <span class="tag regra">Regras</span>
+          <h3>Recusa a pressão e registra</h3>
+          <p>O produtor pede para marcar o número financiado: sem nova evidência, o valor não muda.</p>
+        </div>
+        <figure class="captura">
+          <span class="selo-demo">DEMONSTRAÇÃO — dados sintéticos</span>
+          <img src="img/demo-pressao.png" width="760" height="131"
+            alt="Cartão da demo: pressão recusada, ocorrência registrada na cadeia de hash">
+        </figure>
+      </div>
+      <div class="linha">
+        <div class="passo">
+          <span class="tag regra">Política</span>
+          <h3>Bloqueia o laudo com pendência</h3>
+          <p>O rascunho só sai quando cada item tem prova ou justificativa da fiscal.</p>
+        </div>
+        <figure class="captura">
+          <span class="selo-demo">DEMONSTRAÇÃO — dados sintéticos</span>
+          <img src="img/demo-bloqueio.png" width="760" height="119"
+            alt="Cartão da demo: política bloqueou o rascunho, 3 pendências antes de emitir">
+        </figure>
+      </div>
+      <div class="linha">
+        <div class="passo">
+          <span class="tag humano">Humano</span>
+          <h3>Só a fiscal assina</h3>
+          <p>Confere o hash e assina com PIN; cada item do laudo abre a sua prova.</p>
+        </div>
+        <figure class="captura">
+          <span class="selo-demo">DEMONSTRAÇÃO — dados sintéticos</span>
+          <div class="lado">
+            <img src="img/demo-selado-carimbo.png" width="220" height="85"
+              alt="Carimbo da demo: selado e assinado">
+            <img src="img/demo-selado-hash.png" width="668" height="138"
+              alt="Hash raiz assinado do laudo da demo">
+          </div>
+        </figure>
+      </div>
+    </div>
+  </div>
+  <footer class="rodape">
+    <p>Operação fictícia DEMO-0001: referência, cooperativa, datas, valores e geometria alterados; vídeo,
+      fotos, notas, GTA e defeitos sintéticos. Nenhum produtor real aparece. Capturas da interface de
+      17/10/2026; a demo do palco é ao vivo.</p>
+  </footer>
+</section>
+
+<!-- Tela 4 = S3 (avaliação). Slide único de avaliação (pitch 1:48–2:17), dos relatórios do eval/SLIDE.md -->
+<section class="slide s4" id="s4" aria-label="Avaliação">
+  <div class="topo">
+    <span class="marca">Laudo Vivo</span>
+    <span class="kicker">Solução e IA · avaliação com n e intervalo de 95%</span>
+  </div>
+  <h1>Avaliado antes de chegar aqui</h1>
+  <div class="corpo">
+    <div class="painel">
+      <h2>Teste congelado: n = <!--n:golden.n_teste.valor-->24<!--/n--> fiscalizações sintéticas</h2>
+      <div class="metricas">
+        <div class="m">
+          <span class="rot">Recall de defeito</span>
+          <b><!--n:recall_teste.valor-->1,00<!--/n--></b>
+          <span class="ic"><!--n:recall_teste.ic-->[0,70–1,00]<!--/n-->
+            · <!--n:recall_teste.kn-->9/9<!--/n--></span>
+          <span class="exp">defeitos plantados encontrados</span>
+        </div>
+        <div class="m">
+          <span class="rot">Over-blocking</span>
+          <b><!--n:overblocking_teste.valor-->0%<!--/n--></b>
+          <span class="ic"><!--n:overblocking_teste.ic-->[0–28%]<!--/n-->
+            · <!--n:overblocking_teste.kn-->0/10<!--/n--></span>
+          <span class="exp">fiscalizações válidas bloqueadas</span>
+        </div>
+        <div class="m">
+          <span class="rot">Abstenção correta</span>
+          <b><!--n:abstencao_teste.valor-->1,00<!--/n--></b>
+          <span class="ic"><!--n:abstencao_teste.ic-->[0,57–1,00]<!--/n-->
+            · <!--n:abstencao_teste.kn-->5/5<!--/n--></span>
+          <span class="exp">nos casos ambíguos</span>
+        </div>
+        <div class="m">
+          <span class="rot">Grounding</span>
+          <b><!--n:grounding.sem_lastro.valor-->0<!--/n--></b>
+          <span class="ic">em <!--n:grounding.falas.valor-->273<!--/n--> falas</span>
+          <span class="exp">números sem lastro no que o agente disse</span>
+        </div>
+        <div class="m">
+          <span class="rot">Red-team cego</span>
+          <b><!--n:redteam.cego_ataques.kn-->6/30<!--/n--></b>
+          <span class="ic">ataques · <!--n:redteam.cego_ataques_sem_semicega.kn-->6/26<!--/n--> sem a semi-cega</span>
+          <span class="exp">nos casos da equipe, <!--n:redteam.ataques.kn-->0/80<!--/n--></span>
+        </div>
+        <div class="m semllm">
+          <span class="rot">Sem o LLM</span>
+          <b><!--n:sem_llm.recall_teste.kn-->9/9<!--/n--></b>
+          <span class="ic">o mesmo recall</span>
+          <span class="exp">o status vem das regras, por desenho</span>
+        </div>
+      </div>
+    </div>
+    <div class="painel">
+      <h2>Papel fotografado e fala livre, sintéticos: A/B v2 no teste, fiscal simulado, n =
+        <!--n:ab2_teste.n.valor-->24<!--/n--></h2>
+      <table class="ab">
+        <thead><tr><th></th><th>Agente</th><th>Formulário</th></tr></thead>
+        <tbody>
+          <tr>
+            <th>Conteúdo conciliado igual à referência
+              <small>McNemar <span class="sem-quebra"
+                ><!--n:ab2_teste.mcnemar.curto-->p = 0,51<!--/n--></span></small>
+            </th>
+            <td class="ag"><!--n:ab2_teste.residual.valor-->71%<!--/n-->
+              <small><!--n:ab2_teste.residual.ic-->[51–85%]<!--/n--></small></td>
+            <td><!--n:ab2_teste.formulario.valor-->58%<!--/n-->
+              <small><!--n:ab2_teste.formulario.ic-->[39–76%]<!--/n--></small></td>
+          </tr>
+          <tr>
+            <th>Sem a menção a item não financiado, que o formulário não registra
+              <small>McNemar <span class="sem-quebra"
+                ><!--n:ab2_teste.mcnemar_sem_registro.curto-->p = 0,69<!--/n--></span></small>
+            </th>
+            <td class="ag"><!--n:ab2_teste.residual_sem_registro.valor-->79%<!--/n-->
+              <small><!--n:ab2_teste.residual_sem_registro.ic-->[60–91%]<!--/n--></small></td>
+            <td><!--n:ab2_teste.formulario_sem_registro.valor-->88%<!--/n-->
+              <small><!--n:ab2_teste.formulario_sem_registro.ic-->[69–96%]<!--/n--></small></td>
+          </tr>
+          <tr>
+            <th>O ganho: digitação (tempo modelado)
+              <small><!--n:ab2_teste.toques_residual.valor-->12<!--/n--> × <!--n:ab2_teste.toques_formulario.valor-->304<!--/n--> toques</small></th>
+            <td class="ag"><!--n:ab2_teste.tempo_residual.uma_casa-->34,5 s<!--/n--></td>
+            <td><!--n:ab2_teste.tempo_formulario.valor-->215 s<!--/n--></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="frase-ia">A IA lê o papel e a fala, o que um formulário não consegue; as regras, sem IA,
+        garantem o que é aceito; o humano assina.</p>
+    </div>
+  </div>
+  <footer class="rodape">
+    <p>Teste de <!--n:golden.n_teste.valor-->24<!--/n--> casos com defeitos plantados pela equipe, congelado
+      em 16/10/2026; red-team cego rodado uma vez; fiscal simulado; tempo modelado; DANFE sem o XML não
+      prova autenticidade. No dev, onde o A/B foi desenvolvido, <!--n:ab2.residual.valor-->97%<!--/n--> ×
+      <!--n:ab2.formulario.valor-->42%<!--/n-->: não se repetiu no teste. Rodada
+      <!--n:versao.sufixo.valor-->r4<!--/n-->, sha256(src/)
+      <code><!--n:versao.sha256_src.valor-->1154df4aceffbf20<!--/n-->…</code>; detalhes em
+      <code>eval/SLIDE.md</code>.</p>
+  </footer>
+</section>
+
+<!-- Tela 5 = S4. Diferencial (pitch 2:17–2:38): somar, nunca atacar; sem exclusividade não verificada -->
+<section class="slide s5" id="s5" aria-label="Diferencial">
+  <div class="topo">
+    <span class="marca">Laudo Vivo</span><span class="kicker">Diferencial · somar, não competir</span>
+  </div>
+  <h1>O que o satélite não vê, nós provamos</h1>
+  <div class="corpo">
+    <table class="dif">
+      <thead><tr><th>Quem</th><th>O que faz bem</th><th>Onde o Laudo Vivo entra</th></tr></thead>
+      <tbody>
+        <tr>
+          <th>Audsat</th>
+          <td>conta gado por imagem de satélite e gera o alerta remoto</td>
+          <td class="nos">consome o alerta inconclusivo e fecha a prova no chão, item a item</td>
+        </tr>
+        <tr>
+          <th>Softfocus</th>
+          <td>valida a nota fiscal e liga a instituição ao técnico</td>
+          <td class="nos">integra: o laudo e o pacote de exibição entram no fluxo dela</td>
+        </tr>
+        <tr>
+          <th>Olho do Dono</th>
+          <td>conta por câmera 3D e cruza com a GTA, em confinamento e frigorífico</td>
+          <td class="nos">laudo do MCR 2-7 para a instituição, só com o celular; a contagem deles vira
+            evidência</td>
+        </tr>
+        <tr>
+          <th>Credenciada com prancheta</th>
+          <td>visita presencial e laudo em papel</td>
+          <td class="nos">visita só onde há divergência; cada item do laudo aponta para a sua prova</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="faixa">A camada de prova do MCR 2-7 para o que o satélite não fecha: do lado da instituição
+      financeira, item a item, com abstenção, recusa de pressão, assinatura humana e pacote de exibição.</p>
+  </div>
+  <footer class="rodape">
+    <p>Páginas públicas: Audsat (09/02/2026), Olho do Dono (12/09/2026), Softfocus Zoom e Assist
+      (consultadas em 16/10/2026). Respostas da banca em <code>docs/entregaveis/qa-banca.md</code> (N3, N4,
+      M2, M4).</p>
+  </footer>
+</section>
+
+<!-- Tela 6 = S5. Equipe (pitch 2:38–2:50). ÚNICO marcador permitido no deck: ⚠ PREENCHER (equipe) -->
+<section class="slide s6" id="s6" aria-label="Equipe" data-preencher="equipe">
+  <div class="topo">
+    <span class="marca">Laudo Vivo</span><span class="kicker">Equipe e jornada</span>
+    <span class="preencher-selo">⚠ PREENCHER (equipe)</span>
+  </div>
+  <h1>Equipe</h1>
+  <div class="corpo">
+    <div>
+      <div class="pessoas">
+        <div class="pessoa">
+          <div class="foto">[[EQUIPE: foto]]</div>
+          <p><b>[[EQUIPE: nome]]</b></p>
+          <p>[[EQUIPE: papel e domínio, em uma linha]]</p>
+        </div>
+        <div class="pessoa">
+          <div class="foto">[[EQUIPE: foto]]</div>
+          <p><b>[[EQUIPE: nome]]</b></p>
+          <p>[[EQUIPE: papel e domínio, em uma linha]]</p>
+        </div>
+        <div class="pessoa">
+          <div class="foto">[[EQUIPE: foto]]</div>
+          <p><b>[[EQUIPE: nome]]</b></p>
+          <p>[[EQUIPE: papel e domínio, em uma linha]]</p>
+        </div>
+      </div>
+      <div class="extra">
+        <p><b>Domínio:</b> [[EQUIPE: agrônomo com ART, nome e CREA]] validando as regras.</p>
+        <p><b>Jornada:</b> [[EQUIPE: AVA x de 8 módulos · relatórios x de x no prazo · N commits]]</p>
+      </div>
+    </div>
+    <div class="instrucao">
+      <h3>⚠ PREENCHER (equipe): como preencher este slide</h3>
+      <ol>
+        <li>Troque cada <code>[[EQUIPE: …]]</code> por dado verdadeiro de <code>docs/EQUIPE.md</code>, só
+          com a autorização de cada pessoa para nome e foto.</li>
+        <li>Fotos em <code>docs/entregaveis/deck/img/</code> (ex.: <code>equipe-nome.jpg</code>) no lugar do
+          círculo; acrescente ou apague cartões.</li>
+        <li>Sem agrônomo parceiro confirmado, apague a linha “Domínio”. Sem prova da jornada, apague a
+          linha “Jornada”.</li>
+        <li>Apague esta caixa e o selo ⚠ e gere o PDF de novo: <code>node scripts/gerar_pdf.cjs</code>.</li>
+      </ol>
+      <p class="fim">Nunca leia um marcador em voz alta: sem o dado, vale a frase alternativa do pitch.</p>
+    </div>
+  </div>
+  <footer class="rodape">
+    <p>Papéis, domínio, dedicação e provas da jornada: <code>docs/EQUIPE.md</code> e
+      <code>docs/jornada/</code>.</p>
+  </footer>
+</section>
+
+<!-- Tela 7 = S6. Modelo de negócio e pedido (pitch 2:50–2:59; quem paga também é falado em 2:17) -->
+<section class="slide s7" id="s7" aria-label="Modelo e pedido">
+  <div class="topo">
+    <span class="marca">Laudo Vivo</span><span class="kicker">Modelo de negócio e pedido</span>
+  </div>
+  <h1>Laudo Vivo: a prova do crédito rural, do satélite ao curral</h1>
+  <div class="corpo">
+    <div class="modelo">
+      <div class="item-modelo">
+        <span class="rot">Quem paga</span>
+        <p><b>A cooperativa de crédito</b>, que a norma obriga a fiscalizar e que responde pela
+          fiscalização; a credenciada que fiscaliza por ela paga licença por fiscal.</p>
+      </div>
+      <div class="item-modelo">
+        <span class="rot">Como cobra</span>
+        <p><b>Por fiscalização concluída</b>, a preço-alvo ainda não testado com cliente; a visita
+          presencial fica só para onde há divergência.</p>
+      </div>
+      <div class="item-modelo">
+        <span class="rot">Custo da IA</span>
+        <p>Medido no trace da demo: <b><!--n:custo.local_rs.valor-->R$ 0,0035<!--/n--></b> de energia
+          local, ou <!--n:custo.nuvem_min_rs.valor-->R$ 0,04<!--/n--> a
+          <!--n:custo.nuvem_max_rs.valor-->R$ 0,28<!--/n--> se fosse em nuvem. O que pesa é a revisão
+          humana.</p>
+      </div>
+      <div class="item-modelo">
+        <span class="rot">Nunca o produtor</span>
+        <p>O MCR 2-7 veda fornecedor contratado pelo mutuário: trabalhamos só para quem fiscaliza.</p>
+      </div>
+    </div>
+    <div class="pedido">
+      <span class="quem">Pedido</span>
+      <p class="grande">Queremos três cooperativas goianas no piloto até novembro.</p>
+      <p>Hoje não há piloto nem cliente: o primeiro piloto pago é o próximo marco.</p>
+      <span class="quem depois">Até a final (28/11)</span>
+      <ul>
+        <li>teste com operações reais de uma cooperativa;</li>
+        <li>módulo de exceções socioambientais (<span class="sem-quebra">MCR 2-9</span>);</li>
+        <li>o primeiro piloto pago.</li>
+      </ul>
+      <p class="abre">Código aberto (Apache-2.0). Cada número deste deck sai de um script do repositório
+        (<code>docs/entregaveis/numeros.md</code>).</p>
+    </div>
+  </div>
+  <footer class="rodape">
+    <p>Contas de preço, custo e mercado (estimativas, com fonte): <code>docs/entregaveis/mercado.md</code>
+      e <code>docs/entregaveis/bmc-v1.md</code>.</p>
+  </footer>
+</section>
+
+</main>
+<script>
+  (function () {
+    var telas = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+    var atual = 0;
+    var raiz = document.documentElement;
+    var AVANCA = ["ArrowRight", "PageDown", " ", "Enter"];
+    var VOLTA = ["ArrowLeft", "PageUp", "Backspace"];
+    raiz.classList.add("palco");
+    telas.forEach(function (el, k) {
+      var r = el.querySelector(".rodape");
+      if (r) { r.setAttribute("data-n", String(k + 1)); }
+    });
+    function ajustar() {
+      var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+      raiz.style.setProperty("--escala", String(s));
+    }
+    function ir(n) {
+      atual = Math.max(0, Math.min(telas.length - 1, n));
+      telas.forEach(function (el, k) { el.classList.toggle("ativa", k === atual); });
+      try { history.replaceState(null, "", "#" + (atual + 1)); } catch (e) { /* file:// sem history */ }
+    }
+    window.addEventListener("resize", ajustar);
+    window.addEventListener("keydown", function (e) {
+      var k = e.key;
+      if (AVANCA.indexOf(k) >= 0) { ir(atual + 1); e.preventDefault(); }
+      else if (VOLTA.indexOf(k) >= 0) { ir(atual - 1); e.preventDefault(); }
+      else if (k === "Home") { ir(0); }
+      else if (k === "End") { ir(telas.length - 1); }
+      else if (k === "f" || k === "F") {
+        if (!document.fullscreenElement && raiz.requestFullscreen) { raiz.requestFullscreen(); }
+        else if (document.exitFullscreen) { document.exitFullscreen(); }
+      }
+    });
+    document.addEventListener("click", function (e) {
+      if (e.target.closest("a")) { return; }
+      ir(atual + (e.clientX > window.innerWidth / 3 ? 1 : -1));
+    });
+    ajustar();
+    var h = parseInt(location.hash.slice(1), 10);
+    ir(isFinite(h) ? h - 1 : 0);
+  })();
+</script>
+</body>
+</html>

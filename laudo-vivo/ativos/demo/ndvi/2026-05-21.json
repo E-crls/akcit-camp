@@ -1,0 +1,1 @@
+{"data": "2026-05-21", "item_id": "S2C_T22LFH_20260521T133144_L2A", "tile": "22LFH", "plataforma": "sentinel-2c", "nuvem_cena": 10.305016, "n_pixels": 480, "n_limpos": 480, "frac_limpa": 1.0, "ndvi_p10": 0.4099, "ndvi_p50": 0.5208, "ndvi_p90": 0.7416, "ndvi_media": 0.5562, "limpa": false, "bytes": 3142078, "requisicoes": 6, "segundos": 42.21, "cache": false}

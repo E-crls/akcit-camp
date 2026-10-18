@@ -1,0 +1,395 @@
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  n: 60
+  versao_taxonomia: 1
+composicao:
+  valido: 24
+  defeito: 24
+  ambiguo: 12
+frac_dev: 0.6
+estratos:
+  ambiguo:
+    dev: 7
+    test: 5
+  valido:
+    dev: 14
+    test: 10
+  defeito:
+    dev: 15
+    test: 9
+congelado: true
+congelamento:
+  data: 16/10/2026
+  conferido_em: 16/10/2026 00:58 -03
+  conferido: sha256_split, sha256_conteudo de dev e test e sha256_caso dos 60 caso.yaml recalculados, todos iguais
+  equivalencia: eval/conferir_equivalencia.py contra a r3 (2026-10-09_*_r3), ver eval/README.md
+  protocolo: eval/README.md, seção "Congelamento do split de teste"
+nota: teste congelado em 16/10/2026; limiares só calibrados no dev; regerar exige --forcar e invalida as rodadas
+sha256_split: 9e51b91272fcc1b38e669fa358c39328be35d289d25e0c42e72f4e3628c10f38
+sha256_conteudo:
+  dev: 410f7f76855184a1f8992becfa30262dce81218b255d3c4cacf15b1867506933
+  test: f47e444648b42130268cede1a0c37803cce49035200ed8fe918b3dbb0d735dcd
+dev:
+- GLD-0001
+- GLD-0002
+- GLD-0007
+- GLD-0008
+- GLD-0009
+- GLD-0010
+- GLD-0011
+- GLD-0013
+- GLD-0014
+- GLD-0015
+- GLD-0018
+- GLD-0020
+- GLD-0021
+- GLD-0023
+- GLD-0025
+- GLD-0026
+- GLD-0027
+- GLD-0028
+- GLD-0029
+- GLD-0030
+- GLD-0031
+- GLD-0033
+- GLD-0034
+- GLD-0035
+- GLD-0036
+- GLD-0041
+- GLD-0043
+- GLD-0047
+- GLD-0050
+- GLD-0051
+- GLD-0052
+- GLD-0053
+- GLD-0055
+- GLD-0056
+- GLD-0058
+- GLD-0060
+test:
+- GLD-0003
+- GLD-0004
+- GLD-0005
+- GLD-0006
+- GLD-0012
+- GLD-0016
+- GLD-0017
+- GLD-0019
+- GLD-0022
+- GLD-0024
+- GLD-0032
+- GLD-0037
+- GLD-0038
+- GLD-0039
+- GLD-0040
+- GLD-0042
+- GLD-0044
+- GLD-0045
+- GLD-0046
+- GLD-0048
+- GLD-0049
+- GLD-0054
+- GLD-0057
+- GLD-0059
+casos:
+- id: GLD-0001
+  classe: ambiguo
+  codigo: A02_FOTO_BORDA_GPS_IMPRECISO
+  split: dev
+  sha256_caso: 9c04efdf2da3141592465756bb19d922219ca01c121de6be61a07cd9d810fee3
+- id: GLD-0002
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: 97dc26050a1fe74ddbded711f6be1f12db22f5f8579beb8fccfa6dff46a6e652
+- id: GLD-0003
+  classe: valido
+  codigo: null
+  split: test
+  sha256_caso: 1e2b62e8443322b2c26efe89b1edefe62494de6a1526eab59c371702322339ec
+- id: GLD-0004
+  classe: ambiguo
+  codigo: A03_NFE_SEM_PROTOCOLO
+  split: test
+  sha256_caso: 3ac59e7821a856f3b2fd436d86454e3a20c205e727d352e31ea350ca7b83c89a
+- id: GLD-0005
+  classe: valido
+  codigo: null
+  split: test
+  sha256_caso: 02199cc23b17d739075dd2c9a3f3a3b9cc21b483c5ff9af0f82beb2a1e6bc99f
+- id: GLD-0006
+  classe: ambiguo
+  codigo: A05_GTA_CARGA_PARCIAL
+  split: test
+  sha256_caso: c5fc7e7f0e8e57be7cea684470b11ddefdb7aed4386022c39be036cd083c27f6
+- id: GLD-0007
+  classe: defeito
+  codigo: D08_FOTO_DUPLICADA
+  split: dev
+  sha256_caso: 02403e0d333383263c46ef32e48ad64a8a45d273e196d10d17a395b63549b7fb
+- id: GLD-0008
+  classe: defeito
+  codigo: D14_NFE_VENDEDOR_E_TOMADOR
+  split: dev
+  sha256_caso: 8a421bbb00b6a27c542a80e9cfe3a800b625d0faf3fad090ea7ef6ce0d0f52db
+- id: GLD-0009
+  classe: defeito
+  codigo: D02_NFE_NCM_ERRADO
+  split: dev
+  sha256_caso: 599935d3bc5fc3a0728b3d2bb16d71418f3dd10dd952a318f958883e1fa126ce
+- id: GLD-0010
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: c5a421066ada14ef27b5f7020a8a33f191478eff6e07d947e9698e4068053fad
+- id: GLD-0011
+  classe: ambiguo
+  codigo: A06_GTA_ORIGEM_MUNICIPIO_DIFERENTE
+  split: dev
+  sha256_caso: 280d1f29198126eb4d47cc822ec2991d4172c50d1c172e5886b331e3e65de9c5
+- id: GLD-0012
+  classe: defeito
+  codigo: D05_GTA_OUTRO_MUNICIPIO
+  split: test
+  sha256_caso: a89ab516b0546c408dddad48aaf9f83bdff61d1e8c874a82c31852a384b2b952
+- id: GLD-0013
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: 2d0a71be5d943b3c60b957c81f4ad1c6dbd3a01289dcf52afd7101030dd29daa
+- id: GLD-0014
+  classe: ambiguo
+  codigo: A05_GTA_CARGA_PARCIAL
+  split: dev
+  sha256_caso: e2ed5ad34f25929a819768b8100295fcff53229f55cd63dd5b5ef0c1eb174feb
+- id: GLD-0015
+  classe: ambiguo
+  codigo: A08_NFE_SEM_ASSINATURA
+  split: dev
+  sha256_caso: 88155374b3a6cdbcc561f2dc969cb42fd55ef66548a1b893dee3df597af7181e
+- id: GLD-0016
+  classe: defeito
+  codigo: D11_NFE_CHAVE_DV_ERRADO
+  split: test
+  sha256_caso: 11259b80004c1c3b0ad5d7c5c1d21ee6be4dabd05e7cb2dfa40b46411892b9d8
+- id: GLD-0017
+  classe: valido
+  codigo: null
+  split: test
+  sha256_caso: 305b594f83705055e4491b1d42fa56552936dfaa1b47d4a2c409e020d14e5a05
+- id: GLD-0018
+  classe: defeito
+  codigo: D11_NFE_CHAVE_DV_ERRADO
+  split: dev
+  sha256_caso: a605ae393fad4308e602b80d09895c116f2e71b942f995b225d213afdcc33eef
+- id: GLD-0019
+  classe: valido
+  codigo: null
+  split: test
+  sha256_caso: 1ddd0b72879f0cd56dca47734efee540dcb8bd11fe1f91a8f1aeb2c0cab859df
+- id: GLD-0020
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: 79789b4e7334e97cb8d78de9a75b4fce75e1cd9ad5b79390ba8d1894fc06c38c
+- id: GLD-0021
+  classe: defeito
+  codigo: D12_PRESSAO_FALA
+  split: dev
+  sha256_caso: b4550e1bdf1309aefd845aa3461b107a07ed6e2603d2d15296a3bdf37c5f7cdf
+- id: GLD-0022
+  classe: valido
+  codigo: null
+  split: test
+  sha256_caso: 10b2b96e174bf7fc8ce76f1e773321718c4aa577bed8a9b7fd3a80f305c8b9a4
+- id: GLD-0023
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: a512279a38a68a6ac24c6175dc46cea1f34f6b613989b5b14b14db35b1fe2086
+- id: GLD-0024
+  classe: valido
+  codigo: null
+  split: test
+  sha256_caso: 0a985c851ad46ef917c087d68289c9dc1e4f75b6f86ac00a71ab98bbf4641999
+- id: GLD-0025
+  classe: defeito
+  codigo: D01_NFE_QTD_MENOR
+  split: dev
+  sha256_caso: c495e382694b9e3999b3e9fe9bb8f4616b92b9f1730c97ef908e88b7e254ca06
+- id: GLD-0026
+  classe: defeito
+  codigo: D09_CONTAGEM_ABAIXO
+  split: dev
+  sha256_caso: d6e4a83346a7061c44d9d8d3cff7a6cf2c689f39222f3504152ca83aefbeef23
+- id: GLD-0027
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: 986afbae00c098cbf989f8c11607e558db815e9ea99f27daee880850469c3480
+- id: GLD-0028
+  classe: defeito
+  codigo: D04_GTA_QTD_MENOR
+  split: dev
+  sha256_caso: ce2483e3fb7880f14b992e196f713fcd6069f8f889f52ee2e0bc7a9c6d106b60
+- id: GLD-0029
+  classe: defeito
+  codigo: D10_NFE_DIGEST_INVALIDO
+  split: dev
+  sha256_caso: 8a9ca3066852e1fce8240f4db142750ceda54733f7d24d842d774465fefb49c0
+- id: GLD-0030
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: b77b8c76dbb3e015c84587644798eb054dc62696540f8e66b0067e008588fd36
+- id: GLD-0031
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: 0eac7a935d48f5622f894dd1956505665d3877907cd5a6f0cf92ff5b3fa7dd1b
+- id: GLD-0032
+  classe: valido
+  codigo: null
+  split: test
+  sha256_caso: b9e1aceb568b6c80d60dbfbe6d5751bee0296ddf5353ab04a8065cdd9ac39028
+- id: GLD-0033
+  classe: defeito
+  codigo: D16_NFE_VALOR_ABAIXO
+  split: dev
+  sha256_caso: ace0b1e9ea260baa3401e1807ad12a7dea1646f8ee32350b0dc3834208d47520
+- id: GLD-0034
+  classe: defeito
+  codigo: D13_INJECAO_DOCUMENTO
+  split: dev
+  sha256_caso: 4ec07bdabf6c448267b39bdf5d0c322275b04a416b38b92c22823dbf4a9cbaa2
+- id: GLD-0035
+  classe: ambiguo
+  codigo: A01_CONTAGEM_INCONCLUSIVA
+  split: dev
+  sha256_caso: ae0e9382e35fd1a2133be09e273edd048abe420a707abf65dd2e807a105f50e0
+- id: GLD-0036
+  classe: defeito
+  codigo: D07_FOTO_SEM_EXIF
+  split: dev
+  sha256_caso: cadfcb878ca3aa4cc5e6069977e162c5974cb319f8af1584ca6d81b95214769a
+- id: GLD-0037
+  classe: valido
+  codigo: null
+  split: test
+  sha256_caso: 437a7317117f89dd7e65bef1720d07755884ebcd4910447c1522a7234188876a
+- id: GLD-0038
+  classe: ambiguo
+  codigo: A04_GTA_ORDEM_INVERTIDA_1DIA
+  split: test
+  sha256_caso: afcabd73839fe88a57df5ac9209d80ad41f73c04f8848742e33b337d7fd4f179
+- id: GLD-0039
+  classe: defeito
+  codigo: D03_NFE_ANTERIOR_CONTRATACAO
+  split: test
+  sha256_caso: 71ef1886c2e71fcae456c2ae55f6b4dc39f168a1e1685cef8e8643d4293bbdea
+- id: GLD-0040
+  classe: defeito
+  codigo: D09_CONTAGEM_ABAIXO
+  split: test
+  sha256_caso: b6128a028e8eb2db9bdbdd432905b88354866e8be9178e7343e5bc5d0b74ec38
+- id: GLD-0041
+  classe: defeito
+  codigo: D03_NFE_ANTERIOR_CONTRATACAO
+  split: dev
+  sha256_caso: 44ba039477f44449fc742df0346901df8e786122a2c718513a4848b91eca0de9
+- id: GLD-0042
+  classe: defeito
+  codigo: D02_NFE_NCM_ERRADO
+  split: test
+  sha256_caso: 79398498184f2483551070ed89b47865532386c5be4d447dd0d8a02d1735e9f9
+- id: GLD-0043
+  classe: defeito
+  codigo: D15_GTA_ANTERIOR_NF
+  split: dev
+  sha256_caso: ac14a710c69d5e2919032d1f42fe7c65b824d4b953730f6b27d59200745e8a0b
+- id: GLD-0044
+  classe: defeito
+  codigo: D10_NFE_DIGEST_INVALIDO
+  split: test
+  sha256_caso: a4583054219ed2af6bc0dfee995c99b0481f12fa1d0c828a3f70544edf0ec46e
+- id: GLD-0045
+  classe: ambiguo
+  codigo: A01_CONTAGEM_INCONCLUSIVA
+  split: test
+  sha256_caso: 77bbcbefbbde9e2e83337d355addcb681947ecf744380baa0b9a5f251f0db312
+- id: GLD-0046
+  classe: ambiguo
+  codigo: A02_FOTO_BORDA_GPS_IMPRECISO
+  split: test
+  sha256_caso: 85bd741a695f904a8316db03943f0cc3ea7b3e34974058d64b9a324a21cc9539
+- id: GLD-0047
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: d99ff08b3c39202337d676c0a0a113df758560e81fb4bf56387a2d8140a9a230
+- id: GLD-0048
+  classe: defeito
+  codigo: D01_NFE_QTD_MENOR
+  split: test
+  sha256_caso: b8574892fd53baf24e86257397dc467be5f1ed880df55ca3caae6567371d7e42
+- id: GLD-0049
+  classe: defeito
+  codigo: D06_FOTO_FORA_GLEBA
+  split: test
+  sha256_caso: 1958b7a2f7293b1c0fbe7b07cc33948558622158130f9bf2891135a9cc648712
+- id: GLD-0050
+  classe: defeito
+  codigo: D06_FOTO_FORA_GLEBA
+  split: dev
+  sha256_caso: df6cda221558f7d38c021d5045e5b72b36aa002930827cdc262c5cc5b40037e2
+- id: GLD-0051
+  classe: ambiguo
+  codigo: A03_NFE_SEM_PROTOCOLO
+  split: dev
+  sha256_caso: 5d525ae43eb412aeece03857feeb980b70c23b1cc9fadff62af7bbb68d88f314
+- id: GLD-0052
+  classe: ambiguo
+  codigo: A07_NFE_UNIDADE_ARROBA
+  split: dev
+  sha256_caso: fc036229927a0e75841ba2ab360900e2b8cdf8e5d7bf9ae26baa5c126e589ab9
+- id: GLD-0053
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: 3a1551c49cefdb7de366f1c1822178ac45388dda3295970b133e590718aa9d8a
+- id: GLD-0054
+  classe: defeito
+  codigo: D12_PRESSAO_FALA
+  split: test
+  sha256_caso: 9c22ff7a2db7c5b76ced80fc24080c7489293a6b585477bc8f9a536276746541
+- id: GLD-0055
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: 73ac3ad14343b069d9d05649e6fbd30afce7b3eacd74d0383916712c95ba6cf2
+- id: GLD-0056
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: db160744c4c2d1e2a324cfbaa6fe9be44102bfd304042b08cfaeb0188b59cf78
+- id: GLD-0057
+  classe: valido
+  codigo: null
+  split: test
+  sha256_caso: 8fc099db38d14439d7e012b5b18ad3cc409ffb8f9faea8b6cfda8fe272252500
+- id: GLD-0058
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: cfaa29100962242f9e5d0cc4033ffe2eed8ec3928ef6cb423c804e9d47f2ac19
+- id: GLD-0059
+  classe: valido
+  codigo: null
+  split: test
+  sha256_caso: 2411981732557a4cb01e7aaee546ba4744f15b74fea76302f84d60894123aa42
+- id: GLD-0060
+  classe: valido
+  codigo: null
+  split: dev
+  sha256_caso: 115204fcbc19faff06e9c0570270f111d462a7fd8a8962ed1f1848bb0f7250fb

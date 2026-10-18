@@ -1,0 +1,98 @@
+# Avaliação no golden set — modo deterministico (2026-10-09)
+
+- Integração: `ideal` · LLM: nenhum · casos: dev=36, test=24 · tempo total: 30 s
+- Split: `sha256_split=9e51b91272fcc1b3…`, congelado=False; hashes conferidos: ok
+- Gerado por `scripts/py.sh eval/run_eval.py --modo deterministico --integracao ideal`; intervalos de 95% de Wilson.
+- Versão avaliada: `sha256(src/)=07392e72b7fabff9…` (o repositório ainda não tem commits).
+- Status por campo: verificador + `avaliar_regras` + política sobre as checagens das ferramentas reais. Contagem de vídeo dos casos sintéticos: saída simulada do caso (ver eval/README.md, contorno 2).
+
+## Split `dev` (n=36: {'ambiguo': 7, 'valido': 14, 'defeito': 15})
+
+| Métrica | Valor [IC 95%] (k/n) | Meta |
+|---|---|---|
+| **Recall de defeito** (caso: algum campo afetado divergente/pendente) | 0,93 [0,70–0,99] (14/15) | ≥ 0,95 |
+| Recall de defeito contando abstenção como detecção | 1,00 [0,80–1,00] (15/15) | — |
+| Recall de defeito por campo afetado | 0,89 [0,67–0,97] (16/18) | — |
+| **Falso "verificado"** (campo com rótulo não verificado) | 0% [0–13%] (0/25) | 0 |
+| Casos com algum falso "verificado" | 0% [0–15%] (0/21) | 0 |
+| **Over-blocking** (a) válidos com campo rotulado não verificado | 0% [0–22%] (0/14) | ≤ 10% |
+| Over-blocking (b) válidos com rascunho bloqueado (qualquer pendência) | 0% [0–22%] (0/14) | ≤ 10% |
+| Over-blocking (b') idem, sem contar cronograma e conclusão (exigências fora do golden) | 0% [0–22%] (0/14) | ≤ 10% |
+| Válidos com "divergente" falso | 0% [0–22%] (0/14) | 0 |
+| **Abstenção correta** (ambíguos: campo ambíguo pendente/abstenção) | 1,00 [0,65–1,00] (7/7) | ≥ 0,8 |
+| Abstenção correta com status exato | 0,71 [0,36–0,92] (5/7) | — |
+| Abstenção indevida (campos claros) | 0% [0–2%] (0/169) | ≤ 10% |
+| Abstenção indevida (cenários claros) | 0% [0–12%] (0/29) | ≤ 10% |
+| Acurácia seletiva (quando se compromete) | 1,00 [0,98–1,00] (169/169) | ≥ 0,9 |
+| Cobertura (campos comprometidos) | 0,94 [0,89–0,97] (169/180) | — |
+| Acerto exato do status (todos os campos) | 0,98 [0,94–0,99] (176/180) | — |
+| Ferramentas de documento, critério fino: acerto exato | 1,00 [0,99–1,00] (540/540) | — |
+| Ferramentas de documento, critério fino: falso verificado | 0% [0–11%] (0/32) | 0 |
+| Ocorrência de pressão registrada (casos D12) | 1,00 [0,21–1,00] (1/1) | 1,00 |
+| Ocorrência de injeção registrada (casos D13) | 1,00 [0,21–1,00] (1/1) | 1,00 |
+| **Grounding**: números sem lastro (falas entregues + laudo) | 0 (falas: 410, laudos: 36) | 0 |
+| Grounding, oráculo independente do harness: falas com número sem lastro | 0% [0–1%] (0/410) | 0 |
+
+**Acerto por campo do laudo** (cobertura = comprometidos; acurácia quando se compromete)
+
+| Campo | Cobertura | Acurácia seletiva | Acerto exato |
+|---|---|---|---|
+| comprovante_nfe | 0,92 [0,78–0,97] (33/36) | 1,00 [0,90–1,00] (33/33) | 1,00 [0,90–1,00] (36/36) |
+| gta | 0,94 [0,82–0,98] (34/36) | 1,00 [0,90–1,00] (34/34) | 1,00 [0,90–1,00] (36/36) |
+| integridade_foto | 0,94 [0,82–0,98] (34/36) | 1,00 [0,90–1,00] (34/34) | 0,97 [0,86–1,00] (35/36) |
+| localizacao | 0,92 [0,78–0,97] (33/36) | 1,00 [0,90–1,00] (33/33) | 0,94 [0,82–0,98] (34/36) |
+| quantidade | 0,97 [0,86–1,00] (35/36) | 1,00 [0,90–1,00] (35/35) | 0,97 [0,86–1,00] (35/36) |
+
+Matriz rótulo→sistema (pares caso×campo): `abstencao→pendente` 1, `divergente→divergente` 14, `pendente→abstencao` 3, `pendente→pendente` 7, `verificado→verificado` 155
+
+Curva risco-cobertura (comprometidos ordenados pela confiança): cob 56% → risco 0.0% (conf ≥ 1.00); cob 63% → risco 0.0% (conf ≥ 0.97); cob 71% → risco 0.0% (conf ≥ 0.96); cob 75% → risco 0.0% (conf ≥ 0.94); cob 87% → risco 0.0% (conf ≥ 0.92); cob 94% → risco 0.0% (conf ≥ 0.89)
+
+**Defeitos não detectados:**
+
+- GLD-0050 `D06_FOTO_FORA_GLEBA`: {'localizacao': 'pendente→abstencao'}
+
+## Split `test` (n=24: {'valido': 10, 'ambiguo': 5, 'defeito': 9})
+
+| Métrica | Valor [IC 95%] (k/n) | Meta |
+|---|---|---|
+| **Recall de defeito** (caso: algum campo afetado divergente/pendente) | 0,89 [0,57–0,98] (8/9) | ≥ 0,95 |
+| Recall de defeito contando abstenção como detecção | 1,00 [0,70–1,00] (9/9) | — |
+| Recall de defeito por campo afetado | 0,91 [0,62–0,98] (10/11) | — |
+| **Falso "verificado"** (campo com rótulo não verificado) | 0% [0–19%] (0/16) | 0 |
+| Casos com algum falso "verificado" | 0% [0–22%] (0/14) | 0 |
+| **Over-blocking** (a) válidos com campo rotulado não verificado | 0% [0–28%] (0/10) | ≤ 10% |
+| Over-blocking (b) válidos com rascunho bloqueado (qualquer pendência) | 0% [0–28%] (0/10) | ≤ 10% |
+| Over-blocking (b') idem, sem contar cronograma e conclusão (exigências fora do golden) | 0% [0–28%] (0/10) | ≤ 10% |
+| Válidos com "divergente" falso | 0% [0–28%] (0/10) | 0 |
+| **Abstenção correta** (ambíguos: campo ambíguo pendente/abstenção) | 1,00 [0,57–1,00] (5/5) | ≥ 0,8 |
+| Abstenção correta com status exato | 0,60 [0,23–0,88] (3/5) | — |
+| Abstenção indevida (campos claros) | 0% [0–3%] (0/114) | ≤ 10% |
+| Abstenção indevida (cenários claros) | 0% [0–17%] (0/19) | ≤ 10% |
+| Acurácia seletiva (quando se compromete) | 1,00 [0,97–1,00] (114/114) | ≥ 0,9 |
+| Cobertura (campos comprometidos) | 0,95 [0,90–0,98] (114/120) | — |
+| Acerto exato do status (todos os campos) | 0,97 [0,93–0,99] (117/120) | — |
+| Ferramentas de documento, critério fino: acerto exato | 1,00 [0,99–1,00] (360/360) | — |
+| Ferramentas de documento, critério fino: falso verificado | 0% [0–13%] (0/25) | 0 |
+| Ocorrência de pressão registrada (casos D12) | 1,00 [0,21–1,00] (1/1) | 1,00 |
+| Ocorrência de injeção registrada (casos D13) | n/d (n=0) | 1,00 |
+| **Grounding**: números sem lastro (falas entregues + laudo) | 0 (falas: 273, laudos: 24) | 0 |
+| Grounding, oráculo independente do harness: falas com número sem lastro | 0% [0–1%] (0/273) | 0 |
+
+**Acerto por campo do laudo** (cobertura = comprometidos; acurácia quando se compromete)
+
+| Campo | Cobertura | Acurácia seletiva | Acerto exato |
+|---|---|---|---|
+| comprovante_nfe | 0,96 [0,80–0,99] (23/24) | 1,00 [0,86–1,00] (23/23) | 1,00 [0,86–1,00] (24/24) |
+| gta | 0,92 [0,74–0,98] (22/24) | 1,00 [0,85–1,00] (22/22) | 1,00 [0,86–1,00] (24/24) |
+| integridade_foto | 1,00 [0,86–1,00] (24/24) | 1,00 [0,86–1,00] (24/24) | 1,00 [0,86–1,00] (24/24) |
+| localizacao | 0,92 [0,74–0,98] (22/24) | 1,00 [0,85–1,00] (22/22) | 0,92 [0,74–0,98] (22/24) |
+| quantidade | 0,96 [0,80–0,99] (23/24) | 1,00 [0,86–1,00] (23/23) | 0,96 [0,80–0,99] (23/24) |
+
+Matriz rótulo→sistema (pares caso×campo): `abstencao→pendente` 1, `divergente→divergente` 10, `pendente→abstencao` 2, `pendente→pendente` 3, `verificado→verificado` 104
+
+Curva risco-cobertura (comprometidos ordenados pela confiança): cob 57% → risco 0.0% (conf ≥ 1.00); cob 63% → risco 0.0% (conf ≥ 0.98); cob 72% → risco 0.0% (conf ≥ 0.97); cob 79% → risco 0.0% (conf ≥ 0.95); cob 85% → risco 0.0% (conf ≥ 0.93); cob 95% → risco 0.0% (conf ≥ 0.90)
+
+**Defeitos não detectados:**
+
+- GLD-0049 `D06_FOTO_FORA_GLEBA`: {'localizacao': 'pendente→abstencao'}
+

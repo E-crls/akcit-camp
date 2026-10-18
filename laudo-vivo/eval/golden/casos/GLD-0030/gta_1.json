@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "425519",
+  "serie": "GO",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 15
+    }
+  ],
+  "total": 15,
+  "total_por_extenso": "QUINZE BOVINOS",
+  "marca_rebanho": "MARCA TESTE 29",
+  "origem": {
+    "documento": "99999999502960",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 30 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 30",
+    "codigo_estabelecimento": "TESTE-5213806-9029",
+    "codigo_exploracao": "TESTE-5213806-9029-BOV",
+    "municipio_nome": "MORRINHOS",
+    "municipio_ibge": "5213806",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000012955",
+    "nome": "PRODUTOR TESTE 30",
+    "estabelecimento": "FAZENDA TESTE 30",
+    "codigo_estabelecimento": "TESTE-5214002-0030",
+    "codigo_exploracao": "TESTE-5214002-0030-BOV",
+    "municipio_nome": "MOZARLÂNDIA",
+    "municipio_ibge": "5214002",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST7D41"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2025-07-15"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE MORRINHOS"
+  },
+  "emissao": {
+    "local_municipio": "MORRINHOS",
+    "data": "2026-07-29",
+    "hora": "14:56",
+    "validade": "2026-08-01"
+  },
+  "nfe_chaves": [
+    "52260799999999502960550010000051031221698227"
+  ],
+  "codigo_barras": "SINTGOGO425519",
+  "sintetico": true
+}

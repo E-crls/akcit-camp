@@ -1,0 +1,65 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "630301",
+  "serie": "A",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "M",
+      "faixa_etaria": "13-24",
+      "quantidade": 40
+    }
+  ],
+  "total": 40,
+  "total_por_extenso": "QUARENTA BOVINOS",
+  "marca_rebanho": "MARCA TESTE PUB 23",
+  "origem": {
+    "documento": "99999999072346",
+    "documento_sha256": null,
+    "nome": "AGROPECUARIA VENDEDORA TESTE PUB 23 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE PUB 23",
+    "codigo_estabelecimento": "TESTE-5214838-9023",
+    "codigo_exploracao": null,
+    "municipio_nome": "NOVA CRIXÁS",
+    "municipio_ibge": "5214838",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000072346",
+    "documento_sha256": null,
+    "nome": "PRODUTOR TESTE PUB 23",
+    "estabelecimento": "FAZENDA TESTE PUB 23",
+    "codigo_estabelecimento": "TESTE-5206404-0023",
+    "codigo_exploracao": null,
+    "municipio_nome": "CRIXÁS",
+    "municipio_ibge": "5206404",
+    "uf": "GO"
+  },
+  "finalidade": "ENGORDA",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST3A01"
+  },
+  "vacinacoes": [],
+  "exames": [],
+  "observacao": "CARGA 1 DE 2",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE NOVA CRIXÁS"
+  },
+  "emissao": {
+    "local_municipio": "NOVA CRIXÁS",
+    "data": "2026-07-20",
+    "hora": "11:15",
+    "validade": "2026-07-22"
+  },
+  "nfe_chaves": [
+    "52260799999999072346550010000070231014167040"
+  ],
+  "codigo_barras": "SINTGOA630301",
+  "sintetico": true,
+  "fonte": "json",
+  "ilegiveis": []
+}

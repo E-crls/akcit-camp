@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "521667",
+  "serie": "GO",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 40
+    }
+  ],
+  "total": 40,
+  "total_por_extenso": "QUARENTA BOVINOS",
+  "marca_rebanho": "MARCA TESTE 25",
+  "origem": {
+    "documento": "00000052582",
+    "nome": "VENDEDOR TESTE 26",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 26",
+    "codigo_estabelecimento": "TESTE-5213707-9025",
+    "codigo_exploracao": "TESTE-5213707-9025-BOV",
+    "municipio_nome": "MONTES CLAROS DE GOIÁS",
+    "municipio_ibge": "5213707",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999102512",
+    "nome": "AGROPECUARIA TOMADORA TESTE 26 LTDA",
+    "estabelecimento": "FAZENDA TESTE 26",
+    "codigo_estabelecimento": "TESTE-5213707-0026",
+    "codigo_exploracao": "TESTE-5213707-0026-BOV",
+    "municipio_nome": "MONTES CLAROS DE GOIÁS",
+    "municipio_ibge": "5213707",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST3J49"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-06-02"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE MONTES CLAROS DE GOIÁS"
+  },
+  "emissao": {
+    "local_municipio": "MONTES CLAROS DE GOIÁS",
+    "data": "2026-08-12",
+    "hora": "14:15",
+    "validade": "2026-08-14"
+  },
+  "nfe_chaves": [
+    "52260800000000052582550010000057591296206108"
+  ],
+  "codigo_barras": "SINTGOGO521667",
+  "sintetico": true
+}

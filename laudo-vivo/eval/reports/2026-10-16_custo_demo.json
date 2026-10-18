@@ -1,0 +1,149 @@
+[
+ {
+  "uso": {
+   "fiscalizacao_id": "fis_demo_0001",
+   "turnos": 18,
+   "chamadas_llm": 21,
+   "tokens_entrada": 135349,
+   "tokens_saida": 1038,
+   "llm_ms": 38706,
+   "gpu_ms": 18601,
+   "carga_ms": 17699,
+   "modelos": [
+    "qwen3.5:4b"
+   ],
+   "origem_uso": [
+    "medido"
+   ],
+   "ferramentas": {
+    "avaliar_regras": {
+     "chamadas": 77,
+     "ms": 175
+    },
+    "carregar_operacao": {
+     "chamadas": 1,
+     "ms": 174
+    },
+    "classificar_foto": {
+     "chamadas": 2,
+     "ms": 7175
+    },
+    "completar_leitura_documento": {
+     "chamadas": 1,
+     "ms": 1
+    },
+    "conciliar_gta": {
+     "chamadas": 1,
+     "ms": 5
+    },
+    "conciliar_nfe": {
+     "chamadas": 3,
+     "ms": 10
+    },
+    "contar_bovinos_video": {
+     "chamadas": 1,
+     "ms": 21600
+    },
+    "declaracao_conclusao": {
+     "chamadas": 1,
+     "ms": 0
+    },
+    "emitir_rascunho": {
+     "chamadas": 2,
+     "ms": 216
+    },
+    "geofence": {
+     "chamadas": 2,
+     "ms": 5
+    },
+    "integridade_foto": {
+     "chamadas": 2,
+     "ms": 92
+    },
+    "ler_documento_foto": {
+     "chamadas": 1,
+     "ms": 27999
+    },
+    "planejar_metodo": {
+     "chamadas": 1,
+     "ms": 1
+    },
+    "serie_ndvi": {
+     "chamadas": 1,
+     "ms": 397
+    }
+   },
+   "ferramentas_ms": 57850
+  },
+  "nuvem_equivalente": [
+   {
+    "provedor": "OpenAI",
+    "modelo": "gpt-5-nano",
+    "usd": 0.00718,
+    "rs": 0.0359,
+    "entrada_usd_mtok": 0.05,
+    "saida_usd_mtok": 0.4,
+    "fonte": "https://developers.openai.com/api/docs/pricing (tier padrão; consultado em 2026-10-08)"
+   },
+   {
+    "provedor": "OpenAI",
+    "modelo": "gpt-5-mini",
+    "usd": 0.03591,
+    "rs": 0.1793,
+    "entrada_usd_mtok": 0.25,
+    "saida_usd_mtok": 2.0,
+    "fonte": "https://developers.openai.com/api/docs/pricing (tier padrão; consultado em 2026-10-08)"
+   },
+   {
+    "provedor": "OpenAI",
+    "modelo": "gpt-4.1-mini",
+    "usd": 0.0558,
+    "rs": 0.2786,
+    "entrada_usd_mtok": 0.4,
+    "saida_usd_mtok": 1.6,
+    "fonte": "https://developers.openai.com/api/docs/pricing (tier padrão; consultado em 2026-10-08)"
+   },
+   {
+    "provedor": "Google",
+    "modelo": "gemini-2.5-flash-lite",
+    "usd": 0.01395,
+    "rs": 0.0697,
+    "entrada_usd_mtok": 0.1,
+    "saida_usd_mtok": 0.4,
+    "fonte": "https://ai.google.dev/gemini-api/docs/pricing (tier pago; página de 2026-10-07; consultado em 2026-10-08)"
+   },
+   {
+    "provedor": "Google",
+    "modelo": "gemini-2.5-flash",
+    "usd": 0.0432,
+    "rs": 0.2157,
+    "entrada_usd_mtok": 0.3,
+    "saida_usd_mtok": 2.5,
+    "fonte": "https://ai.google.dev/gemini-api/docs/pricing (tier pago; página de 2026-10-07; consultado em 2026-10-08)"
+   },
+   {
+    "provedor": "Google",
+    "modelo": "gemini-3.5-flash-lite",
+    "usd": 0.0432,
+    "rs": 0.2157,
+    "entrada_usd_mtok": 0.3,
+    "saida_usd_mtok": 2.5,
+    "fonte": "https://ai.google.dev/gemini-api/docs/pricing (tier pago; página de 2026-10-07; consultado em 2026-10-08)"
+   }
+  ],
+  "energia_local": {
+   "kwh": 0.003478,
+   "rs": 0.00348,
+   "tempo_gpu_s": 18.6,
+   "tempo_gpu_fonte": "prompt_eval+eval do Ollama",
+   "tempo_ferramentas_s": 57.9
+  },
+  "parametros": {
+   "cambio_usd_brl": 4.9935,
+   "fonte_cambio": "PTAX venda 07/10/2026, Banco Central (olinda.bcb.gov.br, CotacaoDolarDia)",
+   "potencia_gpu_w": 300.0,
+   "potencia_cpu_w": 120.0,
+   "tarifa_kwh_rs": 1.0
+  }
+ }
+]

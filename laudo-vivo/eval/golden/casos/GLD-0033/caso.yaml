@@ -1,0 +1,297 @@
+id: GLD-0033
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 32
+sintetico: true
+classe: defeito
+defeito:
+  codigo: D16_NFE_VALOR_ABAIXO
+  classe: defeito
+  titulo: Valor da NF-e abaixo do financiado
+  descricao: 'Mesma quantidade, mas preço por cabeça 15% a 40% abaixo do orçado: indício de sobrefinanciamento.'
+data_fiscalizacao: '2026-09-16'
+operacao:
+  ref_bacen: SINT-2026-000033
+  tomador_ref: TOMADOR-TESTE-33
+  uf: GO
+  municipio_ibge: '5204409'
+  municipio_nome: CAIAPÔNIA
+  instituicao: COOPERATIVA DE CREDITO TESTE 03
+  finalidade: investimento
+  empreendimento: '23271300079002'
+  data_contratacao: '2026-07-04'
+  data_liberacao: null
+  valor_rs: 163080.0
+  area_financiada_ha: 138.6
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-51.882008 -16.833956, -51.888541 -16.834736, -51.892806 -16.838070, -51.889625 -16.844687, -51.880629
+    -16.843730, -51.879156 -16.843504, -51.879769 -16.842229, -51.876806 -16.839527, -51.882008 -16.833956))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 4 touro(s) (bovinos carne - reprodutores)
+    quantidade: 4.0
+    unidade: cabeca
+    valor_rs: 68680.0
+    categoria_animal: touro
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: cerca1
+    tipo: cerca
+    descricao: Construção de 5900 m de cerca de arame liso 5 fios
+    quantidade: 5900.0
+    unidade: m
+    valor_rs: 94400.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-11-15'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 33
+    codigo_estabelecimento: TESTE-5204409-0033
+    municipio_ibge: '5204409'
+    municipio_nome: CAIAPÔNIA
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 4 touro(s) (bovinos carne - reprodutores)
+    quantidade: 4
+    unidade: cabeca
+    valor_unitario_rs: 17170.0
+    valor_total_rs: 68680.0
+  - item_id: cerca1
+    descricao: Construção de 5900 m de cerca de arame liso 5 fios
+    quantidade: 5900.0
+    unidade: m
+    valor_unitario_rs: 16.0
+    valor_total_rs: 94400.0
+  empreendimento_sicor:
+    codigo: '23271300079002'
+    descricao: BOVINOS CARNE - REPRODUTORES
+  lotacao_implicita_cab_ha: 0.03
+tomador:
+  ref: TOMADOR-TESTE-33
+  nome: PRODUTOR TESTE 33
+  documento_sintetico: '00000013250'
+  documento_sha256: c400c3bf51368fde117f2a71562ed8c275133475b1968ed63bdb946e41dc9891
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999503266550010000085901460679425'
+    sha256: 21a523e1cc16b276442b7a7945eb765b6b087e575cd255c52d65a8ea14373a10
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-B-828651
+    sha256: 30449a83b06ef0642c6ebaece42a6dc47368c0c90f00229bb8f7b0d0ffd2ab00
+fotos:
+- id: foto_cerca_1
+  arquivo: fotos/foto_cerca_1.jpg
+  item_id: cerca1
+  sha256: df8dbf0f805699714318b2958519fb7e41787078f4a7f850072fbba6ef1c3e8c
+  exif:
+    presente: true
+    data_hora: '2026-09-16T15:59:40-03:00'
+    gps:
+      lat: -16.8389006
+      lon: -51.8885962
+  gps_app:
+    lat: -16.8389006
+    lon: -51.8885962
+    precisao_m: 8.7
+  duplicata_de: null
+  recebida_em: '2026-09-16T16:03:40-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 353.9
+- id: foto_cerca_2
+  arquivo: fotos/foto_cerca_2.jpg
+  item_id: cerca1
+  sha256: b99059e75ae23012dc729a5c0f134dce42cc5ac39101f1f23ae6383ec0ba9a35
+  exif:
+    presente: true
+    data_hora: '2026-09-16T14:09:43-03:00'
+    gps:
+      lat: -16.840041
+      lon: -51.8867286
+  gps_app:
+    lat: -16.840041
+    lon: -51.8867286
+    precisao_m: 4.9
+  duplicata_de: null
+  recebida_em: '2026-09-16T14:22:43-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 476.7
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: ab612a62e8b0302b720e8a32922c72cf95b324304d39eae813afb0477f28975e
+  exif:
+    presente: true
+    data_hora: '2026-09-16T13:00:05-03:00'
+    gps:
+      lat: -16.8358871
+      lon: -51.8858952
+  gps_app:
+    lat: -16.8358871
+    lon: -51.8858952
+    precisao_m: 7.2
+  duplicata_de: null
+  recebida_em: '2026-09-16T13:08:05-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 161.0
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0033/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 58
+  contagem_real: 4
+  saida_simulada_contador:
+    estimativa: 4
+    ic80:
+    - 4
+    - 4
+    confianca: 0.92
+    oclusao_frac: 0.03
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 33, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As touros chegaram depois da nota, vieram de Aruanã.
+- de: fiscal
+  texto: Agora vou fotografar a cerca pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 4 touro(s) (bovinos carne - reprodutores)
+      quantidade: 4.0
+      unidade: cabeca
+      valor_rs: 68680.0
+      categoria_animal: touro
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5204409'
+    municipio_nome: CAIAPÔNIA
+    data_contratacao: '2026-07-04'
+    data_fiscalizacao: '2026-09-16'
+    tomador_doc_sha256: c400c3bf51368fde117f2a71562ed8c275133475b1968ed63bdb946e41dc9891
+    codigo_estabelecimento_destino: TESTE-5204409-0033
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5204409'
+    municipio_nome: CAIAPÔNIA
+    data_contratacao: '2026-07-04'
+    data_fiscalizacao: '2026-09-16'
+    tomador_doc_sha256: c400c3bf51368fde117f2a71562ed8c275133475b1968ed63bdb946e41dc9891
+    codigo_estabelecimento_destino: TESTE-5204409-0033
+    caminhos:
+    - gta_1.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: ''
+    documento:nfe:autorizacao:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: ''
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: divergente
+      regra_id: MCR-2-7-item2b
+      motivo: valor da NF abaixo do financiado
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:cerca1:localizacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item16a
+      motivo: ''
+    item:cerca1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

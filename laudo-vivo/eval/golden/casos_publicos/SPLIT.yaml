@@ -1,0 +1,66 @@
+gerador:
+  versao: 0.2.1
+  semente_chaves: casos-publicos-20261016
+  bits: 1024
+split: casos_publicos
+papel: 'avaliacao_separada: mede o mecanismo (não a frequência); não calibra limiar; fora do dev e do test do golden
+  principal'
+nota: 'split separado (casos inspirados em casos públicos): não entra no dev nem no test do golden principal, não
+  calibra limiar; mede o mecanismo, não a frequência'
+congelado: false
+sha256_conteudo: 56606a318f38dccaa6cb71006c0e74078bb40885006555d166eebf2aa9d2fc27
+casos:
+- id: PUB-0001
+  classe: defeito
+  titulo: 'Documentos completos e rebanho ausente: 3% do financiado no curral'
+  sha256_caso: a417fada569dcdb7138b9914f7df2217a03a7eb103efb0c80b2ea794a492af04
+  arquivos:
+    caso.yaml: a417fada569dcdb7138b9914f7df2217a03a7eb103efb0c80b2ea794a492af04
+    gta_1.json: afb276316e4f02acdec46d9bca6c9f47c44d092e03eae9c85f37bd22cdf13c1c
+    gta_2.json: 0c0fa080b4a9b5330393839e5aa22da8aa06c9cfbff94b1764bedd2f7ef86d8d
+    gta_3.json: 318373671abe24416fe84920821904e33ba2fb51c2b61bc6f6c0cdb1ae6a2b7d
+    gta_4.json: 9fa57ca4b8c949fdacee5f366132f6f7e2a1aaee8a3915881ff03291a55a4550
+    nfe_1.xml: 714badad11dcd39f0ae66755cd99d7360e6025bc719e9919bb91e18d2dde2544
+- id: PUB-0002
+  classe: ambiguo
+  titulo: 'GTA de papel: as GTAs apresentadas não são a citada no grupo ZF da NF-e'
+  sha256_caso: a2c4b2bcb5c2ca8777e5c44c8567a93b9a5772fe2347fc29f5ec7078586e9569
+  arquivos:
+    caso.yaml: a2c4b2bcb5c2ca8777e5c44c8567a93b9a5772fe2347fc29f5ec7078586e9569
+    gta_1.json: 92ef7a7bbd7fe25770480df0c2dbe30d6fa86794ff94d6b9196b45b8664933f7
+    gta_2.json: 0b764c8b097b815765be2d6289784890f64e5c02046426c033776d88a9f203a8
+    nfe_1.xml: 613ab815e13abd4584544bfb0d0c5c0248f12f8c5c3ec51122251285ced7eb64
+- id: PUB-0003
+  classe: ambiguo
+  titulo: GTA com origem em outro produtor e outro município que o vendedor da NF-e
+  sha256_caso: c4eb4ddc82a563b260bf97785013ca7134b1d64d2e99d1948e11c863a80c6bc9
+  arquivos:
+    caso.yaml: c4eb4ddc82a563b260bf97785013ca7134b1d64d2e99d1948e11c863a80c6bc9
+    gta_1.json: 6c29a3d7d64720deb4d6d7cca4add709d187adf3b758f489871b0a6a981ebc08
+    nfe_1.xml: 8824a6b9351c7dc99d929e11fc5ab3f280b62f67347346cf9e9a598589159248
+- id: PUB-0004
+  classe: defeito
+  titulo: Mesma NF-e e mesma GTA já em laudo selado de outra operação (reuso de documento)
+  sha256_caso: e3fa7a1c9e4bf2f6bde199bd5a274ed6defffc2838b1ea1f0f74aad9b81caaf2
+  arquivos:
+    caso.yaml: e3fa7a1c9e4bf2f6bde199bd5a274ed6defffc2838b1ea1f0f74aad9b81caaf2
+    gta_1.json: 743a0084aa0788849b21dd6210eb764c724d789630a50e06c4e08fdc84ac2ae0
+    nfe_1.xml: d4ac5a3c468d5939e4b44f42ed495690478429ef3065c5ee5d83750d24c17629
+- id: PUB-0005
+  classe: defeito
+  titulo: GTA com destino em outro imóvel do mesmo município
+  sha256_caso: b995b5ac534a811d6e5e272c48187bac772b25b30c007a9b807f4ccc7ffae86f
+  arquivos:
+    caso.yaml: b995b5ac534a811d6e5e272c48187bac772b25b30c007a9b807f4ccc7ffae86f
+    gta_1.json: 2fed8e6a72a7ea62a25d84f6ababedad90802ff4a27821b1a5987bea5777959b
+    nfe_1.xml: 968753b360023d97e7cb0296d97f6b26c9b9a75cff96897a4952131061c6cfa5
+- id: PUB-0006
+  classe: defeito
+  titulo: 'Custeio de engorda: contagem muito abaixo da GTA (25% do documentado)'
+  sha256_caso: fde6ce6679766fef5bcb418e9217f6495b58730ed2c9f1035c016ba5c02d99b9
+  arquivos:
+    caso.yaml: fde6ce6679766fef5bcb418e9217f6495b58730ed2c9f1035c016ba5c02d99b9
+    gta_1.json: db7d696ce0ecd9f74145a4db0608978fbf3e1d373b3b18fc9fa41583e329d38c
+    gta_2.json: 1dc6555842a493980d506165ae3abc2f95b107e472000c1d9b6bced4011c0e83
+    gta_3.json: 0c579fe3dc396ceb5b1075db5ffaed0f730aa79c3cd754f66ef0b683c75b3358
+    nfe_1.xml: c7ca347c5660920424946274be953f9fb66ad7f170d0c74bc4ecb45ed1d213f5

@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "236397",
+  "serie": "AC",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "25-36",
+      "quantidade": 32
+    }
+  ],
+  "total": 32,
+  "total_por_extenso": "TRINTA E DOIS BOVINOS",
+  "marca_rebanho": "MARCA TESTE 07",
+  "origem": {
+    "documento": "99999999100730",
+    "nome": "AGROPECUARIA TOMADORA TESTE 08 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 08",
+    "codigo_estabelecimento": "TESTE-5208004-8007",
+    "codigo_exploracao": "TESTE-5208004-8007-BOV",
+    "municipio_nome": "FORMOSA",
+    "municipio_ibge": "5208004",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999100730",
+    "nome": "AGROPECUARIA TOMADORA TESTE 08 LTDA",
+    "estabelecimento": "FAZENDA TESTE 08",
+    "codigo_estabelecimento": "TESTE-5211909-0008",
+    "codigo_exploracao": "TESTE-5211909-0008-BOV",
+    "municipio_nome": "JATAÍ",
+    "municipio_ibge": "5211909",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST3G79"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-04-08"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 2 DE 2",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE FORMOSA"
+  },
+  "emissao": {
+    "local_municipio": "FORMOSA",
+    "data": "2026-08-19",
+    "hora": "09:48",
+    "validade": "2026-08-20"
+  },
+  "nfe_chaves": [
+    "52260899999999100730550010000033951574854072"
+  ],
+  "codigo_barras": "SINTGOAC236397",
+  "sintetico": true
+}

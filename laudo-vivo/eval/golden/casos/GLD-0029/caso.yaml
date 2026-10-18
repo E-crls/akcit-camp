@@ -1,0 +1,297 @@
+id: GLD-0029
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 28
+sintetico: true
+classe: defeito
+defeito:
+  codigo: D10_NFE_DIGEST_INVALIDO
+  classe: defeito
+  titulo: XML da NF-e adulterado (digest inválido)
+  descricao: Valores do item (vUnCom/vProd/vNF) inflados depois da assinatura; o DigestValue não confere.
+data_fiscalizacao: '2026-09-29'
+operacao:
+  ref_bacen: SINT-2026-000029
+  tomador_ref: TOMADOR-TESTE-29
+  uf: GO
+  municipio_ibge: '5214606'
+  municipio_nome: NIQUELÂNDIA
+  instituicao: COOPERATIVA DE CREDITO TESTE 04
+  finalidade: investimento
+  empreendimento: '23271300079002'
+  data_contratacao: '2026-09-02'
+  data_liberacao: null
+  valor_rs: 102850.0
+  area_financiada_ha: 109.6
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-48.410495 -14.480545, -48.414626 -14.489786, -48.412565 -14.492402, -48.402134 -14.491250, -48.402999
+    -14.490891, -48.401534 -14.487706, -48.410495 -14.480545))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 1 touro(s) (bovinos carne - reprodutores)
+    quantidade: 1.0
+    unidade: cabeca
+    valor_rs: 13250.0
+    categoria_animal: touro
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: cerca1
+    tipo: cerca
+    descricao: Construção de 5600 m de cerca de arame liso 5 fios
+    quantidade: 5600.0
+    unidade: m
+    valor_rs: 89600.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-11-28'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 29
+    codigo_estabelecimento: TESTE-5214606-0029
+    municipio_ibge: '5214606'
+    municipio_nome: NIQUELÂNDIA
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 1 touro(s) (bovinos carne - reprodutores)
+    quantidade: 1
+    unidade: cabeca
+    valor_unitario_rs: 13250.0
+    valor_total_rs: 13250.0
+  - item_id: cerca1
+    descricao: Construção de 5600 m de cerca de arame liso 5 fios
+    quantidade: 5600.0
+    unidade: m
+    valor_unitario_rs: 16.0
+    valor_total_rs: 89600.0
+  empreendimento_sicor:
+    codigo: '23271300079002'
+    descricao: BOVINOS CARNE - REPRODUTORES
+  lotacao_implicita_cab_ha: 0.01
+tomador:
+  ref: TOMADOR-TESTE-29
+  nome: PRODUTOR TESTE 29
+  documento_sintetico: 00000012874
+  documento_sha256: 49b3f9094601e81f6f5bacc39d70af8d241f55b8dd8a01ba8ca9628b93365c83
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260999999999502880550010000032661980672935'
+    sha256: 558356425718d9ce856c83a98185d48ef17d10271afd07923fe792e308077236
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-C-284173
+    sha256: b54b40001fd1b4ffd12f4590734e470c8dde4d6a582d20024406ba69547aeaa8
+fotos:
+- id: foto_cerca_1
+  arquivo: fotos/foto_cerca_1.jpg
+  item_id: cerca1
+  sha256: e13fa8e579e8c847b2e1f7befde5786dcf86125b41f609afeb25e6fcf36aa901
+  exif:
+    presente: true
+    data_hora: '2026-09-29T16:36:21-03:00'
+    gps:
+      lat: -14.4867195
+      lon: -48.4050426
+  gps_app:
+    lat: -14.4867195
+    lon: -48.4050426
+    precisao_m: 11.2
+  duplicata_de: null
+  recebida_em: '2026-09-29T16:43:21-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 155.4
+- id: foto_cerca_2
+  arquivo: fotos/foto_cerca_2.jpg
+  item_id: cerca1
+  sha256: 153e7afa1fd4ce6dc9267e859eb62f5a3acf0dcfc5cee0461fbd7583406cb2a8
+  exif:
+    presente: true
+    data_hora: '2026-09-29T16:46:38-03:00'
+    gps:
+      lat: -14.4879853
+      lon: -48.4081665
+  gps_app:
+    lat: -14.4879853
+    lon: -48.4081665
+    precisao_m: 5.9
+  duplicata_de: null
+  recebida_em: '2026-09-29T16:59:38-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 431.9
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: d6815d7f6189f5ba43af8eee276de859bd916cfb0dd9742f3157cabc18c62194
+  exif:
+    presente: true
+    data_hora: '2026-09-29T14:53:16-03:00'
+    gps:
+      lat: -14.4908292
+      lon: -48.4120999
+  gps_app:
+    lat: -14.4908292
+    lon: -48.4120999
+    precisao_m: 11.2
+  duplicata_de: null
+  recebida_em: '2026-09-29T15:38:16-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 145.7
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0029/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 55
+  contagem_real: 1
+  saida_simulada_contador:
+    estimativa: 1
+    ic80:
+    - 1
+    - 1
+    confianca: 0.96
+    oclusao_frac: 0.09
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 29, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As touro chegaram depois da nota, vieram de Faina.
+- de: fiscal
+  texto: Agora vou fotografar a cerca pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 1 touro(s) (bovinos carne - reprodutores)
+      quantidade: 1.0
+      unidade: cabeca
+      valor_rs: 13250.0
+      categoria_animal: touro
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5214606'
+    municipio_nome: NIQUELÂNDIA
+    data_contratacao: '2026-09-02'
+    data_fiscalizacao: '2026-09-29'
+    tomador_doc_sha256: 49b3f9094601e81f6f5bacc39d70af8d241f55b8dd8a01ba8ca9628b93365c83
+    codigo_estabelecimento_destino: TESTE-5214606-0029
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5214606'
+    municipio_nome: NIQUELÂNDIA
+    data_contratacao: '2026-09-02'
+    data_fiscalizacao: '2026-09-29'
+    tomador_doc_sha256: 49b3f9094601e81f6f5bacc39d70af8d241f55b8dd8a01ba8ca9628b93365c83
+    codigo_estabelecimento_destino: TESTE-5214606-0029
+    caminhos:
+    - gta_1.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: divergente
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: DigestValue não confere
+    documento:nfe:autorizacao:
+      status_esperado: pendente
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: protocolo não cobre o conteúdo apresentado
+    item:bov1:nfe_especie:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item2b
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    item:bov1:nfe_quantidade:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item2b
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    item:bov1:nfe_valor:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item2b
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    item:bov1:nfe_data:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item6
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    item:bov1:nfe_partes:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item6
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    item:bov1:nfe_operacao:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item2b
+      motivo: conteúdo da NF-e não confiável (falhou na integridade)
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:cerca1:localizacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item16a
+      motivo: ''
+    item:cerca1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

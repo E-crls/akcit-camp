@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "304716",
+  "serie": "C",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 40
+    }
+  ],
+  "total": 40,
+  "total_por_extenso": "QUARENTA BOVINOS",
+  "marca_rebanho": "MARCA TESTE 05",
+  "origem": {
+    "documento": "99999999500593",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 06 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 06",
+    "codigo_estabelecimento": "TESTE-5212204-9005",
+    "codigo_exploracao": "TESTE-5212204-9005-BOV",
+    "municipio_nome": "JUSSARA",
+    "municipio_ibge": "5212204",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999100579",
+    "nome": "AGROPECUARIA TOMADORA TESTE 06 LTDA",
+    "estabelecimento": "FAZENDA TESTE 06",
+    "codigo_estabelecimento": "TESTE-5218003-0006",
+    "codigo_exploracao": "TESTE-5218003-0006-BOV",
+    "municipio_nome": "PORANGATU",
+    "municipio_ibge": "5218003",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST3D26"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2025-11-28"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 1 DE 2",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE JUSSARA"
+  },
+  "emissao": {
+    "local_municipio": "JUSSARA",
+    "data": "2026-07-21",
+    "hora": "15:09",
+    "validade": "2026-07-24"
+  },
+  "nfe_chaves": [
+    "52260799999999500593550010000078051078474464"
+  ],
+  "codigo_barras": "SINTGOC304716",
+  "sintetico": true
+}

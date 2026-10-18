@@ -1,0 +1,293 @@
+id: GLD-0027
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 26
+sintetico: true
+classe: valido
+defeito: null
+data_fiscalizacao: '2026-09-20'
+operacao:
+  ref_bacen: SINT-2026-000027
+  tomador_ref: TOMADOR-TESTE-27
+  uf: GO
+  municipio_ibge: '5218805'
+  municipio_nome: RIO VERDE
+  instituicao: COOPERATIVA DE CREDITO TESTE 02
+  finalidade: investimento
+  empreendimento: '23271300193002'
+  data_contratacao: '2026-07-06'
+  data_liberacao: null
+  valor_rs: 106900.0
+  area_financiada_ha: 20.0
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-50.893286 -17.845919, -50.894498 -17.846709, -50.895699 -17.847375, -50.896658 -17.848747, -50.892980
+    -17.851787, -50.891578 -17.852066, -50.891408 -17.851740, -50.891287 -17.851065, -50.893286 -17.845919))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 10 vaca leiteira(s) (bovinos leite - matrizes)
+    quantidade: 10.0
+    unidade: cabeca
+    valor_rs: 81400.0
+    categoria_animal: vaca leiteira
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: cerca1
+    tipo: cerca
+    descricao: Construção de 1700 m de cerca de arame liso 5 fios
+    quantidade: 1700.0
+    unidade: m
+    valor_rs: 25500.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-11-19'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 27
+    codigo_estabelecimento: TESTE-5218805-0027
+    municipio_ibge: '5218805'
+    municipio_nome: RIO VERDE
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 10 vaca leiteira(s) (bovinos leite - matrizes)
+    quantidade: 10
+    unidade: cabeca
+    valor_unitario_rs: 8140.0
+    valor_total_rs: 81400.0
+  - item_id: cerca1
+    descricao: Construção de 1700 m de cerca de arame liso 5 fios
+    quantidade: 1700.0
+    unidade: m
+    valor_unitario_rs: 15.0
+    valor_total_rs: 25500.0
+  empreendimento_sicor:
+    codigo: '23271300193002'
+    descricao: BOVINOS LEITE - MATRIZES
+  lotacao_implicita_cab_ha: 0.5
+tomador:
+  ref: TOMADOR-TESTE-27
+  nome: PRODUTOR TESTE 27
+  documento_sintetico: '00000012602'
+  documento_sha256: 67488105f64e5c4dcc5c8c085751417478c0c8b4d5f435c917177b1077d881f8
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999502618550010000048901339544283'
+    sha256: 1d3f1f73fca855c98a51264c13dae64a910da1077945be82db19c786ba2831a6
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-C-706756
+    sha256: 44a30839b781fd05c141c3cb89438c00c38681bf7198284c30a2640d68414af9
+fotos:
+- id: foto_cerca_1
+  arquivo: fotos/foto_cerca_1.jpg
+  item_id: cerca1
+  sha256: 610281f61a874fa3f29959a0002fac05413eefea7ceb7878617b1ffbeee96b51
+  exif:
+    presente: true
+    data_hora: '2026-09-20T11:31:46-03:00'
+    gps:
+      lat: -17.8499992
+      lon: -50.8932474
+  gps_app:
+    lat: -17.8499992
+    lon: -50.8932474
+    precisao_m: 7.7
+  duplicata_de: null
+  recebida_em: '2026-09-20T12:11:46-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 131.2
+- id: foto_cerca_2
+  arquivo: fotos/foto_cerca_2.jpg
+  item_id: cerca1
+  sha256: c693ff37aead239f045486de24732ffb22f91cf17fb8df5ca33a8928df1991b0
+  exif:
+    presente: true
+    data_hora: '2026-09-20T13:21:25-03:00'
+    gps:
+      lat: -17.8506759
+      lon: -50.8928289
+  gps_app:
+    lat: -17.8506759
+    lon: -50.8928289
+    precisao_m: 7.4
+  duplicata_de: null
+  recebida_em: '2026-09-20T13:30:25-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 103.5
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: 80ed76a252b767b0a151684e8a7de1695b88e448147d1b37c259c1191b14f789
+  exif:
+    presente: true
+    data_hora: '2026-09-20T15:31:23-03:00'
+    gps:
+      lat: -17.8479739
+      lon: -50.8934408
+  gps_app:
+    lat: -17.8479739
+    lon: -50.8934408
+    precisao_m: 8.8
+  duplicata_de: null
+  recebida_em: '2026-09-20T15:53:23-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 94.6
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0027/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 68
+  contagem_real: 10
+  saida_simulada_contador:
+    estimativa: 10
+    ic80:
+    - 10
+    - 10
+    confianca: 0.91
+    oclusao_frac: 0.03
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 27, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As vaca leiteiras chegaram depois da nota, vieram de Mineiros.
+- de: fiscal
+  texto: Agora vou fotografar a cerca pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 10 vaca leiteira(s) (bovinos leite - matrizes)
+      quantidade: 10.0
+      unidade: cabeca
+      valor_rs: 81400.0
+      categoria_animal: vaca leiteira
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5218805'
+    municipio_nome: RIO VERDE
+    data_contratacao: '2026-07-06'
+    data_fiscalizacao: '2026-09-20'
+    tomador_doc_sha256: 67488105f64e5c4dcc5c8c085751417478c0c8b4d5f435c917177b1077d881f8
+    codigo_estabelecimento_destino: TESTE-5218805-0027
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5218805'
+    municipio_nome: RIO VERDE
+    data_contratacao: '2026-07-06'
+    data_fiscalizacao: '2026-09-20'
+    tomador_doc_sha256: 67488105f64e5c4dcc5c8c085751417478c0c8b4d5f435c917177b1077d881f8
+    codigo_estabelecimento_destino: TESTE-5218805-0027
+    caminhos:
+    - gta_1.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: ''
+    documento:nfe:autorizacao:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: ''
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:cerca1:localizacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item16a
+      motivo: ''
+    item:cerca1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: true
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

@@ -1,0 +1,65 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "550501",
+  "serie": "A",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "13-24",
+      "quantidade": 40
+    }
+  ],
+  "total": 40,
+  "total_por_extenso": "QUARENTA BOVINOS",
+  "marca_rebanho": "MARCA TESTE PUB 05",
+  "origem": {
+    "documento": "99999999070564",
+    "documento_sha256": null,
+    "nome": "AGROPECUARIA VENDEDORA TESTE PUB 05 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE PUB 05",
+    "codigo_estabelecimento": "TESTE-5218805-9005",
+    "codigo_exploracao": null,
+    "municipio_nome": "RIO VERDE",
+    "municipio_ibge": "5218805",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000070564",
+    "documento_sha256": null,
+    "nome": "PRODUTOR TESTE PUB 05",
+    "estabelecimento": "FAZENDA OUTRA TESTE PUB 05",
+    "codigo_estabelecimento": "TESTE-5218508-0099",
+    "codigo_exploracao": null,
+    "municipio_nome": "QUIRINÓPOLIS",
+    "municipio_ibge": "5218508",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST5A01"
+  },
+  "vacinacoes": [],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE RIO VERDE"
+  },
+  "emissao": {
+    "local_municipio": "RIO VERDE",
+    "data": "2026-07-20",
+    "hora": "11:15",
+    "validade": "2026-07-22"
+  },
+  "nfe_chaves": [
+    "52260799999999070564550010000070051012741625"
+  ],
+  "codigo_barras": "SINTGOA550501",
+  "sintetico": true,
+  "fonte": "json",
+  "ilegiveis": []
+}

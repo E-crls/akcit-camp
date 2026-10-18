@@ -1,0 +1,302 @@
+id: GLD-0015
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 14
+sintetico: true
+classe: ambiguo
+defeito:
+  codigo: A08_NFE_SEM_ASSINATURA
+  classe: ambiguo
+  titulo: NF-e sem assinatura
+  descricao: XML com protocolo, mas sem Signature (versão exportada sem o bloco de assinatura).
+data_fiscalizacao: '2026-09-26'
+operacao:
+  ref_bacen: SINT-2026-000015
+  tomador_ref: TOMADOR-TESTE-15
+  uf: GO
+  municipio_ibge: '5214838'
+  municipio_nome: NOVA CRIXÁS
+  instituicao: COOPERATIVA DE CREDITO TESTE 05
+  finalidade: investimento
+  empreendimento: '23271300078002'
+  data_contratacao: '2026-07-02'
+  data_liberacao: null
+  valor_rs: 296550.0
+  area_financiada_ha: 37.3
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-50.354793 -14.006263, -50.359756 -14.006375, -50.360422 -14.008214, -50.360202 -14.008322, -50.357901
+    -14.013067, -50.354896 -14.011902, -50.353963 -14.010799, -50.354793 -14.006263))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 45 vaca(s) (bovinos carne - matrizes)
+    quantidade: 45.0
+    unidade: cabeca
+    valor_rs: 195750.0
+    categoria_animal: vaca
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: cerca1
+    tipo: cerca
+    descricao: Construção de 5600 m de cerca de arame liso 5 fios
+    quantidade: 5600.0
+    unidade: m
+    valor_rs: 100800.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-11-25'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 15
+    codigo_estabelecimento: TESTE-5214838-0015
+    municipio_ibge: '5214838'
+    municipio_nome: NOVA CRIXÁS
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 45 vaca(s) (bovinos carne - matrizes)
+    quantidade: 45
+    unidade: cabeca
+    valor_unitario_rs: 4350.0
+    valor_total_rs: 195750.0
+  - item_id: cerca1
+    descricao: Construção de 5600 m de cerca de arame liso 5 fios
+    quantidade: 5600.0
+    unidade: m
+    valor_unitario_rs: 18.0
+    valor_total_rs: 100800.0
+  empreendimento_sicor:
+    codigo: '23271300078002'
+    descricao: BOVINOS CARNE - MATRIZES
+  lotacao_implicita_cab_ha: 1.21
+tomador:
+  ref: TOMADOR-TESTE-15
+  nome: PRODUTOR TESTE 15
+  documento_sintetico: 00000011479
+  documento_sha256: df20338fa0a374ba307a688fee10b07b0cbbed6acd59c3c77df58b56f4b25153
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260800000000051420550010000035081674385761'
+    sha256: ee4fa054aa26b2b9b30c5afb6c53b61d995522a981c229bd14b127fa3a465d31
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-C-187191
+    sha256: 2adb2cdd775079ef36a7a73d0cc0edc675190ffa97c2f39bcebb17cef5ae9db9
+  - arquivo_json: gta_2.json
+    arquivo_html: gta_2.html
+    identificador: GO-C-187192
+    sha256: a0ed709f2e45ca6d8816fe2ee669741b3c5286875d94f7036ac3ffd83e7ee1f6
+fotos:
+- id: foto_cerca_1
+  arquivo: fotos/foto_cerca_1.jpg
+  item_id: cerca1
+  sha256: 453f899c4d9f5a240a3ece4a4d60a17034e5964b23ee8c61ece905fd68fdad19
+  exif:
+    presente: true
+    data_hora: '2026-09-26T14:05:51-03:00'
+    gps:
+      lat: -14.0110104
+      lon: -50.3551927
+  gps_app:
+    lat: -14.0110104
+    lon: -50.3551927
+    precisao_m: 11.5
+  duplicata_de: null
+  recebida_em: '2026-09-26T14:30:51-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 87.5
+- id: foto_cerca_2
+  arquivo: fotos/foto_cerca_2.jpg
+  item_id: cerca1
+  sha256: 0c0f893c0217b99e52fab905b3b843b912ee8e3d2116d058a9b3758dd9fc527d
+  exif:
+    presente: true
+    data_hora: '2026-09-26T11:41:22-03:00'
+    gps:
+      lat: -14.007967
+      lon: -50.3595447
+  gps_app:
+    lat: -14.007967
+    lon: -50.3595447
+    precisao_m: 4.8
+  duplicata_de: null
+  recebida_em: '2026-09-26T12:16:22-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 80.2
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: a51bbb92e8f29740dbb69b3ee292deff28d04dab29b3f3305f81e9579e3aa20d
+  exif:
+    presente: true
+    data_hora: '2026-09-26T09:53:42-03:00'
+    gps:
+      lat: -14.0111502
+      lon: -50.3554349
+  gps_app:
+    lat: -14.0111502
+    lon: -50.3554349
+    precisao_m: 8.2
+  duplicata_de: null
+  recebida_em: '2026-09-26T10:19:42-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 97.9
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0015/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 67
+  contagem_real: 45
+  saida_simulada_contador:
+    estimativa: 45
+    ic80:
+    - 45
+    - 45
+    confianca: 0.98
+    oclusao_frac: 0.06
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 15, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As vacas chegaram depois da nota, vieram de Rio Verde.
+- de: fiscal
+  texto: Agora vou fotografar a cerca pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 45 vaca(s) (bovinos carne - matrizes)
+      quantidade: 45.0
+      unidade: cabeca
+      valor_rs: 195750.0
+      categoria_animal: vaca
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5214838'
+    municipio_nome: NOVA CRIXÁS
+    data_contratacao: '2026-07-02'
+    data_fiscalizacao: '2026-09-26'
+    tomador_doc_sha256: df20338fa0a374ba307a688fee10b07b0cbbed6acd59c3c77df58b56f4b25153
+    codigo_estabelecimento_destino: TESTE-5214838-0015
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5214838'
+    municipio_nome: NOVA CRIXÁS
+    data_contratacao: '2026-07-02'
+    data_fiscalizacao: '2026-09-26'
+    tomador_doc_sha256: df20338fa0a374ba307a688fee10b07b0cbbed6acd59c3c77df58b56f4b25153
+    codigo_estabelecimento_destino: TESTE-5214838-0015
+    caminhos:
+    - gta_1.json
+    - gta_2.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: pendente
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: sem assinatura
+    documento:nfe:autorizacao:
+      status_esperado: pendente
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: digVal sem DigestValue
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:cerca1:localizacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item16a
+      motivo: ''
+    item:cerca1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

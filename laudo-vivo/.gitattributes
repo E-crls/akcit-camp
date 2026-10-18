@@ -1,0 +1,36 @@
+# Fim de linha (onda 3): todo texto do repositório entra no git com LF e sai com LF também no Windows. Com
+# core.autocrlf=true a cópia de trabalho virava CRLF e o sha256 de um arquivo texto mudava entre o Windows e o CI.
+* text=auto eol=lf
+# Scripts bash e Makefile sempre com LF (o Git Bash quebra com CRLF).
+*.sh text eol=lf
+Makefile text eol=lf
+# LICENSE idêntico ao LICENSE-2.0.txt oficial (sha256 confere só com LF).
+LICENSE text eol=lf
+# Binários: nunca convertidos
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.tif binary
+*.tiff binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tar binary
+*.parquet binary
+*.onnx binary
+*.mp4 binary
+*.webm binary
+*.mov binary
+*.ogg binary
+*.wav binary
+*.m4a binary
+*.woff binary
+*.woff2 binary
+# Bibliotecas vendorizadas da interface: byte a byte como baixadas (o sha256 em apps/web/vendor/LICENCAS.md é
+# o do arquivo original, e o leaflet.css do unpkg vem com CRLF).
+apps/web/vendor/** -text
+# Pastas com arquivos de hash registrado (eval/golden/casos, eval/golden/casos_publicos) têm .gitattributes
+# próprio com "* -text": lá nada é convertido.

@@ -1,0 +1,140 @@
+id: PUB-0004
+versao_gerador: 0.2.1
+split: casos_publicos
+sintetico: true
+classe: defeito
+titulo: Mesma NF-e e mesma GTA já em laudo selado de outra operação (reuso de documento)
+inspiracao:
+  caso: 'Regra 10ZF04-20 da NT 2024.003 (rejeição 838, ''Guia de Trânsito já utilizada'', facultativa por UF): a
+    SEFAZ recusa a guia já usada; do lado da IF, o análogo é o índice local dos documentos de laudos já selados'
+  fonte: Nota Técnica 2024.003 v1.03 da NF-e (fev/2025), seção 4, regras 10ZF04-10 e 10ZF04-20
+  url: https://inventti.com.br/wp-content/uploads/2025/02/NT_2024.003-1.03.pdf
+  acesso: '2026-10-16'
+  data_noticia: 2025-02
+  item_normativo: MCR 2-7-6-b e 2-7-7-d (duplicidade de crédito; pecuária pelo item 9); NT 2024.003 ZF04-20
+  o_que_prova: 'o mesmo documento não comprova duas operações: GTA e chave de NF-e conferidas por HMAC, nunca em
+    claro; refiscalizar a mesma operação não é reuso'
+  o_que_nao_prova: reuso fora desta instalação (hashes com sal não se comparam entre IFs)
+  adaptacao: um laudo selado sintético de outra operação registra os documentos antes do caso
+data_fiscalizacao: '2026-09-15'
+operacao:
+  ref_bacen: SINT-PUB-2026-000004
+  tomador_ref: TOMADOR-TESTE-PUB-04
+  tomador_doc_sha256: null
+  uf: GO
+  municipio_ibge: '5216403'
+  municipio_nome: PARAÚNA
+  instituicao: COOPERATIVA DE CREDITO TESTE PUB 02
+  finalidade: investimento
+  empreendimento: null
+  data_contratacao: '2026-07-01'
+  data_liberacao: null
+  valor_rs: 134000.0
+  area_financiada_ha: 70.0
+  area_informada_ha: 70.0
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt: []
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 40 novilhas (bovinos carne - matrizes)
+    quantidade: 40.0
+    unidade: cabeca
+    valor_rs: 134000.0
+    categoria_animal: novilha
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE PUB 04
+    codigo_estabelecimento: TESTE-5216403-0004
+    municipio_ibge: '5216403'
+    municipio_nome: PARAÚNA
+  lotacao_implicita_cab_ha: 0.57
+tomador:
+  ref: TOMADOR-TESTE-PUB-04
+  nome: PRODUTOR TESTE PUB 04
+  documento_sintetico: 00000070483
+  documento_sha256: 117cd4a3eb4d9fb7235e764c194d5fab6b1e77fd4f29bc3598b1a52aca2d9dde
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999070483550010000070041012662431'
+    sha256: d4ac5a3c468d5939e4b44f42ed495690478429ef3065c5ee5d83750d24c17629
+    grupo_zf: GO-A-540401
+  gta:
+  - arquivo_json: gta_1.json
+    identificador: GO-A-540401
+    sha256: 743a0084aa0788849b21dd6210eb764c724d789630a50e06c4e08fdc84ac2ae0
+pre_indice:
+  operacao: SINT-PUB-ANTERIOR-000004
+  fiscalizacao: fis:anterior:PUB-0004
+  documentos: nfe_1.xml e todas as GTAs do caso, em laudo selado de outra operação
+video:
+  id: video_curral_1
+  ref: sintetico://videos/PUB-0004/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  saida_simulada_contador:
+    estimativa: 40
+    ic80:
+    - 39
+    - 41
+    confianca: 0.92
+    oclusao_frac: 0.04
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 40 novilhas (bovinos carne - matrizes)
+      quantidade: 40.0
+      unidade: cabeca
+      valor_rs: 134000.0
+      categoria_animal: novilha
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5216403'
+    municipio_nome: PARAÚNA
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: 117cd4a3eb4d9fb7235e764c194d5fab6b1e77fd4f29bc3598b1a52aca2d9dde
+    codigo_estabelecimento_destino: TESTE-5216403-0004
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5216403'
+    municipio_nome: PARAÚNA
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: 117cd4a3eb4d9fb7235e764c194d5fab6b1e77fd4f29bc3598b1a52aca2d9dde
+    codigo_estabelecimento_destino: TESTE-5216403-0004
+    caminhos:
+    - gta_1.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  laudo:
+    item:bov1:quantidade: verificado
+    item:bov1:comprovante_nfe: divergente
+    item:bov1:gta: divergente
+    item:bov1: divergente
+  finos:
+    documento:gta:reuso: divergente
+    documento:nfe:reuso: divergente
+    documento:gta:nfe_guia: verificado
+  ausentes: []
+notas: null

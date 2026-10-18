@@ -1,0 +1,4 @@
+# Ativos com sha256 registrado em manifesto.json: entram e saem do git byte a byte (sem conversão de fim de
+# linha), para a conferência de scripts/preparar_demo.py dar o mesmo resultado no Windows, no Linux e no CI.
+* -text
+*.mp4 binary

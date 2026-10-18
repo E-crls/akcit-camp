@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "678119",
+  "serie": "A",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "25-36",
+      "quantidade": 35
+    }
+  ],
+  "total": 35,
+  "total_por_extenso": "TRINTA E CINCO BOVINOS",
+  "marca_rebanho": "MARCA TESTE 08",
+  "origem": {
+    "documento": "99999999500836",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 09 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 09",
+    "codigo_estabelecimento": "TESTE-5210109-9008",
+    "codigo_exploracao": "TESTE-5210109-9008-BOV",
+    "municipio_nome": "IPAMERI",
+    "municipio_ibge": "5210109",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000010820",
+    "nome": "PRODUTOR TESTE 09",
+    "estabelecimento": "FAZENDA TESTE 09",
+    "codigo_estabelecimento": "TESTE-5218508-0009",
+    "codigo_exploracao": "TESTE-5218508-0009-BOV",
+    "municipio_nome": "QUIRINÓPOLIS",
+    "municipio_ibge": "5218508",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST9C82"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-02-11"
+    }
+  ],
+  "exames": [],
+  "observacao": "CARGA 1 DE 2",
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE IPAMERI"
+  },
+  "emissao": {
+    "local_municipio": "IPAMERI",
+    "data": "2026-09-06",
+    "hora": "15:19",
+    "validade": "2026-09-08"
+  },
+  "nfe_chaves": [
+    "52260999999999500836550010000048321029716114"
+  ],
+  "codigo_barras": "SINTGOA678119",
+  "sintetico": true
+}

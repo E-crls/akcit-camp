@@ -1,0 +1,81 @@
+id: CUS-0004
+versao_gerador: 0.2.1
+split: dev_custeio
+sintetico: true
+classe: valido
+titulo: Custeio só de manutenção do lote, lotação acima do parâmetro
+inspiracao: null
+data_fiscalizacao: '2026-09-15'
+operacao:
+  ref_bacen: SINT-PUB-2026-000024
+  tomador_ref: TOMADOR-TESTE-PUB-24
+  tomador_doc_sha256: null
+  uf: GO
+  municipio_ibge: '5206404'
+  municipio_nome: CRIXÁS
+  instituicao: COOPERATIVA DE CREDITO TESTE PUB 01
+  finalidade: custeio
+  empreendimento: null
+  data_contratacao: '2026-07-01'
+  data_liberacao: null
+  valor_rs: 382500.0
+  area_financiada_ha: 30.0
+  area_informada_ha: 30.0
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt: []
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Custeio de manutenção de 150 bois em engorda (sal mineral, ração e vacinas)
+    quantidade: 150.0
+    unidade: cabeca
+    valor_rs: 382500.0
+    categoria_animal: boi
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE PUB 24
+    codigo_estabelecimento: TESTE-5206404-0024
+    municipio_ibge: '5206404'
+    municipio_nome: CRIXÁS
+  lotacao_implicita_cab_ha: 5.0
+tomador:
+  ref: TOMADOR-TESTE-PUB-24
+  nome: PRODUTOR TESTE PUB 24
+  documento_sintetico: '00000072427'
+  documento_sha256: eb4a5f1d17413ccf6f55b31ca72c24209316cc5dcfeea425bf2e65e43efb52de
+documentos:
+  nfe: []
+  gta: []
+pre_indice: null
+video:
+  id: video_curral_1
+  ref: sintetico://videos/CUS-0004/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  saida_simulada_contador:
+    estimativa: 150
+    ic80:
+    - 149
+    - 152
+    confianca: 0.92
+    oclusao_frac: 0.04
+entradas_ferramentas: {}
+esperado:
+  laudo:
+    item:bov1:quantidade: verificado
+    item:bov1:lotacao: pendente
+    item:bov1:metodo_if: verificado
+    item:bov1: verificado
+  finos: {}
+  ausentes:
+  - item:bov1:comprovante_nfe
+  - item:bov1:gta
+notas: NF-e e GTA de compra não se aplicam (item só de manutenção); lotação de 5 cab/ha é ponto de atenção não bloqueante

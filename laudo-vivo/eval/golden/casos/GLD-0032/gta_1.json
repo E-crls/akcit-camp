@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "466895",
+  "serie": "B",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "25-36",
+      "quantidade": 15
+    }
+  ],
+  "total": 15,
+  "total_por_extenso": "QUINZE BOVINOS",
+  "marca_rebanho": "MARCA TESTE 31",
+  "origem": {
+    "documento": "99999999503185",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 32 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 32",
+    "codigo_estabelecimento": "TESTE-5216403-9031",
+    "codigo_exploracao": "TESTE-5216403-9031-BOV",
+    "municipio_nome": "PARAÚNA",
+    "municipio_ibge": "5216403",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000013170",
+    "nome": "PRODUTOR TESTE 32",
+    "estabelecimento": "FAZENDA TESTE 32",
+    "codigo_estabelecimento": "TESTE-5212204-0032",
+    "codigo_exploracao": "TESTE-5212204-0032-BOV",
+    "municipio_nome": "JUSSARA",
+    "municipio_ibge": "5212204",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST2B98"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2025-12-31"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE PARAÚNA"
+  },
+  "emissao": {
+    "local_municipio": "PARAÚNA",
+    "data": "2026-07-12",
+    "hora": "18:04",
+    "validade": "2026-07-15"
+  },
+  "nfe_chaves": [
+    "52260799999999503185550010000078411819439875"
+  ],
+  "codigo_barras": "SINTGOB466895",
+  "sintetico": true
+}

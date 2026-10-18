@@ -1,0 +1,297 @@
+id: GLD-0026
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 25
+sintetico: true
+classe: defeito
+defeito:
+  codigo: D09_CONTAGEM_ABAIXO
+  classe: defeito
+  titulo: Contagem no curral abaixo do financiado
+  descricao: Documentos corretos, mas o vídeo do curral conta 10% a 25% menos cabeças (intervalo inteiro abaixo).
+data_fiscalizacao: '2026-09-29'
+operacao:
+  ref_bacen: SINT-2026-000026
+  tomador_ref: TOMADOR-TESTE-26
+  uf: GO
+  municipio_ibge: '5213707'
+  municipio_nome: MONTES CLAROS DE GOIÁS
+  instituicao: COOPERATIVA DE CREDITO TESTE 01
+  finalidade: investimento
+  empreendimento: '23271300078002'
+  data_contratacao: '2026-08-04'
+  data_liberacao: null
+  valor_rs: 216100.0
+  area_financiada_ha: 47.6
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-51.505811 -16.048115, -51.505249 -16.045882, -51.516168 -16.050792, -51.509721 -16.053609, -51.508537
+    -16.053083, -51.506236 -16.050448, -51.504542 -16.049897, -51.505811 -16.048115))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 40 vaca(s) (bovinos carne - matrizes)
+    quantidade: 40.0
+    unidade: cabeca
+    valor_rs: 173600.0
+    categoria_animal: vaca
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: cerca1
+    tipo: cerca
+    descricao: Construção de 2500 m de cerca de arame liso 5 fios
+    quantidade: 2500.0
+    unidade: m
+    valor_rs: 42500.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-11-28'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 26
+    codigo_estabelecimento: TESTE-5213707-0026
+    municipio_ibge: '5213707'
+    municipio_nome: MONTES CLAROS DE GOIÁS
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 40 vaca(s) (bovinos carne - matrizes)
+    quantidade: 40
+    unidade: cabeca
+    valor_unitario_rs: 4340.0
+    valor_total_rs: 173600.0
+  - item_id: cerca1
+    descricao: Construção de 2500 m de cerca de arame liso 5 fios
+    quantidade: 2500.0
+    unidade: m
+    valor_unitario_rs: 17.0
+    valor_total_rs: 42500.0
+  empreendimento_sicor:
+    codigo: '23271300078002'
+    descricao: BOVINOS CARNE - MATRIZES
+  lotacao_implicita_cab_ha: 0.84
+tomador:
+  ref: TOMADOR-TESTE-26
+  nome: AGROPECUARIA TOMADORA TESTE 26 LTDA
+  documento_sintetico: '99999999102512'
+  documento_sha256: e244a96d595edc23d240e114200cfe576e21db50e7c6e2595534a3a8d358be34
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260800000000052582550010000057591296206108'
+    sha256: 8b27eab6e0177193256140c4b6730e23e2760cd668462213168aacfefc1553fe
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-GO-521667
+    sha256: 392f7dd8283b7481f8e6b00891699b85870ba73863eb2f1d74f81de15d92a668
+fotos:
+- id: foto_cerca_1
+  arquivo: fotos/foto_cerca_1.jpg
+  item_id: cerca1
+  sha256: 71059a735848820d865c3d76e709432674e8f2d8c783eb9fcf7a6dbd8bc65243
+  exif:
+    presente: true
+    data_hora: '2026-09-29T10:40:33-03:00'
+    gps:
+      lat: -16.0511895
+      lon: -51.5077944
+  gps_app:
+    lat: -16.0511895
+    lon: -51.5077944
+    precisao_m: 8.4
+  duplicata_de: null
+  recebida_em: '2026-09-29T11:01:33-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 74.5
+- id: foto_cerca_2
+  arquivo: fotos/foto_cerca_2.jpg
+  item_id: cerca1
+  sha256: 263a5370f0d7547345a6ab8473579ef8d3dc82fb98189a4767f2cb46353e70f4
+  exif:
+    presente: true
+    data_hora: '2026-09-29T14:08:50-03:00'
+    gps:
+      lat: -16.0497313
+      lon: -51.5118076
+  gps_app:
+    lat: -16.0497313
+    lon: -51.5118076
+    precisao_m: 6.8
+  duplicata_de: null
+  recebida_em: '2026-09-29T14:35:50-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 90.3
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: 8f9d7b996f25f647532e2dbffd89cf67924d14d6c037954a5ca8c0926891f579
+  exif:
+    presente: true
+    data_hora: '2026-09-29T10:27:54-03:00'
+    gps:
+      lat: -16.0489202
+      lon: -51.5094214
+  gps_app:
+    lat: -16.0489202
+    lon: -51.5094214
+    precisao_m: 9.6
+  duplicata_de: null
+  recebida_em: '2026-09-29T11:03:54-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 116.5
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0026/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 74
+  contagem_real: 35
+  saida_simulada_contador:
+    estimativa: 35
+    ic80:
+    - 34
+    - 36
+    confianca: 0.94
+    oclusao_frac: 0.09
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 26, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As vacas chegaram depois da nota, vieram de Montes Claros De Goiás.
+- de: fiscal
+  texto: Agora vou fotografar a cerca pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 40 vaca(s) (bovinos carne - matrizes)
+      quantidade: 40.0
+      unidade: cabeca
+      valor_rs: 173600.0
+      categoria_animal: vaca
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5213707'
+    municipio_nome: MONTES CLAROS DE GOIÁS
+    data_contratacao: '2026-08-04'
+    data_fiscalizacao: '2026-09-29'
+    tomador_doc_sha256: e244a96d595edc23d240e114200cfe576e21db50e7c6e2595534a3a8d358be34
+    codigo_estabelecimento_destino: TESTE-5213707-0026
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5213707'
+    municipio_nome: MONTES CLAROS DE GOIÁS
+    data_contratacao: '2026-08-04'
+    data_fiscalizacao: '2026-09-29'
+    tomador_doc_sha256: e244a96d595edc23d240e114200cfe576e21db50e7c6e2595534a3a8d358be34
+    codigo_estabelecimento_destino: TESTE-5213707-0026
+    caminhos:
+    - gta_1.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: ''
+    documento:nfe:autorizacao:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: ''
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: divergente
+      regra_id: MCR-2-7-item9
+      motivo: contagem abaixo do financiado
+    item:cerca1:localizacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item16a
+      motivo: ''
+    item:cerca1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

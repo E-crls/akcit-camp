@@ -1,0 +1,192 @@
+{
+  "gerado_em": "2026-10-08T18:20:32-03:00",
+  "fonte_versao": "sicor@2026-10-07;ibge-ppm@2025",
+  "recorte": {
+    "uf": "GO",
+    "ano_emissao": 2026,
+    "emissao_min": "2026-01-02",
+    "emissao_max": "2026-09-30"
+  },
+  "operacoes": {
+    "n": 28637,
+    "itens": 30518,
+    "valor_rs": 16487268584.97,
+    "com_poligono": 7499,
+    "glebas": 11453,
+    "com_municipio": 7499
+  },
+  "pecuaria_bovina": {
+    "n": 19009,
+    "pct_operacoes": 66.4,
+    "valor_rs": 5933916639.35,
+    "pct_valor": 36.0
+  },
+  "compra_gado": {
+    "n": 13385,
+    "valor_rs": 4760238772.02,
+    "com_poligono": 4357,
+    "investimento": {
+      "n": 6235,
+      "valor_rs": 1228215661.94,
+      "com_poligono": 3110
+    },
+    "custeio_aquisicao": {
+      "n": 7150,
+      "valor_rs": 3532023110.08,
+      "com_poligono": 1247
+    },
+    "confinamento": 4
+  },
+  "lotacao_implicita_cab_ha": {
+    "definicao": "quantidade financiada (cabeças ou UA de 450 kg) / maior área informada entre os itens bovinos e os demais itens da operação (VL_AREA_INFORMADA); exclui confinamento",
+    "investimento_compra": {
+      "p10": 0.259,
+      "p25": 0.44,
+      "p50": 0.855,
+      "p75": 1.669,
+      "p90": 3.125,
+      "p95": 4.689,
+      "p99": 38.455,
+      "n": 6204,
+      "pct_acima_2": 20.7,
+      "pct_acima_3": 10.8,
+      "pct_acima_5": 4.4
+    },
+    "custeio_aquisicao": {
+      "p10": 0.224,
+      "p25": 0.435,
+      "p50": 0.842,
+      "p75": 1.607,
+      "p90": 2.926,
+      "p95": 3.819,
+      "p99": 10.663,
+      "n": 7142,
+      "pct_acima_3": 7.8,
+      "pct_acima_5": 3.2
+    }
+  },
+  "valor_por_cabeca_rs": {
+    "investimento_UA": {
+      "p10": 3512.0,
+      "p25": 4000.0,
+      "p50": 4545.45,
+      "p75": 5240.0,
+      "p90": 5460.0,
+      "p95": 6612.242,
+      "p99": 15000.0,
+      "n": 4017
+    },
+    "investimento_cab": {
+      "p10": 5000.0,
+      "p25": 6000.0,
+      "p50": 8000.0,
+      "p75": 9413.775,
+      "p90": 10200.0,
+      "p95": 10500.0,
+      "p99": 12528.125,
+      "n": 2156
+    }
+  },
+  "sobreposicao": {
+    "pares_mesma_safra": 388,
+    "ops_com_sobreposicao": 657,
+    "ops_frac_ge_50pct": 485,
+    "ops_com_outra_if": 97,
+    "compra_gado_com_sobreposicao": 391
+  },
+  "sensoriamento_remoto_obrigatorio": {
+    "acima_300ha": 1696,
+    "exige_sr_item5": 1315
+  },
+  "prioridade_verificacao": {
+    "por_nivel": {
+      "sem_sinal": 26026,
+      "media": 1386,
+      "baixa": 1175,
+      "alta": 50
+    },
+    "compra_gado_por_nivel": {
+      "sem_sinal": 11039,
+      "media": 1175,
+      "baixa": 1121,
+      "alta": 50
+    },
+    "por_motivo": {
+      "LOTACAO_ALTA": 1842,
+      "SOBREPOSICAO_GLEBAS": 628,
+      "VALOR_CABECA_ATIPICO": 260,
+      "AREA_DIVERGENTE": 14,
+      "FRACAO_REBANHO_MUNICIPAL": 1
+    }
+  },
+  "ibge_ppm": {
+    "ano": 2025,
+    "bovinos_go": 22494716,
+    "municipios": 246
+  },
+  "limiares": {
+    "lot_inv_1": 2.0,
+    "lot_inv_2": 3.0,
+    "lot_inv_3": 5.0,
+    "lot_cust_1": 3.0,
+    "lot_cust_2": 5.0,
+    "lot_vs_densidade": 4.0,
+    "sobrep_frac_alta": 0.5,
+    "sobrep_frac_baixa": 0.1,
+    "sobrep_min_ha": 0.5,
+    "area_razao_max": 2.0,
+    "area_razao_min": 0.5,
+    "frac_rebanho_mun": 0.05,
+    "sr_area_ha": 300.0
+  },
+  "fontes": {
+    "empreendimento": {
+      "url": "https://www.bcb.gov.br/htms/sicor/Empreendimento.csv",
+      "last_modified": "Wed, 07 Oct 2026 23:30:29 GMT",
+      "bytes_transferidos": 675797,
+      "sha256": "95a50dd106b052142e9054b7b2879438c64a0e396288b8cbf3cde0323b9ba234"
+    },
+    "categoria_emitente": {
+      "url": "https://www.bcb.gov.br/htms/sicor/CategoriaEmitente.csv",
+      "last_modified": "Wed, 07 Oct 2026 23:30:16 GMT",
+      "bytes_transferidos": 565,
+      "sha256": "f7558e430a8593698bb1a9b1caf6834c081f98881270f549b2f7601d924951b2"
+    },
+    "programa": {
+      "url": "https://www.bcb.gov.br/htms/sicor/Programa.csv",
+      "last_modified": "Wed, 07 Oct 2026 23:30:30 GMT",
+      "bytes_transferidos": 5905,
+      "sha256": "de39b94fea8e6f7c35819231fd0ef03d68c2a71dc8ab3d592371492dc3554fbb"
+    },
+    "fonte_recursos": {
+      "url": "https://www.bcb.gov.br/htms/sicor/FonteRecursos.csv",
+      "last_modified": "Wed, 07 Oct 2026 23:30:30 GMT",
+      "bytes_transferidos": 3413,
+      "sha256": "9632fef76e1f7d1f4e477c92cd4df49daa26d8819e335441cddd23a0f993e929"
+    },
+    "lista_ifs": {
+      "url": "https://www.bcb.gov.br/htms/sicor/DadosBrutos/SICOR_LISTA_IFS.csv",
+      "last_modified": "Wed, 07 Oct 2026 07:01:53 GMT",
+      "bytes_transferidos": 36787,
+      "sha256": "dfb41e5ebedda666ec1bab142f8213a2ac3c689ac2e2dedcbb040db75cf2f6f9"
+    },
+    "fase_ciclo_producao": {
+      "url": "https://www.bcb.gov.br/htms/sicor/FaseCicloProducao.csv",
+      "last_modified": "Wed, 07 Oct 2026 23:30:20 GMT",
+      "bytes_transferidos": 1038,
+      "sha256": "6f939e58b62cb6eb469b1d8569b6308b0b2499547f420c3d9ab2f271b2537c0b"
+    },
+    "operacoes": {
+      "url": "https://www.bcb.gov.br/htms/sicor/DadosBrutos/SICOR_OPERACAO_BASICA_ESTADO_2026.gz",
+      "last_modified": "Wed, 07 Oct 2026 11:18:40 GMT",
+      "bytes_transferidos": 45845217,
+      "sha256": "c2823fb2dfa47680e3031e350f00db93364c512ee61e398d4f167fce4c371a3d"
+    },
+    "glebas": {
+      "url": "https://www.bcb.gov.br/htms/sicor/DadosBrutos/SICOR_GLEBAS_WKT_2026.gz",
+      "last_modified": "Wed, 07 Oct 2026 11:20:12 GMT",
+      "bytes_transferidos": 117020212,
+      "sha256": "ef55cc4fbeca28bb16cc768f9e45c4958363c055e54d0809be70f8166f2751a2"
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "607235",
+  "serie": "AB",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 40
+    }
+  ],
+  "total": 40,
+  "total_por_extenso": "QUARENTA BOVINOS",
+  "marca_rebanho": "MARCA TESTE 36",
+  "origem": {
+    "documento": "00000053635",
+    "nome": "VENDEDOR TESTE 37",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 37",
+    "codigo_estabelecimento": "TESTE-5204409-9036",
+    "codigo_exploracao": "TESTE-5204409-9036-BOV",
+    "municipio_nome": "CAIAPÔNIA",
+    "municipio_ibge": "5204409",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000013684",
+    "nome": "PRODUTOR TESTE 37",
+    "estabelecimento": "FAZENDA TESTE 37",
+    "codigo_estabelecimento": "TESTE-5206404-0037",
+    "codigo_exploracao": "TESTE-5206404-0037-BOV",
+    "municipio_nome": "CRIXÁS",
+    "municipio_ibge": "5206404",
+    "uf": "GO"
+  },
+  "finalidade": "ENGORDA",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST5C18"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-04-25"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE CAIAPÔNIA"
+  },
+  "emissao": {
+    "local_municipio": "CAIAPÔNIA",
+    "data": "2026-09-14",
+    "hora": "11:55",
+    "validade": "2026-09-15"
+  },
+  "nfe_chaves": [
+    "52260900000000053635550010000072641300165095"
+  ],
+  "codigo_barras": "SINTGOAB607235",
+  "sintetico": true
+}

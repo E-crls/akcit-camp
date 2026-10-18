@@ -1,0 +1,76 @@
+# Laudo Vivo em contêiner, sem GPU. Rode na pasta laudo-vivo/ (a primeira vez constrói a imagem, ver
+# docs/COMO_RODAR.md para os tempos):
+#
+#   docker compose up --build demo         # interface web em replay: http://127.0.0.1:8000 (Ctrl+C encerra)
+#   docker compose run --rm cli            # demo da CLI: 19 passos, ferramentas reais, LLM gravado
+#   docker compose run --rm testes         # suíte de testes (lentos e de rede pulados)
+#   docker compose run --rm exemplo        # confere o laudo selado de exemplo (docs/exemplos/)
+#
+# Modo ao vivo (opcional; o LLM roda num contêiner do Ollama, em CPU se não houver GPU, e fica lento):
+#   docker compose --profile ao-vivo up -d ollama
+#   docker compose exec ollama ollama pull qwen3.5:4b      # ~3,4 GB, uma vez (fica no volume "ollama")
+#   docker compose --profile ao-vivo up demo-ao-vivo       # http://127.0.0.1:8001
+#   docker compose --profile ao-vivo down                  # encerra (o volume com o modelo fica)
+name: laudo-vivo
+
+x-imagem: &imagem
+  image: laudo-vivo:demo
+  build:
+    context: .
+  init: true
+
+services:
+  # Interface web em replay: o mesmo que scripts/rodar_demo.sh --replay (CMD do Dockerfile).
+  demo:
+    <<: *imagem
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  cli:
+    <<: *imagem
+    profiles: ["ferramentas"]
+    command: ["python", "scripts/demo_cli.py", "--ferramentas", "reais", "--llm", "replay",
+              "--replay", "tests/unit/dados_agente/replay_demo_real_qwen35_4b.jsonl"]
+
+  testes:
+    <<: *imagem
+    profiles: ["ferramentas"]
+    command: ["python", "-m", "pytest", "tests", "-q", "-p", "no:cacheprovider"]
+
+  exemplo:
+    <<: *imagem
+    profiles: ["ferramentas"]
+    command: ["python", "docs/exemplos/conferir_exemplo.py"]
+
+  # Servidor do LLM local (Apache-2.0 do modelo; MIT do Ollama). Para usar GPU NVIDIA, descomente "deploy".
+  ollama:
+    image: ollama/ollama:0.32.4
+    profiles: ["ao-vivo"]
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      # a demo ao vivo divide a rede deste contêiner (network_mode abaixo): a porta dela é publicada aqui
+      - "127.0.0.1:8001:8000"
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # Interface web com o LLM ao vivo. Divide a rede do contêiner do Ollama para que o condutor e o VLM
+  # encontrem o servidor em 127.0.0.1:11434, como na máquina de campo. A leitura do DANFE da demo vem do cache
+  # gravado do VLM (o padrão de scripts/rodar_demo.sh); a fala é digitada (sem o ASR na imagem).
+  demo-ao-vivo:
+    <<: *imagem
+    profiles: ["ao-vivo"]
+    network_mode: "service:ollama"
+    depends_on:
+      - ollama
+    command: ["python", "-m", "laudo.api", "--host", "0.0.0.0", "--porta", "8000", "--caso", "DEMO-0001",
+              "--ferramentas", "reais", "--perfil", "campo", "--llm", "ollama", "--asr", "desligado",
+              "--aquecer", "--vlm-cache", "tests/unit/dados_agente/vlm_cache_demo"]
+
+volumes:
+  ollama:

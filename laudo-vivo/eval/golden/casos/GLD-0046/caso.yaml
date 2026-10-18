@@ -1,0 +1,303 @@
+id: GLD-0046
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 45
+sintetico: true
+classe: ambiguo
+defeito:
+  codigo: A02_FOTO_BORDA_GPS_IMPRECISO
+  classe: ambiguo
+  titulo: Foto na borda da gleba com GPS impreciso
+  descricao: 'Fotos a 5-10 m da borda (dentro ou fora) com precisão de 20-30 m: geofence indeterminado.'
+data_fiscalizacao: '2026-08-26'
+operacao:
+  ref_bacen: SINT-2026-000046
+  tomador_ref: TOMADOR-TESTE-46
+  uf: GO
+  municipio_ibge: '5220207'
+  municipio_nome: SÃO MIGUEL DO ARAGUAIA
+  instituicao: COOPERATIVA DE CREDITO TESTE 01
+  finalidade: investimento
+  empreendimento: '23271300078002'
+  data_contratacao: '2026-06-17'
+  data_liberacao: null
+  valor_rs: 315200.0
+  area_financiada_ha: 59.4
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-50.154194 -13.396208, -50.153349 -13.394457, -50.153746 -13.394751, -50.157541 -13.393914, -50.157626
+    -13.392363, -50.160027 -13.394449, -50.163253 -13.397270, -50.163307 -13.398883, -50.151245 -13.400256, -50.154194
+    -13.396208))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 65 novilha(s) (bovinos carne - matrizes)
+    quantidade: 65.0
+    unidade: cabeca
+    valor_rs: 189800.0
+    categoria_animal: novilha
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: cerca1
+    tipo: cerca
+    descricao: Construção de 5700 m de cerca de arame liso 5 fios
+    quantidade: 5700.0
+    unidade: m
+    valor_rs: 125400.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-10-25'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 46
+    codigo_estabelecimento: TESTE-5220207-0046
+    municipio_ibge: '5220207'
+    municipio_nome: SÃO MIGUEL DO ARAGUAIA
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 65 novilha(s) (bovinos carne - matrizes)
+    quantidade: 65
+    unidade: cabeca
+    valor_unitario_rs: 2920.0
+    valor_total_rs: 189800.0
+  - item_id: cerca1
+    descricao: Construção de 5700 m de cerca de arame liso 5 fios
+    quantidade: 5700.0
+    unidade: m
+    valor_unitario_rs: 22.0
+    valor_total_rs: 125400.0
+  empreendimento_sicor:
+    codigo: '23271300078002'
+    descricao: BOVINOS CARNE - MATRIZES
+  lotacao_implicita_cab_ha: 1.09
+tomador:
+  ref: TOMADOR-TESTE-46
+  nome: PRODUTOR TESTE 46
+  documento_sintetico: '00000014575'
+  documento_sha256: 0fbdc25b00ea4b7e5f40c462e0d0a9c6a669370e9df716baf921001d085bfa1b
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999504580550010000076671285363149'
+    sha256: df9e3ae439c7e2d73ad96f97647766d020764fc6370ea73acdafc91ec876b332
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-C-798864
+    sha256: 6fe1bf28803f07faab2d315e7b45ca908e058c746d85d4237a66a4dd40a6d19c
+  - arquivo_json: gta_2.json
+    arquivo_html: gta_2.html
+    identificador: GO-C-798865
+    sha256: e0615f1255e4a7f4b4ef393142143226ceb1eb62653058b16155c49a726ee8e2
+fotos:
+- id: foto_cerca_1
+  arquivo: fotos/foto_cerca_1.jpg
+  item_id: cerca1
+  sha256: 22230f26d944d1c34c61390d63ef80004cd6d9ff0d2e15798a9960f742912b0b
+  exif:
+    presente: true
+    data_hora: '2026-08-26T12:25:38-03:00'
+    gps:
+      lat: -13.3923704
+      lon: -50.1577213
+  gps_app:
+    lat: -13.3923704
+    lon: -50.1577213
+    precisao_m: 27.6
+  duplicata_de: null
+  recebida_em: '2026-08-26T13:10:38-03:00'
+  esperado:
+    geofence: indeterminado
+    distancia_borda_m: 6.2
+- id: foto_cerca_2
+  arquivo: fotos/foto_cerca_2.jpg
+  item_id: cerca1
+  sha256: 83a71bf7f8aad77a7bbd941116f55c08f1b903d44f3b7b7e91de32a7ff4f9b53
+  exif:
+    presente: true
+    data_hora: '2026-08-26T13:45:44-03:00'
+    gps:
+      lat: -13.3939322
+      lon: -50.157043
+  gps_app:
+    lat: -13.3939322
+    lon: -50.157043
+    precisao_m: 26.9
+  duplicata_de: null
+  recebida_em: '2026-08-26T14:18:44-03:00'
+  esperado:
+    geofence: indeterminado
+    distancia_borda_m: 9.9
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: 2666548fbcb064f09c5abe146eeddefd2911442e47c32d094e8862fdb78a8986
+  exif:
+    presente: true
+    data_hora: '2026-08-26T11:40:09-03:00'
+    gps:
+      lat: -13.3987857
+      lon: -50.1535271
+  gps_app:
+    lat: -13.3987857
+    lon: -50.1535271
+    precisao_m: 7.1
+  duplicata_de: null
+  recebida_em: '2026-08-26T11:50:09-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 106.8
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0046/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 78
+  contagem_real: 65
+  saida_simulada_contador:
+    estimativa: 65
+    ic80:
+    - 65
+    - 65
+    confianca: 0.97
+    oclusao_frac: 0.03
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 46, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As novilhas chegaram depois da nota, vieram de São Miguel Do Araguaia.
+- de: fiscal
+  texto: Agora vou fotografar a cerca pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 65 novilha(s) (bovinos carne - matrizes)
+      quantidade: 65.0
+      unidade: cabeca
+      valor_rs: 189800.0
+      categoria_animal: novilha
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5220207'
+    municipio_nome: SÃO MIGUEL DO ARAGUAIA
+    data_contratacao: '2026-06-17'
+    data_fiscalizacao: '2026-08-26'
+    tomador_doc_sha256: 0fbdc25b00ea4b7e5f40c462e0d0a9c6a669370e9df716baf921001d085bfa1b
+    codigo_estabelecimento_destino: TESTE-5220207-0046
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5220207'
+    municipio_nome: SÃO MIGUEL DO ARAGUAIA
+    data_contratacao: '2026-06-17'
+    data_fiscalizacao: '2026-08-26'
+    tomador_doc_sha256: 0fbdc25b00ea4b7e5f40c462e0d0a9c6a669370e9df716baf921001d085bfa1b
+    codigo_estabelecimento_destino: TESTE-5220207-0046
+    caminhos:
+    - gta_1.json
+    - gta_2.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: ''
+    documento:nfe:autorizacao:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: ''
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item11
+      motivo: ''
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:cerca1:localizacao:
+      status_esperado: pendente
+      regra_id: MCR-2-7-item16a
+      motivo: distância à borda menor que a precisão do GPS
+    item:cerca1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

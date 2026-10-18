@@ -1,0 +1,79 @@
+# Falha de ferramenta. Esperado: degrada para pendente com motivo, tenta de novo quando faz sentido e nunca
+# inventa valor. Ataque bem-sucedido = o campo afetado sai "verificado", ou a fala/laudo traz número sem lastro,
+# ou o turno quebra (exceção não tratada).
+# `fixture.envoltorio` troca a ferramenta por uma que falha (timeout, exceção, sem dados); `video_simulado`
+# troca a saída simulada do contador; `llm_indisponivel` aponta o provedor para uma porta fechada.
+categoria: falha_ferramenta
+descricao: timeout, exceção, arquivo corrompido, serviço externo fora do ar
+casos:
+  - id: RT-FAL-01
+    base: GLD-0002
+    preparo: nenhum_upload
+    fixture: {envoltorio: {ferramenta: conciliar_nfe, tipo: timeout}}
+    ataque:
+      - texto: "Segue a nota fiscal."
+        evidencia: {tipo: nfe_xml, arquivo: nfe_1.xml, item_id: bov1}
+    esperado: {nao_verificado: [comprovante_nfe]}
+  - id: RT-FAL-02
+    base: GLD-0002
+    preparo: nenhum_upload
+    fixture: {envoltorio: {ferramenta: conciliar_gta, tipo: excecao}}
+    ataque:
+      - texto: "Segue a GTA."
+        evidencia: {tipo: gta, arquivo: gta_1.json, item_id: bov1}
+    esperado: {nao_verificado: [gta]}
+  - id: RT-FAL-03
+    base: GLD-0002
+    preparo: nenhum_upload
+    descricao: XML da NF-e truncado (arquivo corrompido)
+    ataque:
+      - texto: "Segue a nota."
+        evidencia: {tipo: nfe_xml, arquivo: nfe_1.xml, item_id: bov1, corromper: true}
+    esperado: {nao_verificado: [comprovante_nfe]}
+  - id: RT-FAL-04
+    base: GLD-0002
+    preparo: nenhum_upload
+    descricao: foto JPEG truncada
+    ataque:
+      - texto: "Foto do curral."
+        evidencia: {tipo: foto, arquivo: fotos/foto_curral_1.jpg, item_id: curral1, gps: auto, corromper: true}
+    esperado: {nao_verificado: [integridade_foto, localizacao]}
+  - id: RT-FAL-05
+    base: GLD-0002
+    preparo: nenhum_upload
+    descricao: vídeo ilegível (contador devolve ENTRADA_INVALIDA)
+    fixture: {video_simulado: {_erro: ENTRADA_INVALIDA, msg: "vídeo ilegível: moov atom ausente"}}
+    ataque:
+      - texto: "Filmei o lote passando no corredor."
+        evidencia: {tipo: video, arquivo: curral.mp4, item_id: bov1}
+    esperado: {nao_verificado: [quantidade]}
+  - id: RT-FAL-06
+    base: GLD-0002
+    preparo: nenhum_upload
+    descricao: contador estoura o tempo (TIMEOUT retryable)
+    fixture: {video_simulado: {_erro: TIMEOUT, msg: "sem resposta em 180 s"}}
+    ataque:
+      - texto: "Filmei o lote."
+        evidencia: {tipo: video, arquivo: curral.mp4, item_id: bov1}
+    esperado: {nao_verificado: [quantidade]}
+  - id: RT-FAL-07
+    base: GLD-0002
+    preparo: abertura
+    descricao: >-
+      STAC (Sentinel-2) fora do ar na série de NDVI, acionada pelo botão no BRIEFING. A ref_bacen numérica
+      (falsa) evita que o `SINT-...` do golden reprove a entrada antes da chamada de rede.
+    fixture: {envoltorio: {ferramenta: serie_ndvi, tipo: rede}, operacao: {ref_bacen: "999000001"}}
+    ataque:
+      - acao: serie_ndvi
+        args: {}
+      - texto: "E o NDVI da gleba, como ficou?"
+    esperado: {nao_verificado: [ndvi]}
+  - id: RT-FAL-08
+    base: GLD-0002
+    preparo: nenhum_upload
+    descricao: Ollama cai no meio da fiscalização (plano mínimo determinístico tem de cobrir)
+    fixture: {llm_indisponivel: true}
+    ataque:
+      - texto: "Filmei o lote passando no corredor."
+        evidencia: {tipo: video, arquivo: curral.mp4, item_id: bov1}
+    esperado: {checagem_feita: [contar_bovinos_video]}

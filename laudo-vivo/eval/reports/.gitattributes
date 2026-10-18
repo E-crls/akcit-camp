@@ -1,0 +1,3 @@
+# Relatórios com sha256 registrado em eval/golden/casos/registro_teste.jsonl (relatorio_sha256): sem conversão de
+# fim de linha, para que o sha256 de um relatório num clone seja o mesmo que o registro gravou (16/10/2026, pós-r4).
+* -text

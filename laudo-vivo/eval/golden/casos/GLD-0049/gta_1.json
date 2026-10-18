@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "829762",
+  "serie": "B",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "25-36",
+      "quantidade": 10
+    }
+  ],
+  "total": 10,
+  "total_por_extenso": "DEZ BOVINOS",
+  "marca_rebanho": "MARCA TESTE 48",
+  "origem": {
+    "documento": "00000054879",
+    "nome": "VENDEDOR TESTE 49",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 49",
+    "codigo_estabelecimento": "TESTE-5212204-9048",
+    "codigo_exploracao": "TESTE-5212204-9048-BOV",
+    "municipio_nome": "JUSSARA",
+    "municipio_ibge": "5212204",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000014818",
+    "nome": "PRODUTOR TESTE 49",
+    "estabelecimento": "FAZENDA TESTE 49",
+    "codigo_estabelecimento": "TESTE-5216403-0049",
+    "codigo_exploracao": "TESTE-5216403-0049-BOV",
+    "municipio_nome": "PARAÚNA",
+    "municipio_ibge": "5216403",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST7A10"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-01-11"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE JUSSARA"
+  },
+  "emissao": {
+    "local_municipio": "JUSSARA",
+    "data": "2026-07-03",
+    "hora": "12:19",
+    "validade": "2026-07-06"
+  },
+  "nfe_chaves": [
+    "52260700000000054879550010000038791776613461"
+  ],
+  "codigo_barras": "SINTGOB829762",
+  "sintetico": true
+}

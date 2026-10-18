@@ -1,0 +1,136 @@
+id: PUB-0005
+versao_gerador: 0.2.1
+split: casos_publicos
+sintetico: true
+classe: defeito
+titulo: GTA com destino em outro imóvel do mesmo município
+inspiracao:
+  natureza: cenario_construido
+  caso: 'cenário construído pela equipe, sem notícia de origem: a GTA leva o lote para outro estabelecimento do
+    mesmo município, e não para o da operação; a regra é a do campo de destino da GTA'
+  fonte: Manual SDA de trânsito de bovinos e bubalinos (regra do destino; não é notícia)
+  url: https://wikisda.agricultura.gov.br/pt-br/Saúde-Animal/trânsito_bovinos
+  acesso: null
+  acesso_nota: 'data de acesso não registrada: regra do destino (item 12) tirada de src/laudo/docs_fiscais/fontes.py
+    (MAPA-SDA-BOV-item12), que registra a URL sem data; não relida em 16/10/2026'
+  item_normativo: Manual SDA de trânsito de bovinos, item 12 (destino); MCR 2-7-2-a-I; OP-bovinos-gta
+  o_que_prova: estabelecimento de destino da GTA diferente do da operação diverge, mesmo no mesmo município
+  o_que_nao_prova: 'que os animais não estão no imóvel (pode haver arrendamento: humano decide)'
+  adaptacao: mesmo tomador e mesmo município; só o código do estabelecimento muda
+data_fiscalizacao: '2026-09-15'
+operacao:
+  ref_bacen: SINT-PUB-2026-000005
+  tomador_ref: TOMADOR-TESTE-PUB-05
+  tomador_doc_sha256: null
+  uf: GO
+  municipio_ibge: '5218508'
+  municipio_nome: QUIRINÓPOLIS
+  instituicao: COOPERATIVA DE CREDITO TESTE PUB 03
+  finalidade: investimento
+  empreendimento: null
+  data_contratacao: '2026-07-01'
+  data_liberacao: null
+  valor_rs: 130000.0
+  area_financiada_ha: 55.0
+  area_informada_ha: 55.0
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt: []
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 40 novilhas (bovinos carne - matrizes)
+    quantidade: 40.0
+    unidade: cabeca
+    valor_rs: 130000.0
+    categoria_animal: novilha
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE PUB 05
+    codigo_estabelecimento: TESTE-5218508-0005
+    municipio_ibge: '5218508'
+    municipio_nome: QUIRINÓPOLIS
+  lotacao_implicita_cab_ha: 0.73
+tomador:
+  ref: TOMADOR-TESTE-PUB-05
+  nome: PRODUTOR TESTE PUB 05
+  documento_sintetico: '00000070564'
+  documento_sha256: 9d754599fa91b7148274b72314a86e7110ad1913037d13dfc94ad63c7770eff2
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999070564550010000070051012741625'
+    sha256: 968753b360023d97e7cb0296d97f6b26c9b9a75cff96897a4952131061c6cfa5
+    grupo_zf: null
+  gta:
+  - arquivo_json: gta_1.json
+    identificador: GO-A-550501
+    sha256: 2fed8e6a72a7ea62a25d84f6ababedad90802ff4a27821b1a5987bea5777959b
+pre_indice: null
+video:
+  id: video_curral_1
+  ref: sintetico://videos/PUB-0005/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  saida_simulada_contador:
+    estimativa: 40
+    ic80:
+    - 40
+    - 41
+    confianca: 0.92
+    oclusao_frac: 0.04
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 40 novilhas (bovinos carne - matrizes)
+      quantidade: 40.0
+      unidade: cabeca
+      valor_rs: 130000.0
+      categoria_animal: novilha
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5218508'
+    municipio_nome: QUIRINÓPOLIS
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: 9d754599fa91b7148274b72314a86e7110ad1913037d13dfc94ad63c7770eff2
+    codigo_estabelecimento_destino: TESTE-5218508-0005
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5218508'
+    municipio_nome: QUIRINÓPOLIS
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: 9d754599fa91b7148274b72314a86e7110ad1913037d13dfc94ad63c7770eff2
+    codigo_estabelecimento_destino: TESTE-5218508-0005
+    caminhos:
+    - gta_1.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  laudo:
+    item:bov1:quantidade: verificado
+    item:bov1:comprovante_nfe: verificado
+    item:bov1:gta: divergente
+    item:bov1: divergente
+  finos:
+    item:bov1:gta_destino: divergente
+  ausentes: []
+notas: null

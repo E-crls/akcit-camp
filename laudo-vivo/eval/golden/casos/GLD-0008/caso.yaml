@@ -1,0 +1,304 @@
+id: GLD-0008
+versao_taxonomia: 1
+gerador:
+  versao: 0.1.0
+  semente: 20261008
+  indice: 7
+sintetico: true
+classe: defeito
+defeito:
+  codigo: D14_NFE_VENDEDOR_E_TOMADOR
+  classe: defeito
+  titulo: Vendedor é o próprio tomador
+  descricao: 'NF-e emitida pelo tomador para ele mesmo e GTA saindo de outra fazenda do tomador: recuperação de
+    capital investido.'
+data_fiscalizacao: '2026-09-12'
+operacao:
+  ref_bacen: SINT-2026-000008
+  tomador_ref: TOMADOR-TESTE-08
+  uf: GO
+  municipio_ibge: '5211909'
+  municipio_nome: JATAÍ
+  instituicao: COOPERATIVA DE CREDITO TESTE 03
+  finalidade: investimento
+  empreendimento: '23271300078002'
+  data_contratacao: '2026-08-04'
+  data_liberacao: null
+  valor_rs: 264700.0
+  area_financiada_ha: 66.6
+  area_informada_ha: null
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt:
+  - POLYGON ((-51.764770 -17.939198, -51.765077 -17.939308, -51.775303 -17.937479, -51.775703 -17.937541, -51.774270
+    -17.938115, -51.776971 -17.937456, -51.773646 -17.944781, -51.773846 -17.945139, -51.763909 -17.941706, -51.764770
+    -17.939198))
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 65 novilha(s) (bovinos carne - matrizes)
+    quantidade: 65.0
+    unidade: cabeca
+    valor_rs: 232700.0
+    categoria_animal: novilha
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  - id: cerca1
+    tipo: cerca
+    descricao: Construção de 1600 m de cerca de arame liso 5 fios
+    quantidade: 1600.0
+    unidade: m
+    valor_rs: 32000.0
+    categoria_animal: null
+    sexo: null
+    cronograma_fim: '2026-11-11'
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE 08
+    codigo_estabelecimento: TESTE-5211909-0008
+    municipio_ibge: '5211909'
+    municipio_nome: JATAÍ
+  orcamento:
+  - item_id: bov1
+    descricao: Aquisição de 65 novilha(s) (bovinos carne - matrizes)
+    quantidade: 65
+    unidade: cabeca
+    valor_unitario_rs: 3580.0
+    valor_total_rs: 232700.0
+  - item_id: cerca1
+    descricao: Construção de 1600 m de cerca de arame liso 5 fios
+    quantidade: 1600.0
+    unidade: m
+    valor_unitario_rs: 20.0
+    valor_total_rs: 32000.0
+  empreendimento_sicor:
+    codigo: '23271300078002'
+    descricao: BOVINOS CARNE - MATRIZES
+  lotacao_implicita_cab_ha: 0.98
+tomador:
+  ref: TOMADOR-TESTE-08
+  nome: AGROPECUARIA TOMADORA TESTE 08 LTDA
+  documento_sintetico: '99999999100730'
+  documento_sha256: 97f8e2aa9cda78a9a6defaad5d55c891223ceb6972208fe31708417d39050598
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260899999999100730550010000033951574854072'
+    sha256: a22ea5c5e05013c18925c94d10fa84bd5363cb002ecf68a117b908eb6075ad8e
+  gta:
+  - arquivo_json: gta_1.json
+    arquivo_html: gta_1.html
+    identificador: GO-AC-236396
+    sha256: 4c00fa45c62fe646dd7a6644d0aaf85383bb557f6cf63d80ea9b3fcd6d3f55ec
+  - arquivo_json: gta_2.json
+    arquivo_html: gta_2.html
+    identificador: GO-AC-236397
+    sha256: efc4fb62ddc479418e3d7cf5a59ec3c35ddd3d6a2c277ff435b5cd17765dc6b5
+fotos:
+- id: foto_cerca_1
+  arquivo: fotos/foto_cerca_1.jpg
+  item_id: cerca1
+  sha256: 0449678046d041925e0fd7f247e188d566bfaadcde084cd6aaf7d6f064ad3d18
+  exif:
+    presente: true
+    data_hora: '2026-09-12T08:11:58-03:00'
+    gps:
+      lat: -17.93946
+      lon: -51.7686298
+  gps_app:
+    lat: -17.93946
+    lon: -51.7686298
+    precisao_m: 4.3
+  duplicata_de: null
+  recebida_em: '2026-09-12T08:37:58-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 85.6
+- id: foto_cerca_2
+  arquivo: fotos/foto_cerca_2.jpg
+  item_id: cerca1
+  sha256: 0a9ef32161864ced16e8c9eb9b94391cdac71dbc68c31f92acf77dcbc0327786
+  exif:
+    presente: true
+    data_hora: '2026-09-12T09:30:54-03:00'
+    gps:
+      lat: -17.9394702
+      lon: -51.7686982
+  gps_app:
+    lat: -17.9394702
+    lon: -51.7686982
+    precisao_m: 7.5
+  duplicata_de: null
+  recebida_em: '2026-09-12T09:55:54-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 88.1
+- id: foto_lote_1
+  arquivo: fotos/foto_lote_1.jpg
+  item_id: bov1
+  sha256: b49591bb2658ea899c7ece58d30756e0e1a16d104d57e41097d85beb08224867
+  exif:
+    presente: true
+    data_hora: '2026-09-12T14:31:00-03:00'
+    gps:
+      lat: -17.9399462
+      lon: -51.7695681
+  gps_app:
+    lat: -17.9399462
+    lon: -51.7695681
+    precisao_m: 10.6
+  duplicata_de: null
+  recebida_em: '2026-09-12T15:10:00-03:00'
+  esperado:
+    geofence: dentro
+    distancia_borda_m: 156.7
+video:
+  id: video_curral_1
+  ref: sintetico://videos/GLD-0008/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  duracao_s: 47
+  contagem_real: 65
+  saida_simulada_contador:
+    estimativa: 65
+    ic80:
+    - 65
+    - 65
+    confianca: 0.91
+    oclusao_frac: 0.02
+falas:
+- de: fiscal
+  texto: Estou no curral da FAZENDA TESTE 08, vou filmar o lote passando pelo corredor.
+- de: produtor
+  texto: As novilhas chegaram depois da nota, vieram de Goiás.
+- de: fiscal
+  texto: Agora vou fotografar a cerca pelo lado de dentro da gleba.
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 65 novilha(s) (bovinos carne - matrizes)
+      quantidade: 65.0
+      unidade: cabeca
+      valor_rs: 232700.0
+      categoria_animal: novilha
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5211909'
+    municipio_nome: JATAÍ
+    data_contratacao: '2026-08-04'
+    data_fiscalizacao: '2026-09-12'
+    tomador_doc_sha256: 97f8e2aa9cda78a9a6defaad5d55c891223ceb6972208fe31708417d39050598
+    codigo_estabelecimento_destino: TESTE-5211909-0008
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+      tolerancia_quantidade: 0
+      tolerancia_valor_pct: 0.05
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5211909'
+    municipio_nome: JATAÍ
+    data_contratacao: '2026-08-04'
+    data_fiscalizacao: '2026-09-12'
+    tomador_doc_sha256: 97f8e2aa9cda78a9a6defaad5d55c891223ceb6972208fe31708417d39050598
+    codigo_estabelecimento_destino: TESTE-5211909-0008
+    caminhos:
+    - gta_1.json
+    - gta_2.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  campos:
+    documento:nfe:integridade:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl3
+      motivo: ''
+    documento:nfe:autorizacao:
+      status_esperado: verificado
+      regra_id: AJ-SINIEF-07-2005-cl4
+      motivo: ''
+    item:bov1:nfe_especie:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_valor:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:nfe_data:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item6
+      motivo: ''
+    item:bov1:nfe_partes:
+      status_esperado: divergente
+      regra_id: MCR-2-7-item6
+      motivo: vendedor é o tomador
+    item:bov1:nfe_operacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    documento:gta:formato:
+      status_esperado: verificado
+      regra_id: IN-MAPA-09-2021-art3
+      motivo: ''
+    item:bov1:gta_especie:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item01
+      motivo: ''
+    item:bov1:gta_quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item2b
+      motivo: ''
+    item:bov1:gta_destino:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item12
+      motivo: ''
+    item:bov1:gta_origem:
+      status_esperado: divergente
+      regra_id: MCR-2-7-item6
+      motivo: origem da GTA é o tomador
+    item:bov1:gta_finalidade:
+      status_esperado: verificado
+      regra_id: MAPA-SDA-BOV-item13
+      motivo: ''
+    item:bov1:gta_data:
+      status_esperado: verificado
+      regra_id: GO-INC-ECONOMIA-AGRODEFESA-01-2021
+      motivo: ''
+    item:bov1:quantidade:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item9
+      motivo: ''
+    item:cerca1:localizacao:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item16a
+      motivo: ''
+    item:cerca1:integridade_foto:
+      status_esperado: verificado
+      regra_id: MCR-2-7-item1
+      motivo: ''
+  ocorrencias: []
+  alertas_offline:
+  - nfe.cadeia_icp_brasil
+  - nfe.situacao_sefaz
+  - gta.autenticidade
+  - gta.baixa_cancelamento
+  rascunho_sem_pendencias: false
+  regra_contagem: verificado se ic80_inf >= financiado; divergente se ic80_sup < financiado; senão abstencao

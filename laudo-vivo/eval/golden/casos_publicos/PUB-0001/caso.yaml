@@ -1,0 +1,147 @@
+id: PUB-0001
+versao_gerador: 0.2.1
+split: casos_publicos
+sintetico: true
+classe: defeito
+titulo: 'Documentos completos e rebanho ausente: 3% do financiado no curral'
+inspiracao:
+  caso: 'Pains (MG): 1.553 cabeças financiadas e 47 encontradas na vistoria do banco'
+  fonte: CompreRural
+  url: https://comprerural.com/fraude-em-financiamentos-rurais-de-r-18-milhao-faz-politico-virar-reu-na-justica-federal/
+  acesso: '2026-10-16'
+  data_noticia: '2026-01-09'
+  item_normativo: MCR 2-7-2-a-I e 2-5-10 (aplicação comprovada); OP-bovinos-contagem-tolerancia
+  o_que_prova: NF-e e GTA coerentes não provam que o animal financiado está na fazenda
+  o_que_nao_prova: frequência do desvio; nada sobre Goiás
+  adaptacao: 'proporção mantida (cerca de 3%): 160 financiadas, 5 contadas; uma NF-e e 4 GTAs (uma por carga), com
+    a GTA da carga 1 no grupo ZF da nota (uma guia por NF-e)'
+data_fiscalizacao: '2026-09-15'
+operacao:
+  ref_bacen: SINT-PUB-2026-000001
+  tomador_ref: TOMADOR-TESTE-PUB-01
+  tomador_doc_sha256: null
+  uf: GO
+  municipio_ibge: '5212204'
+  municipio_nome: JUSSARA
+  instituicao: COOPERATIVA DE CREDITO TESTE PUB 02
+  finalidade: investimento
+  empreendimento: null
+  data_contratacao: '2026-07-01'
+  data_liberacao: null
+  valor_rs: 544000.0
+  area_financiada_ha: 180.0
+  area_informada_ha: 180.0
+  area_total_ha: null
+  modulos_fiscais: null
+  fonte_recursos: null
+  car_ref: null
+  codigo_estabelecimento: null
+  glebas_wkt: []
+  itens:
+  - id: bov1
+    tipo: bovinos
+    descricao: Aquisição de 160 novilhas (bovinos carne - matrizes)
+    quantidade: 160.0
+    unidade: cabeca
+    valor_rs: 544000.0
+    categoria_animal: novilha
+    sexo: null
+    cronograma_fim: null
+    exige_numero_serie: true
+  fonte: sintetico
+projeto:
+  propriedade:
+    nome: FAZENDA TESTE PUB 01
+    codigo_estabelecimento: TESTE-5212204-0001
+    municipio_ibge: '5212204'
+    municipio_nome: JUSSARA
+  lotacao_implicita_cab_ha: 0.89
+tomador:
+  ref: TOMADOR-TESTE-PUB-01
+  nome: PRODUTOR TESTE PUB 01
+  documento_sintetico: '00000070130'
+  documento_sha256: 1e9a6719c6608971bf23834e775c8bdcef7318e6dd9ae13e12c7e9ddd70ce4de
+documentos:
+  nfe:
+  - arquivo: nfe_1.xml
+    chave: '52260799999999070130550010000070011012424867'
+    sha256: 714badad11dcd39f0ae66755cd99d7360e6025bc719e9919bb91e18d2dde2544
+    grupo_zf: GO-A-520201
+  gta:
+  - arquivo_json: gta_1.json
+    identificador: GO-A-520201
+    sha256: afb276316e4f02acdec46d9bca6c9f47c44d092e03eae9c85f37bd22cdf13c1c
+  - arquivo_json: gta_2.json
+    identificador: GO-A-520202
+    sha256: 0c0fa080b4a9b5330393839e5aa22da8aa06c9cfbff94b1764bedd2f7ef86d8d
+  - arquivo_json: gta_3.json
+    identificador: GO-A-520203
+    sha256: 318373671abe24416fe84920821904e33ba2fb51c2b61bc6f6c0cdb1ae6a2b7d
+  - arquivo_json: gta_4.json
+    identificador: GO-A-520204
+    sha256: 9fa57ca4b8c949fdacee5f366132f6f7e2a1aaee8a3915881ff03291a55a4550
+pre_indice: null
+video:
+  id: video_curral_1
+  ref: sintetico://videos/PUB-0001/curral.mp4
+  arquivo_disponivel: false
+  item_id: bov1
+  saida_simulada_contador:
+    estimativa: 5
+    ic80:
+    - 4
+    - 6
+    confianca: 0.92
+    oclusao_frac: 0.04
+entradas_ferramentas:
+  conciliar_nfe:
+    item: &id001
+      id: bov1
+      tipo: bovinos
+      descricao: Aquisição de 160 novilhas (bovinos carne - matrizes)
+      quantidade: 160.0
+      unidade: cabeca
+      valor_rs: 544000.0
+      categoria_animal: novilha
+      sexo: null
+      cronograma_fim: null
+      exige_numero_serie: true
+    uf_operacao: GO
+    municipio_ibge: '5212204'
+    municipio_nome: JUSSARA
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: 1e9a6719c6608971bf23834e775c8bdcef7318e6dd9ae13e12c7e9ddd70ce4de
+    codigo_estabelecimento_destino: TESTE-5212204-0001
+    caminhos:
+    - nfe_1.xml
+    parametros:
+      aceitar_homologacao: true
+  conciliar_gta:
+    item: *id001
+    uf_operacao: GO
+    municipio_ibge: '5212204'
+    municipio_nome: JUSSARA
+    data_contratacao: '2026-07-01'
+    data_fiscalizacao: '2026-09-15'
+    tomador_doc_sha256: 1e9a6719c6608971bf23834e775c8bdcef7318e6dd9ae13e12c7e9ddd70ce4de
+    codigo_estabelecimento_destino: TESTE-5212204-0001
+    caminhos:
+    - gta_1.json
+    - gta_2.json
+    - gta_3.json
+    - gta_4.json
+    nfe_caminhos:
+    - nfe_1.xml
+    parametros: {}
+esperado:
+  laudo:
+    item:bov1:quantidade: divergente
+    item:bov1:comprovante_nfe: verificado
+    item:bov1:gta: verificado
+    item:bov1: divergente
+  finos:
+    documento:gta:nfe_guia: verificado
+    item:bov1:gta_quantidade: verificado
+  ausentes: []
+notas: null

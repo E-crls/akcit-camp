@@ -1,0 +1,263 @@
+# Rulebook MCR 2-9 (Impedimentos Sociais, Ambientais e Climáticos): módulo da final (28/11).
+# Texto literal: docs/normas/mcr_2_9.md. Esquema e convenções: ver mcr_2_7.yaml e docs/regras.md.
+
+id: mcr-2-9
+titulo: "MCR 2-9 — Impedimentos socioambientais (Prodes, supressão, áreas vedadas)"
+versao: 0.1.0
+vigencia_inicio: 2026-07-01
+vigencia_fim: null
+norma_base: >-
+  MCR 2-9 consolidado (Atualização MCR nº 757, de 17/07/2026): Res. CMN 5.193/2024, 5.268/2025,
+  5.303/2026 (itens 17, 17-A, 18) e 5.314/2026 (item 16)
+texto_normativo: docs/normas/mcr_2_9.md
+
+fontes:
+  - id: mcr-sgm-2-9
+    descricao: "MCR vigente no SGM/BCB, Seção 2-9 (Atualização MCR nº 757)"
+    url: "https://manuais.bcb.gov.br/app/manual/mcr/publico"
+    acesso: 2026-10-08
+  - id: res-5303
+    descricao: "Resolução CMN nº 5.303/2026 (itens 17, 17-A e 18)"
+    url: "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20CMN&numero=5303"
+    acesso: 2026-10-08
+  - id: res-5314
+    descricao: "Resolução CMN nº 5.314/2026 (item 16, a partir de 01/07/2026)"
+    url: "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20CMN&numero=5314"
+    acesso: 2026-10-08
+  - id: res-5268
+    descricao: "Resolução CMN nº 5.268/2025 (itens 4, 5-A, 8, 15, 19)"
+    url: "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20CMN&numero=5268"
+    acesso: 2026-10-08
+
+revisao:
+  estado: rascunho_tecnico
+  revisores: []
+  pendencias:
+    - "Compliance: remissões do item 18 a MCR 6-1-2 e 6-7-7-a após a Res. 5.314 (ver docs/normas/mcr_2_9.md)."
+    - "Compliance: ASV emitida entre 15/09/2025 e 15/03/2026 — critério de 'conformidade com a Conama 510'."
+    - "Dados: definir a fonte e o formato da 'lista disponibilizada pelo MMA' (checagem consultar_prodes)."
+
+parametros:
+  - id: PAR-prodes-fonte-recursos-desconhecida-aplica
+    valor: true
+    justificativa: >-
+      O item 18 condiciona a concessão com recursos controlados ou direcionados. Se a fonte de recursos da
+      operação não for informada, tratamos o item como aplicável (default-deny) e avisamos. Errar para "exige
+      documento" custa um pedido a mais. Errar para "dispensa" esconderia um impedimento.
+    base_normativa: ["MCR 2-9-18"]
+  - id: PAR-tentativas-inconclusivas-max
+    valor: 2
+    unidade: "tentativas"
+    justificativa: >-
+      Mesmo critério do rulebook mcr-2-7: depois de duas checagens inconclusivas o sistema se abstém e devolve
+      a decisão ao humano.
+
+regras:
+  - id: MCR-2-9-item2-imovel-sicar
+    item: "MCR 2-9-2"
+    tipo: requisito_evidencia
+    origem: norma
+    titulo: "Imóvel identificado pelo Sicar (CAR)"
+    citacao: "a identificação do imóvel rural onde se situa o empreendimento objeto do crédito rural será realizada de acordo com as informações registradas no Sistema Nacional de Cadastro Ambiental Rural (Sicar)"
+    aplica_a: [imovel]
+    evidencias: [documento]
+    usado_por: [planejar_metodo]
+    pedido: "número do CAR do imóvel (recibo do Sicar)"
+
+  - id: MCR-2-9-item3-car-ativo
+    item: "MCR 2-9-3"
+    tipo: criterio_status
+    origem: norma
+    titulo: "CAR inscrito, não cancelado nem suspenso"
+    citacao: "não esteja inscrito ou cuja inscrição se encontre cancelada ou suspensa no Cadastro Ambiental Rural (CAR)"
+    resumo: "Ainda não executada (checagem consultar_car a construir)."
+    aplica_a: [imovel]
+    ferramentas: [consultar_car]
+
+  - id: MCR-2-9-item4-trabalho-escravo
+    item: "MCR 2-9-4"
+    tipo: criterio_status
+    origem: norma
+    titulo: "Vedação: cadastro de empregadores (trabalho análogo ao de escravo)"
+    citacao: "à pessoa física ou jurídica inscrita no cadastro de empregadores que mantiveram trabalhadores em condições análogas à de escravo"
+    resumo: "Não executada: exige CPF/CNPJ do tomador, que o Laudo Vivo não guarda (LGPD). Verificação da IF."
+    aplica_a: [operacao]
+
+  - id: MCR-2-9-item5-unidade-conservacao
+    item: "MCR 2-9-5"
+    tipo: criterio_status
+    origem: norma
+    titulo: "Vedação: imóvel em Unidade de Conservação (CNUC), salvo Plano de Manejo"
+    citacao: "imóvel rural total ou parcialmente inserido em Unidade de Conservação, desde que registrada no Cadastro Nacional de Unidades de Conservação (CNUC)"
+    aplica_a: [imovel]
+    ferramentas: [sobreposicao_areas_vedadas]
+
+  - id: MCR-2-9-item7-terra-indigena
+    item: "MCR 2-9-7"
+    tipo: criterio_status
+    origem: norma
+    titulo: "Vedação: terras ocupadas por indígenas (Funai)"
+    citacao: "imóvel rural total ou parcialmente inserido em terras ocupadas por indígenas"
+    aplica_a: [imovel]
+    ferramentas: [sobreposicao_areas_vedadas]
+
+  - id: MCR-2-9-item8-quilombo
+    item: "MCR 2-9-8"
+    tipo: criterio_status
+    origem: norma
+    titulo: "Vedação: terras tituladas por remanescentes de quilombos"
+    citacao: "imóvel rural total ou parcialmente inserido em terras tituladas, ou com título parcial, por remanescentes das comunidades de quilombos"
+    aplica_a: [imovel]
+    ferramentas: [sobreposicao_areas_vedadas]
+
+  - id: MCR-2-9-item10-embargo
+    item: "MCR 2-9-10"
+    tipo: criterio_status
+    origem: norma
+    titulo: "Vedação: embargo ambiental por desmatamento ilegal (lista do Ibama)"
+    citacao: "imóvel rural em que exista embargo de órgão ambiental competente, federal ou estadual"
+    aplica_a: [imovel]
+    ferramentas: [consultar_embargos_ibama]
+
+  - id: MCR-2-9-item12-embargo-transitorio
+    item: "MCR 2-9-12"
+    tipo: prazo
+    origem: norma
+    titulo: "Exceção transitória ao embargo até 30/06/2027"
+    citacao: "Até 30 de junho de 2027, a vedação de que trata o item 10 não se aplica à contratação de financiamentos quando observados cumulativamente os seguintes requisitos"
+    aplica_a: [imovel]
+    efeito: {ate: 2027-06-30}
+
+  - id: MCR-2-9-item14-floresta-publica-b
+    item: "MCR 2-9-14"
+    tipo: criterio_status
+    origem: norma
+    titulo: "Vedação: Floresta Pública Tipo B (CNFP)"
+    citacao: "imóvel rural total ou parcialmente inserido em Floresta Pública Tipo B (Não Destinada)"
+    aplica_a: [imovel]
+    ferramentas: [sobreposicao_areas_vedadas]
+
+  - id: MCR-2-9-item16-vedacao-supressao
+    item: "MCR 2-9-16"
+    tipo: requisito_evidencia
+    origem: norma
+    titulo: "Vedada a concessão se projeto/orçamento prevê supressão de vegetação nativa (recursos direcionados e controlados)"
+    citacao: "a concessão de financiamento de empreendimento cujo projeto ou orçamento preveja a supressão da vegetação nativa"
+    vigencia_inicio: 2026-07-01
+    aplica_a: [operacao]
+    evidencias: [documento]
+
+  - id: MCR-2-9-item17-prodes-inicio
+    item: "MCR 2-9-17"
+    tipo: prazo
+    origem: norma
+    titulo: "Verificação de supressão pós-31/07/2019 (Prodes/BiomasBR): início por tamanho do imóvel"
+    citacao: "deve verificar se houve supressão da vegetação nativa após 31 de julho de 2019 no imóvel rural onde será conduzido o empreendimento"
+    citacoes_adicionais:
+      - "a) 4 de janeiro de 2027, quando se tratar de imóveis rurais com área superior a quinze módulos fiscais"
+      - "b) 1º de julho de 2027, quando se tratar de imóveis com área superior a quatro e de até quinze módulos fiscais"
+      - "c) 3 de janeiro de 2028, quando se tratar de imóveis rurais com área de até quatro módulos fiscais"
+    resumo: "A exigência vale para operações contratadas a partir da data de início da faixa do imóvel."
+    aplica_a: [imovel]
+    efeito:
+      marco_supressao: 2019-07-31
+      faixas:
+        - alinea: a
+          inicio: 2027-01-04
+          condicao: {campo: imovel.modulos_fiscais, op: gt, valor: 15}
+        - alinea: b
+          inicio: 2027-07-01
+          condicao:
+            todas:
+              - {campo: imovel.modulos_fiscais, op: gt, valor: 4}
+              - {campo: imovel.modulos_fiscais, op: lte, valor: 15}
+        - alinea: c
+          inicio: 2028-01-03
+          condicao: {campo: imovel.modulos_fiscais, op: lte, valor: 4}
+    avaliador: prodes_inicio
+    usado_por: [planejar_metodo, avaliar_regras]
+    pedido: "informar o tamanho do imóvel em módulos fiscais (CAR/Incra)"
+
+  - id: MCR-2-9-item17A-uso-coletivo
+    item: "MCR 2-9-17-A"
+    tipo: prazo
+    origem: norma
+    titulo: "Assentamentos e comunidades tradicionais com CAR coletivo: prazo da alínea 'c'"
+    citacao: "nos casos em que o CAR for referente ao perímetro do imóvel de uso coletivo, aplica-se o prazo previsto no item 17, alínea “c”"
+    aplica_a: [imovel]
+    condicao: {campo: imovel.uso_coletivo, op: eq, valor: true}
+    efeito: {inicio: 2028-01-03}
+    avaliador: prodes_inicio
+    usado_por: [planejar_metodo, avaliar_regras]
+
+  - id: MCR-2-9-item18-documentos-regularizacao
+    item: "MCR 2-9-18"
+    tipo: requisito_evidencia
+    origem: norma
+    titulo: "Supressão constatada: concessão condicionada a um documento de regularização"
+    citacao: "fica condicionada à apresentação pelo mutuário de um dos seguintes documentos referentes à supressão constatada no imóvel"
+    citacoes_adicionais:
+      - "I - no caso de UAS ou ato equivalente, serão aceitos apenas os documentos expedidos anteriormente a 15 de março de 2026"
+      - "II - poderá ser aceita ASV emitida anteriormente a 15 de setembro de 2025"
+      - "Termo de Ajustamento de Conduta (TAC) firmado com o Ministério Público para regularização ambiental"
+      - "Termo de Compromisso Ambiental firmado com o órgão ambiental estadual competente"
+    aplica_a: [imovel]
+    condicao: {campo: operacao.fonte_recursos, op: in, valor: [controlados, direcionados]}
+    parametros: [PAR-prodes-fonte-recursos-desconhecida-aplica]
+    evidencias: [documento]
+    efeito:
+      documentos:
+        ASV: {alinea: a, aceito_se_emitido_antes: 2025-09-15, senao: validacao_humana}
+        UAS: {alinea: a, aceito_se_emitido_antes: 2026-03-15, senao: recusado}
+        ato_equivalente: {alinea: a, aceito_se_emitido_antes: 2026-03-15, senao: recusado}
+        PRAD: {alinea: b}
+        PRA: {alinea: b}
+        TAC: {alinea: c}
+        laudo_sr: {alinea: d, exige_regra: MCR-2-7-item4-metadados-sr}
+        TCA: {alinea: e}
+    usado_por: [avaliar_regras]
+    pedido: "um dos documentos do MCR 2-9-18 (ASV/UAS, PRAD/PRA, TAC, laudo de sensoriamento ou Termo de Compromisso Ambiental) com tipo e data de emissão"
+
+  - id: MCR-2-9-item18d-laudo-sr
+    item: "MCR 2-9-18-d"
+    tipo: requisito_laudo
+    origem: norma
+    titulo: "Laudo técnico de sensoriamento remoto da IF como documento de regularização"
+    citacao: "laudo técnico de sensoriamento remoto, sob responsabilidade da instituição financeira, comprovando a ausência de desmatamento no imóvel rural após 31 de julho de 2019"
+    resumo: "Se emitido pelo Laudo Vivo, carrega também os metadados do MCR 2-7-4-b (analogia nossa)."
+    aplica_a: [imovel]
+
+  - id: MCR-2-9-item19-desclassificacao
+    item: "MCR 2-9-19"
+    tipo: requisito_laudo
+    origem: norma
+    titulo: "Descumprimento durante a vigência pode desclassificar (MCR 2-8)"
+    citacao: "a operação poderá ser desclassificada na forma do MCR 2-8"
+    aplica_a: [operacao]
+    efeito: {decisao_humana: true}
+
+  - id: OP-2-9-prodes-status
+    item: "operacional"
+    tipo: criterio_status
+    origem: parametro_operacional
+    titulo: "Status do campo Prodes (supressão pós-2019 e documento de regularização)"
+    justificativa: >-
+      A norma diz o que verificar (item 17) e o que aceitar (item 18), mas não como classificar o resultado no
+      laudo. Sem supressão constatada, verifica. Com supressão e documento aceito, verifica (regularizada,
+      citando a alínea). Com documento recusado pela regra de data, diverge. Sem documento ou com ASV que
+      exige validação humana, fica pendente. Consulta inconclusiva nunca vira divergência.
+    base_normativa: ["MCR 2-9-17", "MCR 2-9-18"]
+    aplica_a: [imovel]
+    avaliador: prodes_status
+    ferramentas: [consultar_prodes]
+    parametros: [PAR-tentativas-inconclusivas-max]
+    usado_por: [avaliar_regras]
+    pedido: "consultar a lista Prodes/BiomasBR do MMA para o imóvel (CAR)"
+    criterios:
+      verificado: "sem supressão pós-31/07/2019, ou supressão com documento do item 18 aceito"
+      divergente: "supressão constatada e documento apresentado recusado (ex.: UAS emitida a partir de 15/03/2026)"
+      pendente: "sem consulta, consulta inconclusiva/erro, supressão sem documento, ou ASV a validar por humano"
+      abstencao: "consulta inconclusiva após o máximo de tentativas"
+
+campos_laudo:
+  - {campo: "imovel:prodes", regra: OP-2-9-prodes-status}

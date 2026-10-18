@@ -1,0 +1,83 @@
+Licença dos dados do Fiscal-GO 2026 (bench/fiscal_go/)
+=======================================================
+
+Banco de dados ........................ Open Database License (ODbL) v1.0
+Conteúdos calculados pelo projeto ..... Database Contents License (DbCL) v1.0
+Código (build.py, casos_demo.py) ...... Apache License 2.0 (arquivo LICENSE na raiz do repositório)
+
+Aviso oficial (só o parágrafo recuado abaixo, que é o texto recomendado pela Open Data Commons com o nome
+deste banco de dados; o texto da licença que vale é o original em inglês publicado nesses endereços):
+
+  The Fiscal-GO 2026 database is made available under the Open Database License:
+  http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are
+  licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/
+
+Nota da equipe (não faz parte do aviso oficial): a DbCL cobre só os conteúdos sobre os quais o projeto Laudo
+Vivo tem direitos, isto é, os valores que o próprio projeto calcula. Os conteúdos que vêm de terceiros
+continuam com os termos das suas fontes, listados na seção 4.
+
+
+1. O que este arquivo cobre
+---------------------------
+
+O "banco de dados" desta licença é o conjunto dos arquivos de dados desta pasta:
+
+  fiscal_go_2026.parquet, itens_go_2026.parquet, glebas_go_2026.parquet, rebanho_municipal_go.parquet,
+  resumo.json, casos_demo.json, ndvi_demo.json
+
+Os scripts (build.py, casos_demo.py) e o README.md são código e documentação do projeto, sob a Apache
+License 2.0, como o resto do repositório.
+
+
+2. Por que ODbL
+---------------
+
+O Fiscal-GO é derivado dos microdados do Sicor (Banco Central do Brasil). A página de download dos
+microdados (https://www.bcb.gov.br/estabilidadefinanceira/tabelas-credito-rural-proagro) não traz licença
+explícita; o conjunto do Sicor no Portal de Dados Abertos do BCB ("Matriz de Dados do Crédito Rural",
+BCB/Derop) está sob ODbL, conferido em 08/10/2026 pela API CKAN de dadosabertos.bcb.gov.br (ver
+THIRD_PARTY.md, na raiz). Por prudência, publicamos os derivados sob a mesma licença. Quem publicar um banco
+de dados derivado deste precisa mantê-lo sob a ODbL 1.0 (compartilhamento pela mesma licença, seção 4.4 da
+ODbL) e manter este aviso.
+
+
+3. Atribuição (obrigatória para quem reusar)
+--------------------------------------------
+
+Cite, junto com o uso público dos dados ou de um derivado:
+
+  "Fiscal-GO 2026, projeto Laudo Vivo, disponível sob a Open Database License 1.0."
+  "Fonte: Banco Central do Brasil — Sicor (microdados do crédito rural)."
+  "Fonte: IBGE — Pesquisa da Pecuária Municipal 2025; Malha Municipal."
+  "Contém dados Copernicus Sentinel modificados (2026)."   (só quando usar ndvi_demo.json)
+
+
+4. Conteúdos de terceiros
+-------------------------
+
+a) Banco Central do Brasil, Sicor (operações, itens, glebas em WKT e tabelas de códigos): ODbL, como na
+   seção 2. Os arquivos do Sicor usados não têm CPF/CNPJ nem nome de tomador; REF_BACEN já vem mascarado
+   pelo BCB.
+
+b) IBGE: Pesquisa da Pecuária Municipal 2025 (SIDRA 3939), malha municipal e localidades de Goiás. Estão em
+   rebanho_municipal_go.parquet (cod_ibge, municipio, area_ha, ano, bovinos_cab, densidade_bovina_cab_ha) e
+   nas colunas municipio_ibge, municipio_nome, rebanho_municipal_cab, densidade_bovina_mun_cab_ha,
+   razao_lotacao_densidade e frac_rebanho_mun de fiscal_go_2026.parquet. São dados públicos com citação
+   obrigatória da fonte. Não achamos licença aberta formal para esses produtos (a página do IBGE no gov.br
+   indica CC BY-ND 3.0 para o conteúdo do site, e os produtos cartográficos têm termo de uso próprio). Esta
+   licença não concede sobre eles mais direitos do que o IBGE concede. Antes de publicar o bench como
+   dataset separado (por exemplo, no Hugging Face), confirmar os termos com o IBGE.
+
+c) Copernicus Sentinel-2 L2A (ESA), coleção sentinel-2-c1-l2a do Earth Search (Element 84) no AWS Open
+   Data: só as séries de NDVI de ndvi_demo.json. Sentinel Data Legal Notice: acesso livre, completo e
+   aberto, com a atribuição da seção 3.
+
+
+5. Nota de uso (não é condição da licença)
+------------------------------------------
+
+Os sinais do Fiscal-GO são prioridade de verificação, não indício de irregularidade. Por favor, não os use
+para rotular operação ou pessoa.
+
+Este arquivo é a leitura da equipe sobre as licenças das fontes, conferidas em 08/10/2026; não é parecer
+jurídico.

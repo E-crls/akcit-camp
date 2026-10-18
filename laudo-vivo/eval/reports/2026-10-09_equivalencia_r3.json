@@ -1,0 +1,70 @@
+{
+ "data": "09/10/2026 05:08",
+ "referencia": {
+  "data": "2026-10-09",
+  "sufixo": "_r3",
+  "sha256_src": "c297955f9b44ad3792fbbe5f07044650cae1d188c3cbad3d5cc7292563cd62d5"
+ },
+ "sha256_src_atual": "a88445406cdd09a3ae87ac183ad9cdc98a02baf85e382a9be0ec8996497f707a",
+ "motivo": "sal da instalacao movido para dados_locais/config (sem efeito em metricas)",
+ "conferencias": [
+  {
+   "nome": "golden set sem LLM (todas as métricas por split)",
+   "resultado": "igual",
+   "comparado": [
+    "splits"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "red-team sem LLM (resumo)",
+   "resultado": "igual",
+   "comparado": [
+    "resumo"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "A/B v2 (leituras e alegações gravadas; tudo menos config)",
+   "resultado": "igual",
+   "comparado": [
+    "principal",
+    "estabilidade_replicacoes",
+    "sensibilidade",
+    "leitura",
+    "fala",
+    "sanidade_oraculo",
+    "episodios"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "replay da demo na CLI, 19 passos com a foto do DANFE (gravado no código novo)",
+   "resultado": "igual",
+   "comparado": [
+    "requisições ao LLM fora da gravação",
+    "etapa final"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "replay da demo na CLI, só o XML, 17 passos (gravado em 08/10, antes das mudanças)",
+   "resultado": "igual",
+   "comparado": [
+    "requisições ao LLM fora da gravação",
+    "etapa final"
+   ],
+   "diferencas": []
+  },
+  {
+   "nome": "contingência da interface, 19 passos pela API (gravada no código novo)",
+   "resultado": "igual",
+   "comparado": [
+    "requisições ao LLM fora da gravação",
+    "etapa final"
+   ],
+   "diferencas": []
+  }
+ ],
+ "conclusao": "métricas sem LLM idênticas e o contexto do LLM inalterado nas gravações: os números da referência continuam valendo para o código atual; a rodada completa com o LLM fica para o congelamento"
+}

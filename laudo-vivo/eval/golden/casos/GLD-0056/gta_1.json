@@ -1,0 +1,67 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "315682",
+  "serie": "A",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "13-24",
+      "quantidade": 35
+    }
+  ],
+  "total": 35,
+  "total_por_extenso": "TRINTA E CINCO BOVINOS",
+  "marca_rebanho": "MARCA TESTE 05",
+  "origem": {
+    "documento": "99999999505552",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 56 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 56",
+    "codigo_estabelecimento": "TESTE-5218003-9055",
+    "codigo_exploracao": "TESTE-5218003-9055-BOV",
+    "municipio_nome": "PORANGATU",
+    "municipio_ibge": "5218003",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000015547",
+    "nome": "PRODUTOR TESTE 56",
+    "estabelecimento": "FAZENDA TESTE 56",
+    "codigo_estabelecimento": "TESTE-5213806-0056",
+    "codigo_exploracao": "TESTE-5213806-0056-BOV",
+    "municipio_nome": "MORRINHOS",
+    "municipio_ibge": "5213806",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST6G42"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2025-10-05"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE PORANGATU"
+  },
+  "emissao": {
+    "local_municipio": "PORANGATU",
+    "data": "2026-08-19",
+    "hora": "09:50",
+    "validade": "2026-08-20"
+  },
+  "nfe_chaves": [
+    "52260899999999505552550010000046331391034398",
+    "52260899999999505552550010000046341348886083"
+  ],
+  "codigo_barras": "SINTGOA315682",
+  "sintetico": true
+}

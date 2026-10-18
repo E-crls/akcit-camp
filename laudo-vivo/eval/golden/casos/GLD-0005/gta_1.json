@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "325446",
+  "serie": "AB",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": "25-36",
+      "quantidade": 15
+    }
+  ],
+  "total": 15,
+  "total_por_extenso": "QUINZE BOVINOS",
+  "marca_rebanho": "MARCA TESTE 04",
+  "origem": {
+    "documento": "99999999500402",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 05 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 05",
+    "codigo_estabelecimento": "TESTE-5214606-9004",
+    "codigo_exploracao": "TESTE-5214606-9004-BOV",
+    "municipio_nome": "NIQUELÂNDIA",
+    "municipio_ibge": "5214606",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "00000010405",
+    "nome": "PRODUTOR TESTE 05",
+    "estabelecimento": "FAZENDA TESTE 05",
+    "codigo_estabelecimento": "TESTE-5212204-0005",
+    "codigo_exploracao": "TESTE-5212204-0005-BOV",
+    "municipio_nome": "JUSSARA",
+    "municipio_ibge": "5212204",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST4B88"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2025-08-14"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE NIQUELÂNDIA"
+  },
+  "emissao": {
+    "local_municipio": "NIQUELÂNDIA",
+    "data": "2026-08-19",
+    "hora": "12:22",
+    "validade": "2026-08-22"
+  },
+  "nfe_chaves": [
+    "52260899999999500402550010000026551197654376"
+  ],
+  "codigo_barras": "SINTGOAB325446",
+  "sintetico": true
+}

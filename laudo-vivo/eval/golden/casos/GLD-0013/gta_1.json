@@ -1,0 +1,66 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "550983",
+  "serie": "GO",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "F",
+      "faixa_etaria": ">36",
+      "quantidade": 20
+    }
+  ],
+  "total": 20,
+  "total_por_extenso": "VINTE BOVINOS",
+  "marca_rebanho": "MARCA TESTE 12",
+  "origem": {
+    "documento": "99999999501212",
+    "nome": "AGROPECUARIA VENDEDORA TESTE 13 LTDA",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 13",
+    "codigo_estabelecimento": "TESTE-5202502-9012",
+    "codigo_exploracao": "TESTE-5202502-9012-BOV",
+    "municipio_nome": "ARUANÃ",
+    "municipio_ibge": "5202502",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999101206",
+    "nome": "AGROPECUARIA TOMADORA TESTE 13 LTDA",
+    "estabelecimento": "FAZENDA TESTE 13",
+    "codigo_estabelecimento": "TESTE-5206404-0013",
+    "codigo_exploracao": "TESTE-5206404-0013-BOV",
+    "municipio_nome": "CRIXÁS",
+    "municipio_ibge": "5206404",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST9F23"
+  },
+  "vacinacoes": [
+    {
+      "doenca": "BRUCELOSE",
+      "data": "2026-03-14"
+    }
+  ],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE ARUANÃ"
+  },
+  "emissao": {
+    "local_municipio": "ARUANÃ",
+    "data": "2026-07-17",
+    "hora": "18:41",
+    "validade": "2026-07-18"
+  },
+  "nfe_chaves": [
+    "52260799999999501212550010000056121647669576"
+  ],
+  "codigo_barras": "SINTGOGO550983",
+  "sintetico": true
+}

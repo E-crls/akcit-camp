@@ -1,0 +1,47 @@
+# Workspace do AKCIT Camp 2026 (raiz do repositório). O produto está em laudo-vivo/ (que tem o próprio .gitignore).
+# Ambiente local (micromamba, ~2,7 GB), dados públicos brutos (re-baixáveis pelos scripts) e cópias de segurança.
+.ferramentas/
+dados/
+snapshots/
+# Dados locais, caches e builds em qualquer pasta
+**/dados_locais/
+**/node_modules/
+**/__pycache__/
+*.pyc
+.tmp_*/
+.venv/
+.env
+.env.*
+
+# estado e binários do Terraform (o provider tem ~138 MB)
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+**/terraform.tfvars
+
+# instruções de trabalho internas (fora do git)
+BRIEFING.md
+
+# revisões e estratégia internas (fora do git)
+painel/
+ESTRATEGIA_FINAL.md
+
+# configuração local do editor
+.claude/
+
+# material interno (fica só na máquina da equipe)
+DECISAO.md
+negocio/inscricao.md
+negocio/relatorio_quinzenal_*
+negocio/email_organizacao.md
+negocio/afirmacoes_proibidas.md
+negocio/kit_validacao/
+negocio/PASSO_A_PASSO_EQUIPE.md
+laudo-vivo/CHANGELOG.md
+laudo-vivo/docs/decisao.md
+laudo-vivo/docs/tcle_modelo.md
+laudo-vivo/docs/EQUIPE.md
+laudo-vivo/docs/entregaveis/KIT_APRESENTADOR.md
+laudo-vivo/docs/entregaveis/qa-banca.md
+laudo-vivo/docs/entregaveis/pitch-final-5min.md

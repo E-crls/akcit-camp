@@ -1,0 +1,61 @@
+{
+  "modelo": "e-GTA",
+  "uf_emissao": "GO",
+  "numero": "725225",
+  "serie": "C",
+  "especie": "bovina",
+  "quantidades": [
+    {
+      "sexo": "M",
+      "faixa_etaria": ">36",
+      "quantidade": 2
+    }
+  ],
+  "total": 2,
+  "total_por_extenso": "DOIS BOVINOS",
+  "marca_rebanho": "MARCA TESTE 40",
+  "origem": {
+    "documento": "00000054011",
+    "nome": "VENDEDOR TESTE 41",
+    "estabelecimento": "FAZENDA ORIGEM TESTE 41",
+    "codigo_estabelecimento": "TESTE-5218300-9040",
+    "codigo_exploracao": "TESTE-5218300-9040-BOV",
+    "municipio_nome": "POSSE",
+    "municipio_ibge": "5218300",
+    "uf": "GO"
+  },
+  "destino": {
+    "documento": "99999999104051",
+    "nome": "AGROPECUARIA TOMADORA TESTE 41 LTDA",
+    "estabelecimento": "FAZENDA TESTE 41",
+    "codigo_estabelecimento": "TESTE-5217203-0041",
+    "codigo_exploracao": "TESTE-5217203-0041-BOV",
+    "municipio_nome": "PIRANHAS",
+    "municipio_ibge": "5217203",
+    "uf": "GO"
+  },
+  "finalidade": "REPRODUCAO",
+  "meio_transporte": {
+    "tipo": "RODOVIARIO",
+    "placa": "TST0J59"
+  },
+  "vacinacoes": [],
+  "exames": [],
+  "observacao": null,
+  "emitente": {
+    "tipo": "PRODUTOR",
+    "identificacao": "EMISSAO ELETRONICA - EMITENTE TESTE",
+    "unidade_expedidora": "UNIDADE LOCAL TESTE POSSE"
+  },
+  "emissao": {
+    "local_municipio": "POSSE",
+    "data": "2026-07-02",
+    "hora": "10:07",
+    "validade": "2026-07-04"
+  },
+  "nfe_chaves": [
+    "52260700000000054011550010000054021194196523"
+  ],
+  "codigo_barras": "SINTGOC725225",
+  "sintetico": true
+}

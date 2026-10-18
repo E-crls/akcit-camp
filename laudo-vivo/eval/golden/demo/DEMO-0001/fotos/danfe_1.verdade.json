@@ -1,0 +1,33 @@
+{
+ "nivel": "media",
+ "semente": "DEMO-0001:danfe:2",
+ "meta": {
+  "nivel": "media",
+  "dobra_y": 700,
+  "rotacao_graus": -1.94,
+  "tamanho": [
+   934,
+   1250
+  ],
+  "jpeg_q": 72
+ },
+ "campos": {
+  "chave": "52260499999999599948550010000086641559429439",
+  "numero": 8664,
+  "serie": 1,
+  "data_emissao": "2026-04-14",
+  "tp_nf": "1",
+  "emitente_doc": "99999999599948",
+  "destinatario_doc": "00000099970",
+  "emitente_uf": "GO",
+  "destinatario_uf": "GO",
+  "v_prod": 225999.9,
+  "emitente_municipio": "GOIAS",
+  "item1.ncm": "01022919",
+  "item1.cfop": "5101",
+  "item1.unidade": "CB",
+  "item1.quantidade": 29.0,
+  "item1.valor_unitario": 7793.1,
+  "item1.valor_total": 225999.9
+ }
+}

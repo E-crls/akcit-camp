@@ -1,0 +1,99 @@
+# CI do Laudo Vivo. O produto fica em laudo-vivo/: todo passo roda de dentro dessa pasta
+# (defaults.run.working-directory), e os caminhos de cache e de artefato partem da raiz do repositório.
+# Passos: lint, testes sem GPU, varredura de dados pessoais, frases proibidas (com o texto do .zip de
+# docs/exemplos/ e os textos de negocio/), números de palco, números de fonte fixa, tempo do pitch e avaliação
+# determinística só do dev (REQ-31). São os passos de `scripts/tarefas.sh ci`, um a um, mais a avaliação.
+# Sem segredos e sem rede para LLM: os testes lentos (vídeo real, ASR) pulam sem LAUDO_LENTO, os de rede pulam
+# sem LAUDO_TESTES_REDE e o replay usa as gravações em tests/unit/dados_agente/. O número de palco não sai
+# daqui: vem da rodada r4 congelada (`scripts/tarefas.sh r4`, local, com o LLM), conferida pelo passo dos
+# números.
+# laudo-vivo/.github/workflows/ci.yml é a variante para quando a pasta laudo-vivo/ for publicada como
+# repositório próprio. Os passos das duas são os mesmos: o passo "CI da raiz e variante" confere.
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["*"]
+    paths:
+      - "laudo-vivo/**"
+      - "negocio/**"
+      - ".github/workflows/**"
+  pull_request:
+    paths:
+      - "laudo-vivo/**"
+      - "negocio/**"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+    working-directory: laudo-vivo
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      PY: python
+      PYTHONPATH: src
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: laudo-vivo/pyproject.toml
+
+      - name: Instalar dependências (pyproject.toml, extras geo/vision/voice e grupo dev)
+        run: |
+          python -m pip install --upgrade pip  # --group (PEP 735) exige pip >= 25.1
+          python -m pip install -e ".[geo,vision,voice]"
+          python -m pip install --group dev
+
+      - name: CI da raiz e variante da pasta com os mesmos passos (scripts/checar_ci.py)
+        run: python scripts/checar_ci.py
+
+      - name: Lint (ruff)
+        run: bash scripts/tarefas.sh lint
+
+      - name: Testes (sem GPU)
+        run: bash scripts/tarefas.sh testes
+
+      - name: Varredura de dados pessoais (inclui .parquet)
+        run: bash scripts/tarefas.sh pii
+
+      - name: Frases proibidas (memorando de 16/10/2026 e P20 a P25 pós-r4; autoteste + textos + .zip do exemplo)
+        run: bash scripts/tarefas.sh frases
+
+      - name: Números do pitch, Q&A e slide = relatórios da versão de palco (fonte única, eval/reports/palco.json)
+        run: bash scripts/tarefas.sh numeros --verificar
+
+      - name: Números de fonte fixa (mercado, Fiscal-GO e vídeo; marcadores <!--f:--> contra a fonte)
+        run: bash scripts/tarefas.sh fixos
+
+      - name: Tempo do pitch (versão A até 2:50, versão B até 4:45; scripts/tempo_pitch.py --conferir)
+        run: bash scripts/tarefas.sh tempo
+
+      - name: Avaliação determinística só do dev (golden set dev + red-team original e v2, sem LLM)
+        env:
+          SAIDA_EVAL: eval-ci
+        run: bash scripts/tarefas.sh avaliacao
+
+      - name: Publicar relatórios da avaliação
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: avaliacao-deterministica
+          path: laudo-vivo/eval-ci/
+          if-no-files-found: ignore
