@@ -25,7 +25,7 @@ mesmas regras antes de aceitar.
 |---|---|
 | [`docs/exemplos/laudo_selado.html`](docs/exemplos/laudo_selado.html) ([PDF](docs/exemplos/laudo_selado.pdf)) | o laudo selado do fim da demo: cada item com status, regra citada e prova; o selo confere sem a instalação que o gerou ([como ler](docs/exemplos/README.md)) |
 | [`docs/entregaveis/video/`](docs/entregaveis/video/) | a demo gravada da interface: os 19 passos do caso `DEMO-0001`, uma operação fictícia |
-| [`docs/resultados.md`](docs/resultados.md) | os resultados da avaliação: golden set no teste e no dev, red-team da equipe e cego, A/B, custo e latência, com n e IC 95% |
+| [`eval/SLIDE.md`](eval/SLIDE.md) | os resultados da avaliação: golden set no teste e no dev, red-team da equipe e cego, A/B, custo e latência, com n e IC 95% |
 | [`docs/fluxo_do_agente.md`](docs/fluxo_do_agente.md) | o fluxo do agente: entradas, lógica, estados, ferramentas, políticas e saídas |
 | [`docs/entregaveis/deck.pdf`](docs/entregaveis/deck.pdf), [`docs/entregaveis/bmc-v1.pdf`](docs/entregaveis/bmc-v1.pdf) | apresentação e Business Model Canvas |
 
@@ -51,7 +51,7 @@ gerenciado, está em [`infra/gcp/README.md`](infra/gcp/README.md).
 ## Resultados
 
 Todos os números, com n, IC 95% de Wilson e o par teste/dev lado a lado, estão em
-[`docs/resultados.md`](docs/resultados.md). Os principais, da avaliação final no split de teste congelado
+[`eval/SLIDE.md`](eval/SLIDE.md). Os principais, da avaliação final no split de teste congelado
 (n = <!--n:golden.n_teste.valor-->24<!--/n-->):
 
 | Medida | Resultado |
@@ -85,7 +85,7 @@ Os quatro entregáveis e onde conferir cada um estão em
 | 4. Fluxo do agente (inputs, lógica, outputs) | [`docs/fluxo_do_agente.md`](docs/fluxo_do_agente.md) |
 
 Apoio: arquitetura e decisões em [`docs/arquitetura.md`](docs/arquitetura.md) e [`docs/adr/`](docs/adr/);
-resultados em [`docs/resultados.md`](docs/resultados.md); privacidade (LGPD) em
+resultados em [`eval/SLIDE.md`](eval/SLIDE.md); privacidade (LGPD) em
 [`docs/privacidade.md`](docs/privacidade.md); validação do problema em
 [`validacao/README.md`](validacao/README.md); licença, terceiros e como contribuir em [`LICENSE`](LICENSE),
 [`THIRD_PARTY.md`](THIRD_PARTY.md) e [`CONTRIBUTING.md`](CONTRIBUTING.md).
@@ -159,7 +159,7 @@ o LLM ao vivo: Ollama com `qwen3.5:4b` (`ollama pull qwen3.5:4b`), um modelo por
 | Caminho | O quê |
 |---|---|
 | `docs/fluxo_do_agente.md` | **entregável do edital**: inputs, lógica, estados, ferramentas, políticas, outputs, LGPD, observabilidade |
-| `docs/resultados.md` | resultados da avaliação, com n e IC 95% |
+| `eval/SLIDE.md` | resultados da avaliação, com n e IC 95% |
 | `docs/arquitetura.md`, `docs/adr/` | arquitetura, o porquê de cada fronteira e decisões (ADR 001: modelo local; ADR 002: ambiente) |
 | `docs/regras.md`, `docs/normas/` | MCR 2-7 e 2-9 como código: texto normativo literal, versionamento e revisão |
 | `docs/modelos.md` | modelos e dados de visão (licenças, sha256, métricas) |
@@ -176,7 +176,7 @@ o LLM ao vivo: Ollama com `qwen3.5:4b` (`ollama pull qwen3.5:4b`), um modelo por
 | `bench/desclassificacao/` | observatório de desclassificações do Sicor (agregados públicos; base da matriz de validação) |
 | `validacao/` | matriz de evidências de Problema e Validação (o que o regulador, o auditor e o juiz escreveram) |
 | `eval/golden/` | golden set (60 casos com defeitos plantados), entradas "bagunçadas" (papel e fala), gerador e a demo (`demo/DEMO-0001`) |
-| `eval/` | avaliação: golden set, red-team, A/B; relatórios em `eval/reports/`, resumidos em [`docs/resultados.md`](docs/resultados.md) |
+| `eval/` | avaliação: golden set, red-team, A/B; relatórios em `eval/reports/`, resumidos em [`eval/SLIDE.md`](eval/SLIDE.md) |
 | `scripts/` | demo de linha de comando, instalador, preparo dos ativos, tarefas, coleta de dados, custo, expurgo, varredura de PII |
 | `tests/` | testes unitários e de contrato |
 | `ativos/` | vídeo semissintético e série Sentinel-2 da gleba da demo, versionados com sha256 e licença ([`ativos/README.md`](ativos/README.md)) |

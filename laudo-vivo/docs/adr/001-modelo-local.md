@@ -85,7 +85,7 @@ trace.
 ## Consequências
 
 - A tool call válida na 1ª tentativa no golden set é medida pelo avaliador (`eval/run_eval.py --modo agente`);
-  o resultado está em [`docs/resultados.md`](../resultados.md).
+  o resultado está em [`eval/SLIDE.md`](../../eval/SLIDE.md).
 - Gravações requisição→resposta da demo viram fixtures de replay sem GPU
   (`tests/unit/dados_agente/replay_demo_qwen35_4b.jsonl`, ferramentas falsas, e
   `replay_demo_real_qwen35_4b.jsonl`, ferramentas reais).

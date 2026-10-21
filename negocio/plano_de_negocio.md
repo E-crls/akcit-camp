@@ -301,7 +301,7 @@ validar, filmar, rotular e conseguir as primeiras LOIs; o negócio é nacional d
 ### 6.1 Custo de tecnologia por fiscalização
 
 Medido no trace da demo (19 passos; resultados em
-[`../laudo-vivo/docs/resultados.md`](../laudo-vivo/docs/resultados.md)):
+[`../laudo-vivo/eval/SLIDE.md`](../laudo-vivo/eval/SLIDE.md)):
 <!--n:custo.tokens_entrada.valor-->135.349<!--/n--> tokens de entrada e <!--n:custo.tokens_saida.valor-->1.038<!--/n-->
 de saída por fiscalização; energia local <!--n:custo.local_rs.valor-->R$ 0,0035<!--/n-->; os mesmos tokens em
 nuvem, <!--n:custo.nuvem_min_rs.valor-->R$ 0,04<!--/n--> a <!--n:custo.nuvem_max_rs.valor-->R$ 0,28<!--/n-->. A
@@ -387,7 +387,7 @@ Meses contados a partir da captação do pré-seed (os mesmos M6, M12 e M18 da s
 - Um laudo de exemplo clicável
   ([`../laudo-vivo/docs/exemplos/laudo_selado.html`](../laudo-vivo/docs/exemplos/laudo_selado.html)).
 - Os resultados da avaliação com intervalos de confiança
-  ([`../laudo-vivo/docs/resultados.md`](../laudo-vivo/docs/resultados.md)).
+  ([`../laudo-vivo/eval/SLIDE.md`](../laudo-vivo/eval/SLIDE.md)).
 - A política de dados (LGPD) ([`../laudo-vivo/docs/privacidade.md`](../laudo-vivo/docs/privacidade.md)).
 - Para a validação comercial: roteiro de entrevista de 30 minutos, modelo de LOI e a oferta do Piloto Fundador.
 
@@ -440,7 +440,7 @@ perfil ideal e ser comprável (Serasa comprou Agrosatélite e idwall; a Aliare c
 ### 10.1 O que o protótipo já mostra
 
 Números da avaliação final. A página completa, com dev e teste lado a lado, está em
-[`../laudo-vivo/docs/resultados.md`](../laudo-vivo/docs/resultados.md).
+[`../laudo-vivo/eval/SLIDE.md`](../laudo-vivo/eval/SLIDE.md).
 
 | Entrega | Número |
 |---|---|
