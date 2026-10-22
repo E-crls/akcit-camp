@@ -225,7 +225,7 @@ def test_varredura_padrao_cobre_os_textos_publicos_e_o_pacote():
     assert all(p.exists() for p in no_repo), [str(p) for p in no_repo if not p.exists()]
     assert CF.REPO / "docs" / "exemplos" in CF.RAIZES_PADRAO
     nomes = [n for n, _ in CF.textos(no_repo)]
-    for esperado in ("README.md", "docs/entregaveis/pitch-regional-3min.md", "docs/entregaveis/qa-banca.md",
+    for esperado in ("README.md", "docs/entregaveis/pitch-regional-3min.md", "docs/entregaveis/bmc-v1.md",
                      "docs/entregaveis/deck/index.html", "docs/fluxo_do_agente.md"):
         assert esperado in nomes
     pacote = CF.REPO / "docs" / "exemplos" / "DEMONSTRACAO_pacote_exibicao.zip"
