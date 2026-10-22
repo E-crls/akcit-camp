@@ -28,7 +28,6 @@ import base64
 import hashlib
 import io
 import json
-import os
 import re
 import time
 import zlib
@@ -50,10 +49,11 @@ from laudo.docs_fiscais.comum import (
     sinais_injecao,
     tipo_documento,
 )
-from laudo.llm.provider import NUM_CTX
+from laudo.llm.provider import NUM_CTX, url_ollama
+from laudo.vision import cache_vlm
 
 VERSAO = "leitura_documentos@0.1.0"
-OLLAMA = "http://127.0.0.1:11434"
+OLLAMA = "http://127.0.0.1:11434"  # padrão sem OLLAMA_HOST (a URL usada sai de `url_ollama()`)
 TAMANHO_MAXIMO = 25 * 1024 * 1024
 _N = {"type": "string", "pattern": "^[0-9.,]{0,16}$"}
 _DOC = {"type": "string", "pattern": "^[0-9A-Za-z./-]{0,20}$"}
@@ -210,7 +210,8 @@ def _ollama(modelo: str, timeout_s: float) -> Leitor:
         corpo = {"model": modelo, "stream": False, "format": esquema, "think": False, "keep_alive": "30m",
                  "messages": [{"role": "user", "content": prompt, "images": [img_b64]}],
                  "options": {"temperature": temperatura, "seed": semente, "num_ctx": NUM_CTX, "num_predict": 700}}
-        r = httpx.post(f"{OLLAMA}/api/chat", json=corpo, timeout=timeout_s)
+        # mesmo servidor do condutor e da classificação de foto (OLLAMA_HOST, lido a cada chamada)
+        r = httpx.post(f"{url_ollama()}/api/chat", json=corpo, timeout=timeout_s)
         r.raise_for_status()
         try:
             return json.loads(r.json()["message"]["content"])
@@ -220,23 +221,28 @@ def _ollama(modelo: str, timeout_s: float) -> Leitor:
     return ler
 
 
-def com_cache(leitor: Leitor, diretorio: str | Path, modelo: str, so_cache: bool = False) -> Leitor:
+def com_cache(leitor: Leitor, diretorio: str | Path, modelo: str, so_cache: bool = False,
+              gravar_em: str | Path | None = None) -> Leitor:
     """Grava/relê cada resposta do VLM em disco (chave = sha256 da imagem, prompt, esquema, temperatura,
     semente e modelo). Serve ao replay da demo sem GPU (`LAUDO_VLM_CACHE`; com `LAUDO_VLM_SO_CACHE=1`, leitura
-    ausente vira erro em vez de chamar o Ollama) e a não repetir leituras na avaliação."""
-    d = Path(diretorio)
-    d.mkdir(parents=True, exist_ok=True)
+    ausente vira erro em vez de chamar o Ollama) e a não repetir leituras na avaliação. Lê de `diretorio` (e de
+    `gravar_em`); grava a resposta nova em `gravar_em`, ou em `diretorio` se ele não estiver em `tests/`
+    (`laudo.vision.cache_vlm.montar`)."""
+    return _com_pastas(leitor, cache_vlm.montar(diretorio, gravar_em, so_cache), modelo)
 
+
+def _com_pastas(leitor: Leitor, pc: cache_vlm.PastasCache, modelo: str) -> Leitor:
     def ler(img_b64: str, prompt: str, esquema: dict[str, Any], temperatura: float, semente: int) -> dict[str, Any]:
         chave = hashlib.sha256(json.dumps([img_b64, prompt, esquema, temperatura, semente, modelo],
                                           sort_keys=True).encode()).hexdigest()
-        arq = d / f"{chave[:32]}.json"
-        if arq.is_file():
-            return json.loads(arq.read_text(encoding="utf-8"))
-        if so_cache:
-            raise httpx.HTTPError(f"leitura do VLM ausente do cache {d}")
+        nome = f"{chave[:32]}.json"
+        texto = pc.ler(nome)
+        if texto is not None:
+            return json.loads(texto)
+        if pc.so_cache:
+            raise httpx.HTTPError(f"leitura do VLM ausente do cache {pc.principal}")
         r = leitor(img_b64, prompt, esquema, temperatura, semente)
-        arq.write_text(json.dumps(r, ensure_ascii=False), encoding="utf-8")
+        pc.gravar(nome, json.dumps(r, ensure_ascii=False))
         return r
 
     return ler
@@ -462,8 +468,8 @@ def ler_documento_foto(args: EntradaLerDocumento) -> Envelope:
         return Envelope.falha(nome, CodigoErro.ENTRADA_INVALIDA, f"documento ilegível: {e}", t0=t0)
     hoje = args.data_referencia or _hoje()
     leitor = _LEITOR or _ollama(args.modelo, args.timeout_vlm_s)
-    if _LEITOR is None and (cache := os.environ.get("LAUDO_VLM_CACHE")):
-        leitor = com_cache(leitor, cache, args.modelo, so_cache=os.environ.get("LAUDO_VLM_SO_CACHE") == "1")
+    if _LEITOR is None and (pc := cache_vlm.pastas()) is not None:
+        leitor = _com_pastas(leitor, pc, args.modelo)
     try:
         tipo = args.tipo_documento if args.tipo_documento != "auto" else classificar_tipo(img, hoje, leitor)
         if tipo == "outro":

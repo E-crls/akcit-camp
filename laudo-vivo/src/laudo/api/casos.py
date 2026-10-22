@@ -6,7 +6,8 @@ Dois formatos:
    mesmos turnos e a mesma semente de ids que `scripts/demo_cli.py`. Por isso o replay gravado com o modelo
    real (`tests/unit/dados_agente/replay_demo_qwen35_4b.jsonl`) casa requisição por requisição.
 2. **pasta com `caso.yaml`** no formato do golden set (`eval/golden/casos/DEMO-0001/`, ou
-   `eval/golden/demo/<ID>/`). Os arquivos (NF-e XML, e-GTA JSON, fotos) são
+   `eval/golden/demo/<ID>/`, ou uma subpasta de `LAUDO_CASOS_DIR`: casos de demonstração fora do repositório,
+   listados na carteira com qualquer nome; ver `laudo.demonstracao`). Os arquivos (NF-e XML, e-GTA JSON, fotos) são
    usados no lugar; o vídeo, se não existir, vira um marcador e o contador falso devolve a
    `saida_simulada_contador` do caso. O roteiro de passos vem de `roteiro:` no `caso.yaml` ou de
    `roteiro.yaml` na mesma pasta; sem eles, é derivado das falas e evidências do caso.
@@ -193,7 +194,8 @@ def caso_roteiro(dir_arquivos: Path) -> CasoDemo:
 
 
 def localizar_caso(caso: str) -> Path | None:
-    """`DEMO-0001` → pasta com caso.yaml (em eval/golden/demo ou eval/golden/casos); aceita caminho direto."""
+    """`DEMO-0001` → pasta com caso.yaml (em eval/golden/demo ou eval/golden/casos; depois, nas pastas de
+    `LAUDO_CASOS_DIR`, pelo nome da pasta ou pelo `id` do caso.yaml); aceita caminho direto."""
     p = Path(caso)
     if (p / "caso.yaml").exists():
         return p
@@ -202,7 +204,24 @@ def localizar_caso(caso: str) -> Path | None:
     for base in DIRS_CASOS:
         if (base / caso / "caso.yaml").exists():
             return base / caso
+    externas = demonstracao.pastas_casos_externos()
+    for pasta in externas:
+        if pasta.name == caso:
+            return pasta
+    for pasta in externas:
+        if _id_do_caso(pasta) == caso:
+            return pasta
     return None
+
+
+def _id_do_caso(pasta: Path) -> str | None:
+    try:
+        dados = yaml.safe_load((pasta / "caso.yaml").read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError):
+        return None
+    if not isinstance(dados, dict) or not dados.get("id"):
+        return None
+    return str(dados["id"])
 
 
 class CasoDoTesteCongelado(PermissionError):
@@ -243,12 +262,17 @@ def checar_uso_do_teste(pasta: Path, cid: str | None = None) -> str | None:
 
 
 def listar_casos_disponiveis() -> list[str]:
+    """Casos da carteira: as pastas `DEMO*` do repositório e, depois, todas as pastas de caso de
+    `LAUDO_CASOS_DIR` (casos de demonstração montados fora do repositório, com qualquer nome)."""
     vistos: list[str] = []
     for base in DIRS_CASOS:
         if base.is_dir():
             for d in sorted(base.iterdir()):
                 if (d / "caso.yaml").exists() and d.name.upper().startswith("DEMO") and d.name not in vistos:
                     vistos.append(d.name)
+    for d in demonstracao.pastas_casos_externos():
+        if d.name not in vistos:
+            vistos.append(d.name)
     return vistos
 
 
@@ -616,9 +640,8 @@ def carregar_caso(caso: str, dir_trabalho: Path) -> CasoDemo:
         return caso_roteiro(dir_trabalho / "roteiro")
     pasta = localizar_caso(caso)
     if pasta is None:
-        raise FileNotFoundError(
-            f"caso {caso!r} não encontrado (procurei em {', '.join(map(str, DIRS_CASOS))})"
-        )
+        bases = [*DIRS_CASOS, *demonstracao.dirs_casos_externos()]
+        raise FileNotFoundError(f"caso {caso!r} não encontrado (procurei em {', '.join(map(str, bases))})")
     aviso = checar_uso_do_teste(pasta, caso)  # split de teste congelado: recusa (ou avisa, com a variável)
     c = caso_yaml(pasta, dir_trabalho)
     if aviso:

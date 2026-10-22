@@ -15,8 +15,10 @@ gravação (feita ao vivo com o qwen3.5:4b): a soma estima o tempo do passo na d
 `rodar_demo.sh --vlm-gravado` (os tempos do `ROTEIRO_DEMO.md` vêm daqui).
 
 A leitura do DANFE usa o cache do VLM da demo (`tests/unit/dados_agente/vlm_cache_demo`): a mesma foto, o
-mesmo pedido; a contingência roda sem GPU. Com `--conferir`, sai com erro se alguma requisição ao LLM não
-estiver na gravação ou se a fiscalização não terminar SELADA.
+mesmo pedido; a contingência roda sem GPU. Esse cache só é lido: a resposta de uma foto nova (caso novo) vai para
+`LAUDO_VLM_CACHE_GRAVACAO` (padrão: `dados_locais/vlm_cache`), que o `--conferir` também lê
+(`laudo.vision.cache_vlm`). Com `--conferir`, sai com erro se alguma requisição ao LLM não estiver na gravação ou
+se a fiscalização não terminar SELADA.
 """
 
 from __future__ import annotations

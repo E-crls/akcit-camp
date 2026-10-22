@@ -231,8 +231,9 @@ def montar_operacao(r: dict) -> Operacao:
 
 def _operacao_demonstracao(ref_bacen: str, t0: float) -> Envelope | None:
     """Operação FICTÍCIA de um caso de demonstração (`eval/golden/demo/*/caso.yaml` mascarado por
-    `scripts/mascarar_demo.py`): não está no bench público; a triagem vem do caso, calculada pela mesma regra de
-    lotação do Fiscal-GO sobre os números fictícios."""
+    `scripts/mascarar_demo.py`, ou um caso de `LAUDO_CASOS_DIR` com o bloco `demonstracao:`): não está no bench
+    público; a triagem vem do caso, calculada pela mesma regra de lotação do Fiscal-GO sobre os números fictícios, e
+    o aviso é o do caso (`demonstracao.aviso_do_caso`; no DEMO-0001, o `AVISO` fixo)."""
     from laudo import demonstracao
 
     caso = demonstracao.caso_demo_por_ref(ref_bacen)
@@ -246,7 +247,7 @@ def _operacao_demonstracao(ref_bacen: str, t0: float) -> Envelope | None:
               "irregularidade)")
     return Envelope.sucesso("carregar_operacao",
                             {"status": "ok", "motivo": motivo, "operacao": operacao.model_dump(mode="json"),
-                             "triagem": triagem, "aviso": f"{AVISO} {demonstracao.AVISO}",
+                             "triagem": triagem, "aviso": f"{AVISO} {demonstracao.aviso_do_caso(caso)}",
                              "demonstracao": True},
                             fonte_versao=str(triagem.get("fonte_versao") or "demo"), t0=t0)
 

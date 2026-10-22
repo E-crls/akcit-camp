@@ -6,7 +6,10 @@ ou for "outro". Texto escrito na foto é tratado como dado (instrução explíci
 
 Autoconsistência adaptativa: com k = 3, se as duas primeiras amostras concordam (e não são "outro"), a
 3ª não muda a maioria e não é pedida (mesma decisão, um terço a menos de chamadas). Com `LAUDO_VLM_CACHE`, cada
-resposta do VLM é gravada/relida em disco (replay da demo sem GPU; `LAUDO_VLM_SO_CACHE=1` não chama o Ollama).
+resposta do VLM é relida do disco (replay da demo sem GPU; `LAUDO_VLM_SO_CACHE=1` não chama o Ollama); as respostas
+novas vão para a pasta de gravação (`LAUDO_VLM_CACHE_GRAVACAO`), nunca, sem pedido explícito, para o cache versionado
+em `tests/` (`laudo.vision.cache_vlm`).
+O servidor é o de `OLLAMA_HOST` (o mesmo do condutor, `laudo.llm.provider.url_ollama`).
 """
 
 from __future__ import annotations
@@ -14,18 +17,17 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
-import os
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
-from pathlib import Path
 
 import cv2
 import httpx
 import numpy as np
 
-from laudo.llm.provider import NUM_CTX
+from laudo.llm.provider import NUM_CTX, url_ollama
+from laudo.vision import cache_vlm
 
-OLLAMA = "http://127.0.0.1:11434"
+OLLAMA = "http://127.0.0.1:11434"  # padrão sem OLLAMA_HOST (a URL usada sai de `url_ollama()`)
 CLASSES = ("bovinos", "cerca", "curral", "galpao", "maquina", "documento", "outro")
 DESCRICOES = {
     "bovinos": "gado bovino ou bubalino é o assunto principal (vale também com os animais dentro de curral, "
@@ -66,24 +68,25 @@ def _prompt(classes: tuple[str, ...], hoje: date) -> str:
 
 
 def _chat_com_cache(c: httpx.Client, corpo: dict) -> str:
-    """Conteúdo da resposta do Ollama; com `LAUDO_VLM_CACHE`, grava/relê a resposta (chave = corpo sem
-    `keep_alive`). Com `LAUDO_VLM_SO_CACHE=1`, resposta ausente vira erro em vez de chamar o Ollama."""
-    pasta = os.environ.get("LAUDO_VLM_CACHE")
-    arq = None
-    if pasta:
+    """Conteúdo da resposta do Ollama; com cache (`laudo.vision.cache_vlm`), relê a resposta das pastas de
+    leitura e grava a nova só na de gravação (chave = corpo sem `keep_alive`). Com `LAUDO_VLM_SO_CACHE=1`, resposta
+    ausente vira erro em vez de chamar o Ollama."""
+    pc = cache_vlm.pastas()
+    nome = None
+    if pc is not None:
         chave = hashlib.sha256(json.dumps({k: v for k, v in corpo.items() if k != "keep_alive"},
                                           sort_keys=True).encode()).hexdigest()
-        arq = Path(pasta) / f"cls_{chave[:32]}.json"
-        if arq.is_file():
-            return json.loads(arq.read_text(encoding="utf-8"))["content"]
-        if os.environ.get("LAUDO_VLM_SO_CACHE") == "1":
-            raise httpx.HTTPError(f"classificação do VLM ausente do cache {pasta}")
+        nome = f"cls_{chave[:32]}.json"
+        texto = pc.ler(nome)
+        if texto is not None:
+            return json.loads(texto)["content"]
+        if pc.so_cache:
+            raise httpx.HTTPError(f"classificação do VLM ausente do cache {pc.principal}")
     r = c.post("/api/chat", json=corpo)
     r.raise_for_status()
     conteudo = r.json()["message"]["content"]
-    if arq is not None:
-        arq.parent.mkdir(parents=True, exist_ok=True)
-        arq.write_text(json.dumps({"content": conteudo}, ensure_ascii=False), encoding="utf-8")
+    if pc is not None and nome is not None:
+        pc.gravar(nome, json.dumps({"content": conteudo}, ensure_ascii=False))
     return conteudo
 
 
@@ -97,8 +100,9 @@ def classificar(caminho: str, classes: tuple[str, ...] = CLASSES, k: int = 3, mo
               "required": ["classe", "justificativa"]}
     img = _jpeg_b64(caminho)
     respostas: list[dict] = []
-    so_cache = bool(os.environ.get("LAUDO_VLM_CACHE")) and os.environ.get("LAUDO_VLM_SO_CACHE") == "1"
-    with httpx.Client(base_url=OLLAMA, timeout=timeout_s) as c:
+    pc = cache_vlm.pastas()
+    so_cache = pc is not None and pc.so_cache
+    with httpx.Client(base_url=url_ollama(), timeout=timeout_s) as c:
         carregados = [] if so_cache else [m.get("name") for m in c.get("/api/ps").json().get("models", [])]
         for i in range(k):
             if i == 2 and len(respostas) == 2 and respostas[0]["classe"] == respostas[1]["classe"] != "outro":

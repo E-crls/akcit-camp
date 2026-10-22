@@ -172,3 +172,31 @@ def test_recusa_que_nao_e_de_leitura_nao_vira_novo_pedido(danfe):
     p = R.PedidoResidual.model_validate(leitura["pedido_residual"])
     r = R.completar(leitura, {"destinatario_doc": danfe["emitente_doc"]}, HOJE, p)
     assert r.status == "indeterminado" and r.pedido is None and "XML" in r.motivo
+
+
+_POR_EXTENSO = dict(zip("0123456789", ["zero", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito",
+                                        "nove"], strict=True))
+
+
+def test_um_ditado_entre_digitos_vira_1():
+    """P2-13: "um" isolado é artigo para o normalizador, e a chave ditada perdia o dígito (11 em vez de 12)."""
+    fala = "seis quatro um cinco cinco nove quatro dois nove quatro três nove"
+    assert R._digitos_seguidos(R._Texto(fala), 12) == "641559429439"
+    assert R._numeros_do_texto("6, 4, um, 5") == "6, 4, 1, 5"  # o ASR costuma pôr vírgulas entre algarismos
+    assert R._numeros_do_texto("seis um um cinco") == "6 1 1 5"
+    assert R._numeros_do_texto("são um quatro cinco") == "são 1 4 5"  # começo da sequência ditada
+    assert R._numeros_do_texto("quatro três um, e o CNPJ") == "4 3 1, e o CNPJ"  # fim da sequência ditada
+    # artigo continua artigo
+    assert R._numeros_do_texto("uma cerca de oitocentos metros") == "uma cerca de 800 metros"
+    assert R._numeros_do_texto("tenho um 40 e um 5") == "tenho um 40 e um 5"
+    assert R._numeros_do_texto("nota 1 2 3 um pouco borrada") == "nota 1 2 3 um pouco borrada"
+
+
+def test_chave_ditada_por_extenso_com_um_e_aceita(danfe):
+    ch = danfe["chave"]
+    leitura = _leitura("danfe", {**danfe, "chave": None}, [{"chave": ch[:34] + "0" * 10}, {"chave": ch[:34] + "1" * 10}])
+    p = R.PedidoResidual.model_validate(leitura["pedido_residual"])
+    fala = " ".join(_POR_EXTENSO[c] for c in ch[32:44])
+    assert "1" in ch[32:44] and " um " in f" {fala} "  # o caso exercita o "um" ditado
+    r = R.completar(leitura, R.interpretar_resposta(p, f"os 12 últimos são {fala}"), HOJE, p)
+    assert r.status == "ok" and r.campos["chave"]["valor"] == ch

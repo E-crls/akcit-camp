@@ -314,6 +314,10 @@ PLANO_MINIMO: dict[str, list[str]] = {
 
 
 _TIPOS_ESTRUTURA = ("cerca", "curral", "galpao")
+# Foto sem GPS do app e sem GPS no EXIF (ex.: arquivo escolhido no notebook, sem permissão de localização)
+MSG_FOTO_SEM_GPS = ("foto sem localização: o aparelho não mandou o GPS e a foto não tem GPS no EXIF. Tire a foto "
+                    "pela página com a localização do aparelho ligada, ou envie o arquivo original da câmera (com "
+                    "GPS)")
 
 
 def plano_da_evidencia(fis: Fiscalizacao, ev, classificar_fotos: bool = False) -> list[str]:
@@ -1342,6 +1346,20 @@ class Condutor:
     def _schema(self, nome: str) -> dict[str, Any]:
         return schema_para_llm(self.registro[nome]) if nome in self.registro else schema_interna(nome)
 
+    def pedido_de_aquecimento(
+        self, etapa: str = fsm.Etapa.BRIEFING
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]] | None]:
+        """Mensagens e ferramentas de um pedido curto com o MESMO começo do 1º pedido real da fiscalização: o
+        prompt de sistema do condutor e os esquemas das ferramentas da etapa (na ordem de `_passo_tools`). O
+        servidor manda esse pedido na subida (`Servico.aquecer_llm`): o Ollama processa o prefixo uma vez e o
+        reaproveita no 1º turno, que deixa de pagar os ~9 mil tokens do prompt (19,4 s medidos em 22/10). Não
+        passa pelo provedor: não grava na contingência nem abre span."""
+        msgs = [{"role": "system", "content": self.prompt_condutor},
+                {"role": "user", "content": "Aquecimento do modelo: responda apenas OK."}]
+        if self.modo != "tools":
+            return msgs, None
+        return msgs, [self._schema(n) for n in fsm.nomes_permitidos(etapa, self.registro)]
+
     def _passo_estruturado(self, msgs, permitidas, stats) -> tuple[list, str]:
         catalogo = "\n".join(
             f"- {n}: {self._schema(n)['function']['description']} Argumentos: "
@@ -1588,6 +1606,7 @@ class Condutor:
                 )
         env, span_id, h = self.executor.executar(nome, completos)
         if nome == "geofence" and ev is not None:
+            env = self._geofence_fonte_do_ponto(ev, completos, env)
             env = self._geofence_conforme_integridade(fis, ev, env)
         acao = AcaoExecutada(
             acao=nome,
@@ -1661,6 +1680,24 @@ class Condutor:
         acao = self.executar_acao(fis, "integridade_foto", {"evidencia_id": ev.id}, origem="dependencia")
         if self._resp_turno is not None:
             self._resp_turno.acoes.append(acao)
+
+    @staticmethod
+    def _geofence_fonte_do_ponto(ev, completos: dict[str, Any], env: Envelope) -> Envelope:
+        """Foto sem GPS do app: o ponto do geofence vem do GPS do EXIF da foto (`preencher_argumentos`), e o
+        resultado diz isso (`fonte_gps`). Sem GPS nenhum, o erro de validação ("lat: Field required") vira um
+        pedido legível ao fiscal."""
+        if ev.gps is not None:
+            return env
+        sem_ponto = completos.get("lat") is None or completos.get("lon") is None
+        if not env.ok and env.error is not None and env.error.code == CodigoErro.ENTRADA_INVALIDA and sem_ponto:
+            return env.model_copy(update={"error": env.error.model_copy(update={"msg": MSG_FOTO_SEM_GPS})})
+        if env.ok and env.data is not None and not sem_ponto:
+            data = dict(env.data)
+            data["fonte_gps"] = "exif"
+            if data.get("motivo"):
+                data["motivo"] = f"{data['motivo']} (ponto do GPS do EXIF da foto: o app não mandou o GPS do aparelho)"
+            return env.model_copy(update={"data": data})
+        return env
 
     @staticmethod
     def _geofence_conforme_integridade(fis: Fiscalizacao, ev, env: Envelope) -> Envelope:

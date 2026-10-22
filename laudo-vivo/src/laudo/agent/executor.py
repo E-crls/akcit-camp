@@ -41,6 +41,7 @@ from laudo.agent.pii import mascarar
 from laudo.audit import otel
 from laudo.audit.cofre import Cofre
 from laudo.contracts import (
+    GPS,
     CodigoErro,
     Envelope,
     Ferramenta,
@@ -343,6 +344,40 @@ def documentos_do_item(fis: Fiscalizacao, tipo: str, item_id: str | None) -> lis
     return list(dict.fromkeys(caminhos))
 
 
+_CAMPOS_PONTO = frozenset({"lat", "lon", "precisao_m", "ponto", "gps"})
+
+
+def gps_exif_da_foto(fis: Fiscalizacao, ev: Any) -> GPS | None:
+    """GPS do EXIF de uma foto sem GPS do app (`fonte="exif"`): o que a integridade da mesma foto leu (ela roda
+    antes do geofence) ou, sem ela, o lido do arquivo. A precisão vem do EXIF (GPSHPositioningError); sem ela, o
+    geofence dá indeterminado (precisão ausente), nunca uma precisão inventada."""
+    if ev is None or ev.tipo != "foto":
+        return None
+    g: Any = None
+    integ = [c for c in fis.checagens if c.ferramenta == "integridade_foto" and ev.id in c.evidencias
+             and c.status != "erro"]
+    if integ:
+        g = integ[-1].resultado.get("gps_exif")
+    elif ev.caminho and Path(ev.caminho).is_file():
+        try:
+            from PIL import Image
+
+            from laudo.vision.integridade import ler_exif
+
+            with Image.open(ev.caminho) as img:
+                _, g = ler_exif(img)
+        except Exception:  # noqa: BLE001 - foto ilegível: sem ponto (a integridade acusa)
+            g = None
+    if not isinstance(g, dict) or g.get("lat") is None or g.get("lon") is None:
+        return None
+    try:
+        prec = g.get("precisao_m")
+        return GPS(lat=float(g["lat"]), lon=float(g["lon"]), fonte="exif",
+                   precisao_m=float(prec) if prec is not None and float(prec) >= 0 else None)
+    except (TypeError, ValueError):
+        return None
+
+
 def documento_tomador_hash(tomador_ref: str | None) -> str | None:
     """`tomador_ref` → `hmac:<hash do documento do tomador com o sal desta instalação>` (o de
     `comum.hash_documento`, com o prefixo que diz à ferramenta que já está convertido): serve para conferir as
@@ -465,12 +500,17 @@ def preencher_argumentos(
         por("exif", ev.meta.get("exif"))
         if dir_dados is not None:
             por("dir_evidencias", str(Path(dir_dados) / "evidencias" / "visao" / ev.sha256[:12]))
-        if ev.gps is not None:
-            por("lat", ev.gps.lat)
-            por("lon", ev.gps.lon)
-            por("precisao_m", ev.gps.precisao_m)
-            por("ponto", ev.gps.model_dump(mode="json"))
-            por("gps", ev.gps.model_dump(mode="json"))
+        # ponto da localização (geofence): o GPS do app; sem ele, o do EXIF da foto (P2-11). O `gps_app` acima
+        # continua só o do app: a integridade compara o EXIF com ele, nunca com o próprio EXIF.
+        gps = ev.gps
+        if gps is None and campos & _CAMPOS_PONTO:
+            gps = gps_exif_da_foto(fis, ev)
+        if gps is not None:
+            por("lat", gps.lat)
+            por("lon", gps.lon)
+            por("precisao_m", gps.precisao_m)
+            por("ponto", gps.model_dump(mode="json"))
+            por("gps", gps.model_dump(mode="json"))
         por("capturada_em", ev.capturada_em.isoformat() if ev.capturada_em else None)
     if ferr.nome in DOCUMENTOS_CUMULATIVOS:  # DANFE/GTA lidos de foto entram na mesma conciliação cumulativa
         cofre = Cofre(Path(dir_dados) / "chaves") if dir_dados is not None else None

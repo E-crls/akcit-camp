@@ -30,6 +30,9 @@ SOFTWARE_EDICAO = ("photoshop", "gimp", "lightroom", "snapseed", "picsart", "can
 RESOLUCOES_TELA = {(1080, 1920), (1080, 2400), (1080, 2340), (1170, 2532), (1179, 2556), (1284, 2778),
                    (1290, 2796), (720, 1600), (720, 1280), (1440, 3200), (1366, 768), (1920, 1080),
                    (1440, 900), (1536, 864), (2560, 1440), (1280, 720), (828, 1792), (750, 1334)}
+# GPS do app bom o bastante para dispensar o GPS do EXIF (o mesmo limite de precisão do geofence, 30 m). Fora de
+# ParametrosIntegridade de propósito: os parâmetros vão na saída de toda foto e mudariam o resultado gravado.
+PRECISAO_APP_MAX_M = 30.0
 
 
 @dataclass
@@ -283,7 +286,12 @@ def _haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 def avaliar_integridade(caminho: str | Path, sha256: str, recebida_em: datetime | None = None,
                         gps_app: tuple[float, float] | None = None, contexto: str | None = None,
                         indice: IndiceFotos | None = None, registrar: bool = True,
-                        p: ParametrosIntegridade | None = None) -> dict:
+                        p: ParametrosIntegridade | None = None, precisao_app_m: float | None = None,
+                        gps_app_simulado: bool = False) -> dict:
+    """`precisao_app_m`/`gps_app_simulado`: precisão e "localização simulada" do GPS que o app mandou com a foto.
+    Foto sem GPS no EXIF com GPS do app bom (precisão ≤ `PRECISAO_APP_MAX_M`, não simulado) não fica pendente
+    por isso: SEM_GPS vira informação, porque a localização sai do GPS do app (o navegador do celular costuma tirar
+    o GPS do EXIF da foto). Sem GPS do app, ou com precisão pior, SEM_GPS continua indeterminado."""
     p = p or ParametrosIntegridade()
     fuso = timezone(timedelta(hours=p.fuso_horas))
     recebida = recebida_em or datetime.now(fuso)
@@ -336,7 +344,13 @@ def avaliar_integridade(caminho: str | Path, sha256: str, recebida_em: datetime 
     # GPS
     dist_gps = None
     if gps_exif is None:
-        if p.exigir_gps:
+        app_bom = (gps_app is not None and precisao_app_m is not None and not gps_app_simulado
+                   and 0 <= precisao_app_m <= PRECISAO_APP_MAX_M)
+        if p.exigir_gps and app_bom:
+            motivos.append(_motivo("SEM_GPS", "info",
+                                   f"foto sem coordenada GPS no EXIF; vale o GPS do aparelho enviado com a foto "
+                                   f"(±{fmt_br(precisao_app_m, 0)} m)"))
+        elif p.exigir_gps:
             motivos.append(_motivo("SEM_GPS", "indeterminado", "foto sem coordenada GPS no EXIF"))
     elif gps_app is not None:
         dist_gps = _haversine_m(gps_exif["lat"], gps_exif["lon"], gps_app[0], gps_app[1])

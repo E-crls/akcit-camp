@@ -52,9 +52,13 @@ def integridade_foto(args: EntradaIntegridadeFoto) -> Envelope:
         p = ParametrosIntegridade(max_atraso_h=args.max_atraso_h, limiar_nitidez=args.limiar_nitidez,
                                   exigir_gps=args.exigir_gps)
         gps_app = (args.gps_app.lat, args.gps_app.lon) if args.gps_app else None
+        # precisão e "localização simulada" do GPS do app: foto sem GPS no EXIF com GPS do app bom (≤ 30 m) não
+        # fica pendente por isso (SEM_GPS vira informação; ver avaliar_integridade)
         dados = avaliar_integridade(foto, sha, recebida_em=args.recebida_em, gps_app=gps_app,
                                     contexto=args.contexto, indice=IndiceFotos(args.indice or INDICE_PADRAO),
-                                    registrar=args.registrar_no_indice, p=p)
+                                    registrar=args.registrar_no_indice, p=p,
+                                    precisao_app_m=args.gps_app.precisao_m if args.gps_app else None,
+                                    gps_app_simulado=bool(args.gps_app and args.gps_app.mock))
     except Exception as e:  # noqa: BLE001 — erro vira Envelope
         from PIL import UnidentifiedImageError
 

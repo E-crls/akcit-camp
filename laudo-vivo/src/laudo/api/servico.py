@@ -363,22 +363,27 @@ class Servico:
         self._tirar_do_indice(fis_id)
 
     def _tirar_do_indice(self, fis_id: str) -> None:
-        """A demo recomeçada tira do índice de documentos as linhas que a selagem anterior dela registrou: sem
-        isso, a mesma NF-e/GTA da demo apareceria como "já usada" e a conciliação (e o replay) mudariam."""
-        p = self.dados / "indices" / "documentos.jsonl"
-        if not p.is_file():
-            return
-        manter = []
-        for linha in p.read_text(encoding="utf-8").splitlines():
-            try:
-                if linha.strip() and json.loads(linha).get("fiscalizacao") == fis_id:
-                    continue
-            except json.JSONDecodeError:
-                pass
-            manter.append(linha)
-        tmp = p.with_name(f".{p.name}.{os.getpid()}.tmp")
-        tmp.write_text("".join(x + "\n" for x in manter), encoding="utf-8")
-        os.replace(tmp, p)
+        """A demo recomeçada tira dos índices as linhas que a rodada anterior dela registrou:
+        - documentos (`documentos.jsonl`, campo `fiscalizacao`, gravado na selagem): sem isso, a mesma NF-e/GTA da
+          demo apareceria como "já usada" e a conciliação (e o replay) mudariam;
+        - fotos (`fotos.jsonl`, campo `contexto`): sem isso, a mesma foto enviada de novo depois de "Recomeçar"
+          daria DUPLICATA_MESMA_FISCALIZACAO (e, numa fiscalização nova, DUPLICATA_EXATA). As evidências prontas
+          do caso não mudam: o índice já reconhecia o mesmo arquivo da mesma fiscalização como a própria foto."""
+        for nome, campo in (("documentos.jsonl", "fiscalizacao"), ("fotos.jsonl", "contexto")):
+            p = self.dados / "indices" / nome
+            if not p.is_file():
+                continue
+            manter = []
+            for linha in p.read_text(encoding="utf-8").splitlines():
+                try:
+                    if linha.strip() and json.loads(linha).get(campo) == fis_id:
+                        continue
+                except (json.JSONDecodeError, AttributeError):
+                    pass
+                manter.append(linha)
+            tmp = p.with_name(f".{p.name}.{os.getpid()}.tmp")
+            tmp.write_text("".join(x + "\n" for x in manter), encoding="utf-8")
+            os.replace(tmp, p)
 
     def abrir_ref(self, ref_bacen: str, nova: bool = False) -> dict[str, Any]:
         """Fiscalização de uma operação real do Fiscal-GO 2026 (Sicor/BCB), pelo REF_BACEN."""
@@ -839,7 +844,10 @@ class Servico:
         return {"asr": est_asr, "ms": int((time.perf_counter() - t0) * 1000)}
 
     def aquecer_llm(self) -> dict[str, Any]:
-        """Carrega o modelo no Ollama sem passar pelo provedor (não grava nem gera span)."""
+        """Carrega o modelo no Ollama e faz uma chamada de chat curta com o mesmo começo do 1º turno (prompt de
+        sistema e ferramentas do condutor, `Condutor.pedido_de_aquecimento`), sem passar pelo provedor (não grava
+        na contingência nem gera span). Só carregar o modelo não basta: a 1ª chamada real ainda processaria os ~9
+        mil tokens do prompt (19,4 s medidos em 22/10, perto do orçamento de 25 s do perfil campo)."""
         if self.cfg.llm != "ollama":
             return {"ok": True, "aviso": f"LLM {self.cfg.llm}: nada a aquecer"}
         import httpx
@@ -856,7 +864,35 @@ class Servico:
             ok = r.status_code == 200
         except httpx.HTTPError as e:
             raise ErroServico(503, f"Ollama indisponível: {e}") from e
-        return {"ok": ok, "modelo": self.provedor.modelo, "ms": int((time.perf_counter() - t0) * 1000)}
+        out: dict[str, Any] = {"ok": ok, "modelo": self.provedor.modelo,
+                               "ms": int((time.perf_counter() - t0) * 1000)}
+        if ok:
+            out["chat"] = self._aquecer_prefixo()
+        return out
+
+    def _aquecer_prefixo(self) -> dict[str, Any]:
+        """Chamada de chat curta (1 token de resposta) com o corpo que o provedor montaria (mesmo modelo, data no
+        prompt de sistema, keep_alive, think e opções; só `num_predict` muda, o que não recarrega o modelo). Falha
+        aqui não impede a subida: o 1º turno só fica mais lento."""
+        import httpx
+
+        msgs, ferramentas = self.cond.pedido_de_aquecimento()
+        corpo = self.provedor.montar_requisicao(msgs, ferramentas)  # type: ignore[union-attr]
+        corpo["options"] = {**dict(corpo.get("options") or {}), "num_predict": 1}
+        t0 = time.perf_counter()
+        try:
+            r = httpx.post(f"{self.provedor.base_url}/api/chat", json=corpo, timeout=180)  # type: ignore[union-attr]
+        except httpx.HTTPError as e:
+            return {"ok": False, "erro": type(e).__name__, "ms": int((time.perf_counter() - t0) * 1000)}
+        out: dict[str, Any] = {"ok": r.status_code == 200, "ms": int((time.perf_counter() - t0) * 1000),
+                               "n_ferramentas": len(ferramentas or [])}
+        try:
+            d = r.json() if r.status_code == 200 else {}
+        except ValueError:
+            d = {}
+        if d.get("prompt_eval_count") is not None:
+            out["tokens_prompt"] = int(d["prompt_eval_count"])
+        return out
 
     # -- ações humanas ------------------------------------------------------------------
     def pedir_rascunho(self, fis_id: str, do_roteiro: bool = False) -> dict[str, Any]:

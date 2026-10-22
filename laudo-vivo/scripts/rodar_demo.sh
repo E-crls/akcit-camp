@@ -8,6 +8,8 @@
 #
 # Opções:
 #   --caso ID|roteiro        caso do botão "Abrir demo" (padrão: DEMO-0001 se existir; senão o roteiro do agente)
+#   --casos-dir DIR          pasta(s) de casos de demonstração fora do repositório (LAUDO_CASOS_DIR): entram na
+#                            carteira e abrem por id (ex.: --casos-dir ../sinteticos/casos --caso UFG-EVZ-0001)
 #   --ferramentas MODO       falsas | mistas | reais (padrão: reais no caso do golden; falsas no roteiro).
 #                            mistas = documentos, fotos e regras reais, contagem de vídeo simulada (instantânea)
 #   --replay-arquivo ARQ     gravação JSONL específica (padrão: dados_locais/api/gravacoes/<caso>.jsonl,
@@ -26,6 +28,8 @@
 #                            --replay é sempre assim.
 #   --vlm-ao-vivo            ao vivo, manda a foto do DANFE ao VLM de verdade (~15 s; mostra o modelo lendo o
 #                            papel)
+#   --vlm-cache-gravacao DIR onde gravar as respostas NOVAS do VLM (foto fora do cache da demo; também lidas no
+#                            --replay). Padrão: LAUDO_VLM_CACHE_GRAVACAO ou dados_locais/vlm_cache (nunca tests/)
 #   --sem-apresentacao       abre o navegador sem o modo apresentação (o padrão é com: cabeçalho recolhido,
 #                            conversa grande, prova numa gaveta; o botão "Modo apresentação" no topo alterna)
 set -euo pipefail
@@ -43,6 +47,7 @@ while [ $# -gt 0 ]; do
     --replay) MODO="replay" ;;
     --gravar) GRAVAR=1 ;;
     --caso) CASO="$2"; shift ;;
+    --casos-dir) export LAUDO_CASOS_DIR="$2"; shift ;;
     --ferramentas) FERR="$2"; shift ;;
     --replay-arquivo) REPLAY_ARQ="$2"; shift ;;
     --modelo) MODELO="$2"; shift ;;
@@ -59,7 +64,8 @@ while [ $# -gt 0 ]; do
     --vlm-gravado) VLM_GRAVADO=1 ;;
     --vlm-ao-vivo) VLM_GRAVADO=0 ;;
     --sem-apresentacao) APRESENTACAO=0 ;;
-    -h|--help) sed -n '2,29p' "$0"; exit 0 ;;
+    --vlm-cache-gravacao) export LAUDO_VLM_CACHE_GRAVACAO="$2"; shift ;;
+    -h|--help) sed -n '2,34p' "$0"; exit 0 ;;
     *) echo "opção desconhecida: $1 (veja --help)" >&2; exit 2 ;;
   esac
   shift
@@ -110,7 +116,13 @@ else
     echo "⚠ Ollama indisponível: o agente segue com o plano mínimo determinístico. Para contingência: --replay"
   fi
   if [ "$GRAVAR" = 1 ]; then
-    G="$DADOS/gravacoes/$CASO.jsonl"
+    # o replay procura gravacoes/<id do caso.yaml>.jsonl: com --caso <pasta>, o nome sai do id, não do caminho
+    ID_CASO="$CASO"
+    if [ -f "$CASO/caso.yaml" ]; then
+      ID_CASO="$(sed -n 's/^id:[[:space:]]*//p' "$CASO/caso.yaml" | head -n 1 | tr -d "\"'\r")"
+      [ -n "$ID_CASO" ] || ID_CASO="$(basename "$CASO")"
+    fi
+    G="$DADOS/gravacoes/$ID_CASO.jsonl"
     [ -f "$G" ] && mv "$G" "$G.$(date +%Y%m%d-%H%M%S).bak"
     ARGS+=(--gravar "$G")
     echo "▶ Gravando as respostas do LLM em $G (use depois: scripts/rodar_demo.sh --replay --caso $CASO)."

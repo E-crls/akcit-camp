@@ -49,3 +49,14 @@ laudo-vivo/docs/entregaveis/pitch-final-5min.md
 # dossiê interno da equipe (não vai para o GitHub)
 DOSSIE_LAUDO_VIVO.md
 dossie/
+
+# chaves de API (nunca vão para o git)
+synth_videos_keys.txt
+.env
+.env.*
+
+# dataset sintético e scripts de geração (fora do git)
+sinteticos/
+
+# estudos internos de custo e escala (fora do git)
+negocio/escala/

@@ -51,6 +51,16 @@ PERFIS: dict[str, str] = {
     "lote": "qwen3:14b",
 }
 URL_PADRAO = "http://127.0.0.1:11434"
+
+
+def url_ollama(base_url: str | None = None) -> str:
+    """URL do Ollama: `base_url`, senão `OLLAMA_HOST` (como o próprio `ollama serve` lê), senão a porta padrão.
+    Sem esquema, vira `http://` ("127.0.0.1:11435" → "http://127.0.0.1:11435"); a barra final sai. Lida a cada
+    chamada: o condutor, o VLM (classificação de foto) e a leitura de documento usam o mesmo servidor."""
+    url = (base_url or os.environ.get("OLLAMA_HOST") or URL_PADRAO).strip().rstrip("/")
+    return url if url.startswith("http") else "http://" + url
+
+
 # Janela de contexto única do Ollama, usada pelo condutor, pelos leitores de foto (VLM), pelo aquecimento e
 # pela avaliação. Com outro valor, o Ollama recarrega o modelo, o que leva de 15 a 20 s.
 # 16384 porque, no modo real, o 1º pedido do condutor tem cerca de 9.300 tokens e os outros chegam a 8.047:
@@ -392,9 +402,7 @@ class OllamaProvider:
         self.nome = "ollama"
         self.perfil = perfil
         self.modelo = modelo or modelo_do_perfil(perfil)
-        self.base_url = (base_url or os.environ.get("OLLAMA_HOST") or URL_PADRAO).rstrip("/")
-        if not self.base_url.startswith("http"):
-            self.base_url = "http://" + self.base_url
+        self.base_url = url_ollama(base_url)
         self.timeout_s = timeout_s
         self.timeout = httpx.Timeout(connect=5.0, read=timeout_s, write=30.0, pool=5.0)
         self.retentativas = retentativas

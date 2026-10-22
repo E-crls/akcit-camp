@@ -57,6 +57,12 @@ def main() -> int:
         help="respostas gravadas do VLM (leitura do DANFE). No --llm replay, padrão: o cache da demo "
         "(tests/unit/dados_agente/vlm_cache_demo), só leitura, sem GPU",
     )
+    ap.add_argument(
+        "--vlm-cache-gravacao",
+        default=os.environ.get("LAUDO_VLM_CACHE_GRAVACAO"),
+        help="onde gravar as respostas NOVAS do VLM (foto fora do cache); também é lida, inclusive no replay. "
+        "Padrão: a própria --vlm-cache, salvo se ela estiver em tests/ (aí, dados_locais/vlm_cache)",
+    )
     a = ap.parse_args()
     # contingência: a leitura da foto do DANFE vem do cache gravado (a mesma foto e o mesmo pedido), sem GPU
     repo = Path(__file__).resolve().parents[3]
@@ -67,6 +73,8 @@ def main() -> int:
         os.environ["LAUDO_VLM_SO_CACHE"] = "1"
     elif a.vlm_cache:
         os.environ["LAUDO_VLM_CACHE"] = a.vlm_cache
+    if a.vlm_cache_gravacao:
+        os.environ["LAUDO_VLM_CACHE_GRAVACAO"] = a.vlm_cache_gravacao
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")  # ver laudo.speech.asr

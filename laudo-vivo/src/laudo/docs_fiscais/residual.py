@@ -395,7 +395,46 @@ def _numeros_do_texto(texto: str) -> str:
     from laudo.speech.numeros import normalizar
 
     partes = re.split(r"(\S*\d\S*)", texto or "")
-    return "".join(x if re.search(r"\d", x) else normalizar(x).texto for x in partes)
+    return _um_entre_digitos("".join(x if re.search(r"\d", x) else normalizar(x).texto for x in partes))
+
+
+_RX_PALAVRA = re.compile(r"\S+")
+_PONTUACAO = ".,;:!?()"
+
+
+def _um_entre_digitos(texto: str) -> str:
+    """"um"/"uma" ditados numa sequência de algarismos viram 1. O normalizador trata "um" isolado como artigo
+    ("uma cerca"), e a chave lida algarismo por algarismo perderia o dígito: "6 4 um 5 5 9" ficaria com 5.
+    Troca quando há algarismo antes e depois (atravessando outros "um"); na ponta de uma sequência ditada
+    algarismo por algarismo (2 ou mais soltos), troca no começo ("um 5 4") e no fim só se o "um" fecha a frase
+    ou o trecho ("4 3 um." / "4 3 um, CNPJ ..."), para "1 2 3, uma cabeça" continuar artigo."""
+    toks = list(_RX_PALAVRA.finditer(texto or ""))
+    if not toks:
+        return texto
+    nucleo = [m.group().strip(_PONTUACAO).lower() for m in toks]
+    um = [n in ("um", "uma") for n in nucleo]
+    dig = [bool(re.fullmatch(r"\d+", n)) for n in nucleo]
+    solto = [d and len(n) == 1 for d, n in zip(dig, nucleo, strict=True)]
+    trocar: list[int] = []
+    for i, eh in enumerate(um):
+        if not eh:
+            continue
+        a = i - 1
+        while a >= 0 and um[a]:
+            a -= 1
+        b = i + 1
+        while b < len(toks) and um[b]:
+            b += 1
+        antes, depois = a >= 0 and dig[a], b < len(toks) and dig[b]
+        fecha = b == len(toks) or toks[b - 1].group()[-1] in ".,;:!?"  # o último "um" da sequência fecha o trecho
+        if (antes and depois) or (depois and b + 1 < len(toks) and solto[b] and solto[b + 1]) or (
+            antes and fecha and a >= 1 and solto[a] and solto[a - 1]
+        ):
+            trocar.append(i)
+    for i in reversed(trocar):
+        m = toks[i]
+        texto = texto[:m.start()] + re.sub(r"(?i)uma|um", "1", m.group(), count=1) + texto[m.end():]
+    return texto
 
 
 class _Texto:
