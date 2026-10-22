@@ -496,7 +496,7 @@ cujo laudo foi selado e aceito pela IF sem retrabalho.
 
 | Risco | Probab. [E] | Mitigação | Critério de morte ou de alerta |
 |---|---|---|---|
-| "O satélite já resolve o gado" (Audsat) | média | posicionar como conciliação física e documental que complementa o remoto e consome o alerta dele | 3 de 5 fiscais entrevistados dizem que o satélite resolve |
+| "O satélite já resolve o gado" (Audsat) | média | posicionar como conciliação física e documental que complementa o remoto e consome o alerta dele | se 3 de 5 fiscais ouvidos na validação disserem que o satélite resolve |
 | Disposição a pagar baixa (fiscalização é centro de custo) | média-alta | vender à credenciada como produtividade; à cooperativa como visita evitada e auditoria tranquila | custo atual por visita abaixo de R$ 150, ou preço aceito abaixo de R$ 30 |
 | Concentração no BB em Goiás (77% dos itens físicos) | alta | cooperativas + credenciadas como canal; tese nacional | nenhuma cooperativa ou credenciada de GO aceita conversar sobre piloto |
 | Compliance não aceita evidência capturada pelo produtor | média | começar pela ferramenta da fiscal; autofiscalização na fase 2, com prova de vida da cena | compliance vetar até o modo "fiscal" |

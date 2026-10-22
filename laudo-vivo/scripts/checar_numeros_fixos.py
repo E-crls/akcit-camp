@@ -161,9 +161,8 @@ def conferir_textos(fixos: dict[str, Fixo], textos: list[str],
     for rel in textos:
         p = (REPO / rel).resolve()
         if not p.exists():
-            if not rel.startswith("../"):
-                problemas.append(f"{rel}: arquivo não existe")
-            elif pulados is not None:
+            # textos internos (../negocio e os roteiros da equipe) não fazem parte do repositório publicado
+            if pulados is not None:
                 pulados.append(rel)
             continue
         conteudo = p.read_text(encoding="utf-8")
