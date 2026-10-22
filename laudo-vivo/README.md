@@ -136,8 +136,27 @@ roteirizado e **ferramentas falsas**: não é a demo. Operação da demo, contin
 
 A série Sentinel-2 da gleba da demo já vem calculada em `ativos/` (sem ela, a primeira execução baixa ~40 MB
 em ~40 s; depois tudo roda do cache, offline). As respostas do VLM da demo (leitura do DANFE, classificação da
-foto da cerca) ficam gravadas em `tests/unit/dados_agente/vlm_cache_demo/`, para o replay rodar sem GPU. Para
-o LLM ao vivo: Ollama com `qwen3.5:4b` (`ollama pull qwen3.5:4b`), um modelo por vez.
+foto da cerca) ficam gravadas em `tests/unit/dados_agente/vlm_cache_demo/`, para o replay rodar sem GPU. Esse
+cache só é lido: a resposta para uma foto nova vai para `dados_locais/vlm_cache/`, ou para a pasta de
+`LAUDO_VLM_CACHE_GRAVACAO` (`--vlm-cache-gravacao`), e nunca para `tests/`. Para o LLM ao vivo: Ollama com
+`qwen3.5:4b` (`ollama pull qwen3.5:4b`), um modelo por vez. O `OLLAMA_HOST` vale para o LLM, para o VLM e para a
+leitura de documento por foto. Na subida ao vivo, o servidor aquece o modelo com uma chamada curta, com o mesmo
+prompt e as mesmas ferramentas do 1º turno, que assim não espera o processamento do prompt.
+
+### Testar com dados novos
+
+Um caso próprio (fotos, vídeo e fala de uma fazenda de teste, ou dados gerados) é uma pasta com `caso.yaml`, fora
+do repositório. Com `LAUDO_CASOS_DIR` (ou `--casos-dir`), ele entra na Carteira com o aviso e a triagem do próprio
+`caso.yaml`, e roda ao vivo e em replay como a demo:
+
+```bash
+scripts/rodar_demo.sh --casos-dir ../casos --caso CAMPO-0001 --vlm-cache-gravacao ../casos/CAMPO-0001/vlm_cache
+```
+
+A foto sem o GPS do aparelho usa o GPS do EXIF no geofence. A foto sem GPS no EXIF passa com o GPS do aparelho,
+se a precisão for de até 30 m. O passo a passo, com o `caso.yaml` comentado, a gleba em WKT, as fotos, o vídeo, a
+NF-e, a GTA, a fala, a gravação da contingência e as recomendações de captura, está em
+[`docs/TESTAR_COM_DADOS_NOVOS.md`](docs/TESTAR_COM_DADOS_NOVOS.md).
 
 ### Outros comandos
 
@@ -148,6 +167,7 @@ o LLM ao vivo: Ollama com `qwen3.5:4b` (`ollama pull qwen3.5:4b`), um modelo por
 | A/B de centralidade (fiscal simulado; papel fotografado e fala livre, sintéticos) | `scripts/py.sh eval/ab_centralidade/run_ab.py` · `eval/ab_centralidade_v2/run_ab_v2.py` |
 | Números citados nos textos (fonte única, gerada dos relatórios) | `scripts/py.sh scripts/gerar_numeros.py --aplicar` · `--verificar` (`make numeros`) |
 | Contingência da interface (grava e confere o replay) | `scripts/py.sh scripts/gravar_contingencia_web.py` · `--conferir` |
+| Caso de demonstração fora do repositório (dados novos) | `scripts/rodar_demo.sh --casos-dir DIR --caso ID` ([guia](docs/TESTAR_COM_DADOS_NOVOS.md)) |
 | Custo por fiscalização (tokens, GPU, energia; do trace) | `scripts/py.sh scripts/custo_fiscalizacao.py dados_locais/demo/traces/fis_demo_0001.jsonl` |
 | Cofre e expurgo LGPD (crypto-shredding por fiscalização) | `scripts/py.sh scripts/expurgo_lgpd.py cifrar <fis>` · `expurgar <fis> --motivo ...` · `vencidos --dias 90` |
 | Varredura de dados pessoais | `scripts/py.sh scripts/checar_pii.py --parquet` |
@@ -163,6 +183,7 @@ o LLM ao vivo: Ollama com `qwen3.5:4b` (`ollama pull qwen3.5:4b`), um modelo por
 | `docs/arquitetura.md`, `docs/adr/` | arquitetura, o porquê de cada fronteira e decisões (ADR 001: modelo local; ADR 002: ambiente) |
 | `docs/regras.md`, `docs/normas/` | MCR 2-7 e 2-9 como código: texto normativo literal, versionamento e revisão |
 | `docs/modelos.md` | modelos e dados de visão (licenças, sha256, métricas) |
+| `docs/TESTAR_COM_DADOS_NOVOS.md` | caso com dados novos: `caso.yaml`, gleba, fotos, vídeo, documentos e fala; contingência; recomendações de captura |
 | `docs/entregaveis/` | BMC, pitch, slides, mercado e a demo gravada |
 | `src/laudo/contracts.py` | contratos compartilhados (`Operacao`, `Evidencia`, `Checagem`, `CampoLaudo`, `Bloqueio`, `Envelope`) |
 | `src/laudo/agent/` | condutor (LLM + FSM), executor, verificador, política, fatos por template, estado append-only, demo |

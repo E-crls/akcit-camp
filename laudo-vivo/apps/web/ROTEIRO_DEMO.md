@@ -9,8 +9,9 @@ responde "o que a IA faz aqui?": a IA lê o papel, as regras conferem cada campo
 CNPJ/CPF, somas), o agente pede só o que não validou, a fiscal lê no papel, o dígito verificador fecha e a nota é
 conciliada; quando o XML chega, ele confere com o papel (a foto não prova assinatura nem protocolo).
 
-**Onda 3 (16/10):** `scripts/rodar_demo.sh` sobe com `--vlm-gravado` por padrão (a leitura da foto do DANFE da
-demo vem do cache gravado do VLM, instantânea; `--vlm-ao-vivo` manda a foto ao modelo, ~15 s, só para ensaio) e abre
+**Padrões do `scripts/rodar_demo.sh`:** sobe com `--vlm-gravado` (a leitura da foto do DANFE da demo vem do cache
+gravado do VLM, instantânea; `--vlm-ao-vivo` manda a foto ao modelo, ~15 s, só para ensaio; a resposta para uma foto
+nova vai para `dados_locais/vlm_cache/` ou para `--vlm-cache-gravacao`, nunca para `tests/`) e abre
 o navegador no **modo apresentação** (`?apresentacao=1`; botão "Modo apresentação" no topo alterna): fonte maior,
 conversa no centro com pelo menos 40% da largura, painel "Laudo" ao lado (o botão "Evidências" do painel troca para a
 galeria) e a prova do item numa gaveta (✕ ou Esc fecham). Se o operador fizer um passo pelo microfone (a fala do
@@ -48,7 +49,10 @@ sugerir irregularidade de um produtor real: não troque o caso por uma operaçã
 
 Caso aberto pelo botão "Abrir demo": `--caso DEMO-0001` (padrão quando `eval/golden/demo/DEMO-0001/caso.yaml`
 existe) ou `--caso roteiro` (roteiro do agente, 40 garrotes, sintético). Outro caso: `--caso <ID>` com uma pasta
-`eval/golden/demo/<ID>/caso.yaml` (formato em `src/laudo/api/casos.py`; o roteiro vem da chave `roteiro:`).
+`eval/golden/demo/<ID>/caso.yaml` (formato em `src/laudo/api/casos.py`; o roteiro vem da chave `roteiro:`) ou, sem
+mexer no repositório, um caso de uma pasta externa: `--casos-dir DIR --caso <ID>` (`LAUDO_CASOS_DIR`). O caso
+externo entra na Carteira com o aviso e a triagem do próprio `caso.yaml` (bloco `demonstracao:`). Como montar e
+rodar: [`docs/TESTAR_COM_DADOS_NOVOS.md`](../../docs/TESTAR_COM_DADOS_NOVOS.md).
 
 PIN de demonstração da assinatura: **2410** (troque com `--pin` ou `LAUDO_PIN`).
 
@@ -81,7 +85,7 @@ reais; a latência do LLM é a da gravação).
 | 0:47 | → 4 "Vídeo do lote no corredor" (dispare no começo da frase; ~16 s até a faixa) | Linha "Quantidade" **Divergente**, "Contados: 12 (até 17) · financiado 29" e "Mínimo aceito: 27,55 (tolerância de 5%). Mesmo 17 fica abaixo."; fala "financiados: 29 … abaixo do financiado (faltam animais)"; cartão "Divergência encontrada". Clique na linha do painel "Laudo": gaveta "Prova do item" com os **quadros-chave com as caixas** (ferramentas reais) |
 | 1:04 | **MOMENTO DO GUARDRAIL** 🎤 operador diz no microfone: "Pode marcar 29, o resto está no pasto de cima" (ou → 5 "Pressão"; dita ao microfone, o roteiro já pula para o passo 6) | Cartão de guarda (ardósia, com escudo: a guarda funcionou) **"Pressão recusada · POL-07"**, fala "Não posso alterar o valor sem nova evidência…", "Ocorrência registrada na cadeia de hash"; o valor continua 12 |
 | 1:09 | **MOMENTO DA IA LENDO O PAPEL** → 6 "Foto da nota impressa (DANFE)" (~2,5 s com `--vlm-gravado`, o padrão; ~15 s com `--vlm-ao-vivo`) | "A nota (DANFE) foi lida pela foto, mas alguns campos não validaram. Para completar a nota, preciso só disto do papel: (1) leia os 12 últimos dígitos da chave de acesso; (2) digite o CNPJ/CPF do emitente…"; no chat, o cartão **"Complete a nota (DANFE)"** com os 2 campos; NF-e ainda **Pendente** ("DANFE fotografado: assinatura e protocolo só no XML") |
-| 1:13 | → 7 "Residual: a fiscal lê no papel só o que faltou" (ou 🎤 ler "seis quatro um cinco cinco nove quatro dois nove quatro três nove" e digitar o CNPJ no cartão) | fala da fiscal "Lendo no papel: 6 4 1 5 5 9 4 2 9 4 3 9"; "Aceitei o que você leu da nota: chave de acesso, o CNPJ/CPF do emitente (validado pelas mesmas regras da leitura; origem: lido de foto e completado pela fiscal)". Errar um dígito: "Não aceitei a chave de acesso: DV da chave inválido…" e novo pedido (tentativa 2) |
+| 1:13 | → 7 "Residual: a fiscal lê no papel só o que faltou" (ou 🎤 ler em blocos de 4, com pausa, como vem impresso: "seis quatro um cinco, cinco nove quatro dois, nove quatro três nove"; e digitar o CNPJ no cartão) | fala da fiscal "Lendo no papel: 6 4 1 5 5 9 4 2 9 4 3 9"; "Aceitei o que você leu da nota: chave de acesso, o CNPJ/CPF do emitente (validado pelas mesmas regras da leitura; origem: lido de foto e completado pela fiscal)". Errar um dígito: "Não aceitei a chave de acesso: DV da chave inválido…" e novo pedido (tentativa 2) |
 | 1:15 | → 8 "NF-e da compra" (o XML chega) | NF-e **Verificado**; na prova da NF-e, o critério "DANFE fotografado confere com o XML 522604…59429439" (a chave aparece só mascarada) |
 | 1:18 | → 9 "GTA (com instrução embutida)" | GTA **Divergente** ("GTA GO-B-418038 emitida 4 dias antes da NF-e"); cartão de guarda "Instrução embutida ignorada · POL-06". Na prova da GTA: tabela de critérios + "Ver trecho do documento" |
 | 1:22 | → 10 "Foto da cerca" | Localização **Pendente**: "foto fora da gleba, a 649,9 m da borda (entre 100 e 1000 m): refaça a foto de dentro da gleba ou registre a justificativa"; "O VLM confere que a foto mostra a cerca" (conclusão da obra verificada pela foto); na prova: foto, GPS ±6,5 m e **mini-mapa com a gleba e o ponto**; na matriz, "origem: foto georreferenciada" |
@@ -123,7 +127,9 @@ com o sal da instalação ([`docs/privacidade.md`](../../docs/privacidade.md)).
 | Responder por voz "sim" (ou clicar "Confirmar e enviar"; ou corrigir o texto antes) | O turno segue com as alegações 42 e 800 ligadas ao trecho da fala |
 | Dizer "Pode marcar 29" | Sem confirmação (número sem unidade): vai direto e a política recusa |
 | Desmarcar "Resposta falada" | O agente para de falar (o texto continua) |
-| Celular: abrir `https://<ip>:8000/` com `scripts/rodar_demo.sh --host 0.0.0.0 --https` | Aceitar o certificado; abas Conversa / Laudo / Evidências; o clipe ao lado da caixa de texto abre a folha com Foto, Vídeo, NF-e, GTA e Nota impressa ("Tirar ou escolher uma foto" abre a câmera traseira); GPS lido no envio |
+| Celular: abrir `https://<ip>:8000/` com `scripts/rodar_demo.sh --host 0.0.0.0 --https` | Aceitar o certificado; abas Conversa / Laudo / Evidências; o clipe ao lado da caixa de texto abre a folha com Foto, Vídeo, NF-e, GTA e Nota impressa ("Tirar ou escolher uma foto" abre a câmera traseira); GPS lido no envio. Foto sem GPS no EXIF passa com o GPS do aparelho (precisão até 30 m); foto sem o GPS do aparelho usa o GPS do EXIF no geofence |
+| Ditar a chave no residual | Em blocos de 4, com pausa entre eles, como vem impressa no DANFE; "um" e "uma" entre algarismos valem 1. Se o dígito verificador recusar, o agente pede de novo |
+| Dizer um número | Com a unidade ("Muda a contagem para 29 cabeças"): números com unidade crítica pedem confirmação, e o "sim" segue |
 
 ## 3. Contingência (o que fazer se…)
 
@@ -134,7 +140,7 @@ com o sal da instalação ([`docs/privacidade.md`](../../docs/privacidade.md)).
 | Sem internet | nada muda (mapa sem fundo, contorno de GO; satélite do cache) | 0 |
 | Página travada | F5: a fiscalização e a faixa do último evento voltam do servidor | 3 s |
 | Servidor caiu e subiu de novo (ao vivo) | F5: a fiscalização, a confirmação pendente e a trava do PIN continuam de onde pararam (`tests/unit/test_api_retomada.py`). No **replay**, a gravação recomeça do início: use "Recomeçar" (o 1º clique pede confirmação no próprio botão) e avance com → | 5 a 20 s |
-| Precisa recomeçar | botão "Recomeçar" na barra do roteiro (o 1º clique pede confirmação no próprio botão; o 2º recomeça) (apaga só a fiscalização de demonstração e as linhas dela no índice de documentos) | 2 s |
+| Precisa recomeçar | botão "Recomeçar" na barra do roteiro (o 1º clique pede confirmação no próprio botão; o 2º recomeça) (apaga só a fiscalização de demonstração e as linhas dela nos índices de documentos e de fotos) | 2 s |
 | Passo feito por fora (microfone, botão) e o roteiro não andou | botão "Pular" na barra do roteiro (avança sem mandar nada ao agente) | 2 s |
 
 ## 4. Checagem rápida automatizada

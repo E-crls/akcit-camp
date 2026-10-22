@@ -160,11 +160,39 @@ python -m laudo.api --caso DEMO-0001 --ferramentas reais --perfil campo --llm ol
   `python -c "from huggingface_hub import snapshot_download as s; s('Systran/faster-whisper-large-v3')"`.
   O microfone do navegador só funciona em `localhost` ou em HTTPS.
 - **Leitura do papel:** `--vlm-cache` lê a foto do DANFE da demo pela resposta gravada do VLM (a mesma foto e
-  o mesmo pedido). Sem a opção, a foto vai ao modelo (~15 s).
+  o mesmo pedido). Sem a opção, a foto vai ao modelo (~15 s). O cache versionado da demo só é lido: a resposta
+  para uma foto nova vai para `--vlm-cache-gravacao DIR` (ou `LAUDO_VLM_CACHE_GRAVACAO`; sem ela,
+  `dados_locais/vlm_cache/`), nunca para `tests/`. Essa pasta também é lida, inclusive no `--llm replay`.
+- **Aquecimento:** com `--aquecer`, o servidor carrega o Whisper e o modelo e faz uma chamada curta ao Ollama com
+  o mesmo começo do 1º pedido da fiscalização (prompt de sistema e ferramentas do condutor). O Ollama guarda esse
+  prefixo, de cerca de 9 mil tokens, e o 1º turno não espera o processamento dele. A chamada não entra na gravação
+  da contingência, e uma falha nela não impede a subida. O terminal mostra `LLM: {... 'chat': {'ok': True, ...}}`.
+  Para aquecer de novo depois de mais de 30 min parado: `curl -s -X POST http://127.0.0.1:8000/api/llm/aquecer`.
+- **Ollama em outra porta ou máquina:** `OLLAMA_HOST` (ex.: `127.0.0.1:11435`; sem esquema, vira `http://`) vale
+  para o LLM, para o VLM (classificação de foto) e para a leitura de documento por foto.
 - **Com Docker:** `docker compose --profile ao-vivo up -d ollama`, depois
   `docker compose exec ollama ollama pull qwen3.5:4b` e `docker compose --profile ao-vivo up demo-ao-vivo`
   (http://127.0.0.1:8001). Sem GPU, o Ollama roda em CPU, mais devagar. Para usar uma GPU NVIDIA, descomente o
   bloco `deploy` do serviço `ollama` no `docker-compose.yml`.
+
+### Caso com dados novos
+
+Um caso próprio, com fotos, vídeo e fala de uma fazenda de teste ou com dados gerados, é uma pasta com `caso.yaml`
+fora do repositório. `LAUDO_CASOS_DIR` aceita uma ou mais pastas (separadas por `;` no Windows e `:` nos outros
+sistemas). Cada subpasta com `caso.yaml` entra na Carteira, com qualquer nome, e abre pelo id. Com o bloco
+`demonstracao:`, o REF fictício do caso fica indexado: o agente fala a triagem do próprio caso no passo 1, e a tela,
+o laudo e o pacote mostram o aviso do `caso.yaml` (`demonstracao.aviso` ou `aviso`).
+
+```bash
+scripts/rodar_demo.sh --casos-dir ../casos --caso CAMPO-0001 --vlm-cache-gravacao ../casos/CAMPO-0001/vlm_cache
+LAUDO_CASOS_DIR=../casos python -m laudo.api --caso CAMPO-0001 --ferramentas reais --perfil campo --llm ollama \
+    --asr desligado --vlm-cache-gravacao ../casos/CAMPO-0001/vlm_cache --aquecer        # o mesmo, sem o script
+```
+
+No geofence, a foto sem o GPS do aparelho usa o GPS do EXIF, com a precisão do próprio EXIF. A foto sem GPS no EXIF
+passa com o GPS do aparelho, se a precisão for de até 30 m e a localização não for simulada. O `caso.yaml`
+comentado, as peças (gleba em WKT, fotos, vídeo, NF-e, GTA e fala), a gravação da contingência e as recomendações
+de captura estão em [`docs/TESTAR_COM_DADOS_NOVOS.md`](TESTAR_COM_DADOS_NOVOS.md).
 
 ## 7. Tempos medidos
 
@@ -201,12 +229,15 @@ primeira instalação demora mais.
 | Mapa da interface sem fundo | sem internet, os tiles do OpenStreetMap não carregam, e o resto funciona. O contorno de Goiás offline vem da malha do IBGE (`python scripts/dados_ibge.py`, opcional) |
 | `pip install --group dev` falha | precisa de pip ≥ 25.1: `python -m pip install --upgrade pip` |
 | `Recusado: … split de teste congelado` | é o esperado: casos do teste congelado só rodam pela rodada registrada (`eval/README.md`) |
+| `caso 'X' não encontrado (procurei em …)` com um caso fora do repositório | confira `LAUDO_CASOS_DIR` ou `--casos-dir` (caminho relativo a `laudo-vivo/`; separador `;` no Windows) e o `id` do `caso.yaml`. Outros sintomas de caso novo (GPS da foto, duplicata, replay) estão na [seção 8 do guia](TESTAR_COM_DADOS_NOVOS.md#8-problemas-comuns) |
+| "foto sem localização: o aparelho não mandou o GPS e a foto não tem GPS no EXIF…" | tire a foto pela página, com a localização do aparelho ligada, ou envie o arquivo original da câmera, com GPS |
 
 ## 9. Mais
 
 - O fluxo do agente está em [`docs/fluxo_do_agente.md`](fluxo_do_agente.md) e a arquitetura em
   [`docs/arquitetura.md`](arquitetura.md).
 - Para a operação no dia e as contingências, veja [`docs/runbook.md`](runbook.md).
+- Para montar e rodar um caso com dados novos, veja [`docs/TESTAR_COM_DADOS_NOVOS.md`](TESTAR_COM_DADOS_NOVOS.md).
 - A implantação gerenciada, com a mesma imagem do `Dockerfile` descrita em Terraform, está em
   [`infra/gcp/README.md`](../infra/gcp/README.md).
 - Licenças dos ativos, modelos e bibliotecas: [`THIRD_PARTY.md`](../THIRD_PARTY.md).

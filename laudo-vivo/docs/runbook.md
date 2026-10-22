@@ -28,13 +28,16 @@ scripts/rodar_demo.sh --vlm-ao-vivo   # só para ensaio: manda a foto do DANFE a
 scripts/rodar_demo.sh --replay        # CONTINGÊNCIA: LLM e leitura do papel gravados, sem GPU nem rede
 ```
 
-Desde a onda 3 (16/10/2026, L35), dois padrões do `rodar_demo.sh` mudaram (`scripts/rodar_demo.sh --help`):
+Padrões e opções do `rodar_demo.sh` (`scripts/rodar_demo.sh --help`):
 
 - **Leitura do DANFE gravada (`--vlm-gravado`, padrão):** a foto do DANFE da demo é lida pelo cache gravado do VLM
-  (a mesma foto e o mesmo pedido; o passo 6 leva ~2,5 s, só o LLM). Foto nova continua indo ao VLM. Para ensaiar
-  a leitura de verdade, `--vlm-ao-vivo` (~15 s). No `--replay` é sempre pelo cache.
+  (a mesma foto e o mesmo pedido; o passo 6 leva ~2,5 s, só o LLM). Foto nova continua indo ao VLM, e a resposta
+  dela vai para `dados_locais/vlm_cache/` (ou para `--vlm-cache-gravacao DIR`), nunca para o cache versionado em
+  `tests/`. Para ensaiar a leitura de verdade, `--vlm-ao-vivo` (~15 s). No `--replay` é sempre pelo cache.
 - **Modo apresentação (padrão):** o navegador abre em `?apresentacao=1` (cabeçalho recolhido, conversa grande,
   prova numa gaveta; o botão "Modo apresentação" no topo alterna). `--sem-apresentacao` abre a tela normal.
+- **Caso fora do repositório (`--casos-dir DIR`, ou `LAUDO_CASOS_DIR`):** os casos dessa pasta entram na Carteira.
+  Com `--caso <id>`, um deles vira o caso padrão (seção 9). Sem `--caso`, o padrão continua o `DEMO-0001`.
 
 **No palco, o perfil é sempre `campo`** (o padrão do `rodar_demo.sh` e de `scripts/py.sh -m laudo.api`; na CLI,
 passe `--perfil campo`, porque o padrão do `demo_cli.py` é `escritorio`). Só o perfil `campo` tem o orçamento de LLM
@@ -42,8 +45,12 @@ por turno (25 s) e o disjuntor: depois de um TIMEOUT ou de o Ollama sumir, o age
 plano mínimo e as falas por template e tenta de novo no turno seguinte. Com `escritorio` ou `lote`, um Ollama travado
 segura o turno por minutos. Não troque o perfil no dia.
 
-O script sobe o Ollama se ele estiver parado, aquece o modelo (fica carregado por 30 min) e o Whisper, sobe a API em
-`http://127.0.0.1:8000/` e abre o navegador. Conferir em "Detalhes técnicos" (botão no topo; o ponto ao lado
+O script sobe o Ollama se ele estiver parado (no endereço de `OLLAMA_HOST`, se definido; a mesma variável vale para
+o LLM, o VLM e a leitura de documento), aquece o modelo e o Whisper, sobe a API em `http://127.0.0.1:8000/` e abre
+o navegador. O aquecimento carrega o modelo, que fica carregado por 30 min, e faz uma chamada curta com o prompt de
+sistema e as ferramentas do condutor: o 1º turno não espera o processamento do prompt. No terminal, a linha
+`LLM: {... 'chat': {'ok': True, ...}}` confirma; se a chamada falhar, a subida segue, e só o 1º turno fica mais
+lento. Conferir em "Detalhes técnicos" (botão no topo; o ponto ao lado
 fica verde), seção "Sistema": `Modelo de linguagem: ollama · qwen3.5:4b`, `Voz (transcrição): GPU
 (Whisper)` e `Ferramentas: reais`, verdes. No replay: `Modelo de linguagem: replay`, `Fora da gravação: 0`
 e, na faixa do topo, "Contingência: respostas do modelo reproduzidas de uma gravação".
@@ -59,6 +66,8 @@ Saúde pela linha de comando: `curl -s http://127.0.0.1:8000/api/saude`.
 3. "Recomeçar" (na barra escura "Controle da demonstração"; dois cliques, o 1º só pede confirmação no próprio
    botão) e deixar a tela na Carteira.
 4. Testar o microfone: segurar "Segure para falar" e dizer "teste".
+5. Se a máquina ficar mais de 30 min parada, o modelo descarrega. Para aquecer de novo sem reiniciar:
+   `curl -s -X POST http://127.0.0.1:8000/api/llm/aquecer` (recarrega o modelo e o começo do prompt).
 
 ## 4. Contingência com replay
 
@@ -94,6 +103,7 @@ A contingência é a demo gravada com o modelo real: o replay devolve as mesmas 
 | Ollama sem memória de GPU | erro "out of memory" ou resposta muito lenta | `ollama ps`; `ollama stop` em qualquer modelo que não seja o `qwen3.5:4b`; fechar o que usa a GPU (navegador com vídeo, jogos) |
 | **ASR (voz)** | "Voz (transcrição): desligada" em "Detalhes técnicos" ou "não entendi a fala" repetido | digitar a fala no campo de texto (Enter envia) ou usar → (o roteiro manda a fala); para voltar, reiniciar com `--com-voz`; sem GPU, `scripts/py.sh -m laudo.api ... --asr cpu` (mais lento) |
 | Leitura do DANFE lenta | o passo 6 demora mais de 20 s | seguir a fala; conferir se a demo não subiu com `--vlm-ao-vivo` (o padrão é a leitura gravada) |
+| Foto enviada pelo seletor de arquivos do notebook | o navegador pede a localização no projetor; com a do notebook, longe da gleba, a foto sai GPS_DIVERGENTE | no palco, usar só → e os botões "Arquivos do caso de demonstração". Se o pedido aparecer, negar: vale o GPS do EXIF. Sem GPS nenhum, o agente pede uma foto com localização |
 | **Servidor (API)** | a página não responde | rodar `scripts/rodar_demo.sh` de novo e F5: a fiscalização continua de onde parou (estado, cadeia de hash, confirmação pendente e trava do PIN ficam em disco). No **replay**, a gravação recomeça do início: "Recomeçar" (dois cliques) e → até o ponto |
 | Rede | mapa sem fundo | nada: tudo roda local; satélite do cache |
 | Projetor | imagem cortada | F11 e zoom do navegador em 100% |
@@ -135,6 +145,7 @@ A contingência é a demo gravada com o modelo real: o replay devolve as mesmas 
 ```bash
 curl -s http://127.0.0.1:11434/api/ps                 # o que o Ollama tem carregado
 curl -s http://127.0.0.1:8000/api/saude               # LLM, voz, ferramentas e caso padrão
+curl -s -X POST http://127.0.0.1:8000/api/llm/aquecer  # aquece de novo: modelo + prompt e ferramentas do condutor
 scripts/py.sh scripts/custo_fiscalizacao.py dados_locais/api/traces    # tokens e tempos por fiscalização
 scripts/py.sh -m pytest tests/unit/test_api_retomada.py -q             # retomada depois de queda
 tail -50 dados_locais/api/ollama.log                  # se o rodar_demo.sh subiu o Ollama
@@ -172,3 +183,36 @@ Sem `--final`, com o split congelado, os scripts rodam só o dev (ou se recusam 
 contingência regravada e conferida (seção 4), `gerar_slide --sufixo _r4`, `gerar_numeros --aplicar` e
 `--verificar` com 0 problemas (o próprio `rodada_r4.py` faz os três no fim). Se a r4 falhar, os números da r3
 continuam valendo (mesmo conjunto de teste).
+
+## 9. Caso com dados novos (fora do repositório)
+
+Um caso próprio é uma pasta com `caso.yaml` fora do repositório. O formato, as peças e as recomendações de captura
+estão em [`docs/TESTAR_COM_DADOS_NOVOS.md`](TESTAR_COM_DADOS_NOVOS.md). A operação do caso segue a do `DEMO-0001`,
+com `--casos-dir` e `--caso`:
+
+```bash
+C=../casos/CAMPO-0001
+scripts/rodar_demo.sh --casos-dir ../casos --caso CAMPO-0001 --vlm-cache-gravacao $C/vlm_cache            # ao vivo
+LAUDO_CASOS_DIR=../casos LAUDO_VLM_CACHE_GRAVACAO=$C/vlm_cache \
+    scripts/py.sh scripts/gravar_contingencia_web.py --caso CAMPO-0001             # grava $C/replay_qwen35_4b.jsonl
+LAUDO_CASOS_DIR=../casos LAUDO_VLM_CACHE_GRAVACAO=$C/vlm_cache \
+    scripts/py.sh scripts/gravar_contingencia_web.py --caso CAMPO-0001 --conferir  # SELADO, 0 fora da gravação
+scripts/rodar_demo.sh --casos-dir ../casos --caso CAMPO-0001 --vlm-cache-gravacao $C/vlm_cache --replay   # contingência
+```
+
+- **O caso na tela.** Com o bloco `demonstracao:` no `caso.yaml`, o agente fala no passo 1 a triagem do próprio
+  caso. A tela, o laudo e o pacote mostram o aviso do caso (`demonstracao.aviso` ou `aviso`). O `DEMO-0001` continua
+  com o aviso de sempre.
+- **VLM.** As fotos novas e a foto do DANFE do caso vão ao VLM ao vivo. As respostas ficam na pasta de
+  `--vlm-cache-gravacao`, que o replay também lê. Grave e reproduza com a mesma pasta.
+- **Gravação.** `rodar_demo.sh --gravar --caso <id ou pasta>` grava em `dados_locais/api/gravacoes/<id do
+  caso.yaml>.jsonl`, que tem prioridade no replay sobre o `replay*.jsonl` da pasta do caso. Uma gravação pela metade
+  ali quebra a contingência: termine a passada até o selo ou renomeie o arquivo.
+- **Um caso por subida em replay.** O replay é o do `--caso`. O `DEMO-0001` e o caso novo em contingência são duas
+  subidas, ou duas portas (`--porta 8010`).
+- **Satélite.** Rode o caso uma vez com rede (a gravação já faz isso). Depois, não mude o polígono nem as datas do
+  `caso.yaml`, porque o cache vale para aquele texto e aquele período.
+- **Fotos ao vivo.** "Recomeçar" tira a fiscalização dos índices de documentos e de fotos, então a mesma foto pode
+  ser enviada de novo no ensaio seguinte. Numa fiscalização nova, a mesma foto continua sendo duplicata.
+- **Depois de qualquer mudança em `src/`**, confira de novo a contingência do `DEMO-0001` (seção 4) e a do caso
+  novo (`--conferir`).

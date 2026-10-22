@@ -9,7 +9,7 @@
 # Opções:
 #   --caso ID|roteiro        caso do botão "Abrir demo" (padrão: DEMO-0001 se existir; senão o roteiro do agente)
 #   --casos-dir DIR          pasta(s) de casos de demonstração fora do repositório (LAUDO_CASOS_DIR): entram na
-#                            carteira e abrem por id (ex.: --casos-dir ../sinteticos/casos --caso UFG-EVZ-0001)
+#                            carteira e abrem por id (ex.: --casos-dir ../casos --caso CAMPO-0001)
 #   --ferramentas MODO       falsas | mistas | reais (padrão: reais no caso do golden; falsas no roteiro).
 #                            mistas = documentos, fotos e regras reais, contagem de vídeo simulada (instantânea)
 #   --replay-arquivo ARQ     gravação JSONL específica (padrão: dados_locais/api/gravacoes/<caso>.jsonl,
