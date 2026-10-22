@@ -297,11 +297,15 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
 
     @app.post("/api/fiscalizacoes/{fis_id}/turno-audio")
     async def turno_audio(
-        fis_id: str, audio: Annotated[UploadFile, File()], confirmar_numeros: Annotated[bool, Form()] = True
+        fis_id: str, audio: Annotated[UploadFile, File()],
+        confirmar_numeros: Annotated[str | None, Form()] = None,
     ):
+        # O campo é opcional e o padrão é confirmar. Lido como texto porque versões diferentes do FastAPI tratam
+        # de formas diferentes um booleano de formulário ausente num envio multipart.
+        confirmar = (confirmar_numeros or "").strip().lower() not in ("false", "0", "nao", "não", "off", "no")
         conteudo = await audio.read(LIMITE_AUDIO_MB * MIB + 1)
         return await run_in_threadpool(
-            srv.turno_audio, fis_id, audio.filename or "fala.webm", conteudo, confirmar_numeros
+            srv.turno_audio, fis_id, audio.filename or "fala.webm", conteudo, confirmar
         )
 
     @app.post("/api/fiscalizacoes/{fis_id}/confirmar")

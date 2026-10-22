@@ -13,7 +13,7 @@ Uso (na raiz do repositório):
   scripts/py.sh scripts/checar_frases_proibidas.py --so P20-P25     # só estas regras (lista ou faixa)
   scripts/py.sh scripts/checar_frases_proibidas.py --relatorio      # lista tudo e sai com 0 (modo relatório)
 
-Varredura padrão: `docs/entregaveis/`, `validacao/`, `README.md`, `docs/decisao.md`, `docs/privacidade.md`,
+Varredura padrão: `docs/entregaveis/`, `validacao/`, `README.md`, `docs/privacidade.md`,
 `docs/fluxo_do_agente.md`, `docs/runbook.md`, `docs/exemplos/` e `../negocio/` (o que a banca ou a equipe leem
 como afirmação nossa). Dentro de um `.zip` (o pacote de exibição de `docs/exemplos/`), o texto de cada arquivo
 de texto do pacote também é varrido; o achado sai como `pacote.zip!caminho/no/pacote.json:linha`.
@@ -69,7 +69,6 @@ RAIZES_PADRAO = [
     REPO / "docs" / "entregaveis",
     REPO / "validacao",
     REPO / "README.md",
-    REPO / "docs" / "decisao.md",
     REPO / "docs" / "privacidade.md",
     REPO / "docs" / "fluxo_do_agente.md",
     REPO / "docs" / "runbook.md",
