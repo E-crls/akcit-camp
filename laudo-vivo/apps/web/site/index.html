@@ -38,8 +38,8 @@ try { if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-moti
   --destaque: #C0582E; --destaque-vivo: #E8916A;  /* vivo: só sobre a tinta (6,9:1) */
   /* o que falta: âmbar como marca e contorno (3,6:1), com o texto em tinta sobre o claro */
   --falta: #B7791F; --falta-claro: #FBF1DC;
-  /* estados do laudo: branco por cima (Verificado 5,0:1; Divergente 6,6:1) */
-  --verificado: #15803D; --divergente: #B42318;
+  /* estados do laudo: Verificado em etiqueta clara (texto tinta, contorno e visto verdes); Divergente com branco por cima (6,6:1) */
+  --verificado: #15803D; --verificado-claro: #E7F4EC; --divergente: #B42318;
   --f-texto: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --f-titulo: "Barlow Semi Condensed", "Barlow", system-ui, sans-serif;
   --f-numero: "Barlow Condensed", "Barlow", system-ui, sans-serif;
@@ -240,7 +240,9 @@ h1 { font-family: var(--f-titulo); font-weight: 700; font-size: 3.25rem; line-he
 .st { display: inline-flex; align-items: center; gap: .35em; padding: .18em .55em; border-radius: var(--r-x); font-family: var(--f-titulo); font-weight: 700;
   font-size: .9em; line-height: 1.35; white-space: nowrap; }
 .st .ic { width: 1em; height: 1em; }
-.st.ok { background: var(--verificado); color: var(--branco); }
+/* Verificado é etiqueta clara, como no produto (eace4bf): chapa verde com texto branco é a gramática do botão */
+.st.ok { background: var(--verificado-claro); color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--verificado); }
+.st.ok .ic { color: var(--verificado); }
 .st.dv { background: var(--divergente); color: var(--branco); }
 .st.ft { background: var(--falta-claro); color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--falta); }
 .st.ft::before { content: ""; width: .7em; height: .7em; box-shadow: inset 0 0 0 1.5px var(--falta); border-radius: 1px; }
