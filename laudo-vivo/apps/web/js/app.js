@@ -7,7 +7,7 @@
 // Modo apresentação (telão): `?apresentacao=1`, o menu do usuário ou localStorage "lv.apresentacao"; só a raiz muda
 // (tudo em rem), a barra da demonstração fica recolhida e a carteira abre com o caso de demonstração selecionado.
 
-import { api } from "./api.js";
+import { api, definirDemoPublica } from "./api.js";
 import { telaCarteira } from "./carteira.js";
 import { sairFiscalizacao, telaFiscalizacao } from "./fiscalizacao.js";
 import { telaFiscalizacoes } from "./fiscalizacoes.js";
@@ -58,6 +58,8 @@ async function carregarSaude() {
     document.body.classList.toggle("demo-publica", publica());
     const faixa = document.getElementById("faixa-publica");
     if (faixa) faixa.hidden = !publica();
+    // erro sem o JSON do app (413/429 do front-end do Cloud Run) vira frase em português, com os limites da demonstração
+    definirDemoPublica(publica() ? saude.demo_publica?.limites || {} : null);
   }
   const ponto = document.getElementById("ponto-tec");
   if (!saude) {

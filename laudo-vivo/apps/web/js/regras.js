@@ -738,3 +738,60 @@ export function agora(e, ctx = {}) {
   return { rot: "Agora", titulo: "Revise e assine o laudo", apoio: "Quem assina é você, com o seu PIN.",
     acoes: [{ rot: "Revisar e assinar", acao: "revisar-assinar", ic: "assinar" }] };
 }
+
+// ---------------------------------------------------------------- demonstração pública (QR code)
+// Só valem quando a saúde diz `config.demo_publica`: quem chama confere isso antes.
+
+// Ações do "Agora" que abrem a câmera, a galeria ou o seletor de arquivos do aparelho (as chaves de ACAO_ARQ).
+export const ehAcaoDeArquivo = (acao) => /^(filmar|galeria-|fotografar-|refazer-foto|arquivo-)/.test(String(acao || ""));
+
+// Enquanto o próximo passo do roteiro não pede o arquivo que o botão abriria, a câmera não pode ser a ação principal
+// do "Agora": o vídeo próprio tira o visitante do roteiro (e a contagem roda na CPU por até ~1 min). O destaque vai
+// para "Executar passo" e Filmar/Galeria ficam como secundárias. `doPasso(acao)` diz se a ação abre o arquivo pronto
+// deste passo (aí ela continua a principal: abre "Arquivo da demonstração").
+export function acoesAgoraPublica(acoes, passo, { doPasso = () => false, ehArquivo = ehAcaoDeArquivo } = {}) {
+  const lista = acoes || [];
+  if (!passo || passo.acao === "assinar" || !lista.length) return lista;
+  const pri = lista[0];
+  if (!ehArquivo(pri.acao) || doPasso(pri.acao)) return lista;
+  return [{ rot: "Executar passo", acao: "executar-passo", ic: "play" }, ...lista];
+}
+
+// Teto de cada arquivo do aparelho (o mesmo da API: `Limites` em src/laudo/api/publica.py; MB = 2^20 bytes). O que a
+// saúde manda em `demo_publica.limites` vale por cima destes.
+export const LIMITES_PUBLICOS = Object.freeze({ upload_mb: Object.freeze({ foto: 10, video: 30, nfe_xml: 2 }), video_max_s: 20 });
+const MIB = 1024 * 1024;
+export function limitesPublicos(limites = null) {
+  const l = limites || {};
+  return { upload_mb: { ...LIMITES_PUBLICOS.upload_mb, ...(l.upload_mb || {}) }, video_max_s: Number(l.video_max_s) || LIMITES_PUBLICOS.video_max_s };
+}
+// "até 20 s e 30 MB": a dica do vídeo no Anexar e nas mensagens
+export function regraVideoPublico(limites = null) {
+  const l = limitesPublicos(limites);
+  return `até ${fmtDec(l.video_max_s)} s e ${fmtDec(l.upload_mb.video)} MB`;
+}
+// Antes de enviar: o arquivo cabe nos limites da demonstração? Devolve a mensagem para a tela, ou null. A duração do
+// vídeo vem dos metadados lidos no aparelho (null quando não deu para ler: aí só a API confere). A API dá 0,5 s de folga.
+export function conferirArquivoPublico({ tipo, bytes, duracao = null }, limites = null) {
+  const l = limitesPublicos(limites);
+  const teto = Number(l.upload_mb[tipo]);
+  const mb = Math.ceil((Number(bytes) / MIB) * 10) / 10;
+  const grande = teto > 0 && Number(bytes) > teto * MIB;
+  if (tipo === "video") {
+    const fim = `na demonstração, o vídeo vai ${regraVideoPublico(limites)}. Grave um trecho mais curto ou use o vídeo pronto do caso.`;
+    if (grande) return `Vídeo de ${fmtDec(mb, 1)} MB: ${fim}`;
+    const d = Number(duracao);
+    if (duracao !== null && duracao !== undefined && Number.isFinite(d) && d > l.video_max_s + 0.5) return `Vídeo de ${fmtInt(Math.round(d))} s: ${fim}`;
+    return null;
+  }
+  if (!grande) return null;
+  return tipo === "foto" ? `Foto de ${fmtDec(mb, 1)} MB: na demonstração, a foto vai até ${fmtDec(teto)} MB.`
+    : `Arquivo de ${fmtDec(mb, 1)} MB: na demonstração, o XML da NF-e vai até ${fmtDec(teto)} MB.`;
+}
+
+// Depois do selo ainda pode haver passo do roteiro (o 19: a tentativa de alterar o laudo selado): o número dele, ou null.
+export function passoDepoisDoSelo(e) {
+  const r = e?.roteiro;
+  if (e?.etapa !== "SELADO" || !r || !(Number(r.proximo) >= 1) || Number(r.proximo) > Number(r.total)) return null;
+  return Number(r.proximo);
+}
