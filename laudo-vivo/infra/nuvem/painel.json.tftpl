@@ -1,6 +1,6 @@
 {
   "displayName": "Laudo Vivo: demo pública (acessos e custos)",
-  "labels": {"laudo-vivo": ""},
+  "labels": {"laudo-vivo": "", "centro-custo": "laudo-vivo-demo"},
   "mosaicLayout": {
     "columns": 48,
     "tiles": [
@@ -72,12 +72,12 @@
       {
         "yPos": 13, "width": 24, "height": 14,
         "widget": {
-          "title": "Acessos: requisições por classe de resposta",
+          "title": "Acessos: requisições por minuto, por classe de resposta",
           "xyChart": {
             "dataSets": [{
-              "plotType": "STACKED_BAR", "targetAxis": "Y1",
+              "plotType": "LINE", "targetAxis": "Y1",
               "timeSeriesQuery": {
-                "prometheusQuery": "sum by (response_code_class) (increase(run_googleapis_com:request_count{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[5m]))"
+                "prometheusQuery": "sum by (response_code_class) (rate(run_googleapis_com:request_count{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[5m])) * 60"
               }
             }]
           }
@@ -86,12 +86,12 @@
       {
         "xPos": 24, "yPos": 13, "width": 24, "height": 14,
         "widget": {
-          "title": "Uso: eventos da demo por tipo",
+          "title": "Uso: eventos da demo por minuto, por tipo",
           "xyChart": {
             "dataSets": [{
-              "plotType": "STACKED_BAR", "targetAxis": "Y1",
+              "plotType": "LINE", "targetAxis": "Y1",
               "timeSeriesQuery": {
-                "prometheusQuery": "sum by (evento) (increase(logging_googleapis_com:user_laudo_eventos{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[5m]))"
+                "prometheusQuery": "sum by (evento) (rate(logging_googleapis_com:user_laudo_eventos{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[5m])) * 60"
               }
             }]
           }
@@ -100,12 +100,12 @@
       {
         "yPos": 27, "width": 24, "height": 14,
         "widget": {
-          "title": "LLM: chamadas por origem (replay sem custo x Gemini x teto atingido)",
+          "title": "LLM: chamadas por minuto, por origem (replay sem custo, Gemini, teto)",
           "xyChart": {
             "dataSets": [{
-              "plotType": "STACKED_BAR", "targetAxis": "Y1",
+              "plotType": "LINE", "targetAxis": "Y1",
               "timeSeriesQuery": {
-                "prometheusQuery": "sum by (detalhe) (increase(logging_googleapis_com:user_laudo_eventos{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\",evento=\"llm\"}[5m]))"
+                "prometheusQuery": "sum by (detalhe) (rate(logging_googleapis_com:user_laudo_eventos{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\",evento=\"llm\"}[5m])) * 60"
               }
             }]
           }
@@ -114,14 +114,14 @@
       {
         "xPos": 24, "yPos": 27, "width": 24, "height": 14,
         "widget": {
-          "title": "LLM: tokens do Gemini e custo acumulado (US$)",
+          "title": "LLM: tokens do Gemini por minuto e custo em 24 h (US$)",
           "xyChart": {
             "dataSets": [
               {
                 "plotType": "LINE", "targetAxis": "Y1",
-                "legendTemplate": "tokens (5 min)",
+                "legendTemplate": "tokens por minuto",
                 "timeSeriesQuery": {
-                  "prometheusQuery": "sum(increase(logging_googleapis_com:user_laudo_llm_tokens_sum{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\",detalhe=\"vertex\"}[5m]))"
+                  "prometheusQuery": "sum(rate(logging_googleapis_com:user_laudo_llm_tokens_sum{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\",detalhe=\"vertex\"}[5m])) * 60"
                 }
               },
               {
@@ -178,12 +178,12 @@
       {
         "xPos": 32, "yPos": 41, "width": 16, "height": 14,
         "widget": {
-          "title": "Recusas por limite e erros",
+          "title": "Recusas por limite e erros, por minuto",
           "xyChart": {
             "dataSets": [{
-              "plotType": "STACKED_BAR", "targetAxis": "Y1",
+              "plotType": "LINE", "targetAxis": "Y1",
               "timeSeriesQuery": {
-                "prometheusQuery": "sum by (evento, detalhe) (increase(logging_googleapis_com:user_laudo_eventos{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\",evento=~\"recusa_limite|erro\"}[5m]))"
+                "prometheusQuery": "sum by (evento, detalhe) (rate(logging_googleapis_com:user_laudo_eventos{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\",evento=~\"recusa_limite|erro\"}[5m])) * 60"
               }
             }]
           }
@@ -192,12 +192,12 @@
       {
         "yPos": 55, "width": 24, "height": 14,
         "widget": {
-          "title": "Voz: segundos de áudio transcritos (5 min)",
+          "title": "Voz: segundos de áudio transcritos por minuto",
           "xyChart": {
             "dataSets": [{
-              "plotType": "STACKED_BAR", "targetAxis": "Y1",
+              "plotType": "LINE", "targetAxis": "Y1",
               "timeSeriesQuery": {
-                "prometheusQuery": "sum(increase(logging_googleapis_com:user_laudo_asr_audio_s_sum{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[5m]))"
+                "prometheusQuery": "sum(rate(logging_googleapis_com:user_laudo_asr_audio_s_sum{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[5m])) * 60"
               }
             }]
           }
@@ -212,6 +212,20 @@
               "plotType": "LINE", "targetAxis": "Y1",
               "timeSeriesQuery": {
                 "prometheusQuery": "avg by (checker_location) (monitoring_googleapis_com:uptime_check_check_passed{monitored_resource=\"uptime_url\"})"
+              }
+            }]
+          }
+        }
+      },
+      {
+        "yPos": 69, "width": 48, "height": 12,
+        "widget": {
+          "title": "Gemini: tokens medidos pelo Vertex AI (24 h, entrada e saída) — confere a estimativa do app",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "LINE", "targetAxis": "Y1",
+              "timeSeriesQuery": {
+                "prometheusQuery": "sum by (type) (increase(aiplatform_googleapis_com:publisher_online_serving_token_count[1d]))"
               }
             }]
           }

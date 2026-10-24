@@ -51,6 +51,7 @@ rotulo() {  # rótulo, json com .labels (ou userLabels)
     ok "etiqueta de custo: $1"; else ruim "sem etiqueta de custo: $1"; fi
 }
 rotulo "repositório" "$(g artifacts repositories describe "$NOME" --location "$REG" --format=json)"
+rotulo "painel" "$(curl -s -H "Authorization: Bearer $TOKEN" "https://monitoring.googleapis.com/v1/projects/$PROJ/dashboards" | python -c "import json,sys; d=[x for x in json.load(sys.stdin).get('dashboards',[]) if x.get('displayName','').startswith('Laudo Vivo')]; print(json.dumps(d[0] if d else {}))")"
 rotulo "bucket" "$(g storage buckets describe "gs://$PROJ-$NOME-fontes" --format=json | python -c "import json,sys; d=json.load(sys.stdin); print(json.dumps({'labels': d.get('labels') or d.get('default_labels') or {}}))")"
 
 if [ "$TEM_SERVICO" = 1 ]; then
@@ -102,16 +103,20 @@ f = f'monitored_resource="cloud_run_revision",service_name="{nome}"'
 seg = q(f'sum(increase(run_googleapis_com:container_billable_instance_time{{{f}}}[1d]))')
 req = q(f'sum(increase(run_googleapis_com:request_count{{{f}}}[1d]))')
 llm = q(f'sum(increase(logging_googleapis_com:user_laudo_llm_custo_usd_sum{{{f}}}[1d]))')
+# tokens medidos pelo próprio Vertex AI (fonte oficial; o app estima pelo uso que a resposta informa)
+v_ent = q('sum(increase(aiplatform_googleapis_com:publisher_online_serving_token_count{type="input"}[1d]))')
+v_sai = q('sum(increase(aiplatform_googleapis_com:publisher_online_serving_token_count{type="output"}[1d]))')
+llm_v = v_ent * 0.25e-6 + v_sai * 1.50e-6 if v_ent == v_ent and v_sai == v_sai else float("nan")
 tok_ = q(f'sum(increase(logging_googleapis_com:user_laudo_llm_tokens_sum{{{f}}}[1d]))')
 run = seg * (4 * 0.0000336 + 8 * 0.0000035) if seg == seg else float("nan")
 cambio = 5.6
 print(f"  Cloud Run: {seg:.0f} s faturáveis, {req:.0f} requisições -> US$ {run:.4f}")
-print(f"  Gemini:    {tok_:.0f} tokens -> US$ {llm:.4f}")
-tot = (run if run == run else 0) + (llm if llm == llm else 0)
+print(f"  Gemini:    {tok_:.0f} tokens pelo app -> US$ {llm:.4f}; medido pelo Vertex: {v_ent:.0f} entrada + {v_sai:.0f} saída -> US$ {llm_v:.4f}")
+tot = (run if run == run else 0) + max(llm if llm == llm else 0, llm_v if llm_v == llm_v else 0)
 print(f"  Total estimado 24 h: US$ {tot:.4f} (~R$ {tot * cambio:.2f}; câmbio de referência {cambio})")
 print("  (nan = métrica ainda sem dado; o valor oficial está no relatório de faturamento, com atraso de horas)")
 EOF
-SZ=$(g artifacts repositories describe "$NOME" --location "$REG" --format="value(sizeBytes)" | awk '{printf "%.2f", $1/1e9}')
+SZ=$(curl -s -H "Authorization: Bearer $TOKEN" "https://artifactregistry.googleapis.com/v1/projects/$PROJ/locations/$REG/repositories/$NOME" | python -c "import json,sys; print(f\"{int(json.load(sys.stdin).get('sizeBytes') or 0)/1e9:.2f}\")")
 N_IMG=$(g artifacts docker images list "$REG-docker.pkg.dev/$PROJ/$NOME" --format="value(version)" | sort -u | grep -c . || true)
 echo "  Registro: $N_IMG versão(ões), ${SZ:-0} GB (0,5 GB grátis; US$ 0,10/GB-mês acima)"
 
