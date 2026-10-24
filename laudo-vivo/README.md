@@ -23,6 +23,7 @@ mesmas regras antes de aceitar.
 
 | Abra | O que mostra |
 |---|---|
+| [página do produto](https://laudo-vivo-demo-w7k67asc5a-rj.a.run.app/site/) | o que o Laudo Vivo faz, os números com fonte, os resultados com os limites e o modelo de negócio |
 | [demo pública no navegador](https://laudo-vivo-demo-w7k67asc5a-rj.a.run.app) | a interface no computador ou no celular, com dados sintéticos e uma cópia só sua: "Executar passo" percorre os 19 passos até o laudo selado; mensagem livre e voz rodam ao vivo ([como está no ar](infra/nuvem/README.md)) |
 | [`docs/exemplos/laudo_selado.html`](docs/exemplos/laudo_selado.html) ([PDF](docs/exemplos/laudo_selado.pdf)) | o laudo selado do fim da demo: cada item com status, regra citada e prova; o selo confere sem a instalação que o gerou ([como ler](docs/exemplos/README.md)) |
 | [`docs/entregaveis/video/`](docs/entregaveis/video/) | a demo gravada da interface: os 19 passos do caso `DEMO-0001`, uma operação fictícia |

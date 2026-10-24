@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laudo Vivo — a prova do crédito rural</title>
+<meta name="description" content="Agente de fiscalização do crédito rural (MCR 2-7, Res. CMN 5.267): conduz a visita, confere vídeo, foto, nota e GTA contra as regras e entrega o laudo pronto para a fiscal assinar, com trilha auditável.">
+<meta name="theme-color" content="#15130F">
+<meta property="og:title" content="Laudo Vivo — a prova do crédito rural, do satélite ao curral">
+<meta property="og:description" content="Fiscalização do crédito rural com prova de campo, regras do MCR e laudo assinado por humano.">
+<meta property="og:image" content="img/tela-fiscalizacao.jpg">
+<link rel="icon" href="../icone.svg" type="image/svg+xml">
+<style>
+@font-face { font-family: "Barlow"; font-weight: 500; font-display: swap; src: url("../vendor/fonts/Barlow-500.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 600; font-display: swap; src: url("../vendor/fonts/Barlow-600.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 700; font-display: swap; src: url("../vendor/fonts/Barlow-700.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 600; font-display: swap; src: url("../vendor/fonts/BarlowSemiCondensed-600.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 700; font-display: swap; src: url("../vendor/fonts/BarlowSemiCondensed-700.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 700; font-display: swap; src: url("../vendor/fonts/BarlowCondensed-700.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 800; font-display: swap; src: url("../vendor/fonts/BarlowCondensed-800.woff2") format("woff2"); }
+
+:root {
+  --carvao: #15130F; --carvao-2: #24211B; --carvao-3: #3A362E; --grafite: #3C382F; --pedra: #5C564B;
+  --nevoa: #C2BBAD; --poeira: #D3CDC0; --cal-2: #E4E0D6; --cal: #EFECE5; --branco: #FFFFFF; --papel: #F6F4EF;
+  --ipe: #FFC414; --ipe-2: #E8AA00; --ipe-claro: #FFF0BF; --verde: #0B6230; --verde-claro: #DCEFE2;
+  --roxo: #861D4C; --roxo-claro: #F7E4EC;
+  --f-texto: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --f-titulo: "Barlow Semi Condensed", "Barlow", system-ui, sans-serif;
+  --f-numero: "Barlow Condensed", "Barlow", system-ui, sans-serif;
+  --r: .375rem; --larg: 72rem;
+  --regua: repeating-linear-gradient(90deg, var(--carvao) 0 2px, transparent 2px 40px) 0 0 / 100% 8px no-repeat,
+    repeating-linear-gradient(90deg, var(--carvao) 0 1.5px, transparent 1.5px 8px) 0 0 / 100% 5px no-repeat,
+    linear-gradient(var(--carvao), var(--carvao)) 0 0 / 100% 2px no-repeat;
+  --regua-ipe: repeating-linear-gradient(90deg, var(--ipe) 0 2px, transparent 2px 40px) 0 0 / 100% 8px no-repeat,
+    repeating-linear-gradient(90deg, var(--ipe) 0 1.5px, transparent 1.5px 8px) 0 0 / 100% 5px no-repeat,
+    linear-gradient(var(--ipe), var(--ipe)) 0 0 / 100% 2px no-repeat;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--cal); color: var(--carvao); font-family: var(--f-texto); font-weight: 500;
+  font-size: 1.0625rem; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; height: auto; display: block; }
+.tela img, .celular img { width: 100%; }
+a { color: var(--carvao); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--carvao); outline-offset: 3px; }
+.envolve { max-width: var(--larg); margin: 0 auto; padding: 0 1.5rem; }
+.pular { position: absolute; left: -9999px; }
+.pular:focus { left: 1rem; top: 1rem; z-index: 10; background: var(--ipe); padding: .5rem 1rem; }
+
+/* topo */
+.topo { position: sticky; top: 0; z-index: 5; background: rgba(239, 236, 229, .92); backdrop-filter: blur(8px);
+  border-bottom: 1.5px solid var(--poeira); }
+.topo .envolve { display: flex; align-items: center; gap: 1.5rem; height: 4.5rem; }
+.marca { display: flex; align-items: center; gap: .75rem; text-decoration: none; }
+.marca svg { width: 2.5rem; height: 2.5rem; }
+.marca b { font-family: var(--f-numero); font-weight: 800; font-size: 1.6rem; letter-spacing: .02em; }
+.nav { display: flex; gap: 1.5rem; margin-left: auto; }
+.nav a { font-family: var(--f-titulo); font-weight: 600; text-decoration: none; color: var(--grafite); font-size: 1rem; }
+.nav a:hover { color: var(--carvao); text-decoration: underline; text-underline-offset: 6px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .6rem; min-height: 3rem; padding: .75rem 1.4rem;
+  border-radius: var(--r); font-family: var(--f-titulo); font-weight: 700; font-size: 1.125rem; text-decoration: none;
+  border: 2px solid var(--carvao); transition: transform 120ms, background 120ms; }
+.btn:hover { transform: translateY(-1px); }
+.btn-pri { background: var(--ipe); color: var(--carvao); border-color: var(--ipe); }
+.btn-pri:hover { background: var(--ipe-2); border-color: var(--ipe-2); }
+.btn-sec { background: transparent; color: var(--carvao); }
+.btn-sec:hover { background: var(--carvao); color: var(--branco); }
+.btn-escuro { background: var(--carvao); color: var(--branco); }
+.btn svg { width: 1.15rem; height: 1.15rem; flex: none; }
+.topo .btn { min-height: 2.75rem; padding: .5rem 1.1rem; font-size: 1rem; }
+
+/* herói */
+.heroi { padding: 4.5rem 0 3rem; }
+.heroi .envolve { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 3rem; align-items: center; }
+.selo-linha { display: inline-flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+.etiqueta { display: inline-flex; align-items: center; gap: .45rem; padding: .3rem .7rem; border: 1.5px solid var(--carvao);
+  border-radius: 999px; font-family: var(--f-titulo); font-weight: 600; font-size: .9rem; background: var(--branco); }
+.etiqueta i { width: .55rem; height: .55rem; background: var(--ipe); border: 1.5px solid var(--carvao); }
+h1 { font-family: var(--f-numero); font-weight: 800; font-size: clamp(2.7rem, 5.6vw, 4.9rem); line-height: .95;
+  letter-spacing: -.01em; margin: 0 0 1.5rem; text-transform: uppercase; }
+h1 em { font-style: normal; background: linear-gradient(transparent 62%, var(--ipe) 62% 92%, transparent 92%); }
+.lead { font-size: 1.3rem; line-height: 1.5; color: var(--grafite); max-width: 34rem; margin: 0 0 2rem; }
+.acoes { display: flex; flex-wrap: wrap; gap: .75rem; }
+.micro { margin-top: 1rem; font-size: .95rem; color: var(--pedra); }
+.vitrine { position: relative; padding: 2rem 0 3rem; }
+.tela { border-radius: .75rem; overflow: hidden; border: 2px solid var(--carvao);
+  box-shadow: 0 24px 60px rgba(21, 19, 15, .22), 0 4px 12px rgba(21, 19, 15, .12); background: var(--branco); }
+.tela .barra { display: flex; gap: .4rem; padding: .55rem .8rem; background: var(--carvao); }
+.tela .barra span { width: .6rem; height: .6rem; border-radius: 50%; background: var(--carvao-3); }
+.celular { position: absolute; right: -1rem; bottom: 0; width: 30%; border-radius: 1.6rem; overflow: hidden;
+  border: 6px solid var(--carvao); box-shadow: 0 24px 50px rgba(21, 19, 15, .3); background: var(--carvao); }
+.carimbo { position: absolute; left: -1.25rem; bottom: 1.5rem; display: flex; align-items: center; gap: .6rem; padding: .7rem 1rem;
+  background: var(--carvao); color: var(--branco); border-radius: var(--r); font-family: var(--f-titulo); font-weight: 700;
+  box-shadow: 0 12px 30px rgba(21, 19, 15, .3); clip-path: polygon(0 0, calc(100% - .75rem) 0, 100% .75rem, 100% 100%, 0 100%); }
+.carimbo small { display: block; font-family: var(--f-texto); font-weight: 500; font-size: .8rem; color: var(--nevoa); }
+.carimbo svg { width: 1.6rem; height: 1.6rem; color: var(--ipe); flex: none; }
+
+/* régua */
+.regua { height: 8px; background: var(--regua); }
+.regua-ipe { height: 8px; background: var(--regua-ipe); }
+
+/* números */
+.numeros { background: var(--carvao); color: var(--branco); padding: 4rem 0 3.5rem; }
+.numeros h2 { color: var(--branco); }
+.grade-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
+.numero b { display: block; font-family: var(--f-numero); font-weight: 800; font-size: clamp(3rem, 6vw, 4.6rem); line-height: 1;
+  color: var(--ipe); margin: 1.25rem 0 .6rem; }
+.numero p { margin: 0 0 .75rem; font-size: 1.1rem; color: var(--cal); }
+.fonte { font-size: .82rem; color: var(--nevoa); line-height: 1.45; }
+.numeros .fonte a { color: var(--nevoa); }
+
+/* seções */
+section { scroll-margin-top: 5rem; }
+.secao { padding: 5rem 0; }
+.olho { font-family: var(--f-titulo); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: .9rem;
+  display: flex; align-items: center; gap: .6rem; margin: 0 0 .75rem; }
+.olho::before { content: ""; width: .7rem; height: .7rem; background: var(--ipe); border: 1.5px solid currentColor; }
+h2 { font-family: var(--f-titulo); font-weight: 700; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; margin: 0 0 1rem; max-width: 44rem; }
+.sub { font-size: 1.2rem; color: var(--grafite); max-width: 42rem; margin: 0 0 2.5rem; }
+
+.insight { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; align-items: start; }
+.contraste { display: grid; gap: 1rem; }
+.contraste div { padding: 1.4rem 1.5rem; border-radius: var(--r); background: var(--branco); border: 1.5px solid var(--poeira); }
+.contraste div.chao { background: var(--carvao); color: var(--branco); border-color: var(--carvao); }
+.contraste h3 { font-family: var(--f-titulo); font-weight: 700; font-size: 1.35rem; margin: 0 0 .35rem; }
+.contraste p { margin: 0; color: inherit; opacity: .9; }
+
+.passos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; counter-reset: p; }
+.passo { background: var(--branco); border-radius: var(--r); padding: 1.75rem 1.4rem 1.5rem; position: relative;
+  box-shadow: inset 1.5px 0 0 var(--poeira), inset -1.5px 0 0 var(--poeira), inset 0 -1.5px 0 var(--poeira); }
+.passo::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: var(--regua); }
+.passo .n { font-family: var(--f-numero); font-weight: 800; font-size: 2.6rem; line-height: 1; margin-bottom: .75rem; }
+.passo h3 { font-family: var(--f-titulo); font-weight: 700; font-size: 1.3rem; margin: 0 0 .5rem; }
+.passo p { margin: 0; color: var(--grafite); font-size: 1rem; }
+.passo .ia { display: inline-block; margin-top: 1rem; font-family: var(--f-titulo); font-weight: 600; font-size: .85rem;
+  padding: .15rem .55rem; border-radius: var(--r); background: var(--cal-2); }
+
+.papeis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+.papel { border-radius: var(--r); padding: 1.75rem; border: 2px solid var(--carvao); background: var(--branco); }
+.papel.regra { background: var(--carvao); color: var(--branco); }
+.papel.humano { background: var(--ipe); }
+.papel .tag { font-family: var(--f-numero); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: .95rem; }
+.papel h3 { font-family: var(--f-titulo); font-weight: 700; font-size: 1.6rem; line-height: 1.15; margin: .5rem 0 .6rem; }
+.papel p { margin: 0; }
+
+.resultados { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; }
+.res { background: var(--branco); border-radius: var(--r); padding: 1.4rem 1.2rem; border: 1.5px solid var(--poeira); }
+.res b { display: block; font-family: var(--f-numero); font-weight: 800; font-size: 2.5rem; line-height: 1; margin-bottom: .5rem; }
+.res p { margin: 0; font-size: .98rem; color: var(--grafite); }
+.res small { display: block; margin-top: .5rem; font-size: .8rem; color: var(--pedra); }
+.nota { margin-top: 1.25rem; font-size: .88rem; color: var(--pedra); max-width: 56rem; }
+
+.publicos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+.publico { padding-top: 1.25rem; position: relative; }
+.publico::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: var(--regua); }
+.publico h3 { font-family: var(--f-titulo); font-weight: 700; font-size: 1.4rem; margin: .75rem 0 .5rem; }
+.publico ul { margin: 0; padding-left: 1.1rem; color: var(--grafite); }
+.publico li { margin: .3rem 0; }
+
+.escuro { background: var(--carvao); color: var(--branco); }
+.escuro h2, .escuro .olho { color: var(--branco); }
+.escuro .sub { color: var(--nevoa); }
+.garantias { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.garantia { background: var(--carvao-2); border: 1.5px solid var(--carvao-3); border-radius: var(--r); padding: 1.5rem; }
+.garantia svg { width: 1.8rem; height: 1.8rem; color: var(--ipe); }
+.garantia h3 { font-family: var(--f-titulo); font-weight: 700; font-size: 1.25rem; margin: .75rem 0 .4rem; }
+.garantia p { margin: 0; color: var(--nevoa); font-size: 1rem; }
+
+.modelo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 3rem; align-items: center; }
+.precos { display: grid; gap: .75rem; }
+.preco { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 1rem 1.25rem;
+  background: var(--branco); border: 1.5px solid var(--poeira); border-radius: var(--r); }
+.preco.dest { border: 2px solid var(--carvao); box-shadow: 6px 6px 0 var(--ipe); }
+.preco span { font-family: var(--f-titulo); font-weight: 600; font-size: 1.1rem; }
+.preco b { font-family: var(--f-numero); font-weight: 800; font-size: 2rem; }
+
+.chamada { background: var(--ipe); padding: 4.5rem 0; }
+.chamada .envolve { display: grid; grid-template-columns: minmax(0, 1.4fr) auto; gap: 2rem; align-items: center; }
+.chamada h2 { margin: 0 0 .5rem; }
+.chamada p { margin: 0; font-size: 1.15rem; max-width: 40rem; }
+
+.rodape { background: var(--carvao); color: var(--nevoa); padding: 3rem 0 2.5rem; font-size: .92rem; }
+.rodape .envolve { display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; align-items: flex-start; }
+.rodape .marca b { color: var(--branco); }
+.rodape a { color: var(--cal); }
+.rodape nav { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+.rodape p { margin: .75rem 0 0; max-width: 34rem; }
+
+@media (max-width: 1000px) {
+  .heroi .envolve, .insight, .modelo { grid-template-columns: minmax(0, 1fr); }
+  .passos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .resultados { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .papeis, .publicos, .garantias, .grade-3 { grid-template-columns: minmax(0, 1fr); }
+  .chamada .envolve { grid-template-columns: minmax(0, 1fr); }
+  .nav { display: none; }
+  .topo .btn { margin-left: auto; }
+}
+@media (max-width: 560px) {
+  .envolve { padding: 0 1rem; }
+  .heroi { padding: 2.5rem 0 2rem; }
+  .passos, .resultados { grid-template-columns: minmax(0, 1fr); }
+  .celular { width: 34%; right: -.25rem; }
+  .carimbo { left: -.25rem; bottom: .5rem; font-size: .9rem; }
+  .secao { padding: 3.5rem 0; }
+  .acoes .btn { width: 100%; }
+  .marca b { font-size: 1.35rem; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+</style>
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<header class="topo">
+  <div class="envolve">
+    <a class="marca" href="#topo" aria-label="Laudo Vivo, início">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="11" fill="#FFC414"/><g fill="#15130F"><path d="M13 11H26V40H53V53H13Z"/><rect x="30" y="24" width="12" height="12"/></g></svg>
+      <b>LAUDO VIVO</b>
+    </a>
+    <nav class="nav" aria-label="Seções">
+      <a href="#como">Como funciona</a>
+      <a href="#resultados">Resultados</a>
+      <a href="#seguranca">Segurança</a>
+      <a href="#modelo">Modelo</a>
+    </nav>
+    <a class="btn btn-pri" href="/">Testar a demo</a>
+  </div>
+</header>
+
+<main id="conteudo">
+<section class="heroi" id="topo">
+  <div class="envolve">
+    <div>
+      <div class="selo-linha">
+        <span class="etiqueta"><i></i>Fiscalização do crédito rural</span>
+        <span class="etiqueta">MCR 2-7 · Res. CMN 5.267</span>
+      </div>
+      <h1>A prova do crédito rural, do satélite <em>ao curral</em>.</h1>
+      <p class="lead">Um agente conduz a visita da fiscal pelo celular, confere vídeo, foto, nota e GTA contra as regras do MCR e entrega o laudo pronto para ela assinar, com a trilha de cada item.</p>
+      <div class="acoes">
+        <a class="btn btn-pri" href="/">Testar a demo agora
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-sec" href="https://github.com/E-crls/akcit-camp">Ver código e resultados</a>
+      </div>
+      <p class="micro">Demonstração com dados sintéticos e fiscal fictícia · abre no celular, sem cadastro.</p>
+    </div>
+    <div class="vitrine">
+      <div class="tela">
+        <div class="barra" aria-hidden="true"><span></span><span></span><span></span></div>
+        <img src="img/tela-fiscalizacao.jpg" width="1600" height="900" alt="Tela da fiscalização no computador: o agente bloqueia o rascunho porque faltam 3 itens, e o laudo mostra a foto da cerca a 650 m da área e a contagem de 12 de 29 animais financiados como divergente.">
+      </div>
+      <div class="celular"><img src="img/celular-selado.jpg" width="585" height="1266" alt="Tela do celular com o laudo selado."></div>
+      <div class="carimbo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span>Laudo selado<small>assinado pela fiscal · cadeia de hash</small></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="regua" aria-hidden="true"></div>
+
+<section class="numeros" aria-labelledby="t-por-que">
+  <div class="envolve">
+    <p class="olho">Por que agora</p>
+    <h2 id="t-por-que">A fiscalização virou obrigação com prova. E a prova está no chão.</h2>
+    <div class="grade-3">
+      <div class="numero">
+        <b>01/03/2026</b>
+        <p>A Res. CMN 5.267 entrou em vigor: método verificável, amostra com critério e registro para o Banco Central.</p>
+        <div class="fonte">Banco Central, Res. CMN 5.267 de 28/11/2025, art. 2º.</div>
+      </div>
+      <div class="numero">
+        <b>98,4%</b>
+        <p>das operações com gado em Goiás ficam fora do satélite obrigatório: só 301 de 19.009 caem nele.</p>
+        <div class="fonte">Sicor/BCB, Goiás, jan–set/2026 (arquivo de 07/10/2026), cálculo da equipe.</div>
+      </div>
+      <div class="numero">
+        <b>368</b>
+        <p>desclassificações por aplicação não comprovada em 2026, até 13/10, no Brasil. Em 2025 inteiro, foram 349.</p>
+        <div class="fonte">Sicor/BCB, motivo 013, arquivo de 14/10/2026. Desclassificação registrada não é ilícito: é a operação que perde a condição de crédito rural.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="secao" aria-labelledby="t-insight">
+  <div class="envolve insight">
+    <div>
+      <p class="olho">O que falta</p>
+      <h2 id="t-insight">O satélite vê o pasto. A prova do investimento está no curral, na cerca e no papel.</h2>
+      <p class="sub">Nota, GTA, contagem e foto da cerca viram papel avulso e laudo digitado depois da visita. Quando o banco precisa mostrar como fiscalizou, a trilha não existe.</p>
+    </div>
+    <div class="contraste">
+      <div><h3>Do céu</h3><p>Imagem e alerta mostram se há pasto ou lavoura na gleba. Não conferem a nota, a GTA nem se os animais são os financiados.</p></div>
+      <div class="chao"><h3>Do chão, com o Laudo Vivo</h3><p>Cada item financiado ganha a sua prova: vídeo contado, foto dentro da gleba, nota e GTA conferidas, e a regra do MCR que decide.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="secao" id="como" aria-labelledby="t-como" style="padding-top:0">
+  <div class="envolve">
+    <p class="olho">Como funciona</p>
+    <h2 id="t-como">Uma visita guiada, item por item, até o laudo assinado.</h2>
+    <p class="sub">A fiscal conversa com o agente por texto ou voz. Ele diz a próxima prova, confere o que chega e não deixa o laudo sair com pendência.</p>
+    <div class="passos">
+      <article class="passo"><div class="n">01</div><h3>Triagem e método</h3><p>Por que a operação caiu na amostra e qual método a regra pede, antes de sair para o campo.</p><span class="ia">regras</span></article>
+      <article class="passo"><div class="n">02</div><h3>Prova de campo</h3><p>Vídeo do lote no brete com contagem por visão computacional, foto com GPS dentro da gleba e a série do Sentinel-2.</p><span class="ia">visão + satélite</span></article>
+      <article class="passo"><div class="n">03</div><h3>Papel conferido</h3><p>A IA lê a nota impressa e a GTA e pede só o que faltou; as regras conferem dígito verificador, somas e datas.</p><span class="ia">leitura + regras</span></article>
+      <article class="passo"><div class="n">04</div><h3>Laudo selado</h3><p>A fiscal revisa e assina com PIN. O selo é uma cadeia de hash: uma cópia alterada não confere.</p><span class="ia">humano assina</span></article>
+    </div>
+  </div>
+</section>
+
+<section class="secao" aria-labelledby="t-papeis" style="padding-top:0">
+  <div class="envolve">
+    <p class="olho">Quem conversa não confere</p>
+    <h2 id="t-papeis">A IA lê. A regra decide. O humano assina.</h2>
+    <div class="papeis">
+      <div class="papel"><span class="tag">IA</span><h3>Lê o papel e a fala</h3><p>O que um formulário não consegue: a nota fotografada, a GTA, o vídeo do curral e o que a fiscal diz em campo.</p></div>
+      <div class="papel regra"><span class="tag">Regras, sem IA</span><h3>Garantem o que é aceito</h3><p>Política e verificador determinísticos dão o status de cada item e citam o item do MCR 2-7 em que se apoiam.</p></div>
+      <div class="papel humano"><span class="tag">Humano</span><h3>A assinatura é sempre da fiscal</h3><p>O agente monta o rascunho; nada sai sem a revisão e o PIN de quem responde pela fiscalização.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="secao" id="resultados" aria-labelledby="t-res" style="padding-top:0">
+  <div class="envolve">
+    <p class="olho">Resultados, com os limites</p>
+    <h2 id="t-res">Medido antes de chegar aqui, num teste congelado.</h2>
+    <div class="resultados">
+      <div class="res"><b>9 de 9</b><p>defeitos plantados achados</p><small>IC 95%: 70–100%</small></div>
+      <div class="res"><b>0 de 10</b><p>operações válidas bloqueadas</p><small>IC 95%: 0–28%</small></div>
+      <div class="res"><b>0/80</b><p>ataques da equipe passaram; no red-team cego, 6/30</p><small>IC: 0–5% e 10–37%</small></div>
+      <div class="res"><b>12 × 304</b><p>toques na tela: agente × formulário</p><small>fiscal simulado</small></div>
+      <div class="res"><b>40 de 40</b><p>regras apontam o item da norma</p><small>28 com o texto literal</small></div>
+    </div>
+    <p class="nota">Teste de 24 casos sintéticos, congelado em 16/10/2026; fiscal simulado; nenhum cliente ou piloto ainda. Os relatórios e o código estão no repositório público.</p>
+  </div>
+</section>
+
+<section class="secao" aria-labelledby="t-quem" style="padding-top:0">
+  <div class="envolve">
+    <p class="olho">Para quem</p>
+    <h2 id="t-quem">Feito para quem fiscaliza e para quem responde pela fiscalização.</h2>
+    <div class="publicos">
+      <div class="publico"><h3>Cooperativas e bancos</h3><ul><li>Prova de cada item para o Banco Central e para a Justiça</li><li>Amostra com critério e método pela regra</li><li>Pacote de exibição com a trilha</li></ul></div>
+      <div class="publico"><h3>Fiscais e técnicos</h3><ul><li>Visita guiada pelo celular, por texto ou voz</li><li>Pede só o que falta: menos digitação</li><li>Laudo pronto para revisar no fim da visita</li></ul></div>
+      <div class="publico"><h3>Auditoria e jurídico</h3><ul><li>Cada status aponta a prova e a regra</li><li>Pedidos de pressão recusados e registrados</li><li>Selo que se confere sem a instalação</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="secao escuro" id="seguranca" aria-labelledby="t-seg">
+  <div class="envolve">
+    <p class="olho">Segurança e LGPD</p>
+    <h2 id="t-seg">O dado do associado fica com a cooperativa.</h2>
+    <p class="sub">No produto, os modelos rodam na máquina da cooperativa. A demonstração pública usa só dados sintéticos e, para a mensagem livre, um LLM em nuvem.</p>
+    <div class="garantias">
+      <div class="garantia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><h3>Modelo local</h3><p>LLM de 4B, Whisper e YOLOX na máquina: nenhum dado sai dela.</p></div>
+      <div class="garantia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg><h3>Dado pessoal mascarado</h3><p>CPF e chave da nota mascarados nos registros; brutos por 90 dias e depois o expurgo.</p></div>
+      <div class="garantia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg><h3>Papéis claros</h3><p>A cooperativa é a controladora; nós operamos. Parecer jurídico de LGPD e sigilo ainda a fazer.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="secao" id="modelo" aria-labelledby="t-modelo">
+  <div class="envolve modelo">
+    <div>
+      <p class="olho">Modelo de negócio</p>
+      <h2 id="t-modelo">A cooperativa paga por fiscalização concluída.</h2>
+      <p class="sub">Nunca pelo resultado do laudo e nunca pelo mutuário da operação. Preços-alvo do plano de negócio, ainda não testados com cliente.</p>
+    </div>
+    <div class="precos">
+      <div class="preco dest"><span>Avulsa, preço-alvo</span><b>R$ 79</b></div>
+      <div class="preco"><span>Pacote de 50, preço-alvo</span><b>R$ 65</b></div>
+      <div class="preco"><span>Pacote de 100, preço-alvo</span><b>R$ 59</b></div>
+      <div class="preco"><span>Piloto Fundador, preço-alvo</span><b>R$ 39</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="chamada" aria-labelledby="t-chamada">
+  <div class="envolve">
+    <div>
+      <h2 id="t-chamada">Procuramos uma cooperativa goiana para o primeiro teste.</h2>
+      <p>De 20 a 50 operações já fiscalizadas, comparando o laudo do Laudo Vivo com o que foi feito. Depois, o Piloto Fundador.</p>
+    </div>
+    <div class="acoes">
+      <a class="btn btn-escuro" href="/">Testar a demo</a>
+      <a class="btn btn-sec" href="https://github.com/E-crls/akcit-camp">Abrir o repositório</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="rodape">
+  <div class="envolve">
+    <div>
+      <a class="marca" href="#topo" aria-label="Laudo Vivo, voltar ao início">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="11" fill="#FFC414"/><g fill="#15130F"><path d="M13 11H26V40H53V53H13Z"/><rect x="30" y="24" width="12" height="12"/></g></svg>
+        <b>LAUDO VIVO</b>
+      </a>
+      <p>AKCIT Camp 2026, regional de Goiânia. Dados, documentos e vídeos de teste sintéticos; fiscal simulado; custos e mercado são estimativas.</p>
+    </div>
+    <nav aria-label="Rodapé">
+      <a href="/">Demo</a>
+      <a href="https://github.com/E-crls/akcit-camp">Repositório</a>
+      <a href="https://github.com/E-crls/akcit-camp/blob/main/laudo-vivo/LICENSE">Licença</a>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
