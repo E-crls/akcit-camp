@@ -21,7 +21,7 @@ DURACAO_S = 12 * 3600
 # o cartão de agente A2A é público por natureza: é como outro agente descobre o Laudo Vivo (`agent.json` e o caminho
 # da versão 0.3 do A2A, `agent-card.json`)
 CARTAO_A2A = ("/.well-known/agent.json", "/.well-known/agent-card.json")
-ABERTOS = ("/entrar.html", "/api/entrar", "/api/saude", "/icone.svg", "/favicon.ico", *CARTAO_A2A)
+ABERTOS = ("/entrar.html", "/api/entrar", "/api/saude", "/api/contato", "/icone.svg", "/favicon.ico", *CARTAO_A2A)
 PREFIXOS_ABERTOS = ("/site/", "/vendor/fonts/")
 TENTATIVAS, JANELA_S = 20, 600
 

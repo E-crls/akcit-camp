@@ -3,8 +3,8 @@
 import { codigoBlocos, codigoCurto, etapasLaudo, textoIndicador, textoMarcaDiv } from "./regras.js";
 import { abrirModal, chipStatus, copiar, h, icone } from "./ui.js";
 
-// Régua: carvão = pronto; ipê-roxo = divergente sem justificativa; ipê = a vez (o item do AGORA); listrado claro = falta.
-// A divergência justificada conta como pronta e guarda um filete ipê-roxo. Nunca só cor: o texto vai ao lado.
+// Régua: tinta = pronto; vermelho = divergente sem justificativa; âmbar = a vez (o item do AGORA); listrado claro = falta.
+// A divergência justificada conta como pronta e guarda um filete vermelho. Nunca só cor: o texto vai ao lado.
 export function barraProgresso(ind) {
   return h("div", { class: "prog", "aria-hidden": "true" }, ind.segs.map((s) => h("i", { class: s === "falta" ? "" : s })));
 }
@@ -59,7 +59,7 @@ export function trilhaEtapas(e, { comQuem = false, fiscal, segundos = false } = 
     comQuem && x.quem ? h("span", { class: "et-d" }, x.quem) : null)));
 }
 
-// Placar: números grandes lado a lado, com o filete de cor de cada bloco (carvão, verde, ipê-roxo). A linha do número
+// Placar: números grandes lado a lado, com o filete de cor de cada bloco (tinta, verde, vermelho). A linha do número
 // tem altura fixa e alinha pela linha de base: o "R$ … mi" não empurra o rótulo do bloco para baixo.
 export function placar(blocos, { cls = "" } = {}) {
   return h("div", { class: `placar${cls ? ` ${cls}` : ""}`, style: { "--n": String(blocos.length) } }, blocos.map((b) => h("div", { class: b.cls || null },

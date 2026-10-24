@@ -1,5 +1,5 @@
-# Link curto do QR: <site_curto>.web.app (Firebase Hosting, grátis) redireciona para a demo no Cloud Run, com o caminho.
-# Só redireciona (302): a demo, a sessão e o cookie continuam no domínio do Cloud Run.
+# Link curto do QR: <site_curto>.web.app (Firebase Hosting, grátis). A página do produto fica em /site/ no próprio domínio;
+# o resto redireciona (302) para a demo no Cloud Run, onde ficam a sessão, o cookie e a senha.
 
 resource "google_project_service" "firebase" {
   for_each = toset(["firebase.googleapis.com", "firebasehosting.googleapis.com"])
@@ -25,24 +25,5 @@ resource "google_firebase_hosting_site" "curto" {
   depends_on = [google_firebase_project.atual]
 }
 
-resource "google_firebase_hosting_version" "curto" {
-  count    = local.com_servico ? 1 : 0
-  provider = google-beta
-  site_id  = google_firebase_hosting_site.curto[0].site_id
-
-  config {
-    redirects {
-      regex       = "^/(.*)$"
-      status_code = 302
-      location    = "${google_cloud_run_v2_service.site[0].uri}/:1"
-    }
-  }
-}
-
-resource "google_firebase_hosting_release" "curto" {
-  count        = local.com_servico ? 1 : 0
-  provider     = google-beta
-  site_id      = google_firebase_hosting_site.curto[0].site_id
-  version_name = google_firebase_hosting_version.curto[0].name
-  message      = "link curto da demo"
-}
+# O conteúdo e o redirecionamento (versão e release do Hosting) são publicados por publicar_site.py: a página do
+# produto vai como arquivo estático e o resto redireciona para a demo.

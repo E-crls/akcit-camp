@@ -49,6 +49,7 @@ Uso: `scripts/py.sh -m laudo.api --llm ollama --ferramentas mistas` (ver `script
 from __future__ import annotations
 
 import hmac
+import json
 import logging
 from collections.abc import Callable
 from pathlib import Path
@@ -70,7 +71,7 @@ from pydantic import BaseModel, Field, model_validator
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from laudo.api import acesso, eventos
+from laudo.api import acesso, contato, eventos
 from laudo.api import publica as publica_mod
 from laudo.api.servico import LIMITE_AUDIO_MB, LIMITE_UPLOAD_MB, Config, ErroServico, Servico, checar_id
 
@@ -275,6 +276,12 @@ def cartao_agente(base: str) -> dict[str, Any]:
     }
 
 
+def _origem_contato(request: Request) -> bool:
+    """O formulário de contato pode vir da página do produto no domínio curto (ou do próprio serviço)."""
+    origem = (request.headers.get("origin") or "").rstrip("/")
+    return not origem or _mesma_origem(request) or origem in contato.origens()
+
+
 def _mesma_origem(request: Request) -> bool:
     """Sem `Origin` (cliente que não é navegador) ou com a mesma origem do pedido."""
     origem = request.headers.get("origin")
@@ -387,7 +394,8 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
         @app.middleware("http")
         async def _sessao(request: Request, call_next):
             # POST de outro site (CSRF): só a própria origem muda o estado do visitante
-            if request.method not in ("GET", "HEAD", "OPTIONS") and not _mesma_origem(request):
+            if (request.method not in ("GET", "HEAD", "OPTIONS") and not _mesma_origem(request)
+                    and not (request.url.path == "/api/contato" and _origem_contato(request))):
                 eventos.evento("recusa_limite", limite="origem", status=403)
                 return JSONResponse({"erro": "origem não permitida"}, status_code=403)
             token = request.cookies.get(publica_mod.COOKIE)
@@ -453,6 +461,32 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
         if publica:
             resp.headers.setdefault("Content-Security-Policy", CSP_PUBLICA)
         return resp
+
+    # -- contato (formulário da página do produto) ---------------------------------------------
+    teto_contato = contato.Teto()
+
+    @app.post("/api/contato")
+    async def contato_novo(request: Request):
+        # corpo JSON enviado como text/plain (pedido simples, sem preflight de CORS) da página do produto
+        origem = request.headers.get("origin") or ""
+        cab = {"Access-Control-Allow-Origin": origem} if origem and _origem_contato(request) else {}
+        try:
+            dados = contato.Contato.model_validate(json.loads((await request.body())[:20000] or b"{}"))
+        except (ValueError, TypeError):
+            return JSONResponse({"erro": "Confira nome e e-mail."}, status_code=422, headers=cab)
+        if not dados.consentimento:
+            return JSONResponse({"erro": "Marque a autorização de contato."}, status_code=422, headers=cab)
+        if dados.site:  # campo-isca preenchido: robô; responde ok e não guarda
+            return JSONResponse({"ok": True}, headers=cab)
+        if not teto_contato.permitir(ip_do_cliente(request)):
+            return JSONResponse({"erro": "Muitos envios. Tente de novo em alguns minutos."}, status_code=429, headers=cab)
+        try:
+            await run_in_threadpool(contato.guardar, dados, Path(cfg.dados))
+        except Exception:  # o motivo vai ao log; a pessoa vê uma frase simples
+            log.exception("contato não gravado")
+            return JSONResponse({"erro": "Não deu para enviar agora. Tente de novo."}, status_code=503, headers=cab)
+        eventos.evento("contato")
+        return JSONResponse({"ok": True}, headers=cab)
 
     # -- saúde, carteira, mapa ------------------------------------------------------------
     @app.get("/api/saude")

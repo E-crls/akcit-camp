@@ -38,7 +38,7 @@ SERVICO=$(g run services describe "$NOME" --region "$REG" --format=json)
 TEM_SERVICO=$([ -n "$SERVICO" ] && echo 1 || echo 0)
 conta "serviços do Cloud Run" "$TEM_SERVICO" g run services list --format="value(metadata.name)"
 conta "repositórios do Artifact Registry" 1 g artifacts repositories list --location "$REG" --format="value(name)"
-conta "buckets" 1 g storage buckets list --format="value(name)"
+conta "buckets" 2 g storage buckets list --format="value(name)"
 conta "contas de serviço da demo" 2 bash -c "gcloud --project $PROJ iam service-accounts list --format='value(email)' 2>/dev/null | grep '^$NOME-'"
 conta "métricas de log" 4 bash -c "gcloud --project $PROJ logging metrics list --format='value(name)' 2>/dev/null | grep '^laudo_'"
 conta "painéis" 1 bash -c "curl -s -H 'Authorization: Bearer $TOKEN' https://monitoring.googleapis.com/v1/projects/$PROJ/dashboards | python -c \"import json,sys; [print(d['displayName']) for d in json.load(sys.stdin).get('dashboards',[])]\""
@@ -87,8 +87,9 @@ EOF
   cod=$(curl -s -o /dev/null -w '%{http_code}' -m 30 "$URL/api/fiscalizacoes"); echo "        API sem login: HTTP $cod (401 com a senha ligada, 200 sem ela)"
   CURTA=$(terraform output -raw url_curta 2>/dev/null)
   if [ -n "$CURTA" ]; then
-    loc=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' -m 30 "$CURTA/site/")
-    case "$loc" in "302 $URL/site/"*) ok "link curto $CURTA → $URL" ;; *) ruim "link curto: $loc" ;; esac
+    loc=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' -m 30 "$CURTA/")
+    case "$loc" in "302 $URL/"*) ok "link curto $CURTA → demo" ;; *) ruim "link curto: $loc" ;; esac
+    cod=$(curl -s -o /dev/null -w '%{http_code}' -m 30 "$CURTA/site/"); [ "$cod" = 200 ] && ok "página do produto em $CURTA/site/" || ruim "página do produto no link curto: $cod"
   fi
   curl -s -m 30 "$URL/api/saude" | python -c "import json,sys; d=json.load(sys.stdin); print('        saude:', json.dumps({k: d.get(k) for k in ('ok','llm','asr','demo_publica','cfg') if k in d}, ensure_ascii=False)[:400])" 2>/dev/null
   cod=$(curl -s -o /dev/null -w '%{http_code}' -m 10 -H "Origin: https://exemplo.invalido" -X OPTIONS "$URL/api/saude")
