@@ -189,8 +189,9 @@ def test_mensagem_livre_nao_desalinha_os_ids_do_roteiro(publico):
     assert conv[-1].get("livre") is True  # marcado na conversa, que a tela mostra inteira
     _rodar(a)
     _rodar(b)
-    ia, ib = _ids(a), _ids(b)
-    assert [i for i in ia if i in set(ib)] == ib and set(ia) - set(ib)  # os do roteiro iguais; o livre à parte
+    # o passo seguinte volta ao estado do roteiro: a cadeia sai igual à do roteiro limpo; a conversa fica inteira
+    assert _ids(a) == _ids(b)
+    assert any(x.get("livre") for x in a.get(f"/api/fiscalizacoes/{FIS}").json()["conversa"])
     assert a.get("/api/saude").json()["demo_publica"]["uso"]["turnos"] == 1
 
 
@@ -269,8 +270,11 @@ def test_upload_so_foto_video_curto_e_xml_com_teto(publico, tmp_path):
     assert r.status_code == 200, r.text
     ev = [e for e in r.json()["estado"]["evidencias"] if e["tipo"] == "nfe_xml"][-1]
     assert not ev.get("gps")  # a localização do aparelho não entra
-    r = enviar("nfe_xml", "nota2.xml", xml)
-    assert r.status_code == 429 and "arquivos" in r.json()["erro"]  # 3º envio contado (inclui os recusados)
+    # os recusados acima não gastaram vaga: 3 aceitos, e o 4º passa do limite
+    assert enviar("nfe_xml", "nota2.xml", xml).status_code == 200
+    assert enviar("nfe_xml", "nota3.xml", xml).status_code == 200
+    r = enviar("nfe_xml", "nota4.xml", xml)
+    assert r.status_code == 429 and "arquivos" in r.json()["erro"]
     assert not any(p.name == "_entrada" and any(p.iterdir()) for p in (tmp_path / "copias").rglob("_entrada"))
 
 
@@ -360,7 +364,10 @@ def test_limites_do_ambiente():
                                        "LAUDO_DEMO_VIDEO_MAX_S": "15", "LAUDO_DEMO_MAX_FALAS": "x"})
     assert lim.max_sessoes == 7 and lim.ttl_s == 1800 and lim.video_max_s == 15 and lim.max_falas == 25
     p = publica.Limites.do_ambiente({})
-    assert (p.max_sessoes, p.max_turnos, p.max_falas, p.max_uploads) == (300, 40, 25, 12)
+    assert (p.max_sessoes, p.max_turnos, p.max_falas, p.max_uploads) == (400, 40, 25, 12)
+    assert (p.copias_por_ip, p.janela_ip_s, p.ociosa_s) == (150, 600, 120)
+    lim = publica.Limites.do_ambiente({"LAUDO_DEMO_COPIAS_POR_IP": "9", "LAUDO_DEMO_JANELA_IP_MIN": "2"})
+    assert (lim.copias_por_ip, lim.janela_ip_s) == (9, 120)
 
 
 # ---------------------------------------------------------------------------------------------------- lento
