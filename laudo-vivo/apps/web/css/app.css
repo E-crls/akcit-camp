@@ -32,7 +32,7 @@
   --sobre-acao: #FFFFFF; --sobre-acao-2: #D4E2DA; --acao-linha: #A5BDB4;          /* sobre o verde: texto, texto secundário (6,0:1), contorno */
   --destaque: #C0582E; --destaque-vivo: #E8916A;  /* terracota: marcador e número grande (4,49:1 no branco, 3,7:1 na tinta: nunca texto corrido); vivo = texto na tinta (6,9:1) */
   --falta: #B7791F; --falta-claro: #FBF1DC;      /* é com você: âmbar (marca e contorno, 3,6:1), texto sempre tinta; o claro também vale sobre o verde (7,1:1) */
-  --verificado: #15803D; --verificado-claro: #E7F4EC;                             /* só Verificado (branco por cima: 5,0:1) */
+  --verificado: #15803D; --verificado-claro: #E7F4EC;                             /* só Verificado: visto e contorno (5,0:1 no branco); a etiqueta é o claro com texto tinta, nunca chapa verde com texto branco (é o botão) */
   --divergente: #B42318; --divergente-claro: #FDECEA;                             /* só Divergente (branco por cima: 6,6:1; o claro sobre o verde: 7,0:1) */
   --foco: var(--destaque);
   /* forma: um raio só, firme; canto cortado só no lacre */
@@ -154,7 +154,10 @@ img { max-width: 100%; }
 .st { display: inline-flex; align-items: center; gap: .375rem; height: 2rem; padding: 0 .625rem 0 .5rem; border-radius: var(--r-p);
   font-family: var(--f-titulo); font-weight: 700; font-size: 1.0625rem; line-height: 1; white-space: nowrap; }
 .st .ic { width: 1.25rem; height: 1.25rem; }
-.st-ok { background: var(--verificado); color: var(--branco); }
+/* Verificado é etiqueta clara (verde-claro, contorno e visto verdes, texto tinta 14,8:1; o visto dá 4,4:1): chapa verde
+   com texto branco é a gramática do botão (verde-cerrado), e as duas ficavam a só 1,4:1 de distância */
+.st-ok { background: var(--verificado-claro); color: var(--tinta); box-shadow: inset 0 0 0 2px var(--verificado); }
+.st-ok .ic { color: var(--verificado); }
 .st-falta { background: var(--falta-claro); color: var(--tinta); box-shadow: inset 0 0 0 2px var(--falta); }
 .st-falta .ic { color: var(--falta); }
 .st-div { background: var(--divergente); color: var(--branco); }
@@ -490,6 +493,7 @@ body:not(.topo-casa) .usuario-wrap { display: none; }
 .leaflet-container { background: var(--cal-2); font-family: var(--f-texto); }
 .leaflet-bar { border: 0 !important; box-shadow: inset 0 0 0 2px var(--tinta), var(--sombra) !important; border-radius: var(--r) !important; }
 .leaflet-bar a { color: var(--tinta) !important; border-bottom-color: var(--poeira) !important; }
+.leaflet-container .leaflet-control-attribution a { color: var(--tinta); }
 .leaflet-control-zoom a { width: 2.75rem !important; height: 2.75rem !important; line-height: 2.75rem !important; font-size: 1.375rem !important; }
 .cidade span { position: absolute; transform: translate(-.1875rem, -50%); white-space: nowrap; font-family: var(--f-titulo); font-weight: 700; font-size: .875rem;
   color: var(--grafite); padding-left: .5rem;
@@ -787,6 +791,9 @@ body:not(.topo-casa) .usuario-wrap { display: none; }
 .agora .acoes .btn-sec { background: transparent; color: var(--sobre-acao); box-shadow: inset 0 0 0 1.5px var(--acao-linha); }
 .agora .acoes .btn-sec:hover:not(:disabled) { box-shadow: inset 0 0 0 1.5px var(--sobre-acao); background: var(--acao-2); }
 .agora .btn:disabled { background: var(--acao-2); color: var(--sobre-acao-2); box-shadow: none; }
+/* foco no verde: anel branco afastado 2 px (8,0:1 no verde; o terracota dava 1,8:1 ali, e a sombra tinta do foco some
+   sob o box-shadow dos botões do cartão) */
+.agora :focus-visible { outline-color: var(--sobre-acao); outline-offset: 2px; }
 /* demonstração pública, passo do roteiro sem arquivo: no celular, "Executar passo" numa linha só e a câmera e a galeria
    embaixo (no computador os botões já ficam em coluna) */
 @media (max-width: 1099.98px) {
@@ -809,9 +816,12 @@ body:not(.topo-casa) .usuario-wrap { display: none; }
 .faltas-curtas { list-style: none; display: flex; flex-direction: column; gap: .375rem; margin: .5rem 0; }
 .faltas-curtas li { display: flex; align-items: center; gap: .625rem; font-family: var(--f-titulo); font-weight: 700; font-size: 1.0625rem; }
 .faltas-curtas .si { width: 1.75rem; height: 1.75rem; }
-/* no verde do AGORA os ícones vão nos tons claros (o âmbar e o vermelho cheios dão 2,2:1 e 1,2:1 ali): a forma diz o status */
-.faltas-curtas .si-div { color: var(--divergente-claro); }
-.faltas-curtas .si-falta { color: var(--falta-claro); }
+/* no verde do AGORA o âmbar e o vermelho cheios dão 2,2:1 e 1,2:1, e os dois em tom claro viravam o mesmo branco: cada
+   ícone vai numa plaquinha clara com a cor do status (âmbar 3,2:1 no creme, vermelho 5,7:1 no rosado; a plaquinha dá
+   7:1 contra o verde), então o que falta e o que diverge seguem distintos pela cor, além da forma */
+.faltas-curtas .si .ic { width: 1.25rem; height: 1.25rem; }
+.faltas-curtas .si-div { background: var(--divergente-claro); color: var(--divergente); }
+.faltas-curtas .si-falta { background: var(--falta-claro); color: var(--falta); }
 .residual { padding-left: 1.25rem; margin: .5rem 0 0; display: flex; flex-direction: column; gap: .625rem; }
 .residual li { display: flex; flex-direction: column; gap: .375rem; }
 .residual li::marker { font-family: var(--f-numero); font-weight: 800; color: var(--sobre-acao-2); }

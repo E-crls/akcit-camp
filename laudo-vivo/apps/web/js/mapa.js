@@ -60,6 +60,8 @@ export function miniMapa(el, glebas, gps, distancia = null) {
   const L = window.L;
   const m = L.map(el, { zoomControl: true, attributionControl: true, scrollWheelZoom: false })
     .setView(gps ? [gps.lat, gps.lon] : (glebas?.[0]?.[0] || [-16, -49]), 15);
+  // crédito do Leaflet só em texto (o prefixo padrão traz uma bandeirinha azul e amarela, o único amarelo da tela)
+  m.attributionControl?.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
   if (navigator.onLine !== false) {
     let ok = false; let erros = 0;
     // O OpenStreetMap exige o Referer (sem ele, devolve o tile "Access blocked"); o site manda no-referrer, então só
