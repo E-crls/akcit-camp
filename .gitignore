@@ -72,3 +72,6 @@ apresentacao/
 # pacote da equipe para o Google Drive (código, modelos, dataset e materiais internos; fora do git)
 entrega_equipe/
 negocio/concorrencia/
+
+# vídeo da página do produto (publicado no link curto, fora do git)
+laudo-vivo/apps/web/site/video/

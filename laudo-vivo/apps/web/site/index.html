@@ -1182,8 +1182,20 @@ code { font-family: var(--f-titulo); font-weight: 600; font-size: .8rem; color: 
         <div><b>Recebido. A equipe responde em breve.</b><p>Enquanto isso, a demo guiada abre no celular.</p></div>
       </div>
     </div>
+    <footer class="rodape-video" style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.18);display:flex;flex-wrap:wrap;gap:.75rem 1rem;align-items:center;justify-content:space-between">
+      <p style="margin:0;color:#E7F4EC;font-weight:600">O Laudo Vivo em uso, em 28 segundos</p>
+      <div style="display:flex;flex-wrap:wrap;gap:.75rem">
+        <button type="button" id="ver-video" style="min-height:44px;padding:0 1.25rem;border-radius:10px;border:0;background:#FFFFFF;color:#1E5B43;font:inherit;font-weight:700;cursor:pointer">Ver o vídeo</button>
+        <a href="video/laudo_vivo_em_uso.mp4" download="laudo_vivo_em_uso.mp4" style="display:inline-flex;align-items:center;min-height:44px;padding:0 1.25rem;border-radius:10px;border:2px solid #FFFFFF;color:#FFFFFF;font-weight:700;text-decoration:none">Baixar MP4</a>
+      </div>
+    </footer>
   </div>
 </section>
+<dialog id="dlg-video" aria-label="O Laudo Vivo em uso" style="padding:0;border:0;border-radius:16px;background:#111A15;max-width:min(92vw,1100px);width:100%">
+  <video id="video-uso" controls playsinline preload="none" poster="video/poster.jpg" style="display:block;width:100%;height:auto;border-radius:16px 16px 0 0" src="video/laudo_vivo_em_uso.mp4"></video>
+  <div style="display:flex;justify-content:flex-end;gap:.75rem;padding:.75rem 1rem"><a href="video/laudo_vivo_em_uso.mp4" download="laudo_vivo_em_uso.mp4" style="color:#E7F4EC;font-weight:600;align-self:center">Baixar MP4</a><button type="button" id="fechar-video" style="min-height:44px;padding:0 1.25rem;border-radius:10px;border:0;background:#1E5B43;color:#fff;font:inherit;font-weight:700;cursor:pointer">Fechar</button></div>
+</dialog>
+<script>(function(){var d=document.getElementById("dlg-video"),v=document.getElementById("video-uso");document.getElementById("ver-video").addEventListener("click",function(){d.showModal();try{v.play()}catch(e){}});document.getElementById("fechar-video").addEventListener("click",function(){v.pause();d.close()});d.addEventListener("close",function(){v.pause()});})();</script>
 </main>
 
 <nav class="indice" aria-label="Partes da página">
