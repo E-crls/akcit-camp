@@ -753,5 +753,14 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
 
     web = Path(cfg.web)
     if web.is_dir():
+        # o navegador pede /favicon.ico sozinho quando abre um JSON (o cartão A2A, /api/agentes): o ícone da
+        # interface, em vez de um 404 no console
+        icone = web / "icone.svg"
+        if icone.is_file():
+
+            @app.get("/favicon.ico", include_in_schema=False)
+            def favicon():
+                return FileResponse(icone, media_type="image/svg+xml")
+
         app.mount("/", StaticFiles(directory=str(web), html=True), name="web")
     return app

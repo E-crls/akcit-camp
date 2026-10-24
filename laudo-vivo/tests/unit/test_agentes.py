@@ -102,6 +102,9 @@ def test_cartao_a2a_aberto_com_senha_da_demo_publica(tmp_path, monkeypatch):
     c = TestClient(criar_app(Config(dados=tmp_path / "api", caso="DEMO-0001", asr="desligado")), follow_redirects=False)
     assert c.get("/.well-known/agent.json").json()["name"] == "Laudo Vivo"
     assert c.get("/.well-known/agent-card.json").json()["name"] == "Laudo Vivo"
+    # o ícone que o navegador pede ao abrir o cartão (sem 404 no console)
+    ic = c.get("/favicon.ico")
+    assert ic.status_code == 200 and ic.headers["content-type"].startswith("image/svg+xml")
     assert c.get("/api/agentes").status_code == 401
     r = c.post("/api/fiscalizacoes/fis_demo_0001/auditoria")
     assert r.status_code == 401 and "lv_sessao" not in r.cookies
