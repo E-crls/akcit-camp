@@ -99,6 +99,9 @@ def test_eventos_uma_linha_json_so_na_demo_publica(monkeypatch, capsys):
     linha = json.loads(capsys.readouterr().out.strip())
     assert linha["severity"] == "INFO" and linha["laudo_evento"] == "upload" and linha["sessao"] == "abc123"
     assert linha["tipo"] == "foto" and linha["mb"] == 1.5
+    assert linha["detalhe"] == "foto"  # rótulo das métricas de log do painel (infra/nuvem/observabilidade.tf)
+    eventos.evento("recusa_limite", limite="falas", tipo="x")
+    assert json.loads(capsys.readouterr().out)["detalhe"] == "falas"  # o limite vem antes do tipo
 
 
 # ---------------------------------------------------------------------------------------------------- isolamento

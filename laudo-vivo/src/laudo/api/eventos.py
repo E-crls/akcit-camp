@@ -55,6 +55,11 @@ def evento(nome: str, **campos: Any) -> dict[str, Any] | None:
     severidade = str(campos.pop("severity", "INFO"))
     linha = {"severity": severidade, "laudo_evento": nome, "sessao": sessao, "t": round(time.time(), 3)}
     linha |= {str(k): _valor(v) for k, v in campos.items()}
+    if "detalhe" not in linha:  # rótulo `detalhe` das métricas de log (infra/nuvem): o campo que qualifica o evento
+        for k in ("canal", "limite", "codigo", "tipo"):
+            if linha.get(k) is not None:
+                linha["detalhe"] = str(linha[k])
+                break
     texto = json.dumps(linha, ensure_ascii=False, default=str)
     with _lock:
         sys.stdout.write(texto + "\n")
