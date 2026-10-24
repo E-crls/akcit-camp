@@ -35,7 +35,7 @@ from typing import Any
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from pydantic import BaseModel, Field
 
-from laudo import demonstracao
+from laudo import demonstracao, isolamento
 from laudo.agent import estado as est
 from laudo.agent.politica import Politica
 from laudo.agent.verificador import ResultadoVerificacao
@@ -132,21 +132,30 @@ def _descricao_curta(texto: str | None) -> str:
     return str(texto or "").split(" — Sicor:")[0].split(" (projeto sintético")[0].strip()
 
 
+def _ctx() -> dict[str, Any]:
+    """Contexto em uso: o da cópia do visitante na demo pública (`laudo.isolamento`), senão o do processo."""
+    local = isolamento.atual()
+    return local.laudo if local is not None else _CTX
+
+
 def configurar(repo: est.RepositorioFiscalizacoes | None = None, politica: Politica | None = None) -> None:
-    _CTX["repo"] = repo
-    _CTX["politica"] = politica
+    ctx = _ctx()
+    ctx["repo"] = repo
+    ctx["politica"] = politica
 
 
 def _repo() -> est.RepositorioFiscalizacoes:
-    if _CTX["repo"] is None:
-        _CTX["repo"] = est.RepositorioFiscalizacoes()
-    return _CTX["repo"]
+    ctx = _ctx()
+    if ctx["repo"] is None:
+        ctx["repo"] = est.RepositorioFiscalizacoes()
+    return ctx["repo"]
 
 
 def _politica() -> Politica:
-    if _CTX["politica"] is None:
-        _CTX["politica"] = Politica()
-    return _CTX["politica"]
+    ctx = _ctx()
+    if ctx["politica"] is None:
+        ctx["politica"] = Politica()
+    return ctx["politica"]
 
 
 # ---------------------------------------------------------------------------

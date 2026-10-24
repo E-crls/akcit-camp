@@ -59,6 +59,7 @@ from laudo.api import casos as casos_mod
 from laudo.api import visao
 from laudo.audit import otel
 from laudo.contracts import GPS, REGISTRO, Fiscalizacao, Operacao
+from laudo.llm.provider import ErroLLM, ReplayProvider
 from laudo.tools.laudo import ErroSelagem, rotulo_metodo
 from laudo.tools.pacote import por_que_na_amostra
 
@@ -76,10 +77,11 @@ _PAPEL_DE = {"gta": "gta", "nfe_xml": "danfe"}
 
 @dataclass
 class Config:
-    llm: str = "roteiro"  # roteiro | ollama | replay
+    # roteiro | ollama | replay | publico (passos gravados do replay, sem custo, e o resto num LLM ao vivo)
+    llm: str = "roteiro"
     ferramentas: str = "falsas"  # falsas | mistas | reais
     caso: str = "roteiro"  # caso aberto pelo botão "demo": roteiro | DEMO-0001 | pasta com caso.yaml
-    replay: str | None = None  # JSONL gravado (llm=replay); padrão: o do caso
+    replay: str | None = None  # JSONL gravado (llm=replay ou publico); padrão: o do caso
     gravar: str | None = None  # grava requisições do Ollama (para virar replay de contingência)
     perfil: str = "campo"
     modelo: str | None = None
@@ -90,6 +92,8 @@ class Config:
     pin: str = field(default_factory=lambda: os.environ.get("LAUDO_PIN") or PIN_DEMO)
     web: Path = field(default_factory=lambda: REPO / "apps" / "web")
     hoje: date | None = None
+    # llm=publico: o provedor ao vivo depois do replay (None: `LAUDO_LLM_LIVRE`, padrão o Gemini no Vertex AI)
+    provedor_livre: Any = field(default=None, repr=False)
 
     def publico(self) -> dict[str, Any]:
         return {
@@ -104,6 +108,88 @@ class Config:
             "gravando": bool(self.gravar),
             "pin_demo": self.pin == PIN_DEMO,
         }
+
+
+class ReplayContado(ReplayProvider):
+    """Replay que conta as requisições fora da gravação (`fora`), para a tela e a observabilidade (llm=publico)."""
+
+    def __init__(self, *a: Any, **k: Any):
+        super().__init__(*a, **k)
+        self.fora = 0
+
+    def chat(self, mensagens, ferramentas=None, formato=None, metadados=None):
+        try:
+            return super().chat(mensagens, ferramentas, formato, metadados)
+        except ErroLLM:
+            self.fora += 1
+            raise
+
+
+# códigos de ErroLLM que passam ao próximo provedor da cadeia (os mesmos de `provider.ProvedorEmCadeia`)
+_PASSA_ADIANTE = frozenset({"REPLAY_AUSENTE", "INDISPONIVEL", "TIMEOUT", "HTTP", "LIMITE"})
+
+
+class _CadeiaMinima:
+    """Só enquanto `laudo.llm.provider.ProvedorEmCadeia` não existe neste ramo: tenta os provedores em ordem;
+    REPLAY_AUSENTE, INDISPONIVEL, TIMEOUT, HTTP e LIMITE passam ao próximo; se todos falham, relança o último
+    ErroLLM (o condutor cai no plano mínimo e na fala por template)."""
+
+    def __init__(self, provedores: list[Any]):
+        self.provedores = list(provedores)
+        self.nome = "cadeia"
+        self.modelo = getattr(self.provedores[0], "modelo", "") if self.provedores else ""
+        # um elo externo basta para o condutor mascarar a PII antes de enviar (a chave do replay já é mascarada)
+        self.externo = any(getattr(p, "externo", False) for p in self.provedores)
+
+    def chat(self, mensagens, ferramentas=None, formato=None, metadados=None):
+        ultimo: ErroLLM | None = None
+        for p in self.provedores:
+            try:
+                return p.chat(mensagens, ferramentas, formato, metadados)
+            except ErroLLM as e:
+                if e.codigo not in _PASSA_ADIANTE:
+                    raise
+                ultimo = e
+        raise ultimo or ErroLLM("INDISPONIVEL", "nenhum provedor na cadeia")
+
+
+def _cadeia(provedores: list[Any]) -> Any:
+    from laudo.llm import provider
+
+    classe = getattr(provider, "ProvedorEmCadeia", None) or _CadeiaMinima
+    return classe(provedores)
+
+
+RESPOSTA_LIVRE_TESTE = (
+    "Entendi. Nesta demonstração, siga o cartão AGORA ou use Executar passo; posso explicar o que cada item "
+    "do laudo pede."
+)
+
+
+def provedor_livre(cfg: Config) -> Any | None:
+    """O LLM ao vivo da cadeia `publico`: `cfg.provedor_livre` (testes) ou `LAUDO_LLM_LIVRE` = `vertex` (padrão:
+    Gemini no Vertex AI, `provider.VertexProvider`), `roteiro` (resposta fixa, para teste local) ou `nenhum`
+    (sem LLM ao vivo: o que não está na gravação cai no plano mínimo e na fala por template)."""
+    if cfg.provedor_livre is not None:
+        return cfg.provedor_livre
+    modo = (os.environ.get("LAUDO_LLM_LIVRE") or "vertex").strip().lower()
+    if modo == "nenhum":
+        return None
+    if modo == "roteiro":
+        from laudo.llm.provider import ProvedorRoteirizado, RespostaLLM
+
+        return ProvedorRoteirizado(lambda *_: RespostaLLM(conteudo=RESPOSTA_LIVRE_TESTE), modelo="roteiro-livre")
+    from laudo.llm import provider
+
+    classe = getattr(provider, "VertexProvider", None)
+    if classe is None:
+        log.warning("LLM ao vivo: VertexProvider ausente neste ramo; fora da gravação, plano mínimo e template")
+        return None
+    try:
+        return classe()
+    except Exception as e:  # noqa: BLE001 - sem credencial, a demo segue pela gravação e pelo template
+        log.warning("LLM ao vivo indisponível (%s: %s)", type(e).__name__, e)
+        return None
 
 
 class ErroServico(Exception):
@@ -134,8 +220,8 @@ class Servico:
         self.dados = Path(cfg.dados)
         self.dados.mkdir(parents=True, exist_ok=True)
         (self.dados / "ui").mkdir(exist_ok=True)
-        otel.configurar(self.dados / "traces")
-        self.repo = est.RepositorioFiscalizacoes(self.dados)
+        self._configurar_traces()
+        self.repo = self._novo_repositorio()
         self.lock = threading.RLock()
         self._casos: dict[str, casos_mod.CasoDemo] = {}
         self.caso_padrao = cfg.caso or casos_mod.caso_padrao()
@@ -149,6 +235,8 @@ class Servico:
         self.cenario = cenario
         self.registro, self.falsas = self._montar_registro(cenario)
         self.roteiro_llm = None
+        self.replay_publico: ReplayContado | None = None  # llm=publico: a gravação (1º elo da cadeia)
+        self.provedor_ao_vivo: Any | None = None  # llm=publico: o LLM ao vivo (2º elo)
         self.provedor = self._novo_provedor()
         self.cond = Condutor(
             self.provedor,
@@ -169,6 +257,13 @@ class Servico:
         self._selos: dict[str, tuple[tuple, dict[str, Any]]] = {}  # conferência do selo por fiscalização
 
     # -- montagem ----------------------------------------------------------------
+    def _configurar_traces(self) -> None:
+        """Traces em `<dados>/traces` (a demo pública troca por uma pasta por visitante: `api.publica`)."""
+        otel.configurar(self.dados / "traces")
+
+    def _novo_repositorio(self) -> est.RepositorioFiscalizacoes:
+        return est.RepositorioFiscalizacoes(self.dados)
+
     def _montar_registro(self, cenario: dict[str, dict[str, Any]]) -> tuple[dict, list[str]]:
         modo = self.cfg.ferramentas
         if modo == "falsas":
@@ -199,13 +294,20 @@ class Servico:
                 hoje=cfg.hoje or datetime.now().astimezone().date(),
                 gravador=Gravador(cfg.gravar) if cfg.gravar else None,
             )
-        if cfg.llm == "replay":
+        if cfg.llm in ("replay", "publico"):
             caso = self.caso(self.caso_padrao)
             gravada = self.dados / "gravacoes" / f"{caso.id}.jsonl"  # rodar_demo.sh --gravar grava aqui
             arq = cfg.replay or (str(gravada) if gravada.exists() else None) or caso.replay_padrao
             if not arq or not Path(arq).exists():
                 raise ErroServico(500, f"replay sem gravação: {arq or 'nenhum arquivo'}")
-            return ReplayProvider(arq, sequencial_se_ausente=True)
+            if cfg.llm == "replay":
+                return ReplayProvider(arq, sequencial_se_ausente=True)
+            # publico: o passo gravado sai da gravação (custo zero); o que não está nela (texto livre, voz) vai ao
+            # LLM ao vivo. Sem substituição sequencial: uma fala nova nunca recebe a resposta de outro passo.
+            self.replay_publico = ReplayContado(arq, sequencial_se_ausente=False)
+            self.provedor_ao_vivo = provedor_livre(cfg)
+            cadeia = [self.replay_publico] + ([self.provedor_ao_vivo] if self.provedor_ao_vivo else [])
+            return _cadeia(cadeia)
         raise ErroServico(500, f"LLM desconhecido: {cfg.llm}")
 
     def caso(self, cid: str) -> casos_mod.CasoDemo:
@@ -257,6 +359,17 @@ class Servico:
         if self.cfg.llm == "replay":
             llm["arquivo"] = str(getattr(self.provedor, "caminho", ""))
             llm["substituicoes"] = getattr(self.provedor, "substituicoes", 0)
+        elif self.cfg.llm == "publico" and self.replay_publico is not None:
+            vivo = self.provedor_ao_vivo
+            llm |= {
+                "modelo": self.replay_publico.modelo,
+                "arquivo": str(self.replay_publico.caminho),
+                "substituicoes": 0,
+                "fora_da_gravacao": self.replay_publico.fora,
+                "ao_vivo": {"nome": getattr(vivo, "nome", ""), "modelo": getattr(vivo, "modelo", "")}
+                if vivo is not None
+                else None,
+            }
         asr = {"modo": self.cfg.asr, "disponivel": self.transcritor is not None}
         if self.transcritor is not None and hasattr(self.transcritor, "estado"):
             asr |= self.transcritor.estado()
@@ -318,7 +431,7 @@ class Servico:
                 return self.estado(caso.fis_id)
             self._apagar_demo(caso.fis_id)
             est.ids_deterministicos(caso.semente_ids)  # o replay casa pela chave da requisição (ids)
-            if self.cfg.llm == "replay":
+            if self.cfg.llm in ("replay", "publico"):
                 self.provedor = self._novo_provedor()
                 self.cond.provedor = self.provedor
             extras: dict[str, Any] = {"id": caso.fis_id}
