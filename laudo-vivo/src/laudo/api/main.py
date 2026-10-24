@@ -17,7 +17,11 @@ Rotas (todas sob `/api`):
 | POST | `/fiscalizacoes/{id}/roteiro/proximo` | próximo passo do roteiro (apresentação/contingência) |
 | POST | `/fiscalizacoes/{id}/roteiro/pular` | avança o roteiro sem executar o passo ("Pular passo") |
 | POST | `/fiscalizacoes/{id}/rascunho` | pedido humano de rascunho (pode voltar BLOQUEADO_POLITICA) |
+| POST | `/fiscalizacoes/{id}/auditoria` | Agente Auditor: parecer antes de assinar (só lê; não muda status) |
 | POST | `/fiscalizacoes/{id}/assinar` | assinatura humana: PIN + hash raiz conferido |
+| GET | `/agentes` | agentes, guarda-corpos e interoperabilidade (MCP, A2A) — `laudo.agentes` |
+
+Fora de `/api`: `GET /.well-known/agent.json`, o cartão de agente A2A (aberto também com a senha da demo pública).
 | GET | `/fiscalizacoes/{id}/laudo`, `/laudo.html` | laudo JSON / HTML (links item → evidência → trace) |
 | POST | `/fiscalizacoes/{id}/pacote` | pacote de exibição BCB/Justiça (só SELADO; ação humana, sem LLM) |
 | GET | `/fiscalizacoes/{id}/pacote.zip` | ZIP do pacote (manifest sha256, GeoJSON, cenas, checklist…) |
@@ -194,6 +198,80 @@ def ip_do_cliente(request: Request) -> str:
 # Demo pública: CSP mínima, que não quebra a interface (o mapa usa tiles externos: script, estilo, imagem e conexão
 # ficam como estão)
 CSP_PUBLICA = "frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
+
+
+def base_publica(request: Request) -> str:
+    """A origem que o cliente usou (atrás do Cloud Run, pelo X-Forwarded-Proto/Host)."""
+    proto = (request.headers.get("x-forwarded-proto") or request.url.scheme or "http").split(",")[0].strip()
+    host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.netloc).split(",")[0]
+    return f"{proto}://{host.strip()}"
+
+
+def descrever_agentes() -> dict[str, Any]:
+    """Agentes, guarda-corpos e interoperabilidade: as ferramentas que o servidor MCP expõe e o cartão A2A."""
+    from laudo import agentes
+    from laudo.mcp_server import MUTAVEIS, PROTOCOLOS, ServidorMCP
+
+    mcp = ServidorMCP()
+    return agentes.descrever() | {
+        "interop": {
+            "mcp": {
+                "transporte": "stdio (JSON-RPC 2.0)",
+                "comando": "scripts/py.sh -m laudo.mcp_server",
+                "protocolos": list(PROTOCOLOS),
+                "ferramentas": sorted(mcp.ferramentas),
+                "gravam_estado": sorted(MUTAVEIS & set(mcp.ferramentas)),
+            },
+            "a2a": "/.well-known/agent.json",
+            "a2a_estado": "cartão publicado; o recebimento de tarefas A2A ainda é a construir",
+        },
+    }
+
+
+def cartao_agente(base: str) -> dict[str, Any]:
+    """Agent Card A2A (Agent2Agent): como outro agente ou sistema da cooperativa descobre o Laudo Vivo."""
+    return {
+        "protocolVersion": "0.3.0",
+        "name": "Laudo Vivo",
+        "description": (
+            "Agente de fiscalização do crédito rural (MCR 2-7): um Condutor conversa com a fiscal em campo e delega a "
+            "especialistas (Visão, Documentos, Território); um Auditor revisa antes da assinatura. O status de cada "
+            "item vem do verificador determinístico, citando o MCR, e a fiscal assina. Cartão publicado; o "
+            "recebimento de tarefas A2A ainda é a construir."
+        ),
+        "url": f"{base}/",
+        "documentationUrl": f"{base}/site/",
+        "version": "0.1.0",
+        "provider": {"organization": "Laudo Vivo (AKCIT Camp 2026)", "url": f"{base}/site/"},
+        "capabilities": {"streaming": False, "pushNotifications": False},
+        "defaultInputModes": ["text/plain", "application/json", "image/jpeg", "video/mp4", "application/xml"],
+        "defaultOutputModes": ["application/json", "text/html"],
+        "skills": [
+            {
+                "id": "fiscalizar_operacao",
+                "name": "Fiscalizar operação de crédito rural",
+                "description": (
+                    "Abre a fiscalização de uma operação (referência Bacen), planeja o método de cada item e conduz a "
+                    "coleta das provas em campo até o rascunho do laudo, que só vale com a assinatura da fiscal."
+                ),
+                "tags": ["crédito rural", "MCR 2-7", "fiscalização", "pecuária", "laudo"],
+                "examples": [
+                    "Fiscalizar a operação 2026-GO-000123: alerta de satélite inconclusivo na gleba.",
+                    "Conferir a compra de 40 bovinos com NF-e, GTA e o vídeo do brete.",
+                ],
+            },
+            {
+                "id": "revisar_laudo",
+                "name": "Revisar o rascunho antes da assinatura",
+                "description": (
+                    "O Agente Auditor aponta os itens em risco, as evidências e a pergunta para a fiscal. Não muda "
+                    "nenhum status: quem decide é o verificador, citando o MCR."
+                ),
+                "tags": ["auditoria", "revisão", "humano no circuito"],
+                "examples": ["Revisar o rascunho da fiscalização fis_demo_regional antes de assinar."],
+            },
+        ],
+    }
 
 
 def _mesma_origem(request: Request) -> bool:
@@ -380,6 +458,15 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
     def saude(srv=_LEITURA):
         return srv.saude()
 
+    # -- agentes (arquitetura v2): registro, MCP e cartão A2A --------------------------------
+    @app.get("/api/agentes")
+    def agentes():
+        return descrever_agentes()
+
+    @app.get("/.well-known/agent.json")
+    def cartao_a2a(request: Request):
+        return cartao_agente(base_publica(request))
+
     @app.get("/api/carteira")
     def carteira(
         limite: int = 60,
@@ -539,6 +626,15 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
     @app.post("/api/fiscalizacoes/{fis_id}/rascunho")
     def rascunho(fis_id: str, srv=_SRV):
         return srv.pedir_rascunho(fis_id)
+
+    @app.post("/api/fiscalizacoes/{fis_id}/auditoria")
+    def auditoria(fis_id: str, srv=_SRV):
+        # Agente Auditor: só lê (parecer antes de assinar); quem decide o status é o verificador
+        out = srv.auditoria(checar_id(fis_id))
+        extra = {"sessao": srv.sessao.curta} if publica else {}
+        eventos.evento("auditoria", origem=out.get("origem"), recomendacao=(out.get("parecer") or {}).get("recomendacao"),
+                       **extra)
+        return out
 
     @app.post("/api/fiscalizacoes/{fis_id}/assinar")
     def assinar(fis_id: str, a: Assinatura, srv=_SRV):

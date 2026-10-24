@@ -4,6 +4,7 @@
 // do laudo fica ao lado; no celular, "Ler o laudo completo" abre a folha.
 // A API continua recebendo `hash_confirmado: laudo.hash_raiz`: marcar a caixa é a confirmação humana.
 
+import { blocoAuditor, rotuloItemLaudo } from "./agentes.js";
 import { api } from "./api.js";
 import { cartaoResumo, justificativa, placar, trilhaEtapas, verCodigo } from "./componentes.js";
 import * as R from "./regras.js";
@@ -317,6 +318,8 @@ function assinarTela(ctx, movel) {
   cartaoResumo(R.resumoPorObjeto(estado), { link: movel ? h("a", { class: "linha-link", href: `${base}/laudo?completo=1` }, h("span", {}, "Ler o laudo completo"), icone("direita"))
     : h("button", { class: "linha-link", type: "button", onclick: () => document.querySelector(".folha-laudo")?.scrollIntoView({ block: "start", behavior: "smooth" }) },
       h("span", {}, "Ler o laudo completo"), icone("direita")) }),
+  // antes de assinar: a revisão do Agente Auditor (só lê; quem decide é o verificador, e a assinatura é da fiscal)
+  pode ? blocoAuditor(fisId, { rotuloItem: (id) => rotuloItemLaudo(estado, id) }) : null,
   h("label", { class: "cartao confere-chk", for: "conf-hash" }, conf, h("span", {}, h("strong", {}, "Revisei o laudo"), " e confirmo o que vi em campo.",
     // o mesmo código que o agente cita na conversa ("Rascunho emitido (código 53fa 05eb 8853)")
     laudo.hash_raiz ? h("span", { class: "codigo-rasc" }, "Código do rascunho: ", h("span", { class: "mono", translate: "no" }, codigoRascunho(laudo.hash_raiz))) : null)),

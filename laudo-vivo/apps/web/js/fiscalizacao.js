@@ -5,6 +5,7 @@
 // pronto. "Ver prova" abre a prova do item numa gaveta. O técnico (regras, ferramentas, etapas, trace) fica em
 // Detalhes técnicos. O analista acompanha a mesma tela, sem compositor e sem botões de ação.
 
+import { abrirAgentes, blocoAuditor, chipsAgentes, rotuloItemLaudo } from "./agentes.js";
 import { api, postForm, postFormProgresso } from "./api.js";
 import { justificativa, linhaIndicador, trilhaEtapas } from "./componentes.js";
 import { falaFiscal, falaSimples } from "./fala.js";
@@ -40,6 +41,7 @@ export function sairFiscalizacao() {
   document.removeEventListener("pointerdown", S.foraClique, true);
   clearInterval(S.tRec);
   window.removeEventListener("lv:layout", S.aoLayout);
+  window.removeEventListener("lv:agentes", S.aoLayout);
   window.removeEventListener("lv:veu", S.aoVeu);
   S.gravador?.liberar();
   S.miniMapa?.remove?.();
@@ -160,6 +162,7 @@ function montar() {
   document.addEventListener("keydown", S.teclaDown);
   document.addEventListener("keyup", S.teclaUp);
   window.addEventListener("lv:layout", S.aoLayout);
+  window.addEventListener("lv:agentes", S.aoLayout); // os chips dos especialistas, quando o registro chega
   window.addEventListener("lv:veu", S.aoVeu);
 }
 
@@ -260,6 +263,7 @@ function renderTopo() {
     mais: () => [
       { rot: "Por que está na amostra", ic: "info", acao: porQueAmostra },
       { rot: "Voz", sub: "Resposta falada e microfone", ic: "mic", acao: () => preferenciasVoz() },
+      { rot: "Agentes", sub: "Quem faz o quê, e quem decide", ic: "esquadro", acao: () => abrirAgentes(true) },
       { rot: "Detalhes técnicos", ic: "codigo", acao: () => abrirTecnico(true) },
       { rot: document.body.classList.contains("apresentacao") ? "Sair do modo apresentação" : "Modo apresentação", ic: "compartilhar",
         acao: () => window.dispatchEvent(new CustomEvent("lv:apresentacao", { detail: !document.body.classList.contains("apresentacao") })) },
@@ -492,6 +496,9 @@ function bolhaAgente(c, comRotulo = true) {
     bolha.addEventListener("click", (ev) => { if (!ev.target.closest("button, a") && !ver.hidden) alternar(); });
     nos.push(fala, ver);
   }
+  // os especialistas que agiram neste turno (Visão, Documentos, Território, Triagem), numa linha discreta
+  const chips = chipsAgentes(c.acoes);
+  if (chips) nos.push(chips);
   if (g) nos.push(rodapeGuarda(c.turno, g));
   bolha.append(...nos);
   const rot = avatarAgente();
@@ -1019,6 +1026,12 @@ function renderPainel(anterior) {
     nos.push(h("h3", { class: "rotulo-secao" }, `O agente verificou (${doAgente.length})`),
       h("p", { class: "t-sec nota-agente" }, "Com os dados da operação, sem prova sua."),
       h("div", { class: "sub-itens agente" }, doAgente.map((u) => linhaPronta(u))));
+  }
+  // antes de assinar: a revisão do Agente Auditor (só lê; o status continua vindo do verificador)
+  if (ehFiscal() && ["RASCUNHO", "ASSINATURA"].includes(e.etapa) && e.laudo?.tipo === "rascunho" && e.laudo.valido_para_assinar !== false) {
+    const chave = e.laudo.hash_raiz || "";
+    nos.push(h("h3", { class: "rotulo-secao" }, "Antes de assinar"), blocoAuditor(S.id, { rotuloItem: (id) => rotuloItemLaudo(e, id),
+      inicial: S.auditor?.[chave], aoResultado: (out) => { if (S) S.auditor = { [chave]: out }; } }));
   }
   const topo = S.el.painelCorpo.scrollTop;
   S.el.painelCorpo.replaceChildren(...nos);

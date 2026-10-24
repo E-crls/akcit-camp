@@ -986,6 +986,15 @@ class FachadaSessao:
             with self._s.modo(livre=True):
                 return srv.pedir_rascunho(fis_id)
 
+    def auditoria(self, fis_id: str) -> dict[str, Any]:
+        """Agente Auditor: ação livre (ids próprios, a cadeia inteira de LLM) que conta na cota de mensagens livres.
+        Não muda a fiscalização: o passo seguinte do roteiro segue como gravado."""
+        with self._ativo() as srv:
+            srv.carregar(fis_id)
+            self._tocar()
+            with self._cota("turnos", self._ger.limites.max_turnos, self._msg_turnos()), self._s.modo(livre=True):
+                return srv.auditoria(fis_id)
+
     def assinar(self, fis_id: str, pin: str, hash_confirmado: str, papel: str = "fiscal",
                 nome_ref: str = "fiscal-demo") -> dict[str, Any]:
         with self._ativo() as srv:

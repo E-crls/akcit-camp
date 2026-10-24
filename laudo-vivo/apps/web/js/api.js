@@ -114,6 +114,9 @@ export const api = {
   laudo: (id) => get(`/api/fiscalizacoes/${encodeURIComponent(id)}/laudo`),
   // pacote de exibição BCB/Justiça: ação humana, só depois de SELADO (a API devolve 409 antes)
   pacote: (id) => post(`/api/fiscalizacoes/${encodeURIComponent(id)}/pacote`, {}),
+  // agentes (arquitetura v2) e o Agente Auditor (só lê: não muda nenhum status)
+  agentes: () => get("/api/agentes"),
+  auditoria: (id) => post(`/api/fiscalizacoes/${encodeURIComponent(id)}/auditoria`, {}),
   spans: (id, span) => get(`/api/fiscalizacoes/${encodeURIComponent(id)}/trace?span_id=${encodeURIComponent(span)}`),
   trecho: (url) => get(url),
 };

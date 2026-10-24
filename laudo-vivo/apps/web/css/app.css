@@ -1327,3 +1327,50 @@ html.apresentacao { font-size: clamp(18px, min(calc(100vw / 72), calc(100vh / 45
   .cabecalho, .laudo-lado, .roteiro, .avisos { display: none !important; }
   .grade-laudo { display: block; }
 }
+
+/* ---------------------------------------------------------------- agentes (arquitetura v2) */
+/* chips do especialista que agiu: discretos, neutros (o ipê fica para ação, o verde para "verificado", o roxo para "divergente") */
+.ag-chips { display: flex; flex-wrap: wrap; gap: .25rem; margin-top: .5rem; }
+.ag-chip { font-family: var(--f-titulo); font-weight: 600; font-size: .8125rem; line-height: 1.25rem; padding: 0 .5rem; border-radius: var(--r-p);
+  color: var(--grafite); box-shadow: inset 0 0 0 1.5px var(--poeira); background: transparent; white-space: nowrap; }
+.gaveta-agentes .gaveta-corpo { display: flex; flex-direction: column; gap: .75rem; padding-top: 1rem; }
+.ag-frase { font-family: var(--f-titulo); font-weight: 700; font-size: 1.25rem; color: var(--carvao); }
+.ag-diagrama { display: flex; flex-direction: column; gap: .75rem; }
+.ag-faixa { display: flex; flex-direction: column; gap: .375rem; }
+.ag-etapa { font-family: var(--f-titulo); font-weight: 700; font-size: .8125rem; letter-spacing: .04em; text-transform: uppercase; color: var(--pedra); }
+.ag-cartao { padding: .75rem .875rem; border-radius: var(--r); box-shadow: inset 0 0 0 1.5px var(--poeira); background: var(--branco); min-width: 0; }
+.ag-cartao.centro { box-shadow: inset 0 0 0 2.5px var(--carvao); }
+.ag-cartao h3 { font-size: 1.0625rem; line-height: 1.375rem; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.ag-novo { font-family: var(--f-titulo); font-weight: 700; font-size: .75rem; padding: 0 .375rem; border-radius: var(--r-p); background: var(--ipe); color: var(--carvao); }
+.ag-papel { font-size: .9375rem; color: var(--grafite); margin: .25rem 0 .375rem; }
+.ag-kv { display: grid; grid-template-columns: auto 1fr; gap: .125rem .625rem; font-size: .875rem; }
+.ag-kv dt { color: var(--pedra); font-weight: 600; }
+.ag-kv dd { color: var(--carvao); overflow-wrap: anywhere; }
+.ag-seta { font-family: var(--f-titulo); font-weight: 600; font-size: .875rem; color: var(--pedra); padding-left: 1rem; border-left: 2.5px solid var(--carvao); margin-left: 1rem; }
+.ag-especialistas { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: .5rem; }
+.ag-especialistas .ag-kv { grid-template-columns: 1fr; }
+.ag-guardas { list-style: none; display: flex; flex-direction: column; gap: .375rem; font-size: .9375rem; }
+.ag-guardas li { display: flex; gap: .5rem; align-items: flex-start; }
+.ag-guardas .ic, .ag-fiscal .ic { width: 1.125rem; height: 1.125rem; flex: none; margin-top: .1875rem; }
+.ag-fiscal p { display: flex; gap: .5rem; align-items: flex-start; flex-wrap: wrap; font-size: .9375rem; }
+.ag-medido { font-size: .875rem; }
+/* revisão do Auditor: o parecer não é status (sem verde nem roxo); o ipê marca o que é com a fiscal */
+.auditor-bloco { display: flex; flex-direction: column; gap: .625rem; margin: .25rem 0 .75rem; }
+.auditor-parecer { padding: .875rem 1rem; display: flex; flex-direction: column; gap: .5rem; }
+.aud-rec { display: flex; align-items: center; gap: .5rem; font-family: var(--f-titulo); font-size: 1.0625rem; }
+.aud-rec .ic { width: 1.25rem; height: 1.25rem; flex: none; }
+.aud-rec.revisar .ic { color: var(--carvao); background: var(--ipe); border-radius: var(--r-p); padding: .125rem; width: 1.5rem; height: 1.5rem; }
+.aud-resumo { font-size: .9375rem; }
+.aud-itens { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+.aud-item { padding: .5rem .625rem; border-left: 4px solid var(--poeira); background: var(--cal); border-radius: 0 var(--r-p) var(--r-p) 0; font-size: .9375rem; min-width: 0; }
+.aud-item.r-alto { border-left-color: var(--ipe); }
+.aud-item.r-medio { border-left-color: var(--borda-forte); }
+.aud-risco { display: block; font-family: var(--f-titulo); font-weight: 700; font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; color: var(--pedra); }
+.aud-item strong { overflow-wrap: anywhere; }
+.aud-pergunta { display: flex; gap: .375rem; align-items: flex-start; margin-top: .25rem; color: var(--carvao); font-weight: 600; }
+.aud-pergunta .ic { width: 1rem; height: 1rem; flex: none; margin-top: .25rem; }
+.aud-ev { overflow-wrap: anywhere; font-size: .8125rem; }
+.aud-nota { display: flex; gap: .5rem; align-items: flex-start; font-size: .875rem; color: var(--grafite); border-top: 1.5px solid var(--cal-2); padding-top: .5rem; }
+.aud-nota .ic { width: 1.125rem; height: 1.125rem; flex: none; margin-top: .125rem; }
+.aud-origem { font-size: .8125rem; }
+.apresentacao .ag-chip { font-size: .875rem; }

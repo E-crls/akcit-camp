@@ -32,6 +32,9 @@
     <nav class="trilha" id="trilha" aria-label="Você está em"></nav>
     <span class="espaco"></span>
     <span class="demo-pilula marca-demo ok-pequeno" id="demo-pilula" hidden>Demonstração · dados sintéticos</span>
+    <button type="button" class="tec" id="btn-agentes" aria-expanded="false" aria-controls="gaveta-agentes" aria-label="Agentes" title="Agentes">
+      <svg class="ic" aria-hidden="true"><use href="#i-esquadro"/></svg><span class="rot">Agentes</span>
+    </button>
     <button type="button" class="tec" id="btn-tecnico" aria-expanded="false" aria-controls="tecnico" aria-label="Detalhes técnicos" title="Detalhes técnicos">
       <svg class="ic" aria-hidden="true"><use href="#i-codigo"/></svg><span class="rot">Detalhes técnicos</span>
       <span class="ponto-tec" id="ponto-tec" aria-hidden="true"></span>
@@ -64,6 +67,18 @@
     </button>
   </div>
   <div class="gaveta-corpo" id="tecnico-corpo"></div>
+</aside>
+<aside id="gaveta-agentes" class="gaveta-tec gaveta-agentes" aria-labelledby="agentes-titulo" hidden>
+  <div class="gaveta-cab">
+    <div>
+      <h2 id="agentes-titulo">Agentes</h2>
+      <p class="t-sec">Quem faz o quê na fiscalização, e quem decide.</p>
+    </div>
+    <button type="button" class="btn-icone" data-fechar-agentes aria-label="Fechar agentes">
+      <svg class="ic" aria-hidden="true"><use href="#i-x"/></svg>
+    </button>
+  </div>
+  <div class="gaveta-corpo" id="agentes-corpo"></div>
 </aside>
 <div id="veu-global" class="veu" hidden></div>
 <div id="anuncio" class="so-leitor" aria-live="polite" aria-atomic="true"></div>

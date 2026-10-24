@@ -7,6 +7,7 @@
 // Modo apresentação (telão): `?apresentacao=1`, o menu do usuário ou localStorage "lv.apresentacao"; só a raiz muda
 // (tudo em rem), a barra da demonstração fica recolhida e a carteira abre com o caso de demonstração selecionado.
 
+import { abrirAgentes, agentesAberto, carregarAgentes } from "./agentes.js";
 import { api, definirDemoPublica } from "./api.js";
 import { telaCarteira } from "./carteira.js";
 import { sairFiscalizacao, telaFiscalizacao } from "./fiscalizacao.js";
@@ -109,6 +110,7 @@ function menuUsuario() {
   abrirMenu(document.getElementById("menu-usuario"), document.getElementById("btn-usuario"), [
     { rot: `Ver como ${o.titulo.toLowerCase()}`, sub: `${o.nome}, ${o.rotulo}`, ic: "usuario", acao: () => irComo(outro) },
     naCasa ? null : { rot: ROT_CASA[atual], ic: "lista", acao: () => { location.hash = CASA[atual]; } },
+    ehMovel() ? { rot: "Agentes", sub: "Quem faz o quê, e quem decide", ic: "esquadro", acao: () => abrirAgentes(true) } : null,
     ehMovel() ? { rot: "Detalhes técnicos", ic: "codigo", acao: () => abrirTecnico(true) } : null,
     { rot: "Voz", sub: "Resposta falada e microfone", ic: "mic", acao: () => preferenciasVoz() },
     { rot: ap ? "Sair do modo apresentação" : "Modo apresentação", sub: ap ? null : "Telão: tudo maior, a demonstração em destaque", ic: "compartilhar",
@@ -207,15 +209,19 @@ document.getElementById("btn-usuario").addEventListener("click", () => {
   if (!document.getElementById("menu-usuario").hidden) { fecharMenus(); return; }
   menuUsuario();
 });
-document.getElementById("btn-tecnico").addEventListener("click", () => abrirTecnico());
+document.getElementById("btn-tecnico").addEventListener("click", () => { if (agentesAberto()) abrirAgentes(false); abrirTecnico(); });
+document.getElementById("btn-agentes").addEventListener("click", () => { if (tecnicoAberto()) abrirTecnico(false); abrirAgentes(); });
+document.querySelector("[data-fechar-agentes]").addEventListener("click", () => abrirAgentes(false));
 document.querySelector("[data-fechar-tec]").addEventListener("click", () => abrirTecnico(false));
 document.getElementById("veu-global").addEventListener("click", () => {
   fecharMenus();
   if (tecnicoAberto()) abrirTecnico(false);
+  if (agentesAberto()) abrirAgentes(false);
   window.dispatchEvent(new Event("lv:veu"));
 });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && tecnicoAberto() && !document.getElementById("modal").open) { e.stopImmediatePropagation(); abrirTecnico(false); }
+  else if (e.key === "Escape" && agentesAberto() && !document.getElementById("modal").open) { e.stopImmediatePropagation(); abrirAgentes(false); }
 }, true);
 if ("ResizeObserver" in window) new ResizeObserver(medirTopo).observe(document.getElementById("cabecalho"));
 window.addEventListener("hashchange", rotear);
@@ -226,4 +232,5 @@ window.addEventListener("lv:papel", (e) => { renderUsuario(); if (e.detail?.manu
 window.addEventListener("lv:apresentacao", (e) => aplicarApresentacao(!!e.detail));
 medirTopo();
 carregarSaude().then(rotear);
+carregarAgentes(); // o mapa ferramenta → agente dos chips da conversa, uma vez
 setInterval(carregarSaude, 30000);
