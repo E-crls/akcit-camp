@@ -104,9 +104,9 @@ MARCA = [
 
 def simbolo(nome: str, arq: str) -> str:
     t = (ICONES / f"{arq}.svg").read_text(encoding="utf-8")
-    t = re.sub(r"<!--.*?-->", "", t, flags=re.S)
+    t = re.sub(r"<!--.*?-->", "", t, flags=re.DOTALL)
     vb = re.search(r'viewBox="([^"]+)"', t).group(1)
-    corpo = re.sub(r"\s+", " ", re.search(r"<svg[^>]*>(.*)</svg>", t, re.S).group(1)).strip()
+    corpo = re.sub(r"\s+", " ", re.search(r"<svg[^>]*>(.*)</svg>", t, re.DOTALL).group(1)).strip()
     corpo = corpo.replace("> <", "><")
     if arq.startswith("lucide/") or arq == "proprios/area":
         return (f'<symbol id="i-{nome}" viewBox="{vb}" fill="none" stroke="currentColor" stroke-width="2.25" '
@@ -119,7 +119,7 @@ def main() -> int:
     bloco = "<!-- sprite:inicio (gerado por scripts/montar_sprite_web.py) -->\n<defs>\n" + "\n".join(linhas) + "\n</defs>\n<!-- sprite:fim -->"
     idx = WEB / "index.html"
     html = idx.read_text(encoding="utf-8")
-    novo, n = re.subn(r"<!-- sprite:inicio.*?<!-- sprite:fim -->", lambda _m: bloco, html, flags=re.S)
+    novo, n = re.subn(r"<!-- sprite:inicio.*?<!-- sprite:fim -->", lambda _m: bloco, html, flags=re.DOTALL)
     if n != 1:
         raise SystemExit("marcadores do sprite não encontrados em apps/web/index.html")
     idx.write_text(novo, encoding="utf-8", newline="\n")
