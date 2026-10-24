@@ -30,3 +30,11 @@ infra/**/.terraform/
 infra/**/*.tfstate*
 infra/**/*.tfplan
 infra/**/terraform.tfvars
+# documentos internos da equipe (fora do git; nunca entram na imagem)
+CHANGELOG.md
+docs/EQUIPE.md
+docs/decisao.md
+docs/tcle_modelo.md
+docs/entregaveis/KIT_APRESENTADOR.md
+docs/entregaveis/pitch-final-5min.md
+docs/entregaveis/qa-banca.md

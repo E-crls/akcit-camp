@@ -67,6 +67,15 @@ GRUPOS = [
         "licenca": "Sentinel Data Legal Notice (Copernicus): uso livre, completo e aberto",
         "atribuicao": "Contém dados Copernicus Sentinel modificados (2026)",
     },
+    {
+        "prefixo": "contagem/",
+        "o_que_e": "resultado da contagem do YOLOX para o vídeo do DEMO-0001 (envelope e quadros-chave), o mesmo da "
+        "gravação do replay; a demo pública (laudo.api.publica) lê daqui em vez de contar de novo, porque o YOLOX "
+        "em outra CPU (a do Cloud Build) contou diferente e os passos seguintes saíram da gravação",
+        "origem": "python -m laudo.api.publica --preparar, na máquina em que a contagem confere com a gravação",
+        "licenca": "CC BY-SA 4.0 (quadros do vídeo semissintético; ver THIRD_PARTY.md)",
+        "atribuicao": "Gpkp (CC BY-SA 4.0) e Marie Nouvellon (CC BY 2.0), via Wikimedia Commons",
+    },
 ]
 VIDEO_DEMO = "videos/sinteticos/s03_fila_colada.mp4"  # relativo a dados_locais/ (caso.yaml do DEMO-0001)
 
@@ -92,13 +101,15 @@ def hash_gleba_demo() -> str:
 
 
 def gerar_manifesto() -> int:
-    """(Manutenção) Copia de dados_locais/ para ativos/demo/ o vídeo e o cache de NDVI da demo, com nomes
+    """(Manutenção) Copia de dados_locais/ para ativos/demo/ o vídeo, o cache de NDVI e o da contagem da demo, com nomes
     curtos, e reescreve o manifesto. Roda na máquina que tem esses arquivos (depois de uma demo com rede)."""
     gh = hash_gleba_demo()
     pares: list[tuple[Path, str]] = [(DESTINO / VIDEO_DEMO, "video/" + Path(VIDEO_DEMO).name)]
     for p in sorted((DESTINO / "ndvi_cache").rglob(f"*{gh}*")):
         curto = f"ndvi/stac_{gh}.json" if p.parent.name == "stac" else f"ndvi/{p.parent.name}.json"
         pares.append((p, curto))
+    for p in sorted((DESTINO / "cache_contagem").glob("*/*")):  # cache da demo pública (só vídeos do caso)
+        pares.append((p, f"contagem/{p.parent.name}/{p.name}"))
     faltam = [str(o) for o, _ in pares if not o.is_file()]
     if faltam or len(pares) < 3:
         print(f"faltam arquivos em dados_locais/ para gerar os ativos: {faltam or 'cache de NDVI'}",

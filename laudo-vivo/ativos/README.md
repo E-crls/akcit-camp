@@ -17,6 +17,7 @@ byte. Aqui os nomes são curtos, porque um clone no Windows tem limite de 260 ca
 |---|---|---|---|
 | `video/s03_fila_colada.mp4` (1,2 MB) | `dados_locais/videos/sinteticos/s03_fila_colada.mp4` | vídeo semissintético de corredor do curral: 15 bovinos em fila, 17,3 s; o sha256 é o que o `caso.yaml` do `DEMO-0001` registra | **CC BY-SA 4.0**, obra derivada de "Cows at Dharmasthala (2025) 01.webm" (Gpkp, CC BY-SA 4.0) e "Herding the cows video.webm" (Marie Nouvellon, CC BY 2.0), do Wikimedia Commons |
 | `ndvi/stac_dda9cb9b2585de90.json` e `ndvi/AAAA-MM-DD.json` (13 arquivos, 66 kB) | `dados_locais/ndvi_cache/stac/` e `dados_locais/ndvi_cache/22LFH/AAAA-MM-DD/`, com o nome que a ferramenta de NDVI procura | lista de cenas do catálogo STAC e estatísticas de NDVI por data (p10, p50 e p90, fração limpa) da gleba da demo, de 16/03 a 08/10/2026 | Sentinel Data Legal Notice (acesso livre e aberto). "Contém dados Copernicus Sentinel modificados (2026)" |
+| `contagem/<chave>/` (envelope e 4 quadros-chave, 390 kB) | `dados_locais/cache_contagem/<chave>/` | resultado da contagem do YOLOX para o vídeo da demo, o mesmo da gravação do replay: a demo pública lê daqui, porque o YOLOX em outra CPU pode contar diferente e tirar os passos seguintes da gravação | CC BY-SA 4.0, como o vídeo |
 
 O que **não** está aqui: o detector `yolox_m.onnx` (~100 MB, Apache-2.0). Ele é baixado da release oficial do
 YOLOX no GitHub e conferido pelo sha256 de `src/laudo/vision/modelos.py`.

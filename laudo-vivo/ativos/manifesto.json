@@ -14,6 +14,13 @@
    "origem": "laudo.geo.ndvi.serie_ndvi sobre Sentinel-2 L2A (coleção sentinel-2-c1-l2a do Earth Search, Element 84, AWS Open Data)",
    "licenca": "Sentinel Data Legal Notice (Copernicus): uso livre, completo e aberto",
    "atribuicao": "Contém dados Copernicus Sentinel modificados (2026)"
+  },
+  {
+   "prefixo": "contagem/",
+   "o_que_e": "resultado da contagem do YOLOX para o vídeo do DEMO-0001 (envelope e quadros-chave), o mesmo da gravação do replay; a demo pública (laudo.api.publica) lê daqui em vez de contar de novo, porque o YOLOX em outra CPU (a do Cloud Build) contou diferente e os passos seguintes saíram da gravação",
+   "origem": "python -m laudo.api.publica --preparar, na máquina em que a contagem confere com a gravação",
+   "licenca": "CC BY-SA 4.0 (quadros do vídeo semissintético; ver THIRD_PARTY.md)",
+   "atribuicao": "Gpkp (CC BY-SA 4.0) e Marie Nouvellon (CC BY 2.0), via Wikimedia Commons"
   }
  ],
  "arquivos": [
@@ -114,6 +121,41 @@
    "sha256": "4f4a2e4536a2d8ed78d40beeecafa6e6e2a20a4231d3f2fde86d2053162b2521",
    "bytes": 62109,
    "grupo": "ndvi/"
+  },
+  {
+   "caminho": "contagem/71da7f3d3c37022a/envelope.json",
+   "destino": "dados_locais/cache_contagem/71da7f3d3c37022a/envelope.json",
+   "sha256": "cf01140d663d6747fe7193d22b0cd33794415d814c233530a0b47a22eb26c402",
+   "bytes": 5211,
+   "grupo": "contagem/"
+  },
+  {
+   "caminho": "contagem/71da7f3d3c37022a/linha_006a14_000074.jpg",
+   "destino": "dados_locais/cache_contagem/71da7f3d3c37022a/linha_006a14_000074.jpg",
+   "sha256": "cae71688be8e30b8cd2bb2647f820b7f8c9e5a6831c868acd3d36cc8bec7ae91",
+   "bytes": 96026,
+   "grupo": "contagem/"
+  },
+  {
+   "caminho": "contagem/71da7f3d3c37022a/linha_006a14_000120.jpg",
+   "destino": "dados_locais/cache_contagem/71da7f3d3c37022a/linha_006a14_000120.jpg",
+   "sha256": "af0b49af6d59c36f1272de6ff67882d8f634350f64a3ab0c50305a81731a66ac",
+   "bytes": 102444,
+   "grupo": "contagem/"
+  },
+  {
+   "caminho": "contagem/71da7f3d3c37022a/linha_006a14_000184.jpg",
+   "destino": "dados_locais/cache_contagem/71da7f3d3c37022a/linha_006a14_000184.jpg",
+   "sha256": "92d64a10541435d9dbad51f78d37b89199d5d408ff5f0ad52eaf7e0fe658f0a3",
+   "bytes": 95068,
+   "grupo": "contagem/"
+  },
+  {
+   "caminho": "contagem/71da7f3d3c37022a/linha_006a14_000257.jpg",
+   "destino": "dados_locais/cache_contagem/71da7f3d3c37022a/linha_006a14_000257.jpg",
+   "sha256": "abbd4b389016f64a1ed88ef9e717d79f97caae470ea136933a6ef2ef2d8a1482",
+   "bytes": 86984,
+   "grupo": "contagem/"
   }
  ]
 }
