@@ -50,7 +50,7 @@ def main() -> int:
         return 2
     # No Hosting, o redirecionamento vem ANTES do arquivo estático: só os caminhos da demo redirecionam (a raiz,
     # que é o QR, a entrada, a API e os arquivos do app); /site/, as fontes e o ícone ficam aqui
-    demo = r"entrar\.html|api/.*|js/.*|css/.*|fis/.*|vendor/leaflet[^/]*/.*|vendor/icones/.*|\.well-known/.*"
+    demo = r"entrar\.html|guiado/?.*|api/.*|js/.*|css/.*|fis/.*|vendor/leaflet[^/]*/.*|vendor/icones/.*|\.well-known/.*"
     config = {
         "redirects": [
             {"regex": "^/$", "statusCode": 302, "location": f"{destino}/"},

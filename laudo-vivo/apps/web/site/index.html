@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Laudo Vivo — a prova do crédito rural</title>
-<meta name="description" content="Agente de fiscalização do crédito rural (MCR 2-7, Res. CMN 5.267): conduz a visita, confere vídeo, foto, nota e GTA contra as regras e entrega o laudo pronto para a fiscal assinar, com trilha auditável.">
-<meta name="theme-color" content="#15130F">
-<meta property="og:title" content="Laudo Vivo — a prova do crédito rural, do satélite ao curral">
-<meta property="og:description" content="Fiscalização do crédito rural com prova de campo, regras do MCR e laudo assinado por humano.">
-<meta property="og:image" content="img/tela-fiscalizacao.jpg">
+<title>Laudo Vivo — o agente conferente do crédito rural</title>
+<meta name="description" content="O Laudo Vivo é o agente conferente da fiscalização do crédito rural: recebe a prova de onde ela vier, aplica o MCR 2-7 item a item, diz “inconclusivo” quando falta prova e pede à fiscal só o que falta. Só a fiscal assina.">
+<meta name="theme-color" content="#F5F3EE">
+<meta property="og:title" content="Laudo Vivo — o agente que confere a fiscalização do crédito rural">
+<meta property="og:description" content="Confere a prova contra o que foi financiado, item por item do MCR 2-7, e entrega um laudo que a auditoria consegue refazer. Só a fiscal assina.">
 <link rel="icon" href="../icone.svg" type="image/svg+xml">
+<script>/* a entrada das partes só esconde o conteúdo se houver movimento e IntersectionObserver */
+try { if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("js-revela"); } catch (e) {}</script>
 <style>
 @font-face { font-family: "Barlow"; font-weight: 500; font-display: swap; src: url("../vendor/fonts/Barlow-500.woff2") format("woff2"); }
 @font-face { font-family: "Barlow"; font-weight: 600; font-display: swap; src: url("../vendor/fonts/Barlow-600.woff2") format("woff2"); }
@@ -19,396 +20,1396 @@
 @font-face { font-family: "Barlow Condensed"; font-weight: 700; font-display: swap; src: url("../vendor/fonts/BarlowCondensed-700.woff2") format("woff2"); }
 @font-face { font-family: "Barlow Condensed"; font-weight: 800; font-display: swap; src: url("../vendor/fonts/BarlowCondensed-800.woff2") format("woff2"); }
 
+/* Identidade "Esquadro", versão página do produto, com a paleta "Cerrado" do produto (tokens de apps/web/css/app.css).
+   Texto tinta sobre areia, superfícies brancas, bordas finas de areia. Cores com papel fixo, como no produto:
+   verde-cerrado = marca e ação (botão principal e cartão AGORA, sempre com texto branco); terracota = destaque, com
+   moderação (números-chave, o ponto de destaque e o filete do AGORA; nunca texto corrido); âmbar = o que falta (marca,
+   contorno e fundo claro; o texto em cima é sempre tinta); verde = só Verificado; vermelho = só Divergente; tinta = o
+   que não muda (lacre e régua do que está pronto). Nunca só cor: todo status tem ícone e palavra.
+   Ritmo: no computador, uma parte por tela (rolagem com encaixe); cada parte entra com um deslize curto. */
 :root {
-  --carvao: #15130F; --carvao-2: #24211B; --carvao-3: #3A362E; --grafite: #3C382F; --pedra: #5C564B;
-  --nevoa: #C2BBAD; --poeira: #D3CDC0; --cal-2: #E4E0D6; --cal: #EFECE5; --branco: #FFFFFF; --papel: #F6F4EF;
-  --ipe: #FFC414; --ipe-2: #E8AA00; --ipe-claro: #FFF0BF; --verde: #0B6230; --verde-claro: #DCEFE2;
-  --roxo: #861D4C; --roxo-claro: #F7E4EC;
+  /* chão e tinta (contraste na areia: tinta 15,1:1; grafite 8,4:1; pedra 5,7:1) */
+  --areia: #F5F3EE; --cal: #ECE9E1; --cal-2: #E3DFD5; --poeira: #D3D0C6; --branco: #FFFFFF; --listra: #F9F8F4;
+  --tinta: #14201A; --tinta-2: #1F2E26; --tinta-3: #34463C; --grafite: #3B4A42; --pedra: #57635C; --borda-forte: #7A857D; --nevoa: #C4CEC8;
+  /* marca e ação: branco por cima (8,0:1); no hover, 8% mais escuro; acao-2 é o campo dentro do AGORA (10,4:1) */
+  --acao: #1E5B43; --acao-hover: #1C543E; --acao-2: #174835; --acao-claro: #E4EEE8;
+  --sobre-acao: #FFFFFF; --sobre-acao-2: #D4E2DA; --acao-linha: #A5BDB4;
+  /* destaque terracota: só número grande e marcador (4,49:1 no branco) */
+  --destaque: #C0582E; --destaque-vivo: #E8916A;  /* vivo: só sobre a tinta (6,9:1) */
+  /* o que falta: âmbar como marca e contorno (3,6:1), com o texto em tinta sobre o claro */
+  --falta: #B7791F; --falta-claro: #FBF1DC;
+  /* estados do laudo: branco por cima (Verificado 5,0:1; Divergente 6,6:1) */
+  --verificado: #15803D; --divergente: #B42318;
   --f-texto: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --f-titulo: "Barlow Semi Condensed", "Barlow", system-ui, sans-serif;
   --f-numero: "Barlow Condensed", "Barlow", system-ui, sans-serif;
-  --r: .375rem; --larg: 72rem;
-  --regua: repeating-linear-gradient(90deg, var(--carvao) 0 2px, transparent 2px 40px) 0 0 / 100% 8px no-repeat,
-    repeating-linear-gradient(90deg, var(--carvao) 0 1.5px, transparent 1.5px 8px) 0 0 / 100% 5px no-repeat,
-    linear-gradient(var(--carvao), var(--carvao)) 0 0 / 100% 2px no-repeat;
-  --regua-ipe: repeating-linear-gradient(90deg, var(--ipe) 0 2px, transparent 2px 40px) 0 0 / 100% 8px no-repeat,
-    repeating-linear-gradient(90deg, var(--ipe) 0 1.5px, transparent 1.5px 8px) 0 0 / 100% 5px no-repeat,
-    linear-gradient(var(--ipe), var(--ipe)) 0 0 / 100% 2px no-repeat;
+  --r: 10px; --r-s: 8px; --r-l: 12px; --r-x: 6px;
+  --sombra: 0 1px 2px rgba(20, 32, 26, .04), 0 4px 14px rgba(20, 32, 26, .04);
+  --sombra-app: 0 1px 2px rgba(20, 32, 26, .06), 0 24px 48px -20px rgba(20, 32, 26, .18);
+  --larg: 75rem; --gut: 1.5rem; --t: 180ms; --topo-h: 60px; --meio: 2rem;
+  --listra-clara: repeating-linear-gradient(135deg, var(--cal) 0 3px, var(--listra) 3px 6px);
+  --regua: repeating-linear-gradient(90deg, var(--tinta) 0 1.5px, transparent 1.5px 40px) 0 0 / 100% 7px no-repeat,
+    repeating-linear-gradient(90deg, var(--tinta) 0 1px, transparent 1px 8px) 0 0 / 100% 4px no-repeat,
+    linear-gradient(var(--tinta), var(--tinta)) 0 0 / 100% 1.5px no-repeat;
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--cal); color: var(--carvao); font-family: var(--f-texto); font-weight: 500;
-  font-size: 1.0625rem; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scroll-padding-top: var(--topo-h); scroll-snap-type: y proximity; }
+body { margin: 0; background: var(--areia); color: var(--tinta); font-family: var(--f-texto); font-weight: 500;
+  font-size: 1rem; line-height: 1.55; -webkit-font-smoothing: antialiased; font-variant-numeric: lining-nums; overflow-x: hidden; }
+h1, h2, h3, h4, p, ul, ol, figure { margin: 0; }
+ul { padding: 0; list-style: none; }
 img { max-width: 100%; height: auto; display: block; }
-.tela img, .celular img { width: 100%; }
-a { color: var(--carvao); }
-a:focus-visible, button:focus-visible { outline: 3px solid var(--carvao); outline-offset: 3px; }
-.envolve { max-width: var(--larg); margin: 0 auto; padding: 0 1.5rem; }
-.pular { position: absolute; left: -9999px; }
-.pular:focus { left: 1rem; top: 1rem; z-index: 10; background: var(--ipe); padding: .5rem 1rem; }
+a { color: var(--tinta); text-underline-offset: 3px; }
+b, strong { font-weight: 700; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--tinta); outline-offset: 3px; border-radius: 4px; }
+.ic { width: 1em; height: 1em; flex: none; fill: currentColor; }
+.envolve { max-width: var(--larg); margin: 0 auto; padding: 0 var(--gut); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+.pular { position: absolute; left: -9999px; top: 0; }
+.pular:focus { left: 1rem; top: .75rem; z-index: 20; background: var(--acao); color: var(--sobre-acao); padding: .5rem 1rem; border-radius: var(--r-s); }
 
-/* topo */
-.topo { position: sticky; top: 0; z-index: 5; background: rgba(239, 236, 229, .92); backdrop-filter: blur(8px);
-  border-bottom: 1.5px solid var(--poeira); }
-.topo .envolve { display: flex; align-items: center; gap: 1.5rem; height: 4.5rem; }
-.marca { display: flex; align-items: center; gap: .75rem; text-decoration: none; }
-.marca svg { width: 2.5rem; height: 2.5rem; }
-.marca b { font-family: var(--f-numero); font-weight: 800; font-size: 1.6rem; letter-spacing: .02em; }
-.nav { display: flex; gap: 1.5rem; margin-left: auto; }
-.nav a { font-family: var(--f-titulo); font-weight: 600; text-decoration: none; color: var(--grafite); font-size: 1rem; }
-.nav a:hover { color: var(--carvao); text-decoration: underline; text-underline-offset: 6px; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: .6rem; min-height: 3rem; padding: .75rem 1.4rem;
-  border-radius: var(--r); font-family: var(--f-titulo); font-weight: 700; font-size: 1.125rem; text-decoration: none;
-  border: 2px solid var(--carvao); transition: transform 120ms, background 120ms; }
-.btn:hover { transform: translateY(-1px); }
-.btn-pri { background: var(--ipe); color: var(--carvao); border-color: var(--ipe); }
-.btn-pri:hover { background: var(--ipe-2); border-color: var(--ipe-2); }
-.btn-sec { background: transparent; color: var(--carvao); }
-.btn-sec:hover { background: var(--carvao); color: var(--branco); }
-.btn-escuro { background: var(--carvao); color: var(--branco); }
-.btn svg { width: 1.15rem; height: 1.15rem; flex: none; }
-.topo .btn { min-height: 2.75rem; padding: .5rem 1.1rem; font-size: 1rem; }
+/* ---------- botões (reais) */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; padding: .5rem 1.1rem;
+  border-radius: var(--r-s); font-family: var(--f-titulo); font-weight: 700; font-size: 1.0625rem; line-height: 1.2; text-decoration: none;
+  border: 1px solid transparent; transition: background var(--t), border-color var(--t); white-space: nowrap; }
+.btn .ic { width: 1.05rem; height: 1.05rem; }
+.btn-pri { background: var(--acao); color: var(--sobre-acao); border-color: var(--acao); box-shadow: 0 1px 0 rgba(20, 32, 26, .12); }
+.btn-pri:hover { background: var(--acao-hover); border-color: var(--acao-hover); }
+.btn-pri:disabled { cursor: progress; opacity: .7; }
+.link-sec { display: inline-flex; align-items: center; gap: .4rem; min-height: 2.75rem; padding: 0 .35rem; font-family: var(--f-titulo); font-weight: 600;
+  font-size: .975rem; color: var(--grafite); text-decoration: underline; text-decoration-color: var(--poeira); text-underline-offset: 4px; }
+.link-sec:hover { color: var(--tinta); text-decoration-color: currentColor; }
+.link-sec .ic { width: 1rem; height: 1rem; }
+.btn-sec { background: var(--branco); color: var(--tinta); border-color: var(--poeira); }
+.btn-sec:hover { border-color: var(--tinta); }
+.btn-peq { min-height: 2.375rem; padding: .375rem .9rem; font-size: 1rem; }
 
-/* herói */
-.heroi { padding: 4.5rem 0 3rem; }
-.heroi .envolve { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 3rem; align-items: center; }
-.selo-linha { display: inline-flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
-.etiqueta { display: inline-flex; align-items: center; gap: .45rem; padding: .3rem .7rem; border: 1.5px solid var(--carvao);
-  border-radius: 999px; font-family: var(--f-titulo); font-weight: 600; font-size: .9rem; background: var(--branco); }
-.etiqueta i { width: .55rem; height: .55rem; background: var(--ipe); border: 1.5px solid var(--carvao); }
-h1 { font-family: var(--f-numero); font-weight: 800; font-size: clamp(2.7rem, 5.6vw, 4.9rem); line-height: .95;
-  letter-spacing: -.01em; margin: 0 0 1.5rem; text-transform: uppercase; }
-h1 em { font-style: normal; background: linear-gradient(transparent 62%, var(--ipe) 62% 92%, transparent 92%); }
-.lead { font-size: 1.3rem; line-height: 1.5; color: var(--grafite); max-width: 34rem; margin: 0 0 2rem; }
-.acoes { display: flex; flex-wrap: wrap; gap: .75rem; }
-.micro { margin-top: 1rem; font-size: .95rem; color: var(--pedra); }
-.vitrine { position: relative; padding: 2rem 0 3rem; }
-.tela { border-radius: .75rem; overflow: hidden; border: 2px solid var(--carvao);
-  box-shadow: 0 24px 60px rgba(21, 19, 15, .22), 0 4px 12px rgba(21, 19, 15, .12); background: var(--branco); }
-.tela .barra { display: flex; gap: .4rem; padding: .55rem .8rem; background: var(--carvao); }
-.tela .barra span { width: .6rem; height: .6rem; border-radius: 50%; background: var(--carvao-3); }
-.celular { position: absolute; right: -1rem; bottom: 0; width: 30%; border-radius: 1.6rem; overflow: hidden;
-  border: 6px solid var(--carvao); box-shadow: 0 24px 50px rgba(21, 19, 15, .3); background: var(--carvao); }
-.carimbo { position: absolute; left: -1.25rem; bottom: 1.5rem; display: flex; align-items: center; gap: .6rem; padding: .7rem 1rem;
-  background: var(--carvao); color: var(--branco); border-radius: var(--r); font-family: var(--f-titulo); font-weight: 700;
-  box-shadow: 0 12px 30px rgba(21, 19, 15, .3); clip-path: polygon(0 0, calc(100% - .75rem) 0, 100% .75rem, 100% 100%, 0 100%); }
-.carimbo small { display: block; font-family: var(--f-texto); font-weight: 500; font-size: .8rem; color: var(--nevoa); }
-.carimbo svg { width: 1.6rem; height: 1.6rem; color: var(--ipe); flex: none; }
+/* ---------- cabeçalho */
+.topo { position: sticky; top: 0; z-index: 10; background: rgba(245, 243, 238, .92); -webkit-backdrop-filter: saturate(1.2) blur(10px);
+  backdrop-filter: saturate(1.2) blur(10px); border-bottom: 1px solid var(--cal-2); }
+.topo .envolve { display: flex; align-items: center; gap: 2rem; height: calc(var(--topo-h) - 1px); }
+.marca { display: inline-flex; align-items: center; gap: .55rem; text-decoration: none; flex: none; }
+.marca svg { width: 1.75rem; height: 1.75rem; }
+.marca b { font-family: var(--f-numero); font-weight: 800; font-size: 1.3rem; letter-spacing: .03em; line-height: 1; }
+.nav { display: flex; gap: .25rem; margin-left: auto; }
+.nav a { font-family: var(--f-titulo); font-weight: 600; font-size: .98rem; text-decoration: none; color: var(--grafite);
+  padding: .4rem .7rem; border-radius: var(--r-x); transition: background var(--t), color var(--t); }
+.nav a:hover { background: var(--cal); color: var(--tinta); }
 
-/* régua */
-.regua { height: 8px; background: var(--regua); }
-.regua-ipe { height: 8px; background: var(--regua-ipe); }
+/* ---------- ritmo: uma parte por tela no computador (encaixe obrigatório); no celular, encaixe por proximidade */
+.pg { position: relative; padding: 3rem 0; scroll-snap-align: start; }
+.pg + .pg { border-top: 1px solid var(--cal-2); }
+.pg.palco { background: var(--cal); }
+@media (min-width: 900px) and (min-height: 700px) {
+  html { scroll-snap-type: y mandatory; }
+  .pg { min-height: calc(100svh - var(--topo-h)); display: flex; flex-direction: column; justify-content: center; padding: 2.25rem 0; scroll-snap-stop: always; }
+  .pg.alta { scroll-snap-stop: normal; justify-content: flex-start; }
+}
+/* entrada de cada parte: fade e deslize de 24 px, com escalonamento curto entre os filhos (sem movimento, nada some) */
+.js-revela .rv { opacity: 0; transform: translateY(24px); }
+.js-revela .rv.visto { opacity: 1; transform: none; transition: opacity 450ms ease-out, transform 450ms cubic-bezier(.2, .7, .2, 1); transition-delay: var(--atraso, 0ms); }
+/* índice das partes: pontos à direita, só no computador */
+.indice { display: none; }
+@media (min-width: 900px) and (min-height: 700px) {
+  .indice { position: fixed; right: .75rem; top: 50%; transform: translateY(-50%); z-index: 9; display: flex; flex-direction: column; align-items: center; gap: .1rem; }
+  .indice a { position: relative; display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 999px; text-decoration: none; }
+  .indice a::before { content: ""; width: .5rem; height: .5rem; border-radius: 999px; box-shadow: inset 0 0 0 1.5px var(--borda-forte); transition: height var(--t), background var(--t); }
+  .indice a:hover::before { background: var(--borda-forte); }
+  .indice a[aria-current="true"]::before { height: 1.25rem; background: var(--acao); box-shadow: none; }
+  .indice a span { position: absolute; right: 2rem; top: 50%; transform: translateY(-50%); padding: .2rem .55rem; border-radius: var(--r-x); background: var(--tinta); color: var(--branco);
+    font-family: var(--f-titulo); font-weight: 600; font-size: .85rem; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity var(--t); }
+  .indice a:hover span, .indice a:focus-visible span { opacity: 1; }
+  .indice.sobre-escuro a::before { box-shadow: inset 0 0 0 1.5px var(--acao-linha); }
+  .indice.sobre-escuro a[aria-current="true"]::before { background: var(--branco); }
+  .indice.sobre-escuro a:focus-visible { outline-color: var(--branco); }
+}
+@media (min-width: 900px) and (max-width: 1320px) and (min-height: 700px) { main .envolve { padding-right: max(var(--gut), 2.75rem); } }
+.cab { max-width: 46rem; margin-bottom: 2rem; }
+.olho { font-family: var(--f-titulo); font-weight: 600; font-size: .95rem; color: var(--pedra); margin-bottom: .5rem; }
+h2 { font-family: var(--f-titulo); font-weight: 700; font-size: 2.125rem; line-height: 1.12; letter-spacing: -.005em; }
+.cab p.sub { margin-top: .75rem; font-size: 1.0625rem; color: var(--grafite); max-width: 42rem; }
+h3 { font-family: var(--f-titulo); font-weight: 700; font-size: 1.1875rem; line-height: 1.25; }
 
-/* números */
-.numeros { background: var(--carvao); color: var(--branco); padding: 4rem 0 3.5rem; }
-.numeros h2 { color: var(--branco); }
-.grade-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
-.numero b { display: block; font-family: var(--f-numero); font-weight: 800; font-size: clamp(3rem, 6vw, 4.6rem); line-height: 1;
-  color: var(--ipe); margin: 1.25rem 0 .6rem; }
-.numero p { margin: 0 0 .75rem; font-size: 1.1rem; color: var(--cal); }
-.fonte { font-size: .82rem; color: var(--nevoa); line-height: 1.45; }
-.numeros .fonte a { color: var(--nevoa); }
+/* ---------- herói */
+.heroi .envolve { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 3.5rem; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: .5rem; padding: .3rem .75rem; border-radius: 999px; background: var(--branco);
+  border: 1px solid var(--cal-2); font-family: var(--f-titulo); font-weight: 600; font-size: .9rem; color: var(--grafite); }
+.chip .ponto { width: .5rem; height: .5rem; background: var(--destaque); border-radius: 1px; }
+h1 { font-family: var(--f-titulo); font-weight: 700; font-size: 3.25rem; line-height: 1.04; letter-spacing: -.012em; margin: 1.25rem 0 1rem; }
+.lead { font-size: 1.15rem; line-height: 1.55; color: var(--grafite); max-width: 31rem; }
+.lead b { color: var(--tinta); font-weight: 700; }
+.acoes { display: flex; flex-wrap: wrap; gap: .625rem; margin-top: 1.6rem; }
+.senha { display: flex; align-items: flex-start; gap: .5rem; margin-top: .9rem; font-size: .925rem; color: var(--pedra); }
+.senha .ic { width: 1rem; height: 1rem; margin-top: .2rem; color: var(--grafite); }
+.senha b { color: var(--tinta); font-weight: 600; }
+.heroi figure { min-width: 0; }
+.legenda { margin-top: .75rem; font-size: .85rem; line-height: 1.45; color: var(--pedra); }
+.legenda::before { content: ""; display: inline-block; width: .5rem; height: .5rem; margin-right: .5rem; border: 1.5px solid var(--pedra); border-radius: 1px; vertical-align: .05em; }
+.legenda a { color: var(--tinta); font-weight: 600; margin-left: .35rem; white-space: nowrap; }
 
-/* seções */
-section { scroll-margin-top: 5rem; }
-.secao { padding: 5rem 0; }
-.olho { font-family: var(--f-titulo); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: .9rem;
-  display: flex; align-items: center; gap: .6rem; margin: 0 0 .75rem; }
-.olho::before { content: ""; width: .7rem; height: .7rem; background: var(--ipe); border: 1.5px solid currentColor; }
-h2 { font-family: var(--f-titulo); font-weight: 700; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; margin: 0 0 1rem; max-width: 44rem; }
-.sub { font-size: 1.2rem; color: var(--grafite); max-width: 42rem; margin: 0 0 2.5rem; }
+/* =====================================================================================================
+   Recriação da interface (mock): não é print. Só elementos visuais; o texto acessível vai no aria-label.
+   ===================================================================================================== */
+.app { --a: 13px; font-size: var(--a); line-height: 1.45; background: var(--cal); border: 1px solid var(--poeira); border-radius: var(--r-l);
+  box-shadow: var(--sombra-app); overflow: hidden; color: var(--tinta); text-align: left; }
+.app-topo { display: flex; align-items: center; gap: .9em; height: 3.4em; padding: 0 1.1em; background: var(--branco); border-bottom: 1px solid var(--cal-2); }
+.app-topo .lg { display: inline-flex; align-items: center; gap: .45em; }
+.app-topo .lg svg { width: 1.6em; height: 1.6em; }
+.app-topo .mig { font-family: var(--f-titulo); font-weight: 600; color: var(--grafite); white-space: nowrap; }
+.app-topo .mig u { text-decoration-thickness: 1.5px; text-underline-offset: 3px; color: var(--tinta); }
+.app-topo .dir { margin-left: auto; display: flex; align-items: center; gap: .8em; }
+.demo-tag { display: inline-flex; align-items: center; gap: .4em; font-family: var(--f-titulo); font-weight: 600; font-size: .88em; color: var(--grafite); white-space: nowrap; }
+.demo-tag::before { content: ""; width: .6em; height: .6em; background: var(--pedra); }
+.quem { display: inline-flex; align-items: center; gap: .5em; font-family: var(--f-titulo); font-weight: 600; white-space: nowrap; }
+.quem i { font-style: normal; display: grid; place-items: center; width: 2em; height: 2em; border-radius: var(--r-x); background: var(--cal); font-family: var(--f-numero); font-weight: 800; font-size: .95em; }
+.app-corpo { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+.conv { padding: 1.1em 1.2em 1.2em; display: flex; flex-direction: column; gap: .75em; min-width: 0; }
+.conv-tit { font-family: var(--f-titulo); font-weight: 700; font-size: 1.22em; padding-bottom: .55em; border-bottom: 1px solid var(--poeira); }
+.bolha { padding: .6em .85em; border-radius: var(--r-s); max-width: 88%; }
+.bolha.fiscal { align-self: flex-end; background: var(--cal-2); font-family: var(--f-titulo); font-weight: 600; display: inline-flex; gap: .45em; align-items: center; }
+.bolha.fiscal .ic { width: 1.1em; height: 1.1em; color: var(--grafite); }
+.bolha.agente { align-self: flex-start; background: var(--branco); border: 1px solid var(--cal-2); }
+.bolha .rot { display: flex; align-items: center; gap: .4em; font-family: var(--f-titulo); font-weight: 700; font-size: .82em; color: var(--pedra); margin-bottom: .2em; }
+.bolha .rot svg { width: 1.15em; height: 1.15em; color: var(--tinta); }
+.bolha .mais { display: inline-block; margin-top: .2em; font-family: var(--f-titulo); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+/* rodapé de guarda (régua tinta + escudo), como no produto */
+.guarda { --px: .85em; --py: .6em; margin: .6em calc(-1 * var(--px)) calc(-1 * var(--py)); padding: .8em var(--px) .55em; background: var(--regua), var(--cal);
+  border-radius: 0 0 var(--r-s) var(--r-s); display: flex; align-items: center; gap: .45em; font-family: var(--f-titulo); font-weight: 700; font-size: .95em; }
+.guarda .ic { width: 1.15em; height: 1.15em; }
+.guarda u { margin-left: auto; font-weight: 600; color: var(--grafite); text-underline-offset: 3px; }
+/* cartão AGORA: a única próxima ação (verde-cerrado com o filete terracota em cima, como no produto) */
+.agora { background: var(--acao); color: var(--sobre-acao); border-radius: var(--r-s); border-top: 4px solid var(--destaque); padding: .95em 1.05em 1.05em;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5em 1em; align-items: center; }
+.agora .rotulo { font-family: var(--f-numero); font-weight: 800; font-size: .92em; letter-spacing: .08em; color: var(--sobre-acao-2); grid-column: 1 / -1; line-height: 1; }
+.agora p.h { margin: 0; color: var(--sobre-acao); font-family: var(--f-titulo); font-weight: 700; font-size: 1.38em; line-height: 1.15; }
+.agora p { color: var(--sobre-acao-2); font-size: .95em; margin-top: .2em; }
+.agora .bts { display: flex; flex-direction: column; gap: .45em; }
+.agora.empilha { grid-template-columns: minmax(0, 1fr); }
+.agora.empilha .bts { flex-direction: row; flex-wrap: wrap; }
+.bt { display: inline-flex; align-items: center; justify-content: center; gap: .45em; min-height: 2.5em; padding: 0 1em; border-radius: var(--r-x);
+  font-family: var(--f-titulo); font-weight: 700; font-size: 1em; white-space: nowrap; }
+.bt .ic { width: 1.15em; height: 1.15em; }
+.bt-pri { background: var(--acao); color: var(--sobre-acao); }
+.agora .bt-pri { background: var(--branco); color: var(--acao); }
+.bt-cont { box-shadow: inset 0 0 0 1.5px var(--acao-linha); color: var(--sobre-acao); }
+.bt-mudo { background: var(--cal); color: var(--pedra); box-shadow: inset 0 0 0 1px var(--poeira); width: 100%; }
+.campo-msg { margin-top: auto; display: flex; align-items: center; gap: .8em; padding: .7em .9em; background: var(--branco); border: 1px solid var(--poeira); border-radius: var(--r-s); color: var(--pedra); }
+.campo-msg .ic { width: 1.25em; height: 1.25em; color: var(--tinta); }
+.campo-msg span { flex: 1; }
+/* painel do laudo */
+.painel { background: var(--branco); border-left: 1px solid var(--cal-2); padding: 1.1em 1.1em 1.2em; display: flex; flex-direction: column; gap: .7em; min-width: 0; }
+.painel .l1 { display: flex; justify-content: space-between; align-items: center; }
+.painel .l1 b { font-family: var(--f-numero); font-weight: 800; letter-spacing: .08em; font-size: .95em; }
+.etq { display: inline-flex; align-items: center; gap: .35em; padding: .2em .55em; border: 1px solid var(--poeira); border-radius: var(--r-x); font-family: var(--f-titulo); font-weight: 600; font-size: .88em; }
+.etq .ic { width: 1em; height: 1em; }
+.conta { display: flex; justify-content: space-between; align-items: baseline; gap: .5em; flex-wrap: wrap; }
+.conta .q { font-family: var(--f-titulo); font-weight: 700; font-size: 1.12em; }
+.conta .q b { font-family: var(--f-numero); font-weight: 800; font-size: 2.1em; line-height: .9; margin-right: .1em; }
+.conta .dv { display: inline-flex; align-items: center; gap: .3em; color: var(--divergente); font-family: var(--f-titulo); font-weight: 700; }
+.conta .dv .ic { width: 1.05em; height: 1.05em; }
+.seg { display: grid; grid-template-columns: repeat(5, 1fr); gap: .25em; }
+.seg i { height: .62em; border-radius: 2px; background: var(--listra-clara); box-shadow: inset 0 0 0 1px var(--cal-2); }
+.seg i.ok { background: var(--tinta); box-shadow: none; }
+.seg i.dv { background: var(--divergente); box-shadow: none; }
+.seg i.dj { background: var(--tinta); box-shadow: inset 0 3px 0 var(--divergente); }
+.seg i.vez { background: var(--falta); box-shadow: none; }
+.linha { display: flex; align-items: center; gap: .5em; padding: .55em .6em; background: var(--cal); border-radius: var(--r-x); font-family: var(--f-titulo); font-weight: 700; }
+.linha .ic { width: 1.2em; height: 1.2em; }
+.linha .car { margin-left: auto; width: 1em; height: 1em; color: var(--grafite); }
+.linha.clara { background: transparent; padding: .5em 0 .1em; border-top: 1px solid var(--cal-2); border-radius: 0; color: var(--grafite); }
+.linha.clara .ok { color: var(--verificado); }
+.grupo { font-family: var(--f-titulo); font-weight: 700; font-size: .95em; color: var(--grafite); margin-top: .1em; }
+.grupo.falta { background: var(--falta-claro); color: var(--tinta); box-shadow: inset 2px 0 0 var(--falta); padding: .3em .55em; border-radius: var(--r-x); }
+.itens { display: flex; flex-direction: column; }
+.it { display: grid; grid-template-columns: 1.6em minmax(0, 1fr) auto; gap: .65em; align-items: start; padding: .55em 0; border-bottom: 1px solid var(--cal-2); }
+.it:last-child { border-bottom: 0; }
+.it b { display: block; font-family: var(--f-titulo); font-weight: 700; font-size: 1.02em; line-height: 1.25; }
+.it small { display: block; color: var(--pedra); font-size: .92em; line-height: 1.35; margin-top: .1em; }
+.it .car { width: 1em; height: 1em; color: var(--grafite); margin-top: .2em; }
+/* ícones de status: nunca só cor (ícone + palavra) */
+.si { width: 1.5em; height: 1.5em; display: grid; place-items: center; }
+.si .ic { width: 1.25em; height: 1.25em; }
+.si.ok { color: var(--verificado); }
+.si.dv { color: var(--divergente); }
+.si.ft::before { content: ""; width: 1.05em; height: 1.05em; background: var(--falta-claro); box-shadow: inset 0 0 0 2px var(--falta); border-radius: 2px; }
+.nota-pe { text-align: center; color: var(--grafite); font-size: .92em; }
 
-.insight { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; align-items: start; }
-.contraste { display: grid; gap: 1rem; }
-.contraste div { padding: 1.4rem 1.5rem; border-radius: var(--r); background: var(--branco); border: 1.5px solid var(--poeira); }
-.contraste div.chao { background: var(--carvao); color: var(--branco); border-color: var(--carvao); }
-.contraste h3 { font-family: var(--f-titulo); font-weight: 700; font-size: 1.35rem; margin: 0 0 .35rem; }
-.contraste p { margin: 0; color: inherit; opacity: .9; }
+/* pílulas: só os 3 status do produto (Verificado, Divergente, Falta) */
+.st { display: inline-flex; align-items: center; gap: .35em; padding: .18em .55em; border-radius: var(--r-x); font-family: var(--f-titulo); font-weight: 700;
+  font-size: .9em; line-height: 1.35; white-space: nowrap; }
+.st .ic { width: 1em; height: 1em; }
+.st.ok { background: var(--verificado); color: var(--branco); }
+.st.dv { background: var(--divergente); color: var(--branco); }
+.st.ft { background: var(--falta-claro); color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--falta); }
+.st.ft::before { content: ""; width: .7em; height: .7em; box-shadow: inset 0 0 0 1.5px var(--falta); border-radius: 1px; }
 
-.passos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; counter-reset: p; }
-.passo { background: var(--branco); border-radius: var(--r); padding: 1.75rem 1.4rem 1.5rem; position: relative;
-  box-shadow: inset 1.5px 0 0 var(--poeira), inset -1.5px 0 0 var(--poeira), inset 0 -1.5px 0 var(--poeira); }
-.passo::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: var(--regua); }
-.passo .n { font-family: var(--f-numero); font-weight: 800; font-size: 2.6rem; line-height: 1; margin-bottom: .75rem; }
-.passo h3 { font-family: var(--f-titulo); font-weight: 700; font-size: 1.3rem; margin: 0 0 .5rem; }
-.passo p { margin: 0; color: var(--grafite); font-size: 1rem; }
-.passo .ia { display: inline-block; margin-top: 1rem; font-family: var(--f-titulo); font-weight: 600; font-size: .85rem;
-  padding: .15rem .55rem; border-radius: var(--r); background: var(--cal-2); }
+/* telas das etapas: uma coluna, com o indicador no topo (como no celular) */
+.app.etapa-app .app-topo { height: auto; padding: .8em 1.1em; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 15em); gap: .4em 1.4em; align-items: center; }
+.app.etapa-app .tt { font-family: var(--f-titulo); font-weight: 700; font-size: 1.12em; line-height: 1.2; display: flex; align-items: center; gap: .5em; min-width: 0; }
+.app.etapa-app .tt .ic { width: 1.15em; height: 1.15em; }
+.app.etapa-app .tt small { display: block; font-family: var(--f-texto); font-weight: 500; font-size: .8em; color: var(--pedra); }
+.app.etapa-app .ind { display: flex; flex-direction: column; gap: .35em; border-radius: var(--r-x); }
+.app.etapa-app .ind .conta .q b { font-size: 1.5em; }
+.app.etapa-app .ind .conta .q { font-size: 1em; }
+.app.etapa-app .conv { padding: 1em 1.1em 1.1em; }
+.duas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7em; }
+.cartao { background: var(--branco); border: 1px solid var(--cal-2); border-radius: var(--r-s); padding: .85em .95em; min-width: 0; }
+.cartao .rt { font-family: var(--f-titulo); font-weight: 700; font-size: .9em; color: var(--pedra); display: flex; align-items: center; gap: .4em; }
+.cartao .rt .ic { width: 1.1em; height: 1.1em; color: var(--tinta); }
+.cartao .big { display: flex; align-items: center; justify-content: space-between; gap: .5em; margin: .2em 0 .25em; }
+.cartao .big b { font-family: var(--f-numero); font-weight: 800; font-size: 2.5em; line-height: 1; letter-spacing: -.01em; }
+.cartao p { color: var(--grafite); font-size: .95em; }
+.cartao .pe { margin-top: .5em; font-family: var(--f-titulo); font-weight: 600; font-size: .9em; color: var(--grafite); }
+.cartao .guarda { --px: .95em; --py: .85em; margin-top: .7em; }
+.cartao.hist { padding-bottom: .85em; }
+.cartao.hist .big { margin: 0; }
+.cartao.hist .big b { font-family: var(--f-titulo); font-weight: 700; font-size: 1.08em; line-height: 1.25; letter-spacing: 0; }
+.marcas { display: flex; flex-wrap: wrap; gap: 3px; margin-top: .6em; }
+.marcas i { width: 7px; height: 12px; border-radius: 1px; box-shadow: inset 0 0 0 1px var(--nevoa); }
+.marcas i.c { background: var(--tinta); box-shadow: none; }
+.marcas i.l { background: repeating-linear-gradient(135deg, var(--tinta) 0 1.5px, transparent 1.5px 4px); box-shadow: inset 0 0 0 1px var(--tinta); }
+.mapa { background: #FAF9F5; border: 1px solid var(--cal-2); border-radius: var(--r-x); display: block; width: 100%; height: auto; }
+.foto-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: .8em; align-items: center; margin-top: .5em; }
+.foto-grid .big { margin: 0 0 .3em; }
+.foto-grid .big b { font-size: 2.2em; }
+.caso { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); gap: .9em; align-items: start; }
+.caso .cab-caso { display: flex; align-items: center; gap: .5em; flex-wrap: wrap; margin-bottom: .3em; }
+.caso .cab-caso b { font-family: var(--f-titulo); font-weight: 700; }
+.caso p { color: var(--grafite); }
+.caso p + p { margin-top: .3em; font-size: .92em; color: var(--pedra); }
+.verif .rt { margin-bottom: .3em; }
+.vl { display: grid; grid-template-columns: 1.5em minmax(0, 1fr); gap: .5em; align-items: center; padding: .35em .3em; border-top: 1px solid var(--cal-2); border-radius: var(--r-x); }
+.vl b { font-family: var(--f-titulo); font-weight: 700; }
+.vl small { color: var(--pedra); font-size: .95em; margin-left: .3em; }
+.campos { display: grid; gap: .5em; margin: .3em 0 .1em; }
+.campos .lb { display: block; font-size: .9em; color: var(--sobre-acao-2); margin-bottom: .2em; }
+.campos .cx { display: flex; align-items: center; min-height: 2.4em; padding: 0 .75em; border-radius: var(--r-x); background: var(--acao-2); box-shadow: inset 0 0 0 1.5px var(--acao-linha);
+  font-family: var(--f-numero); font-weight: 700; font-size: 1.15em; letter-spacing: .08em; color: var(--sobre-acao); }
+.campos .cx.vz { color: var(--sobre-acao-2); font-family: var(--f-texto); font-weight: 500; letter-spacing: 0; font-size: 1em; }
+.assinar { display: grid; gap: .7em; }
+.check { display: flex; gap: .55em; align-items: flex-start; font-family: var(--f-titulo); font-weight: 700; }
+.check i { flex: none; width: 1.25em; height: 1.25em; margin-top: .05em; border-radius: 3px; background: var(--acao); color: var(--sobre-acao); display: grid; place-items: center; }
+.check i .ic { width: .9em; height: .9em; }
+.pin { display: flex; gap: .45em; }
+.pin i { width: 2.4em; height: 2.6em; border-radius: var(--r-x); background: var(--branco); box-shadow: inset 0 0 0 1.5px var(--tinta); display: grid; place-items: center; }
+.pin i::before { content: ""; width: .55em; height: .55em; border-radius: 50%; background: var(--tinta); }
+.bt-cheio { width: 100%; min-height: 2.8em; }
+.assinar .guarda { margin: 0; border-radius: var(--r-x); }
+.dupla-assina { display: grid; grid-template-columns: minmax(0, 1fr) 13.5em; gap: 1.1em; align-items: start; }
+.selo { display: flex; flex-direction: column; gap: .5em; }
+.selo .vl small { display: block; margin-left: 0; }
+.selo .pe { margin-top: .2em; }
+.lacre { align-self: flex-start; display: inline-flex; align-items: center; gap: .4em; padding: .35em .9em .35em .65em; background: var(--tinta); color: var(--branco);
+  font-family: var(--f-numero); font-weight: 800; font-size: 1.15em; letter-spacing: .1em; clip-path: polygon(0 0, calc(100% - .6em) 0, 100% .6em, 100% 100%, 0 100%); }
+.lacre .ic { width: 1em; height: 1em; color: var(--destaque-vivo); }
+.celular { border-radius: 26px; border: 7px solid var(--tinta); background: var(--tinta); overflow: hidden; box-shadow: var(--sombra-app); }
+.celular img { width: 100%; }
+/* o elemento do mock ligado à linha da decisão em foco: contorno de 2 px tinta */
+[data-mira] { outline: 2px solid transparent; outline-offset: 2px; transition: outline-color 160ms ease; }
+[data-mira].mira { outline-color: var(--tinta); }
+.agora[data-mira].mira { outline-offset: 3px; }
 
-.papeis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
-.papel { border-radius: var(--r); padding: 1.75rem; border: 2px solid var(--carvao); background: var(--branco); }
-.papel.regra { background: var(--carvao); color: var(--branco); }
-.papel.humano { background: var(--ipe); }
-.papel .tag { font-family: var(--f-numero); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: .95rem; }
-.papel h3 { font-family: var(--f-titulo); font-weight: 700; font-size: 1.6rem; line-height: 1.15; margin: .5rem 0 .6rem; }
-.papel p { margin: 0; }
+/* ---------- herói: ajustes do mock grande */
+.heroi .bolha.agente { max-width: 94%; }
 
-.resultados { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; }
-.res { background: var(--branco); border-radius: var(--r); padding: 1.4rem 1.2rem; border: 1.5px solid var(--poeira); }
-.res b { display: block; font-family: var(--f-numero); font-weight: 800; font-size: 2.5rem; line-height: 1; margin-bottom: .5rem; }
-.res p { margin: 0; font-size: .98rem; color: var(--grafite); }
-.res small { display: block; margin-top: .5rem; font-size: .8rem; color: var(--pedra); }
-.nota { margin-top: 1.25rem; font-size: .88rem; color: var(--pedra); max-width: 56rem; }
+/* ---------- módulos (bento) */
+.bento { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+.mod { background: var(--branco); border: 1px solid var(--cal-2); border-radius: var(--r-l); padding: 1.5rem; box-shadow: var(--sombra); min-width: 0; }
+.s3 { grid-column: span 3; } .s12 { grid-column: span 12; }
+.num.dor b { color: var(--destaque); }
+.num { align-self: stretch; display: flex; flex-direction: column; }
+.num b { display: block; font-family: var(--f-numero); font-weight: 800; font-size: 2.875rem; line-height: 1; letter-spacing: -.01em; }
+.num > p:not(.fonte) { margin-top: .6rem; color: var(--grafite); flex: 1; }
+.num p.fonte, .fonte { margin-top: 1rem; padding-top: .75rem; border-top: 1px solid var(--cal-2); font-size: .8125rem; line-height: 1.45; color: var(--pedra); }
 
-.publicos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
-.publico { padding-top: 1.25rem; position: relative; }
-.publico::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: var(--regua); }
-.publico h3 { font-family: var(--f-titulo); font-weight: 700; font-size: 1.4rem; margin: .75rem 0 .5rem; }
-.publico ul { margin: 0; padding-left: 1.1rem; color: var(--grafite); }
-.publico li { margin: .3rem 0; }
+/* ---------- onde entra: duas colunas, quem gera evidência (lotado) e quem confere (o Laudo Vivo) */
+.ev-grade { display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem minmax(0, 1.2fr); align-items: stretch; }
+.ev { background: var(--branco); border: 1px solid var(--cal-2); border-radius: var(--r-l); padding: 1.3rem 1.4rem 1.4rem; box-shadow: var(--sombra); min-width: 0; display: flex; flex-direction: column; }
+.ev-cab { display: flex; align-items: center; justify-content: space-between; gap: .5rem 1rem; flex-wrap: wrap; padding-bottom: .8rem; margin-bottom: .9rem; border-bottom: 1px solid var(--cal-2); }
+.ev-cab h3 { font-size: 1.375rem; }
+.rot-ev { display: inline-flex; align-items: center; padding: .15rem .6rem; border-radius: 999px; font-family: var(--f-titulo); font-weight: 700; font-size: .9rem;
+  color: var(--grafite); background: var(--cal); white-space: nowrap; }
+.rot-ev.nos { background: var(--acao); color: var(--sobre-acao); }
+.ev-gera { background: var(--areia); box-shadow: none; }
+.ev-gera ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+.ev-gera li { display: flex; align-items: center; gap: .6rem; padding: .7rem .75rem; background: var(--branco); border: 1px solid var(--cal-2); border-radius: var(--r-s);
+  font-family: var(--f-titulo); font-weight: 600; font-size: 1rem; line-height: 1.25; color: var(--grafite); }
+.ico-ev { flex: none; display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: var(--r-x); background: var(--cal); color: var(--grafite); }
+.ico-ev .ic { width: 1.1rem; height: 1.1rem; }
+.ev-gera .ev-pe, .ev-confere .ev-pe { margin-top: auto; padding-top: .9rem; font-size: .875rem; color: var(--pedra); }
+.ev-confere { border: 1.5px solid var(--acao); box-shadow: 0 0 0 1px var(--acao), var(--sombra); }
+.ev-confere ul { display: grid; gap: .1rem; }
+.ev-confere li { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr); gap: .65rem; padding: .55rem 0; border-top: 1px solid var(--cal-2); }
+.ev-confere li:first-child { border-top: 0; padding-top: 0; }
+.ev-confere li > .ic { width: 1.25rem; height: 1.25rem; margin-top: .15rem; color: var(--acao); }
+.ev-confere li b { display: block; font-family: var(--f-titulo); font-weight: 700; font-size: 1.125rem; line-height: 1.25; }
+.ev-confere li small { display: block; margin-top: .15rem; color: var(--grafite); font-size: .95rem; line-height: 1.4; }
+.ev-liga { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; padding: 0 .5rem; text-align: center; }
+.ev-liga span { font-family: var(--f-titulo); font-weight: 600; font-size: .85rem; line-height: 1.2; color: var(--pedra); }
+.ev-liga svg { width: 100%; height: 12px; color: var(--tinta); }
+.ev-liga svg.v { display: none; }
+.fecho { margin-top: 1.75rem; padding-top: 1.1rem; background: var(--regua); font-family: var(--f-titulo); font-weight: 600; font-size: 1.375rem; line-height: 1.3; color: var(--grafite); max-width: 52rem; }
+.fecho b { color: var(--tinta); font-weight: 700; }
 
-.escuro { background: var(--carvao); color: var(--branco); }
-.escuro h2, .escuro .olho { color: var(--branco); }
-.escuro .sub { color: var(--nevoa); }
-.garantias { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
-.garantia { background: var(--carvao-2); border: 1.5px solid var(--carvao-3); border-radius: var(--r); padding: 1.5rem; }
-.garantia svg { width: 1.8rem; height: 1.8rem; color: var(--ipe); }
-.garantia h3 { font-family: var(--f-titulo); font-weight: 700; font-size: 1.25rem; margin: .75rem 0 .4rem; }
-.garantia p { margin: 0; color: var(--nevoa); font-size: 1rem; }
+/* ---------- como funciona (palco cal, abas acessíveis) */
+.papeis { display: flex; flex-wrap: wrap; gap: .5rem; margin: -.75rem 0 1.5rem; }
+.papeis li { display: inline-flex; align-items: center; gap: .55rem; padding: .3rem .75rem .3rem .3rem; background: var(--branco); border: 1px solid var(--cal-2); border-radius: 999px;
+  font-size: .925rem; color: var(--grafite); }
+.tag { display: inline-flex; align-items: center; gap: .4rem; padding: .15rem .6rem; border-radius: 999px; font-family: var(--f-titulo); font-weight: 700; font-size: .9rem; color: var(--tinta); background: var(--cal); white-space: nowrap; }
+.tag .ic { width: .95rem; height: .95rem; }
+.tag.rg { background: var(--tinta); color: var(--branco); }
+.tag.hm { background: var(--branco); box-shadow: inset 0 0 0 1.5px var(--tinta); }
+.abas { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
+.aba { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .1rem .7rem; align-items: center; text-align: left; padding: .7rem .8rem 1rem; border-radius: var(--r) var(--r) 0 0;
+  border: 0; background: transparent; transition: background var(--t); }
+.aba::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; border-radius: 2px; background: var(--poeira); transition: background var(--t); }
+@media (hover: hover) { .aba:hover { background: rgba(255, 255, 255, .55); } }
+.aba .n { grid-row: span 2; width: 2rem; height: 2rem; border-radius: 50%; display: grid; place-items: center; font-family: var(--f-numero); font-weight: 800; font-size: 1.05rem;
+  box-shadow: inset 0 0 0 1.5px var(--poeira); color: var(--grafite); background: var(--branco); transition: background var(--t), color var(--t), box-shadow var(--t); }
+.aba .n .ic { width: .95rem; height: .95rem; display: none; }
+.aba .t { font-family: var(--f-titulo); font-weight: 700; font-size: 1.0625rem; line-height: 1.2; color: var(--grafite); }
+.aba .t .cu { display: none; }
+.aba .q { font-size: .82rem; color: var(--pedra); line-height: 1.2; }
+.aba[aria-selected="true"] .n { background: var(--acao); color: var(--sobre-acao); box-shadow: none; }
+.aba[aria-selected="true"] .t { color: var(--tinta); }
+.aba[aria-selected="true"]::after, .aba.feita::after { background: var(--acao); }
+.aba.feita .n { box-shadow: inset 0 0 0 1.5px var(--acao); color: var(--acao); }
+.aba.feita .n span { display: none; }
+.aba.feita .n .ic { display: block; }
+.aba:focus-visible { outline-offset: -2px; border-radius: var(--r); }
+.paineis { margin-top: 1.75rem; }
+@media (min-width: 1181px) and (min-height: 700px) {
+  .pg.palco { padding: 1.5rem 0; }
+  .etapas { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 2.5rem; align-items: end; }
+  .etapas > .cab { margin-bottom: 1.25rem; }
+  .etapas > .cab h2 { font-size: 1.875rem; }
+  .palco .app { --a: 12.5px; }
+  .etapas > .papeis { flex-direction: column; align-items: flex-start; gap: .4rem; margin: 0 0 1.25rem; }
+  .etapas > .abas, .etapas > .paineis { grid-column: 1 / -1; }
+  .paineis { margin-top: 1.1rem; }
+}
+.painel-etapa { display: grid; grid-template-columns: minmax(0, 4.4fr) minmax(0, 7.6fr); gap: 2.5rem; align-items: start; }
+.painel-etapa[hidden] { display: none; }
+.painel-etapa.entra .ep-texto, .painel-etapa.entra .ep-tela { animation: entra 200ms ease-out both; }
+.painel-etapa.entra .ep-tela { animation-delay: 30ms; }
+@keyframes entra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ep-texto h3 { font-size: 1.625rem; line-height: 1.15; margin-bottom: .55rem; }
+.ep-texto > p { color: var(--grafite); }
+.decide { margin-top: 1.4rem; background: var(--branco); border: 1px solid var(--cal-2); border-radius: var(--r-l); overflow: hidden; }
+.decide summary { display: flex; align-items: center; gap: .5rem; padding: .75rem 1rem; font-family: var(--f-titulo); font-weight: 700; font-size: 1rem; cursor: pointer; list-style: none; }
+.decide summary::-webkit-details-marker { display: none; }
+.decide summary .qt { color: var(--pedra); font-weight: 600; }
+.decide summary .car { margin-left: auto; width: 1rem; height: 1rem; color: var(--grafite); transform: rotate(90deg); transition: transform var(--t); }
+.decide:not([open]) summary .car { transform: none; }
+.decide summary:focus-visible { outline-offset: -3px; border-radius: var(--r-l); }
+.decide ul { border-top: 1px solid var(--cal-2); }
+.decide li { display: grid; grid-template-columns: 1.25rem minmax(0, 1fr); gap: .7rem; padding: .7rem 1rem; border-top: 1px solid var(--cal-2); transition: background var(--t); }
+.decide li:first-child { border-top: 0; }
+.decide li[data-alvo] { cursor: default; }
+.decide li[data-alvo]:hover, .decide li.ativo { background: var(--listra); }
+.decide li:focus-visible { outline-offset: -3px; border-radius: 0; }
+.decide .qm { width: 1.25rem; height: 1.25rem; margin-top: .15rem; color: var(--pedra); }
+.decide .l1 { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .5rem; }
+.decide .l1 .st { font-size: .85rem; }
+.decide li p { color: var(--grafite); font-size: .95rem; line-height: 1.45; margin-top: .3rem; }
+.decide li.g { background: var(--regua), var(--branco); padding-top: 1rem; }
+.decide li.g[data-alvo]:hover, .decide li.g.ativo { background: var(--regua), var(--listra); }
+.decide li.g .qm { color: var(--tinta); }
+.decide .gt { font-family: var(--f-titulo); font-weight: 700; font-size: .98rem; line-height: 1.3; }
+code { font-family: var(--f-titulo); font-weight: 600; font-size: .8rem; color: var(--grafite); background: var(--areia); border: 1px solid var(--cal-2); border-radius: 4px;
+  padding: .05rem .35rem; overflow-wrap: anywhere; }
+.ep-tela { min-width: 0; }
+.ep-tela .legenda { margin-top: .6rem; }
 
-.modelo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 3rem; align-items: center; }
-.precos { display: grid; gap: .75rem; }
-.preco { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 1rem 1.25rem;
-  background: var(--branco); border: 1.5px solid var(--poeira); border-radius: var(--r); }
-.preco.dest { border: 2px solid var(--carvao); box-shadow: 6px 6px 0 var(--ipe); }
-.preco span { font-family: var(--f-titulo); font-weight: 600; font-size: 1.1rem; }
-.preco b { font-family: var(--f-numero); font-weight: 800; font-size: 2rem; }
+/* ---------- resultados */
+.res-grade { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+.res { background: var(--branco); border: 1px solid var(--cal-2); border-radius: var(--r-l); padding: 1.25rem 1.2rem 1.15rem; box-shadow: var(--sombra); display: flex; flex-direction: column; min-width: 0; }
+.res b { font-family: var(--f-numero); font-weight: 800; font-size: 2.25rem; line-height: 1; letter-spacing: -.01em; }
+.res p { margin-top: .5rem; color: var(--grafite); font-size: .95rem; line-height: 1.4; flex: 1; }
+.res small { display: block; margin-top: .9rem; padding-top: .6rem; border-top: 1px solid var(--cal-2); font-size: .8125rem; color: var(--pedra); }
+.res .par { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.res .par > span { display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
+.res .par > span + span { border-left: 1px solid var(--cal-2); padding-left: 1rem; }
+.res .par i { font-style: normal; font-family: var(--f-titulo); font-weight: 600; font-size: .9rem; color: var(--pedra); }
+.olho-linha { display: flex; align-items: center; flex-wrap: wrap; gap: .4rem .75rem; }
+.etq-sint { display: inline-flex; align-items: center; gap: .35rem; padding: .1rem .55rem; border-radius: 999px; background: var(--branco); border: 1px solid var(--cal-2);
+  font-family: var(--f-titulo); font-weight: 600; font-size: .85rem; color: var(--grafite); }
+.etq-sint::before { content: ""; width: .45rem; height: .45rem; border-radius: 1px; box-shadow: inset 0 0 0 1.5px var(--pedra); }
 
-.chamada { background: var(--ipe); padding: 4.5rem 0; }
-.chamada .envolve { display: grid; grid-template-columns: minmax(0, 1.4fr) auto; gap: 2rem; align-items: center; }
-.chamada h2 { margin: 0 0 .5rem; }
-.chamada p { margin: 0; font-size: 1.15rem; max-width: 40rem; }
+/* ---------- módulos em linha: cabeçalho à esquerda, três colunas à direita */
+.linha-mod { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 1.5rem 2.5rem; align-items: start; }
+.mod h2 { font-size: 1.625rem; }
+.mod .olho { margin-bottom: .4rem; }
+.mod-cab p.sub { margin-top: .6rem; color: var(--grafite); }
+.tri { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+.garantia .ico { width: 2.25rem; height: 2.25rem; border-radius: var(--r-s); background: var(--cal); display: grid; place-items: center; margin-bottom: .7rem; }
+.garantia .ico .ic { width: 1.15rem; height: 1.15rem; }
+.garantia h3, .publico h3 { font-size: 1.0625rem; }
+.garantia p { color: var(--grafite); font-size: .95rem; margin-top: .2rem; }
+.tri > div + div { border-left: 1px solid var(--cal-2); padding-left: 1.25rem; }
+.publico ul { margin-top: .4rem; }
+.publico li { display: flex; gap: .55rem; align-items: flex-start; color: var(--grafite); font-size: .95rem; padding: .15rem 0; }
+.publico li::before { content: ""; flex: none; width: .45rem; height: .45rem; margin-top: .5rem; background: var(--tinta); border-radius: 1px; }
 
-.rodape { background: var(--carvao); color: var(--nevoa); padding: 3rem 0 2.5rem; font-size: .92rem; }
-.rodape .envolve { display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; align-items: flex-start; }
-.rodape .marca b { color: var(--branco); }
-.rodape a { color: var(--cal); }
-.rodape nav { display: flex; flex-wrap: wrap; gap: 1.25rem; }
-.rodape p { margin: .75rem 0 0; max-width: 34rem; }
+/* ---------- modelo e fechamento */
+.precos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--cal-2); border-radius: var(--r); overflow: hidden; }
+.preco { display: flex; flex-direction: column; gap: .35rem; padding: .95rem 1rem 1rem; background: var(--branco); min-width: 0; }
+.preco + .preco { border-left: 1px solid var(--cal-2); }
+.preco span { font-family: var(--f-titulo); font-weight: 700; font-size: 1.0625rem; line-height: 1.2; }
+.preco b { font-family: var(--f-numero); font-weight: 800; font-size: 2rem; line-height: 1; }
+.preco small { font-size: .85rem; color: var(--pedra); line-height: 1.35; }
+.preco .vl-p { display: flex; align-items: baseline; flex-wrap: wrap; gap: .1rem .45rem; }
+.preco .vl-p small { font-family: var(--f-titulo); font-weight: 600; color: var(--grafite); white-space: nowrap; }
+.preco.dest { box-shadow: inset 0 3px 0 var(--destaque); }
+.preco.dest b { color: var(--destaque); }
+.chamada { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 1.5rem 2.5rem; align-items: center; }
+.chamada h2 { margin-bottom: .55rem; }
+.chamada .ch-texto > p { color: var(--grafite); max-width: 38rem; }
+.ch-demo { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); gap: 1.1rem; align-items: center; padding: 1rem; background: var(--areia); border: 1px solid var(--cal-2); border-radius: var(--r); }
+.ch-demo .celular { border-width: 5px; border-radius: 18px; box-shadow: var(--sombra); }
+.cel-mock { font-size: 8.5px; line-height: 1.4; display: flex; flex-direction: column; aspect-ratio: 9 / 17; background: var(--areia); color: var(--tinta); }
+.cel-mock .cel-topo { display: flex; align-items: center; gap: .5em; padding: .9em .8em .7em; background: var(--branco); border-bottom: 1px solid var(--cal-2); font-family: var(--f-titulo); }
+.cel-mock .cel-topo .ic { width: 1.2em; height: 1.2em; }
+.cel-mock .cel-corpo { flex: 1; display: flex; flex-direction: column; gap: .6em; padding: .7em; }
+.cel-mock .cartao { padding: .7em .75em; }
+.cel-mock .cartao .big b { font-size: 2.2em; }
+.cel-mock .cartao p { margin-top: .35em; }
+.cel-mock .agora { margin-top: auto; padding: .8em .8em .85em; }
+.cel-mock .agora p.h { font-size: 1.25em; }
+.cel-mock .bt { width: 100%; }
+.ch-demo figcaption b { display: block; font-family: var(--f-titulo); font-weight: 700; font-size: 1rem; }
+.ch-demo figcaption p { margin-top: .3rem; font-size: .925rem; color: var(--grafite); }
 
-@media (max-width: 1000px) {
-  .heroi .envolve, .insight, .modelo { grid-template-columns: minmax(0, 1fr); }
-  .passos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .resultados { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .papeis, .publicos, .garantias, .grade-3 { grid-template-columns: minmax(0, 1fr); }
-  .chamada .envolve { grid-template-columns: minmax(0, 1fr); }
+/* ---------- contato (a última parte, no lugar do rodapé): fundo verde-cerrado, formulário branco */
+.pg.escura { background: var(--acao); color: var(--sobre-acao); border-top-color: var(--acao); }
+.contato-grade { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 2rem 4rem; align-items: center; }
+.contato .olho { color: var(--sobre-acao-2); }
+.contato h2 { font-size: 2.75rem; }
+.contato-texto > p:not(.olho) { margin-top: .9rem; font-size: 1.125rem; color: var(--sobre-acao-2); max-width: 28rem; }
+.contato-texto .demo-lembra { margin-top: 1.4rem; display: flex; gap: .5rem; align-items: flex-start; font-size: .95rem; }
+.contato-texto .demo-lembra .ic { width: 1rem; height: 1rem; margin-top: .25rem; }
+.contato-texto a { color: var(--sobre-acao); font-weight: 600; }
+.contato :focus-visible { outline-color: var(--branco); }
+.form-caixa { background: var(--branco); color: var(--tinta); border-radius: var(--r-l); padding: 1.6rem 1.6rem 1.4rem; box-shadow: 0 24px 48px -24px rgba(0, 0, 0, .45); min-width: 0; }
+.form-caixa :focus-visible { outline-color: var(--tinta); }
+.campos-f { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .85rem 1rem; }
+.fld { display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
+.fld.largo { grid-column: 1 / -1; }
+.fld label { font-family: var(--f-titulo); font-weight: 700; font-size: 1rem; line-height: 1.2; }
+.fld .opc { font-weight: 600; font-size: .875rem; color: var(--pedra); margin-left: .25rem; }
+.fld input, .fld textarea { width: 100%; min-height: 2.75rem; padding: .55rem .75rem; border: 1.5px solid var(--borda-forte); border-radius: var(--r-s); background: var(--branco);
+  font: inherit; font-size: 1rem; color: var(--tinta); transition: border-color var(--t), box-shadow var(--t); }
+.fld textarea { resize: vertical; min-height: 5.25rem; line-height: 1.45; }
+.fld input:focus, .fld textarea:focus { outline: none; border-color: var(--acao); box-shadow: 0 0 0 3px var(--acao-claro); }
+.fld input:user-invalid, .fld textarea:user-invalid { border-color: var(--divergente); }
+.consent { display: flex; gap: .65rem; align-items: flex-start; margin-top: 1rem; font-size: .975rem; line-height: 1.4; color: var(--tinta); cursor: pointer; }
+.consent input { flex: none; width: 1.25rem; height: 1.25rem; margin: .1rem 0 0; accent-color: var(--acao); cursor: pointer; }
+.form-pe { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem 1.25rem; margin-top: 1.1rem; }
+.form-pe .btn { min-width: 9rem; }
+.form-status { flex: 1 1 14rem; font-size: .95rem; font-weight: 600; color: var(--grafite); }
+.form-status:empty { display: none; }
+.form-status.erro { color: var(--divergente); }
+.isca { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.form-ok { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: .9rem; align-items: start; padding: .5rem 0; }
+.form-ok[hidden] { display: none; }
+.form-ok:focus { outline: none; }
+.form-ok .si-ok { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 999px; background: var(--verificado); color: var(--branco); }
+.form-ok .si-ok .ic { width: 1.25rem; height: 1.25rem; }
+.form-ok b { display: block; font-family: var(--f-titulo); font-weight: 700; font-size: 1.375rem; line-height: 1.25; }
+.form-ok p { margin-top: .35rem; color: var(--grafite); }
+
+/* =============================================== responsivo */
+@media (max-width: 1180px) {
+  h1 { font-size: 2.875rem; }
+  .heroi .envolve { gap: 2.5rem; }
+  .s3 { grid-column: span 6; }
+  .ev-grade { grid-template-columns: minmax(0, 1fr) 4.5rem minmax(0, 1.2fr); }
+  .ev-gera ul { grid-template-columns: minmax(0, 1fr); }
+  .contato-grade { gap: 2rem 2.5rem; }
+  .res-grade { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .res-grade .res { grid-column: span 2; }
+  .res-grade .res:nth-child(n+4) { grid-column: span 3; }
+  .painel-etapa { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  .ep-texto { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 2rem; }
+  .ep-texto .decide { margin-top: 0; grid-column: 2; grid-row: 1 / span 3; }
+  .linha-mod { grid-template-columns: minmax(0, 1fr); }
+  .chamada { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 980px) {
+  :root { --gut: 1.25rem; }
   .nav { display: none; }
   .topo .btn { margin-left: auto; }
+  .heroi .envolve { grid-template-columns: minmax(0, 1fr); }
+  .contato-grade { grid-template-columns: minmax(0, 1fr); }
+  .precos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .preco + .preco { border-left: 0; }
+  .preco:nth-child(even) { border-left: 1px solid var(--cal-2); }
+  .preco:nth-child(n+3) { border-top: 1px solid var(--cal-2); }
 }
-@media (max-width: 560px) {
-  .envolve { padding: 0 1rem; }
-  .heroi { padding: 2.5rem 0 2rem; }
-  .passos, .resultados { grid-template-columns: minmax(0, 1fr); }
-  .celular { width: 34%; right: -.25rem; }
-  .carimbo { left: -.25rem; bottom: .5rem; font-size: .9rem; }
-  .secao { padding: 3.5rem 0; }
-  .acoes .btn { width: 100%; }
-  .marca b { font-size: 1.35rem; }
+@media (max-width: 760px) {
+  :root { --gut: 1rem; --topo-h: 56px; --meio: 1.25rem; }
+  h1 { font-size: 2.375rem; }
+  h2 { font-size: 1.75rem; }
+  .lead { font-size: 1.0625rem; }
+  .pg { padding: 2.25rem 0 2.5rem; }
+  .heroi { padding-top: 1.75rem; }
+  .cab { margin-bottom: 1.4rem; }
+  .marca b { font-size: 1.15rem; }
+  .acoes .btn { flex: 1 1 100%; }
+  .app { --a: 12.5px; }
+  .app-topo .mig, .app-topo .quem span { display: none; }
+  .app-corpo { grid-template-columns: minmax(0, 1fr); }
+  .painel { border-left: 0; border-top: 1px solid var(--cal-2); }
+  .so-pc { display: none !important; }
+  .agora { grid-template-columns: minmax(0, 1fr); }
+  .agora .bts { flex-direction: row; }
+  .agora .bts .bt { flex: 1 1 0; }
+  .app.etapa-app .app-topo { grid-template-columns: minmax(0, 1fr); }
+  .duas { grid-template-columns: minmax(0, 1fr); }
+  .dupla-assina { grid-template-columns: minmax(0, 1fr); }
+  .num b { font-size: 2.5rem; }
+  .num > p:not(.fonte) { margin-top: .4rem; font-size: .975rem; }
+  .num p.fonte { margin-top: 1rem; padding-top: .6rem; font-size: .8125rem; color: var(--pedra); }
+  .s3 { grid-column: span 12; }
+  .mod { padding: 1.25rem; }
+  .ev-grade { grid-template-columns: minmax(0, 1fr); }
+  .ev { padding: 1.1rem 1.1rem 1.2rem; }
+  .ev-gera ul { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+  .ev-gera li { flex-direction: column; align-items: flex-start; gap: .45rem; padding: .6rem .65rem; font-size: .95rem; }
+  .ev-liga { flex-direction: row; justify-content: flex-start; gap: .6rem; padding: .3rem 0 .3rem 1.4rem; }
+  .ev-liga svg.h { display: none; }
+  .ev-liga svg.v { display: block; width: 12px; height: 2.25rem; }
+  .fecho { font-size: 1.1875rem; margin-top: 1.4rem; }
+  .contato h2 { font-size: 2.125rem; }
+  .form-caixa { padding: 1.15rem 1rem 1.1rem; }
+  .campos-f { grid-template-columns: minmax(0, 1fr); }
+  .form-pe .btn { flex: 1 1 100%; }
+  /* papéis: uma linha por papel */
+  .papeis { margin: -.5rem 0 1.25rem; flex-direction: column; gap: .4rem; }
+  .papeis li { border-radius: var(--r); }
+  /* abas: uma faixa única, presa logo abaixo do topo, com o segmento de progresso embaixo de cada aba */
+  .abas { position: sticky; top: var(--topo-h); z-index: 6; display: flex; gap: .2rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    margin: 0 calc(-1 * var(--gut)); padding: .4rem var(--gut) 0; scroll-padding-inline: var(--gut); background: var(--cal); border-bottom: 1px solid var(--cal-2); }
+  .abas::-webkit-scrollbar { display: none; }
+  .aba { flex: 1 0 auto; scroll-snap-align: start; grid-template-columns: auto auto; gap: .35rem; padding: .45rem .3rem .7rem; justify-content: center; }
+  .aba .n { grid-row: auto; width: 1.4rem; height: 1.4rem; font-size: .8rem; }
+  .aba .n .ic { width: .8rem; height: .8rem; }
+  .aba .t { font-size: .95rem; white-space: nowrap; }
+  .aba .t .lg { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+  .aba .t .cu { display: inline; }
+  .aba .q { display: none; }
+  .paineis { margin-top: 1.25rem; }
+  /* no celular, a tela do produto vem logo depois do texto da etapa; as decisões, recolhidas, embaixo dela */
+  .painel-etapa { display: flex; flex-direction: column; gap: 0; }
+  .ep-texto { display: contents; }
+  .ep-tela { order: 2; margin-top: 1rem; }
+  .ep-texto .decide { order: 3; margin-top: 1rem; align-self: stretch; }
+  .ep-texto h3 { font-size: 1.375rem; }
+  .res-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+  .res-grade .res, .res-grade .res:nth-child(n+4) { grid-column: span 1; }
+  .res-grade .res.largo { grid-column: span 2; }
+  .res b { font-size: 2rem; }
+  .tri { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .tri > div { padding: .9rem 0; }
+  .tri > div + div { border-left: 0; padding-left: 0; border-top: 1px solid var(--cal-2); }
+  .tri > div:last-child { padding-bottom: 0; }
+  .ch-demo { grid-template-columns: 7.5rem minmax(0, 1fr); gap: .9rem; padding: .85rem; }
+  .cel-mock { font-size: 7.5px; }
+  .ch-demo .celular { border-width: 4px; border-radius: 14px; }
 }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+@media (max-width: 420px) {
+  h1 { font-size: 2.125rem; }
+  .agora .bts { flex-direction: column; }
+  .precos { grid-template-columns: minmax(0, 1fr); }
+  .preco:nth-child(even) { border-left: 0; }
+  .preco + .preco { border-top: 1px solid var(--cal-2); }
+  .preco { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: .1rem .75rem; padding: .75rem 1rem; }
+  .preco > small { grid-column: 1; grid-row: 2; }
+  .preco .vl-p { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js-revela .rv { opacity: 1; transform: none; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <!-- Ícones Phosphor (bold, MIT) e Lucide (satélite, ISC), os mesmos de ../vendor/icones/ -->
+  <symbol id="i-cam" viewBox="0 0 256 256"><path d="M208,52H182.42L170,33.34A12,12,0,0,0,160,28H96a12,12,0,0,0-10,5.34L73.57,52H48A28,28,0,0,0,20,80V192a28,28,0,0,0,28,28H208a28,28,0,0,0,28-28V80A28,28,0,0,0,208,52Zm4,140a4,4,0,0,1-4,4H48a4,4,0,0,1-4-4V80a4,4,0,0,1,4-4H80a12,12,0,0,0,10-5.34L102.42,52h51.15L166,70.66A12,12,0,0,0,176,76h32a4,4,0,0,1,4,4ZM128,84a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,84Zm0,72a24,24,0,1,1,24-24A24,24,0,0,1,128,156Z"/></symbol>
+  <symbol id="i-lapis" viewBox="0 0 256 256"><path d="M232.49,55.51l-32-32a12,12,0,0,0-17,0l-96,96A12,12,0,0,0,84,128v32a12,12,0,0,0,12,12h32a12,12,0,0,0,8.49-3.51l96-96A12,12,0,0,0,232.49,55.51ZM192,49l15,15L196,75,181,60Zm-69,99H108V133l56-56,15,15Zm105-7.43V208a20,20,0,0,1-20,20H48a20,20,0,0,1-20-20V48A20,20,0,0,1,48,28h67.43a12,12,0,0,1,0,24H52V204H204V140.57a12,12,0,0,1,24,0Z"/></symbol>
+  <symbol id="i-dif" viewBox="0 0 256 256"><path d="M228,160a12,12,0,0,1-12,12H104.22L56.88,224.07a12,12,0,0,1-17.76-16.14L71.78,172H40a12,12,0,0,1,0-24H93.6L130,108H40a12,12,0,0,1,0-24H151.78l47.34-52.07a12,12,0,0,1,17.76,16.14L184.22,84H216a12,12,0,0,1,0,24H162.4L126,148h90A12,12,0,0,1,228,160Z"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></symbol>
+  <symbol id="i-escudo" viewBox="0 0 256 256"><path d="M208,36H48A20,20,0,0,0,28,56v56c0,54.29,26.32,87.22,48.4,105.29,23.71,19.39,47.44,26,48.44,26.29a12.1,12.1,0,0,0,6.32,0c1-.28,24.73-6.9,48.44-26.29,22.08-18.07,48.4-51,48.4-105.29V56A20,20,0,0,0,208,36Zm-4,76c0,35.71-13.09,64.69-38.91,86.15A126.28,126.28,0,0,1,128,219.38a126.14,126.14,0,0,1-37.09-21.23C65.09,176.69,52,147.71,52,112V60H204ZM79.51,144.49a12,12,0,1,1,17-17L112,143l47.51-47.52a12,12,0,0,1,17,17l-56,56a12,12,0,0,1-17,0Z"/></symbol>
+  <symbol id="i-cadeado" viewBox="0 0 256 256"><path d="M208,76H180V56A52,52,0,0,0,76,56V76H48A20,20,0,0,0,28,96V208a20,20,0,0,0,20,20H208a20,20,0,0,0,20-20V96A20,20,0,0,0,208,76ZM100,56a28,28,0,0,1,56,0V76H100ZM204,204H52V100H204Z"/></symbol>
+  <symbol id="i-video" viewBox="0 0 256 256"><path d="M249.45,69.31a12,12,0,0,0-12.51,1L212,88.43V72a20,20,0,0,0-20-20H32A20,20,0,0,0,12,72V184a20,20,0,0,0,20,20H192a20,20,0,0,0,20-20V167.57l24.94,18.14A12,12,0,0,0,256,176V80A12,12,0,0,0,249.45,69.31ZM188,180H36V76H188Zm44-27.57-20-14.54V118.11l20-14.54Z"/></symbol>
+  <symbol id="i-nota" viewBox="0 0 256 256"><path d="M68,100A12,12,0,0,1,80,88h96a12,12,0,0,1,0,24H80A12,12,0,0,1,68,100Zm12,52h96a12,12,0,0,0,0-24H80a12,12,0,0,0,0,24ZM236,56V208a12,12,0,0,1-17.37,10.73L192,205.42l-26.63,13.31a12,12,0,0,1-10.74,0L128,205.42l-26.63,13.31a12,12,0,0,1-10.74,0L64,205.42,37.37,218.73A12,12,0,0,1,20,208V56A20,20,0,0,1,40,36H216A20,20,0,0,1,236,56Zm-24,4H44V188.58l14.63-7.31a12,12,0,0,1,10.74,0L96,194.58l26.63-13.31a12,12,0,0,1,10.74,0L160,194.58l26.63-13.31a12,12,0,0,1,10.74,0L212,188.58Z"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 256 256"><path d="M128,180a52.06,52.06,0,0,0,52-52V64A52,52,0,0,0,76,64v64A52.06,52.06,0,0,0,128,180ZM100,64a28,28,0,0,1,56,0v64a28,28,0,0,1-56,0Zm40,155.22V240a12,12,0,0,1-24,0V219.22A92.14,92.14,0,0,1,36,128a12,12,0,0,1,24,0,68,68,0,0,0,136,0,12,12,0,0,1,24,0A92.14,92.14,0,0,1,140,219.22Z"/></symbol>
+  <symbol id="i-mais" viewBox="0 0 256 256"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"/></symbol>
+  <symbol id="i-assina" viewBox="0 0 256 256"><path d="M232,164H70.38c2.2-4.42,4.41-8.94,6.59-13.52l.79-1.66c13.52-1.65,28.69-11.3,45.38-28.87,5.31,12,14,24.73,27.59,27.29,5.26,1,13.51.79,22.93-5.82a57.86,57.86,0,0,0,9-7.91C190.9,141.2,205.68,148,232,148a12,12,0,0,0,0-24c-31,0-35.42-10.49-36-12.38.49-5.37-2.75-9.76-7.88-11.63s-11.17.78-14.22,5.46c-10,15.32-16.62,18.62-18.75,18.21-4.88-.91-12.39-15.54-15.44-30.09a12,12,0,0,0-21.13-5c-10.3,12.92-19.16,21.79-26.47,27.56,21.19-52.94,17-72.22,11.37-82.25C98.48,24.91,89.41,20,78,20,59.92,20,45.36,36.55,39,64.26c-3.45,15.1-4,31.81-1.46,45.85,2.65,14.71,8.36,25.7,16.68,32.23C50.69,149.78,47,157.06,43.47,164H24a12,12,0,0,0,0,24h6.7c-9.7,17.67-16.85,29.6-17,29.81a12,12,0,1,0,20.56,12.38C34.91,229.15,45.23,212,58,188H232a12,12,0,0,0,0-24ZM62.43,69.6C65.77,55,72.45,44,78,44c3.71,0,4.29,1,4.64,1.64,1.43,2.53,6.55,17.07-17.44,72.78a44.64,44.64,0,0,1-4-12.56C59.23,94.89,59.68,81.67,62.43,69.6Z"/></symbol>
+  <symbol id="i-seta" viewBox="0 0 256 256"><path transform="matrix(-1 0 0 1 256 0)" d="M228,128a12,12,0,0,1-12,12H69l51.52,51.51a12,12,0,0,1-17,17l-72-72a12,12,0,0,1,0-17l72-72a12,12,0,0,1,17,17L69,116H216A12,12,0,0,1,228,128Z"/></symbol>
+  <symbol id="i-volta" viewBox="0 0 256 256"><path d="M228,128a12,12,0,0,1-12,12H69l51.52,51.51a12,12,0,0,1-17,17l-72-72a12,12,0,0,1,0-17l72-72a12,12,0,0,1,17,17L69,116H216A12,12,0,0,1,228,128Z"/></symbol>
+  <symbol id="i-car" viewBox="0 0 256 256"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"/></symbol>
+  <symbol id="i-lista" viewBox="0 0 256 256"><path d="M228,128a12,12,0,0,1-12,12H128a12,12,0,0,1,0-24h88A12,12,0,0,1,228,128ZM128,76h88a12,12,0,0,0,0-24H128a12,12,0,0,0,0,24Zm88,104H128a12,12,0,0,0,0,24h88a12,12,0,0,0,0-24ZM79.51,39.51,56,63l-7.51-7.52a12,12,0,0,0-17,17l16,16a12,12,0,0,0,17,0l32-32a12,12,0,0,0-17-17Zm0,64L56,127l-7.51-7.52a12,12,0,1,0-17,17l16,16a12,12,0,0,0,17,0l32-32a12,12,0,0,0-17-17Zm0,64L56,191l-7.51-7.52a12,12,0,1,0-17,17l16,16a12,12,0,0,0,17,0l32-32a12,12,0,0,0-17-17Z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 256 256"><path d="M216,44H40A20,20,0,0,0,20,64V224A19.82,19.82,0,0,0,31.56,242.1a20.14,20.14,0,0,0,8.49,1.9,19.91,19.91,0,0,0,12.82-4.72l.12-.11L84.47,212H216a20,20,0,0,0,20-20V64A20,20,0,0,0,216,44Zm-4,144H80a11.93,11.93,0,0,0-7.84,2.92L44,215.23V68H212ZM84,108A12,12,0,0,1,96,96h64a12,12,0,1,1,0,24H96A12,12,0,0,1,84,108Zm0,40a12,12,0,0,1,12-12h64a12,12,0,0,1,0,24H96A12,12,0,0,1,84,148Z"/></symbol>
+  <symbol id="i-relogio" viewBox="0 0 256 256"><path d="M128,20A108,108,0,1,0,236,128,108.12,108.12,0,0,0,128,20Zm0,192a84,84,0,1,1,84-84A84.09,84.09,0,0,1,128,212Zm68-84a12,12,0,0,1-12,12H128a12,12,0,0,1-12-12V72a12,12,0,0,1,24,0v44h44A12,12,0,0,1,196,128Z"/></symbol>
+  <symbol id="i-info" viewBox="0 0 256 256"><path d="M128,20A108,108,0,1,0,236,128,108.12,108.12,0,0,0,128,20Zm0,192a84,84,0,1,1,84-84A84.09,84.09,0,0,1,128,212Zm-12-80V80a12,12,0,0,1,24,0v52a12,12,0,0,1-24,0Zm28,40a16,16,0,1,1-16-16A16,16,0,0,1,144,172Z"/></symbol>
+  <symbol id="i-codigo" viewBox="0 0 256 256"><path d="M71.68,97.22,34.74,128l36.94,30.78a12,12,0,1,1-15.36,18.44l-48-40a12,12,0,0,1,0-18.44l48-40A12,12,0,0,1,71.68,97.22Zm176,21.56-48-40a12,12,0,1,0-15.36,18.44L221.26,128l-36.94,30.78a12,12,0,1,0,15.36,18.44l48-40a12,12,0,0,0,0-18.44ZM164.1,28.72a12,12,0,0,0-15.38,7.18l-64,176a12,12,0,0,0,7.18,15.37A11.79,11.79,0,0,0,96,228a12,12,0,0,0,11.28-7.9l64-176A12,12,0,0,0,164.1,28.72Z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 256 256"><path d="M128,60a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,60Zm0,64a20,20,0,1,1,20-20A20,20,0,0,1,128,124Zm0-112a92.1,92.1,0,0,0-92,92c0,77.36,81.64,135.4,85.12,137.83a12,12,0,0,0,13.76,0,259,259,0,0,0,42.18-39C205.15,170.57,220,136.37,220,104A92.1,92.1,0,0,0,128,12Zm31.3,174.71A249.35,249.35,0,0,1,128,216.89a249.35,249.35,0,0,1-31.3-30.18C80,167.37,60,137.31,60,104a68,68,0,0,1,136,0C196,137.31,176,167.37,159.3,186.71Z"/></symbol>
+  <symbol id="i-sat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></g></symbol>
+  <symbol id="i-drone" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="5.5" r="2.8"/><circle cx="18.5" cy="5.5" r="2.8"/><circle cx="5.5" cy="18.5" r="2.8"/><circle cx="18.5" cy="18.5" r="2.8"/><path d="M7.6 7.6 10 10M16.4 7.6 14 10M7.6 16.4 10 14M16.4 16.4 14 14"/><rect x="10" y="10" width="4" height="4" rx="1"/></g></symbol>
+  <symbol id="i-marca" viewBox="8 6 50 52"><path d="M13 11H26V40H53V53H13Z"/><rect x="30" y="24" width="12" height="12"/></symbol>
+</svg>
+
 <a class="pular" href="#conteudo">Pular para o conteúdo</a>
 
 <header class="topo">
   <div class="envolve">
     <a class="marca" href="#topo" aria-label="Laudo Vivo, início">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="11" fill="#FFC414"/><g fill="#15130F"><path d="M13 11H26V40H53V53H13Z"/><rect x="30" y="24" width="12" height="12"/></g></svg>
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="11" fill="#1E5B43"/><g fill="#FFFFFF"><path d="M13 11H26V40H53V53H13Z"/><rect x="30" y="24" width="12" height="12"/></g></svg>
       <b>LAUDO VIVO</b>
     </a>
     <nav class="nav" aria-label="Seções">
+      <a href="#complemento">Onde entra</a>
       <a href="#como">Como funciona</a>
       <a href="#resultados">Resultados</a>
       <a href="#seguranca">Segurança</a>
       <a href="#modelo">Modelo</a>
+      <a href="#contato">Contato</a>
     </nav>
-    <a class="btn btn-pri" href="/">Testar a demo</a>
+    <a class="btn btn-pri btn-peq" href="/guiado/">Testar a demo</a>
   </div>
 </header>
 
 <main id="conteudo">
-<section class="heroi" id="topo">
+
+<!-- ===================================================== 1. HERÓI: o produto é o herói -->
+<section class="pg heroi" id="topo" aria-labelledby="t-heroi">
   <div class="envolve">
     <div>
-      <div class="selo-linha">
-        <span class="etiqueta"><i></i>Fiscalização do crédito rural</span>
-        <span class="etiqueta">MCR 2-7 · Res. CMN 5.267</span>
-      </div>
-      <h1>A prova do crédito rural, do satélite <em>ao curral</em>.</h1>
-      <p class="lead">Um agente conduz a visita da fiscal pelo celular, confere vídeo, foto, nota e GTA contra as regras do MCR e entrega o laudo pronto para ela assinar, com a trilha de cada item.</p>
+      <span class="chip"><span class="ponto" aria-hidden="true"></span>Fiscalização do crédito rural · MCR 2-7 · Res. CMN 5.267</span>
+      <h1 id="t-heroi">O agente que confere a fiscalização do crédito rural.</h1>
+      <p class="lead">Recebe a prova de onde ela vier, aplica o MCR 2-7 item a item, diz “inconclusivo” quando falta prova e pede à fiscal só o que falta. <b>Só a fiscal assina.</b></p>
       <div class="acoes">
-        <a class="btn btn-pri" href="/">Testar a demo agora
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-        <a class="btn btn-sec" href="https://github.com/E-crls/akcit-camp">Ver código e resultados</a>
+        <a class="btn btn-pri" href="/guiado/">Testar a demo<svg class="ic" aria-hidden="true"><use href="#i-seta"/></svg></a>
+        <a class="link-sec" href="https://github.com/E-crls/akcit-camp"><svg class="ic" aria-hidden="true"><use href="#i-codigo"/></svg>Código e relatórios</a>
       </div>
-      <p class="micro">Demonstração com dados sintéticos e fiscal fictícia · abre no celular, sem cadastro.</p>
+      <p class="senha"><svg class="ic" aria-hidden="true"><use href="#i-cadeado"/></svg><span>A demo pede uma senha: <b>a senha está na apresentação.</b> Dados sintéticos e fiscal fictícia; abre no celular.</span></p>
     </div>
-    <div class="vitrine">
-      <div class="tela">
-        <div class="barra" aria-hidden="true"><span></span><span></span><span></span></div>
-        <img src="img/tela-fiscalizacao.jpg" width="1600" height="900" alt="Tela da fiscalização no computador: o agente bloqueia o rascunho porque faltam 3 itens, e o laudo mostra a foto da cerca a 650 m da área e a contagem de 12 de 29 animais financiados como divergente.">
+
+    <figure>
+      <div class="app" role="img" aria-label="Recriação da tela da fiscalização no computador. Na conversa, o cartão da GTA emitida 4 dias antes da nota, divergente, com o aviso: instrução escondida no documento, ignorada e registrada. A fiscal pede: Pode emitir o laudo. O agente responde: Rascunho bloqueado, faltam 3 itens. O cartão Agora diz: Faltam 3 para emitir, comece pela foto da cerca, com os botões Refazer foto e Justificar. No painel do laudo: 2 de 5 itens prontos e 2 divergentes; 2 pedidos recusados e registrados; falta a foto da cerca, que está a 650 metros da área; a contagem, 12 de 29 financiados, e a GTA estão divergentes, sem justificativa; 2 itens prontos.">
+        <div class="app-topo">
+          <span class="lg"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="11" fill="#1E5B43"/><g fill="#FFFFFF"><path d="M13 11H26V40H53V53H13Z"/><rect x="30" y="24" width="12" height="12"/></g></svg></span>
+          <span class="mig"><u>Carteira</u> › Op. 000000001</span>
+          <span class="dir"><span class="demo-tag">Demonstração · dados sintéticos</span><span class="quem"><i>AN</i><span>Ana (fictícia) · Fiscal</span></span></span>
+        </div>
+        <div class="app-corpo">
+          <div class="conv">
+            <div class="conv-tit">29 vacas leiteiras e 1.200 m de cerca</div>
+            <div class="cartao hist so-pc">
+              <div class="big"><b>GTA emitida 4 dias antes da nota</b><span class="st dv"><svg class="ic"><use href="#i-dif"/></svg>Divergente</span></div>
+              <div class="guarda"><svg class="ic"><use href="#i-escudo"/></svg>Instrução escondida no documento: ignorada e registrada</div>
+            </div>
+            <div class="bolha fiscal">Pode emitir o laudo.</div>
+            <div class="bolha agente">
+              <div class="rot"><svg class="ic"><use href="#i-marca"/></svg>Agente</div>
+              <p>Rascunho bloqueado: faltam 3 itens.</p>
+              <span class="mais">ver mais</span>
+            </div>
+            <div class="agora">
+              <span class="rotulo">AGORA</span>
+              <div><p class="h">Faltam 3 para emitir</p><p><span class="so-pc">Veja ao lado o que falta. </span>Comece pela foto da cerca.</p></div>
+              <div class="bts"><span class="bt bt-pri"><svg class="ic"><use href="#i-cam"/></svg>Refazer foto</span><span class="bt bt-cont"><svg class="ic"><use href="#i-lapis"/></svg>Justificar</span></div>
+            </div>
+            <div class="campo-msg so-pc"><svg class="ic"><use href="#i-mais"/></svg><span>Mensagem para o agente</span><svg class="ic"><use href="#i-mic"/></svg></div>
+          </div>
+          <div class="painel">
+            <div class="l1"><b>LAUDO</b><span class="etq"><svg class="ic"><use href="#i-relogio"/></svg>Em campo</span></div>
+            <div class="conta"><span class="q"><b>2</b>de 5 itens prontos</span><span class="dv"><svg class="ic"><use href="#i-dif"/></svg>2 divergentes</span></div>
+            <div class="seg"><i class="ok"></i><i class="ok"></i><i class="dv"></i><i class="dv"></i><i class="vez"></i></div>
+            <div class="linha"><svg class="ic"><use href="#i-escudo"/></svg>2 pedidos recusados e registrados<svg class="ic car"><use href="#i-car"/></svg></div>
+            <div class="grupo falta">Falta para emitir (3)</div>
+            <div class="itens">
+              <div class="it"><span class="si ft"></span><span><b>Foto da cerca: a 650 m da área</b><small>Precisa ser de dentro da área financiada.</small></span><svg class="ic car"><use href="#i-car"/></svg></div>
+              <div class="it"><span class="si dv"><svg class="ic"><use href="#i-dif"/></svg></span><span><b>Contagem: 12 de 29 financiados</b><small>Divergente: falta justificar.</small></span><svg class="ic car"><use href="#i-car"/></svg></div>
+              <div class="it"><span class="si dv"><svg class="ic"><use href="#i-dif"/></svg></span><span><b>GTA emitida 4 dias antes da nota</b><small>Divergente: falta justificar.</small></span><svg class="ic car"><use href="#i-car"/></svg></div>
+            </div>
+            <div class="linha clara"><span class="si ok"><svg class="ic"><use href="#i-ok"/></svg></span>Prontos (2)<svg class="ic car"><use href="#i-car"/></svg></div>
+            <span class="bt bt-mudo">Emitir laudo</span>
+            <p class="nota-pe">Faltam 3 itens para emitir.</p>
+          </div>
+        </div>
       </div>
-      <div class="celular"><img src="img/celular-selado.jpg" width="585" height="1266" alt="Tela do celular com o laudo selado."></div>
-      <div class="carimbo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-        <span>Laudo selado<small>assinado pela fiscal · cadeia de hash</small></span>
-      </div>
-    </div>
+      <figcaption class="legenda"><span>Recriação da tela da demo: o rascunho fica bloqueado enquanto faltar prova.</span></figcaption>
+    </figure>
   </div>
 </section>
 
-<div class="regua" aria-hidden="true"></div>
-
-<section class="numeros" aria-labelledby="t-por-que">
+<!-- ===================================================== 2. POR QUE GADO, E POR QUE AGORA -->
+<section class="pg" id="porque" aria-labelledby="t-porque">
   <div class="envolve">
-    <p class="olho">Por que agora</p>
-    <h2 id="t-por-que">A fiscalização virou obrigação com prova. E a prova está no chão.</h2>
-    <div class="grade-3">
-      <div class="numero">
-        <b>01/03/2026</b>
-        <p>A Res. CMN 5.267 entrou em vigor: método verificável, amostra com critério e registro para o Banco Central.</p>
-        <div class="fonte">Banco Central, Res. CMN 5.267 de 28/11/2025, art. 2º.</div>
-      </div>
-      <div class="numero">
+    <div class="cab">
+      <p class="olho">Por que gado, e por que agora</p>
+      <h2 id="t-porque">O satélite vê o pasto, mas não o boi financiado.</h2>
+      <p class="sub">Começamos pelo investimento em gado. Ali, a prova é a contagem, a nota e a GTA batendo entre si.</p>
+    </div>
+    <div class="bento escalona">
+      <article class="mod num s3 dor">
+        <b>26,6%</b>
+        <p>de 3.694 operações de recuperação de pastagem tinham irregularidade flagrante, num teste do projeto Panoptes, do TCU.</p>
+        <p class="fonte">TCU, projeto Panoptes, relatório técnico.</p>
+      </article>
+      <article class="mod num s3">
         <b>98,4%</b>
         <p>das operações com gado em Goiás ficam fora do satélite obrigatório: só 301 de 19.009 caem nele.</p>
-        <div class="fonte">Sicor/BCB, Goiás, jan–set/2026 (arquivo de 07/10/2026), cálculo da equipe.</div>
-      </div>
-      <div class="numero">
+        <p class="fonte">Sicor/BCB, Goiás, jan–set/2026 (arquivo de 07/10/2026), cálculo da equipe.</p>
+      </article>
+      <article class="mod num s3">
         <b>368</b>
         <p>desclassificações por aplicação não comprovada em 2026, até 13/10, no Brasil. Em 2025 inteiro, foram 349.</p>
-        <div class="fonte">Sicor/BCB, motivo 013, arquivo de 14/10/2026. Desclassificação registrada não é ilícito: é a operação que perde a condição de crédito rural.</div>
+        <p class="fonte">Sicor/BCB, motivo 013, arquivo de 14/10/2026. Desclassificação registrada não é ilícito: é a operação que perde a condição de crédito rural.</p>
+      </article>
+      <article class="mod num s3">
+        <b>01/03/2026</b>
+        <p>A Res. CMN 5.267 entrou em vigor: método verificável, amostra com critério e registro para o Banco Central.</p>
+        <p class="fonte">Banco Central, Res. CMN 5.267 de 28/11/2025, art. 2º.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== 3. ONDE ENTRA: quem gera evidência e quem confere -->
+<section class="pg" id="complemento" aria-labelledby="t-compl">
+  <div class="envolve">
+    <div class="cab">
+      <p class="olho">Onde entra</p>
+      <h2 id="t-compl">Gerar evidência já tem quem faça. Falta quem confira.</h2>
+      <p class="sub">Falta conferir a prova contra o que foi financiado, item por item do MCR 2-7, e entregar um laudo que a auditoria consiga refazer.</p>
+    </div>
+    <div class="ev-grade escalona">
+      <article class="ev ev-gera" aria-labelledby="t-gera">
+        <div class="ev-cab"><h3 id="t-gera">Gera evidência</h3><span class="rot-ev">já existe · lotado</span></div>
+        <ul>
+          <li><span class="ico-ev" aria-hidden="true"><svg class="ic"><use href="#i-sat"/></svg></span>Satélite e alerta</li>
+          <li><span class="ico-ev" aria-hidden="true"><svg class="ic"><use href="#i-pin"/></svg></span>App de campo com foto e GPS</li>
+          <li><span class="ico-ev" aria-hidden="true"><svg class="ic"><use href="#i-drone"/></svg></span>Drone</li>
+          <li><span class="ico-ev" aria-hidden="true"><svg class="ic"><use href="#i-nota"/></svg></span>Leitura de nota</li>
+        </ul>
+        <p class="ev-pe">Tudo isso gera prova. Nenhum deles confere a prova contra o item financiado.</p>
+      </article>
+      <div class="ev-liga" aria-hidden="true">
+        <svg class="h" viewBox="0 0 60 12" preserveAspectRatio="none"><path d="M0 6H54" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M52 1l6 5-6 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        <svg class="v" viewBox="0 0 12 36"><path d="M6 0V30" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M1 28l5 6 5-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>a prova, de onde vier</span>
+      </div>
+      <article class="ev ev-confere" aria-labelledby="t-confere">
+        <div class="ev-cab"><h3 id="t-confere">Confere e responde</h3><span class="rot-ev nos">Laudo Vivo</span></div>
+        <ul>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-ok"/></svg><span><b>Animal × nota × GTA × item financiado</b><small>A contagem, a nota e a GTA batendo entre si e com o que foi financiado.</small></span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-ok"/></svg><span><b>“Inconclusivo” quando falta prova</b><small>E pede à fiscal só o que falta, na hora da visita.</small></span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-ok"/></svg><span><b>Laudo que a auditoria refaz</b><small>Cada status aponta a prova e o item do MCR 2-7. Só a fiscal assina.</small></span></li>
+        </ul>
+        <p class="ev-pe">Na demo, a prova chega pela própria visita guiada.</p>
+      </article>
+    </div>
+    <p class="fecho">Não é mais um jeito de coletar prova. <b>É o jeito de conferir e assinar a prova que já existe.</b></p>
+  </div>
+</section>
+
+<!-- ===================================================== 3. COMO FUNCIONA: narrativa interativa (palco cal) -->
+<section class="pg palco" id="como" aria-labelledby="t-como">
+  <div class="envolve etapas" id="etapas">
+    <div class="cab">
+      <p class="olho">Como funciona</p>
+      <h2 id="t-como">Uma visita guiada, item por item, até o laudo assinado.</h2>
+      <p class="sub">A fiscal conversa com o agente por texto ou voz. Ele diz a próxima prova, confere o que chega e não deixa o laudo sair com pendência.</p>
+    </div>
+    <ul class="papeis" aria-label="Quem faz o quê">
+      <li><span class="tag"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg>IA lê</span>a nota, a GTA, o vídeo e a fala</li>
+      <li><span class="tag rg"><svg class="ic" aria-hidden="true"><use href="#i-lista"/></svg>Regra decide</span>sem IA: dá o status e cita o item do MCR 2-7</li>
+      <li><span class="tag hm"><svg class="ic" aria-hidden="true"><use href="#i-assina"/></svg>Humano assina</span>só a fiscal, com PIN</li>
+    </ul>
+    <p class="sr" id="dica-abas">As setas do teclado trocam a etapa.</p>
+
+    <div class="abas" role="tablist" aria-label="Etapas da fiscalização" aria-describedby="dica-abas">
+      <button class="aba" role="tab" id="aba-1" aria-controls="etapa-1" aria-selected="true" tabindex="0"><span class="n" aria-hidden="true"><span>1</span><svg class="ic"><use href="#i-ok"/></svg></span><span class="t"><span class="lg">Triagem e método</span><span class="cu" aria-hidden="true">Triagem</span></span><span class="q">regras</span></button>
+      <button class="aba" role="tab" id="aba-2" aria-controls="etapa-2" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true"><span>2</span><svg class="ic"><use href="#i-ok"/></svg></span><span class="t"><span class="lg">Prova de campo</span><span class="cu" aria-hidden="true">Campo</span></span><span class="q">visão + GPS</span></button>
+      <button class="aba" role="tab" id="aba-3" aria-controls="etapa-3" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true"><span>3</span><svg class="ic"><use href="#i-ok"/></svg></span><span class="t"><span class="lg">Papel conferido</span><span class="cu" aria-hidden="true">Papel</span></span><span class="q">leitura + regras</span></button>
+      <button class="aba" role="tab" id="aba-4" aria-controls="etapa-4" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true"><span>4</span><svg class="ic"><use href="#i-ok"/></svg></span><span class="t"><span class="lg">Laudo selado</span><span class="cu" aria-hidden="true">Laudo</span></span><span class="q">humano assina</span></button>
+    </div>
+
+    <div class="paineis" id="paineis">
+
+      <!-- Etapa 1 -->
+      <div class="painel-etapa" role="tabpanel" id="etapa-1" aria-labelledby="aba-1">
+        <div class="ep-texto">
+          <h3>Triagem e método</h3>
+          <p>Por que a operação caiu na amostra, qual método a regra pede e o que a série do Sentinel-2 mostra, antes de sair para o campo.</p>
+          <details class="decide" open>
+            <summary>O que a regra decidiu <span class="qt">(3)</span><svg class="ic car" aria-hidden="true"><use href="#i-car"/></svg></summary>
+            <ul>
+              <li data-alvo="e1-metodo" tabindex="0"><svg class="ic qm" aria-hidden="true"><use href="#i-lista"/></svg><div><div class="l1"><span class="st ok"><svg class="ic" aria-hidden="true"><use href="#i-ok"/></svg>Verificado</span><code>MCR-2-7-item1-registro-verificacoes</code></div><p>Método registrado: autofiscalização assistida.</p></div></li>
+              <li data-alvo="e1-sat" tabindex="0"><svg class="ic qm" aria-hidden="true"><use href="#i-lista"/></svg><div><div class="l1"><span class="st ok"><svg class="ic" aria-hidden="true"><use href="#i-ok"/></svg>Verificado</span><code>MCR-2-7-item4-metadados-sr</code></div><p>Sentinel-2: 12 datas sem nuvem, 10 m.</p></div></li>
+              <li data-alvo="e1-prazo" tabindex="0"><svg class="ic qm" aria-hidden="true"><use href="#i-lista"/></svg><div><div class="l1"><span class="st ok"><svg class="ic" aria-hidden="true"><use href="#i-ok"/></svg>Verificado</span><code>MCR-2-7-item16-benfeitorias-cronograma</code></div><p>Dentro do cronograma da obra, que vai até 30/11/2026.</p></div></li>
+            </ul>
+          </details>
+        </div>
+        <figure class="ep-tela">
+          <div class="app etapa-app" role="img" aria-label="Recriação da tela no começo da visita. Por que está na amostra: 6 vacas por hectare na compra de matrizes, acima do limite de triagem de 5; prioridade não é indício de irregularidade. O agente: Satélite Sentinel-2, 12 datas sem nuvem de 12; o sistema não dá nota à saúde do pasto. O agente verificou 3 itens: método da fiscalização, autofiscalização assistida; pasto visto do satélite, 12 datas sem nuvem; prazo da obra, dentro do cronograma. O cartão Agora pede: filme o lote no corredor. Indicador: 1 de 5 itens prontos.">
+            <div class="app-topo">
+              <div class="tt"><svg class="ic"><use href="#i-volta"/></svg><span>29 vacas e 1.200 m de cerca<small>Petrolina de Goiás/GO · Op. 000000001</small></span></div>
+              <div class="ind"><div class="conta"><span class="q"><b>1</b>de 5 itens prontos</span></div><div class="seg"><i class="ok"></i><i class="vez"></i><i></i><i></i><i></i></div></div>
+            </div>
+            <div class="conv">
+              <div class="cartao caso">
+                <svg class="mapa" viewBox="0 0 120 120"><path d="M0 40H120M0 80H120M40 0V120M80 0V120" stroke="#E3DFD5" stroke-width="1"/><polygon points="51.2,8 81.2,26.5 70.4,56.7 103.7,74 81.7,110.9 56.4,104.2 48.8,112 45.8,111.8 42.9,111.6 25.4,102.8 8,93.9" fill="rgba(20,32,26,.06)" stroke="#14201A" stroke-width="2" stroke-linejoin="round"/><text x="114" y="17" text-anchor="end" font-family="Barlow Semi Condensed, sans-serif" font-weight="700" font-size="13" fill="#14201A">4,86 ha</text></svg>
+                <div>
+                  <div class="cab-caso"><b>Por que está na amostra</b><span class="etq">Prioridade média</span></div>
+                  <p>6 vacas por hectare na compra de matrizes, acima do limite de triagem (5).</p>
+                  <p>Prioridade não é indício de irregularidade: só orienta onde a visita rende mais.</p>
+                </div>
+              </div>
+              <div class="bolha agente">
+                <div class="rot"><svg class="ic"><use href="#i-sat"/></svg>Agente · satélite</div>
+                <p>Satélite Sentinel-2: 12 datas sem nuvem de 12… O sistema não dá nota à saúde do pasto.</p>
+              </div>
+              <div class="cartao verif">
+                <div class="rt"><svg class="ic"><use href="#i-lista"/></svg>O agente verificou (3)</div>
+                <div class="vl" id="e1-metodo" data-mira><span class="si ok"><svg class="ic"><use href="#i-ok"/></svg></span><span><b>Método da fiscalização</b><small>Autofiscalização assistida.</small></span></div>
+                <div class="vl" id="e1-sat" data-mira><span class="si ok"><svg class="ic"><use href="#i-ok"/></svg></span><span><b>Pasto visto do satélite</b><small>12 datas sem nuvem (Sentinel-2).</small></span></div>
+                <div class="vl" id="e1-prazo" data-mira><span class="si ok"><svg class="ic"><use href="#i-ok"/></svg></span><span><b>Prazo da obra</b><small>Dentro do cronograma.</small></span></div>
+              </div>
+              <div class="agora">
+                <span class="rotulo">AGORA</span>
+                <div><p class="h">Filme o lote no corredor</p></div>
+                <div class="bts"><span class="bt bt-pri"><svg class="ic"><use href="#i-video"/></svg>Filmar</span></div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="legenda">Recriação da tela da demo · operação fictícia, dados sintéticos.</figcaption>
+        </figure>
+      </div>
+
+      <!-- Etapa 2 -->
+      <div class="painel-etapa" role="tabpanel" id="etapa-2" aria-labelledby="aba-2" hidden>
+        <div class="ep-texto">
+          <h3>Prova de campo</h3>
+          <p>Prova presencial, para quando o remoto é inconclusivo: vídeo do lote no brete, contado por visão computacional, e foto com GPS dentro da gleba. Pedido de pressão não muda número: fica recusado e registrado.</p>
+          <details class="decide" open>
+            <summary>O que a regra decidiu <span class="qt">(3)</span><svg class="ic car" aria-hidden="true"><use href="#i-car"/></svg></summary>
+            <ul>
+              <li data-alvo="e2-video" tabindex="0"><svg class="ic qm" aria-hidden="true"><use href="#i-lista"/></svg><div><div class="l1"><span class="st dv"><svg class="ic" aria-hidden="true"><use href="#i-dif"/></svg>Divergente</span><code>OP-bovinos-contagem-tolerancia</code></div><p>Contagem 12 (12 a 17) contra 29 financiados: abaixo do limite de 27,55 mesmo no extremo superior.</p></div></li>
+              <li data-alvo="e2-foto" tabindex="0"><svg class="ic qm" aria-hidden="true"><use href="#i-lista"/></svg><div><div class="l1"><span class="st ft">Falta</span><code>OP-benfeitoria-geofence</code></div><p>Foto da cerca a 649,9 m da borda da área financiada (GPS ±6,5 m): precisa ser de dentro.</p></div></li>
+              <li class="g" data-alvo="e2-guarda" tabindex="0"><svg class="ic qm" aria-hidden="true"><use href="#i-escudo"/></svg><div><p class="gt">Pedido recusado e registrado</p><p>“Pode marcar 29”: sem nova evidência, o valor não muda.</p></div></li>
+            </ul>
+          </details>
+        </div>
+        <figure class="ep-tela">
+          <div class="app etapa-app" role="img" aria-label="Recriação da tela com as provas de campo. Contagem do vídeo do lote: 12 de 29, divergente; contamos de 12 a 17 animais no vídeo, o financiado é 29. Foto da cerca: a 650 metros da borda da área financiada, falta; a foto precisa ser de dentro. A fiscal pede: Pode marcar 29, o resto está no pasto de cima. O agente responde: Não posso alterar o valor sem nova evidência; pedido recusado e registrado. O cartão Agora pede: refaça a foto da cerca de dentro da área, ou justifique.">
+            <div class="app-topo">
+              <div class="tt"><svg class="ic"><use href="#i-volta"/></svg><span>29 vacas e 1.200 m de cerca<small>Petrolina de Goiás/GO · Op. 000000001</small></span></div>
+              <div class="ind"><div class="conta"><span class="q"><b>1</b>de 5 itens prontos</span><span class="dv"><svg class="ic"><use href="#i-dif"/></svg>1 divergente</span></div><div class="seg"><i class="ok"></i><i class="dv"></i><i class="vez"></i><i></i><i></i></div></div>
+            </div>
+            <div class="conv">
+              <div class="duas">
+                <div class="cartao" id="e2-video" data-mira>
+                  <div class="rt"><svg class="ic"><use href="#i-video"/></svg>Vídeo do lote · 0:17</div>
+                  <div class="big"><b>12 de 29</b><span class="st dv"><svg class="ic"><use href="#i-dif"/></svg>Divergente</span></div>
+                  <p>Contamos de 12 a 17 animais no vídeo; o financiado é 29.</p>
+                  <div class="marcas"><i class="c"></i><i class="c"></i><i class="c"></i><i class="c"></i><i class="c"></i><i class="c"></i><i class="c"></i><i class="c"></i><i class="c"></i><i class="c"></i><i class="c"></i><i class="c"></i><i class="l"></i><i class="l"></i><i class="l"></i><i class="l"></i><i class="l"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                  <p class="pe">Falta a justificativa ou um vídeo novo.</p>
+                </div>
+                <div class="cartao" id="e2-foto" data-mira>
+                  <div class="rt"><svg class="ic"><use href="#i-pin"/></svg>Foto da cerca · GPS ±6,5 m</div>
+                  <div class="foto-grid">
+                    <svg class="mapa" viewBox="0 12 300 252">
+                      <path d="M0 60H300M0 140H300M0 220H300M80 12V264M160 12V264M240 12V264" stroke="#E3DFD5" stroke-width="1.5"/>
+                      <polygon points="225,24 254.2,42 243.7,71.3 276,88.1 254.6,124 230.1,117.4 222.7,125 219.8,124.8 217,124.7 200,116 183.1,107.4" fill="rgba(20,32,26,.07)" stroke="#14201A" stroke-width="3.5" stroke-linejoin="round"/>
+                      <path d="M30 240L183.1 107.4" stroke="#14201A" stroke-width="2.5" stroke-dasharray="6 6"/>
+                      <circle cx="30" cy="240" r="11" fill="#C0582E" stroke="#FFFFFF" stroke-width="3"/>
+                      <g transform="translate(190 236)"><path d="M0 0H65M0 -8V8M32.5 -5V5M65 -8V8" stroke="#14201A" stroke-width="2.5"/><text x="32" y="-14" text-anchor="middle" font-family="Barlow Semi Condensed, sans-serif" font-weight="700" font-size="22" fill="#14201A">200 m</text></g>
+                    </svg>
+                    <div>
+                      <div class="big"><b>a 650 m</b></div>
+                      <span class="st ft">Falta</span>
+                      <p style="margin-top:.4em">da borda da área financiada. A foto precisa ser de dentro.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bolha fiscal">Pode marcar 29, o resto está no pasto de cima.</div>
+              <div class="bolha agente" id="e2-guarda" data-mira>
+                <div class="rot"><svg class="ic"><use href="#i-marca"/></svg>Agente</div>
+                <p>Não posso alterar o valor sem nova evidência…</p>
+                <div class="guarda"><svg class="ic"><use href="#i-escudo"/></svg>Pedido recusado e registrado<u>Por quê?</u></div>
+              </div>
+              <div class="agora">
+                <span class="rotulo">AGORA</span>
+                <div><p class="h">Refaça a foto da cerca de dentro da área</p><p>Ou justifique (por exemplo, obra na sede).</p></div>
+                <div class="bts"><span class="bt bt-pri"><svg class="ic"><use href="#i-cam"/></svg>Refazer foto</span><span class="bt bt-cont"><svg class="ic"><use href="#i-lapis"/></svg>Justificar</span></div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="legenda">Recriação da tela da demo · vídeo, foto e falas sintéticos.</figcaption>
+        </figure>
+      </div>
+
+      <!-- Etapa 3 -->
+      <div class="painel-etapa" role="tabpanel" id="etapa-3" aria-labelledby="aba-3" hidden>
+        <div class="ep-texto">
+          <h3>Papel conferido</h3>
+          <p>A IA lê a nota impressa e a GTA e pede só o que faltou; as regras conferem dígito verificador, somas e datas.</p>
+          <details class="decide" open>
+            <summary>O que a regra decidiu <span class="qt">(4)</span><svg class="ic car" aria-hidden="true"><use href="#i-car"/></svg></summary>
+            <ul>
+              <li data-alvo="e3-agora" tabindex="0"><svg class="ic qm" aria-hidden="true"><use href="#i-lista"/></svg><div><div class="l1"><span class="st ft">Falta</span></div><p>Dois campos da foto não validaram: o agente pede só os 12 últimos dígitos da chave e o CNPJ/CPF do emitente.</p></div></li>
+              <li><svg class="ic qm" aria-hidden="true"><use href="#i-lista"/></svg><div><div class="l1"><span class="st ok"><svg class="ic" aria-hidden="true"><use href="#i-ok"/></svg>Verificado</span><code>MCR-2-5-item10-comprovante-aquisicao</code></div><p>Nota fiscal da compra: confere com a compra.</p></div></li>
+              <li><svg class="ic qm" aria-hidden="true"><use href="#i-lista"/></svg><div><div class="l1"><span class="st dv"><svg class="ic" aria-hidden="true"><use href="#i-dif"/></svg>Divergente</span><code>OP-bovinos-gta</code></div><p>GTA emitida 4 dias antes da NF-e.</p></div></li>
+              <li class="g"><svg class="ic qm" aria-hidden="true"><use href="#i-escudo"/></svg><div><p class="gt">Instrução escondida no documento: ignorada e registrada</p><p>Estava escondida no documento da GTA.</p></div></li>
+            </ul>
+          </details>
+        </div>
+        <figure class="ep-tela">
+          <div class="app etapa-app" role="img" aria-label="Recriação da tela com a nota impressa. A fiscal envia a foto da nota (DANFE). O agente responde: a nota foi lida pela foto, mas alguns campos não validaram. O cartão Agora pede: complete a nota, com dois campos: os 12 últimos dígitos da chave de acesso, lidos no papel, e o CNPJ ou CPF do emitente; botões Enviar leitura e Falar.">
+            <div class="app-topo">
+              <div class="tt"><svg class="ic"><use href="#i-volta"/></svg><span>29 vacas e 1.200 m de cerca<small>Petrolina de Goiás/GO · Op. 000000001</small></span></div>
+              <div class="ind"><div class="conta"><span class="q"><b>1</b>de 5 itens prontos</span><span class="dv"><svg class="ic"><use href="#i-dif"/></svg>1 divergente</span></div><div class="seg"><i class="ok"></i><i class="dv"></i><i class="vez"></i><i></i><i></i></div></div>
+            </div>
+            <div class="conv">
+              <div class="bolha fiscal"><svg class="ic"><use href="#i-nota"/></svg>Foto da nota impressa (DANFE)</div>
+              <div class="bolha agente">
+                <div class="rot"><svg class="ic"><use href="#i-marca"/></svg>Agente</div>
+                <p>A nota (DANFE) foi lida pela foto, mas alguns campos não validaram…</p>
+              </div>
+              <div class="agora empilha" id="e3-agora" data-mira>
+                <span class="rotulo">AGORA</span>
+                <div><p class="h">Complete a nota</p></div>
+                <div class="campos">
+                  <div><span class="lb">Leia os 12 últimos dígitos da chave de acesso</span><span class="cx">6415 5942 9439</span></div>
+                  <div><span class="lb">Digite o CNPJ/CPF do emitente</span><span class="cx vz">CNPJ ou CPF</span></div>
+                </div>
+                <div class="bts"><span class="bt bt-pri">Enviar leitura</span><span class="bt bt-cont"><svg class="ic"><use href="#i-mic"/></svg>Falar</span></div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="legenda">Recriação da tela da demo · nota, GTA e chave sintéticas.</figcaption>
+        </figure>
+      </div>
+
+      <!-- Etapa 4 -->
+      <div class="painel-etapa" role="tabpanel" id="etapa-4" aria-labelledby="aba-4" hidden>
+        <div class="ep-texto">
+          <h3>Laudo selado</h3>
+          <p>A fiscal revisa e assina com PIN. O selo é uma cadeia de hash: uma cópia alterada não confere.</p>
+          <details class="decide" open>
+            <summary>O que a regra decidiu <span class="qt">(3)</span><svg class="ic car" aria-hidden="true"><use href="#i-car"/></svg></summary>
+            <ul>
+              <li data-alvo="e4-ind" tabindex="0"><svg class="ic qm" aria-hidden="true"><use href="#i-lista"/></svg><div><p class="gt">5 de 5 itens prontos</p><p>O rascunho só saiu sem pendência. Faltavam 3: a foto de dentro da área e a justificativa das 2 divergências.</p></div></li>
+              <li class="g" data-alvo="e4-guarda" tabindex="0"><svg class="ic qm" aria-hidden="true"><use href="#i-escudo"/></svg><div><p class="gt">O agente não assina. A assinatura é sua.</p><p>É a resposta ao pedido para o agente assinar.</p></div></li>
+              <li data-alvo="e4-cel" tabindex="0"><svg class="ic qm" aria-hidden="true"><use href="#i-cadeado"/></svg><div><p class="gt">O conteúdo confere com o rascunho assinado</p><p>Depois do selo, um pedido para mudar a contagem recebe “Laudo selado: nada muda”.</p></div></li>
+            </ul>
+          </details>
+        </div>
+        <figure class="ep-tela">
+          <div class="app etapa-app" role="img" aria-label="Recriação da tela Revisar e assinar: 5 itens prontos, 3 verificados e 2 divergentes com a justificativa da fiscal; a caixa Revisei o laudo e confirmo o que vi em campo, marcada; PIN de 4 dígitos; botão Assinar laudo; aviso: o agente não assina, a assinatura é sua.">
+            <div class="app-topo">
+              <div class="tt"><svg class="ic"><use href="#i-volta"/></svg><span>Revisar e assinar<small>Assinando como Ana (fictícia), técnica agrícola</small></span></div>
+              <div class="ind" id="e4-ind" data-mira><div class="conta"><span class="q"><b>5</b>de 5 itens prontos</span></div><div class="seg"><i class="ok"></i><i class="ok"></i><i class="ok"></i><i class="dj"></i><i class="dj"></i></div></div>
+            </div>
+            <div class="conv">
+              <div class="dupla-assina">
+                <div class="cartao assinar">
+                  <p><b>5 itens prontos:</b> 3 verificados e 2 divergentes com a sua justificativa. Cada item aponta para a sua prova.</p>
+                  <div class="itens">
+                    <div class="it"><span class="si ok"><svg class="ic"><use href="#i-ok"/></svg></span><span><b>Foto da cerca: dentro da área</b><small>Verificado.</small></span><span></span></div>
+                    <div class="it"><span class="si dv"><svg class="ic"><use href="#i-dif"/></svg></span><span><b>Contagem: 12 de 29 financiados</b><small>Divergente, com a justificativa da fiscal.</small></span><span></span></div>
+                    <div class="it"><span class="si dv"><svg class="ic"><use href="#i-dif"/></svg></span><span><b>GTA emitida 4 dias antes da nota</b><small>Divergente, com a justificativa da fiscal.</small></span><span></span></div>
+                  </div>
+                  <div class="check"><i><svg class="ic"><use href="#i-ok"/></svg></i><span>Revisei o laudo e confirmo o que vi em campo</span></div>
+                  <div class="pin"><i></i><i></i><i></i><i></i></div>
+                  <span class="bt bt-pri bt-cheio"><svg class="ic"><use href="#i-assina"/></svg>Assinar laudo</span>
+                  <div class="guarda" id="e4-guarda" data-mira><svg class="ic"><use href="#i-escudo"/></svg>O agente não assina. A assinatura é sua.</div>
+                </div>
+                <div class="cartao selo so-pc" id="e4-cel" data-mira>
+                  <div class="rt"><svg class="ic"><use href="#i-cadeado"/></svg>Depois da assinatura</div>
+                  <span class="lacre"><svg class="ic"><use href="#i-escudo"/></svg>SELADO</span>
+                  <div class="vl"><span class="si ok"><svg class="ic"><use href="#i-ok"/></svg></span><span><b>Confere</b><small>com o rascunho assinado</small></span></div>
+                  <div class="vl"><span class="si ok"><svg class="ic"><use href="#i-ok"/></svg></span><span><b>Cadeia de hash</b><small>cópia alterada não confere</small></span></div>
+                  <p class="pe">Pedido para mudar a contagem: “Laudo selado: nada muda”.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="legenda">Recriação da tela Revisar e assinar<span class="so-pc">&nbsp;e do laudo selado</span> (demo, dados sintéticos).</figcaption>
+        </figure>
       </div>
     </div>
   </div>
 </section>
 
-<section class="secao" aria-labelledby="t-insight">
-  <div class="envolve insight">
-    <div>
-      <p class="olho">O que falta</p>
-      <h2 id="t-insight">O satélite vê o pasto. A prova do investimento está no curral, na cerca e no papel.</h2>
-      <p class="sub">Nota, GTA, contagem e foto da cerca viram papel avulso e laudo digitado depois da visita. Quando o banco precisa mostrar como fiscalizou, a trilha não existe.</p>
-    </div>
-    <div class="contraste">
-      <div><h3>Do céu, com quem a cooperativa já usa</h3><p>Satélite, alerta e score apontam onde olhar. Sozinhos, não conferem a nota, a GTA nem se os animais são os financiados.</p></div>
-      <div class="chao"><h3>Do chão, com o Laudo Vivo</h3><p>Começa onde o alerta é inconclusivo: cada item financiado ganha a sua prova (vídeo contado, foto dentro da gleba, nota e GTA conferidas) e a regra do MCR decide. Complementa, não substitui.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="secao" id="como" aria-labelledby="t-como" style="padding-top:0">
+<!-- ===================================================== 4. RESULTADOS -->
+<section class="pg" id="resultados" aria-labelledby="t-res">
   <div class="envolve">
-    <p class="olho">Como funciona</p>
-    <h2 id="t-como">Uma visita guiada, item por item, até o laudo assinado.</h2>
-    <p class="sub">A fiscal conversa com o agente por texto ou voz. Ele diz a próxima prova, confere o que chega e não deixa o laudo sair com pendência.</p>
-    <div class="passos">
-      <article class="passo"><div class="n">01</div><h3>Triagem e método</h3><p>Por que a operação caiu na amostra e qual método a regra pede, antes de sair para o campo.</p><span class="ia">regras</span></article>
-      <article class="passo"><div class="n">02</div><h3>Prova de campo</h3><p>Vídeo do lote no brete com contagem por visão computacional, foto com GPS dentro da gleba e a série do Sentinel-2.</p><span class="ia">visão + satélite</span></article>
-      <article class="passo"><div class="n">03</div><h3>Papel conferido</h3><p>A IA lê a nota impressa e a GTA e pede só o que faltou; as regras conferem dígito verificador, somas e datas.</p><span class="ia">leitura + regras</span></article>
-      <article class="passo"><div class="n">04</div><h3>Laudo selado</h3><p>A fiscal revisa e assina com PIN. O selo é uma cadeia de hash: uma cópia alterada não confere.</p><span class="ia">humano assina</span></article>
+    <div class="cab">
+      <p class="olho olho-linha">Resultados, com os limites<span class="etq-sint">casos sintéticos</span></p>
+      <h2 id="t-res">Medido antes de chegar aqui, num teste congelado.</h2>
     </div>
-  </div>
-</section>
-
-<section class="secao" aria-labelledby="t-papeis" style="padding-top:0">
-  <div class="envolve">
-    <p class="olho">Quem conversa não confere</p>
-    <h2 id="t-papeis">A IA lê. A regra decide. O humano assina.</h2>
-    <div class="papeis">
-      <div class="papel"><span class="tag">IA</span><h3>Lê o papel e a fala</h3><p>O que um formulário não consegue: a nota fotografada, a GTA, o vídeo do curral e o que a fiscal diz em campo.</p></div>
-      <div class="papel regra"><span class="tag">Regras, sem IA</span><h3>Garantem o que é aceito</h3><p>Política e verificador determinísticos dão o status de cada item e citam o item do MCR 2-7 em que se apoiam.</p></div>
-      <div class="papel humano"><span class="tag">Humano</span><h3>A assinatura é sempre da fiscal</h3><p>O agente monta o rascunho; nada sai sem a revisão e o PIN de quem responde pela fiscalização.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="secao" id="resultados" aria-labelledby="t-res" style="padding-top:0">
-  <div class="envolve">
-    <p class="olho">Resultados, com os limites</p>
-    <h2 id="t-res">Medido antes de chegar aqui, num teste congelado.</h2>
-    <div class="resultados">
+    <div class="res-grade escalona">
       <div class="res"><b>9 de 9</b><p>defeitos plantados achados</p><small>IC 95%: 70–100%</small></div>
       <div class="res"><b>0 de 10</b><p>operações válidas bloqueadas</p><small>IC 95%: 0–28%</small></div>
-      <div class="res"><b>0/80</b><p>ataques da equipe passaram; no red-team cego, 6/30</p><small>IC: 0–5% e 10–37%</small></div>
+      <div class="res largo"><div class="par"><span><b>0/80</b><i>da equipe</i></span><span><b>6/30</b><i>do red-team cego</i></span></div><p>ataques que passaram</p><small>IC: 0–5% e 10–37%</small></div>
       <div class="res"><b>12 × 304</b><p>toques na tela: agente × formulário</p><small>fiscal simulado</small></div>
       <div class="res"><b>40 de 40</b><p>regras apontam o item da norma</p><small>28 com o texto literal</small></div>
     </div>
-    <p class="nota">Teste de 24 casos sintéticos, congelado em 16/10/2026; fiscal simulado; nenhum cliente ou piloto ainda. Os relatórios e o código estão no repositório público.</p>
   </div>
 </section>
 
-<section class="secao" aria-labelledby="t-quem" style="padding-top:0">
-  <div class="envolve">
-    <p class="olho">Para quem</p>
-    <h2 id="t-quem">Feito para quem fiscaliza e para quem responde pela fiscalização.</h2>
-    <div class="publicos">
-      <div class="publico"><h3>Cooperativas e bancos</h3><ul><li>Prova de cada item para o Banco Central e para a Justiça</li><li>Amostra com critério e método pela regra</li><li>Pacote de exibição com a trilha</li></ul></div>
-      <div class="publico"><h3>Fiscais e técnicos</h3><ul><li>Visita guiada pelo celular, por texto ou voz</li><li>Pede só o que falta: menos digitação</li><li>Laudo pronto para revisar no fim da visita</li></ul></div>
-      <div class="publico"><h3>Auditoria e jurídico</h3><ul><li>Cada status aponta a prova e a regra</li><li>Pedidos de pressão recusados e registrados</li><li>Selo que se confere sem a instalação</li></ul></div>
-    </div>
+<!-- ===================================================== 5. SEGURANÇA + PARA QUEM -->
+<section class="pg" id="seguranca" aria-label="Segurança, LGPD e para quem">
+  <div class="envolve bento">
+    <article class="mod s12 linha-mod" aria-labelledby="t-seg">
+      <div class="mod-cab">
+        <p class="olho">Segurança e LGPD</p>
+        <h2 id="t-seg">O dado do associado fica com a cooperativa.</h2>
+        <p class="sub">No produto, os modelos rodam na máquina da cooperativa. A demonstração pública usa só dados sintéticos e, para a mensagem livre, um LLM em nuvem.</p>
+      </div>
+      <div class="tri">
+        <div class="garantia"><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-cadeado"/></svg></span><h3>Modelo local</h3><p>LLM de 4B, Whisper e YOLOX na máquina: nenhum dado sai dela.</p></div>
+        <div class="garantia"><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-codigo"/></svg></span><h3>Dado pessoal mascarado</h3><p>CPF e chave da nota mascarados nos registros; brutos por 90 dias e depois o expurgo.</p></div>
+        <div class="garantia"><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-escudo"/></svg></span><h3>Papéis claros</h3><p>A cooperativa é a controladora; nós operamos. Parecer jurídico de LGPD e sigilo ainda a fazer.</p></div>
+      </div>
+    </article>
+    <article class="mod s12 linha-mod" aria-labelledby="t-quem">
+      <div class="mod-cab">
+        <h2 id="t-quem">Feito para quem fiscaliza e para quem responde pela fiscalização.</h2>
+      </div>
+      <div class="tri">
+        <div class="publico"><h3>Cooperativas e bancos</h3><ul><li>Prova de cada item para o Banco Central e para a Justiça</li><li>Amostra com critério e método pela regra</li><li>Pacote de exibição com a trilha</li></ul></div>
+        <div class="publico"><h3>Fiscais e técnicos</h3><ul><li>Visita guiada pelo celular, por texto ou voz</li><li>Pede só o que falta: menos digitação</li><li>Laudo pronto para revisar no fim da visita</li></ul></div>
+        <div class="publico"><h3>Auditoria e jurídico</h3><ul><li>Cada status aponta a prova e a regra</li><li>Pedidos de pressão recusados e registrados</li><li>Selo que se confere sem a instalação</li></ul></div>
+      </div>
+    </article>
   </div>
 </section>
 
-<section class="secao escuro" id="seguranca" aria-labelledby="t-seg">
-  <div class="envolve">
-    <p class="olho">Segurança e LGPD</p>
-    <h2 id="t-seg">O dado do associado fica com a cooperativa.</h2>
-    <p class="sub">No produto, os modelos rodam na máquina da cooperativa. A demonstração pública usa só dados sintéticos e, para a mensagem livre, um LLM em nuvem.</p>
-    <div class="garantias">
-      <div class="garantia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><h3>Modelo local</h3><p>LLM de 4B, Whisper e YOLOX na máquina: nenhum dado sai dela.</p></div>
-      <div class="garantia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg><h3>Dado pessoal mascarado</h3><p>CPF e chave da nota mascarados nos registros; brutos por 90 dias e depois o expurgo.</p></div>
-      <div class="garantia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg><h3>Papéis claros</h3><p>A cooperativa é a controladora; nós operamos. Parecer jurídico de LGPD e sigilo ainda a fazer.</p></div>
-    </div>
+<!-- ===================================================== 6. MODELO + FECHAMENTO -->
+<section class="pg" id="modelo" aria-label="Modelo de negócio e próximo passo">
+  <div class="envolve bento">
+    <article class="mod s12 linha-mod" aria-labelledby="t-modelo">
+      <div class="mod-cab">
+        <p class="olho">Modelo de negócio</p>
+        <h2 id="t-modelo">A cooperativa paga por fiscalização concluída.</h2>
+        <p class="sub">Nunca pelo resultado do laudo e nunca pelo mutuário da operação. Preços-alvo do plano de negócio, ainda não testados com cliente.</p>
+      </div>
+      <div class="precos">
+        <div class="preco dest"><span>Avulsa</span><p class="vl-p"><b>R$ 79</b><small>preço-alvo</small></p><small>por fiscalização</small></div>
+        <div class="preco"><span>Pacote de 50</span><p class="vl-p"><b>R$ 65</b><small>preço-alvo</small></p><small>por fiscalização</small></div>
+        <div class="preco"><span>Pacote de 100</span><p class="vl-p"><b>R$ 59</b><small>preço-alvo</small></p><small>por fiscalização</small></div>
+        <div class="preco"><span>Piloto Fundador</span><p class="vl-p"><b>R$ 39</b><small>preço-alvo</small></p><small>por fiscalização</small></div>
+      </div>
+    </article>
+    <article class="mod s12 chamada" aria-labelledby="t-chamada">
+      <div class="ch-texto">
+        <p class="olho">Próximo passo</p>
+        <h2 id="t-chamada">Procuramos uma cooperativa goiana para o primeiro teste.</h2>
+        <p>De 20 a 50 operações já fiscalizadas, comparando o laudo do Laudo Vivo com o que foi feito. Depois, o Piloto Fundador.</p>
+        <div class="acoes">
+          <a class="btn btn-pri" href="/guiado/">Testar a demo<svg class="ic" aria-hidden="true"><use href="#i-seta"/></svg></a>
+        </div>
+        <p class="senha"><svg class="ic" aria-hidden="true"><use href="#i-cadeado"/></svg><span>A demo pede uma senha: <b>a senha está na apresentação.</b></span></p>
+      </div>
+      <figure class="ch-demo">
+        <div class="celular cel-mock" role="img" aria-label="Recriação do celular em campo: a foto da cerca está a 650 m da borda da área financiada, com o status Falta, e o cartão Agora pede para refazer a foto de dentro da área.">
+          <div class="cel-topo"><svg class="ic"><use href="#i-volta"/></svg><b>29 vacas e 1.200 m de cerca</b></div>
+          <div class="cel-corpo">
+            <div class="seg"><i class="ok"></i><i class="dv"></i><i class="vez"></i><i></i><i></i></div>
+            <div class="cartao"><div class="rt"><svg class="ic"><use href="#i-pin"/></svg>Foto da cerca</div><div class="big"><b>a 650 m</b></div><span class="st ft">Falta</span><p>da borda da área financiada.</p></div>
+            <div class="agora empilha"><span class="rotulo">AGORA</span><div><p class="h">Refaça a foto de dentro da área</p></div><div class="bts"><span class="bt bt-pri"><svg class="ic"><use href="#i-cam"/></svg>Refazer foto</span></div></div>
+          </div>
+        </div>
+        <figcaption><b>Recriação da demo no celular</b><p>O caso é uma operação fictícia: 29 vacas leiteiras e 1.200 m de cerca em Petrolina de Goiás, com vídeo, fotos, nota, GTA e falas sintéticos. A fiscal Ana também é fictícia.</p></figcaption>
+      </figure>
+    </article>
   </div>
 </section>
 
-<section class="secao" id="modelo" aria-labelledby="t-modelo">
-  <div class="envolve modelo">
-    <div>
-      <p class="olho">Modelo de negócio</p>
-      <h2 id="t-modelo">A cooperativa paga por fiscalização concluída.</h2>
-      <p class="sub">Nunca pelo resultado do laudo e nunca pelo mutuário da operação. Preços-alvo do plano de negócio, ainda não testados com cliente.</p>
+<!-- ===================================================== 8. CONTATO (a última parte, no lugar do rodapé) -->
+<section class="pg escura contato" id="contato" aria-labelledby="t-contato">
+  <div class="envolve contato-grade">
+    <div class="contato-texto">
+      <p class="olho">Contato</p>
+      <h2 id="t-contato">Vamos conversar</h2>
+      <p>Cooperativa, banco, fiscal ou auditoria: conte o que você precisa conferir. Respondemos por e-mail.</p>
     </div>
-    <div class="precos">
-      <div class="preco dest"><span>Avulsa, preço-alvo</span><b>R$ 79</b></div>
-      <div class="preco"><span>Pacote de 50, preço-alvo</span><b>R$ 65</b></div>
-      <div class="preco"><span>Pacote de 100, preço-alvo</span><b>R$ 59</b></div>
-      <div class="preco"><span>Piloto Fundador, preço-alvo</span><b>R$ 39</b></div>
-    </div>
-  </div>
-</section>
-
-<section class="chamada" aria-labelledby="t-chamada">
-  <div class="envolve">
-    <div>
-      <h2 id="t-chamada">Procuramos uma cooperativa goiana para o primeiro teste.</h2>
-      <p>De 20 a 50 operações já fiscalizadas, comparando o laudo do Laudo Vivo com o que foi feito. Depois, o Piloto Fundador.</p>
-    </div>
-    <div class="acoes">
-      <a class="btn btn-escuro" href="/">Testar a demo</a>
-      <a class="btn btn-sec" href="https://github.com/E-crls/akcit-camp">Abrir o repositório</a>
+    <div class="form-caixa">
+      <form class="form" id="form-contato" aria-labelledby="t-contato">
+        <div class="campos-f">
+          <div class="fld"><label for="c-nome">Nome</label><input id="c-nome" name="nome" type="text" autocomplete="name" required minlength="2" maxlength="120"></div>
+          <div class="fld"><label for="c-email">E-mail</label><input id="c-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254"></div>
+          <div class="fld"><label for="c-inst">Instituição<span class="opc">opcional</span></label><input id="c-inst" name="instituicao" type="text" autocomplete="organization" maxlength="160"></div>
+          <div class="fld"><label for="c-cargo">Cargo<span class="opc">opcional</span></label><input id="c-cargo" name="cargo" type="text" autocomplete="organization-title" maxlength="120"></div>
+          <div class="fld largo"><label for="c-msg">Mensagem<span class="opc">opcional, curta</span></label><textarea id="c-msg" name="mensagem" rows="3" maxlength="1000"></textarea></div>
+        </div>
+        <div class="isca" aria-hidden="true"><label for="c-site">Site</label><input id="c-site" name="site" type="text" tabindex="-1" autocomplete="off"></div>
+        <label class="consent" for="c-ok"><input id="c-ok" name="consentimento" type="checkbox" required><span>Autorizo o contato da equipe do Laudo Vivo sobre o projeto</span></label>
+        <div class="form-pe">
+          <button class="btn btn-pri" type="submit">Enviar</button>
+          <p class="form-status" id="contato-status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+      <div class="form-ok" id="contato-ok" tabindex="-1" hidden>
+        <span class="si-ok" aria-hidden="true"><svg class="ic"><use href="#i-ok"/></svg></span>
+        <div><b>Recebido. A equipe responde em breve.</b><p>Enquanto isso, a demo guiada abre no celular.</p></div>
+      </div>
     </div>
   </div>
 </section>
 </main>
 
-<footer class="rodape">
-  <div class="envolve">
-    <div>
-      <a class="marca" href="#topo" aria-label="Laudo Vivo, voltar ao início">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="11" fill="#FFC414"/><g fill="#15130F"><path d="M13 11H26V40H53V53H13Z"/><rect x="30" y="24" width="12" height="12"/></g></svg>
-        <b>LAUDO VIVO</b>
-      </a>
-      <p>AKCIT Camp 2026, regional de Goiânia. Dados, documentos e vídeos de teste sintéticos; fiscal simulado; custos e mercado são estimativas.</p>
-    </div>
-    <nav aria-label="Rodapé">
-      <a href="/">Demo</a>
-      <a href="https://github.com/E-crls/akcit-camp">Repositório</a>
-      <a href="https://github.com/E-crls/akcit-camp/blob/main/laudo-vivo/LICENSE">Licença</a>
-    </nav>
-  </div>
-</footer>
+<nav class="indice" aria-label="Partes da página">
+  <a href="#topo" aria-label="Início"><span aria-hidden="true">Início</span></a>
+  <a href="#porque" aria-label="Por que gado"><span aria-hidden="true">Por que gado</span></a>
+  <a href="#complemento" aria-label="Onde entra"><span aria-hidden="true">Onde entra</span></a>
+  <a href="#como" aria-label="Como funciona"><span aria-hidden="true">Como funciona</span></a>
+  <a href="#resultados" aria-label="Resultados"><span aria-hidden="true">Resultados</span></a>
+  <a href="#seguranca" aria-label="Segurança"><span aria-hidden="true">Segurança</span></a>
+  <a href="#modelo" aria-label="Modelo"><span aria-hidden="true">Modelo</span></a>
+  <a href="#contato" aria-label="Contato"><span aria-hidden="true">Contato</span></a>
+</nav>
+
+<script>
+(function () {
+  "use strict";
+  var raiz = document.getElementById("etapas");
+  if (!raiz) return;
+  var lista = raiz.querySelector('[role="tablist"]');
+  var abas = Array.prototype.slice.call(lista.querySelectorAll('[role="tab"]'));
+  var paineis = abas.map(function (a) { return document.getElementById(a.getAttribute("aria-controls")); });
+  var area = document.getElementById("paineis");
+  var topo = document.querySelector(".topo");
+  var n = abas.length, atual = 0;
+  var calmo = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var largo = window.matchMedia ? window.matchMedia("(min-width: 761px)") : { matches: true };
+  var modo = calmo ? "auto" : "smooth";
+
+  /* na faixa de abas do celular, a aba escolhida fica à vista */
+  function mostrarAba(i) {
+    if (lista.scrollWidth <= lista.clientWidth + 1) return;
+    var a = abas[i], pad = parseFloat(getComputedStyle(lista).paddingLeft) || 0;
+    var esq = a.offsetLeft - pad, dir = a.offsetLeft + a.offsetWidth + pad - lista.clientWidth;
+    if (lista.scrollLeft > esq) lista.scrollTo({ left: esq, behavior: modo });
+    else if (lista.scrollLeft < dir) lista.scrollTo({ left: dir, behavior: modo });
+  }
+  /* quem já rolou para dentro da etapa volta ao começo dela, logo abaixo das abas presas */
+  function alinhar() {
+    var fixo = topo.offsetHeight + (largo.matches ? 0 : lista.offsetHeight);
+    var r = area.getBoundingClientRect();
+    if (r.top < fixo - 1) window.scrollTo({ top: window.pageYOffset + r.top - fixo - 12, behavior: modo });
+  }
+
+  function ir(i, opcoes) {
+    opcoes = opcoes || {};
+    if (i < 0 || i >= n) i = (i + n) % n;
+    abas.forEach(function (a, k) {
+      var sel = k === i;
+      a.setAttribute("aria-selected", sel ? "true" : "false");
+      a.tabIndex = sel ? 0 : -1;
+      a.classList.toggle("feita", k < i);
+    });
+    paineis.forEach(function (p, k) {
+      if (k === i) {
+        p.hidden = false;
+        if (i !== atual && !calmo) { p.classList.remove("entra"); void p.offsetWidth; p.classList.add("entra"); }
+      } else { p.hidden = true; p.classList.remove("entra"); }
+    });
+    limparMira();
+    atual = i;
+    mostrarAba(i);
+    if (opcoes.foco) abas[i].focus({ preventScroll: true });
+    alinhar();
+  }
+
+  abas.forEach(function (a, k) {
+    a.addEventListener("click", function () { ir(k); });
+    a.addEventListener("keydown", function (e) {
+      var alvo = null;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") alvo = (k + 1) % n;
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") alvo = (k - 1 + n) % n;
+      else if (e.key === "Home") alvo = 0;
+      else if (e.key === "End") alvo = n - 1;
+      if (alvo !== null) { e.preventDefault(); ir(alvo, { foco: true }); }
+    });
+  });
+
+  /* "O que a regra decidiu": aberto no computador, recolhido no celular */
+  var decides = Array.prototype.slice.call(raiz.querySelectorAll("details.decide"));
+  function ajustarDecide() { decides.forEach(function (d) { d.open = largo.matches; }); }
+
+  /* cada linha da decisão aponta o elemento do mock: no hover ou no foco, ele ganha o contorno */
+  function limparMira() {
+    Array.prototype.forEach.call(raiz.querySelectorAll(".mira"), function (el) { el.classList.remove("mira"); });
+    Array.prototype.forEach.call(raiz.querySelectorAll(".decide li.ativo"), function (el) { el.classList.remove("ativo"); });
+  }
+  Array.prototype.forEach.call(raiz.querySelectorAll(".decide li[data-alvo]"), function (li) {
+    var alvo = document.getElementById(li.getAttribute("data-alvo"));
+    if (!alvo) return;
+    function liga() { limparMira(); li.classList.add("ativo"); alvo.classList.add("mira"); }
+    function desliga() { li.classList.remove("ativo"); alvo.classList.remove("mira"); }
+    li.addEventListener("mouseenter", liga);
+    li.addEventListener("mouseleave", desliga);
+    li.addEventListener("focus", liga);
+    li.addEventListener("blur", desliga);
+  });
+
+  /* no computador, o bloco fica com a altura da etapa mais alta: trocar de etapa não empurra a página */
+  function medir() {
+    area.style.minHeight = "";
+    if (!largo.matches) return;
+    var max = 0;
+    paineis.forEach(function (p) { var oculto = p.hidden; p.hidden = false; max = Math.max(max, p.offsetHeight); p.hidden = oculto; });
+    area.style.minHeight = max + "px";
+  }
+  function arrumar() { ajustarDecide(); medir(); }
+  if (largo.addEventListener) largo.addEventListener("change", arrumar); else if (largo.addListener) largo.addListener(arrumar);
+  var espera = null;
+  window.addEventListener("resize", function () { clearTimeout(espera); espera = setTimeout(medir, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(medir);
+  window.addEventListener("load", medir);
+  arrumar();
+
+  /* carrossel no toque: deslizar para o lado troca a etapa (a rolagem vertical continua livre) */
+  var x0 = null, y0 = null;
+  area.addEventListener("touchstart", function (e) { var t = e.changedTouches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
+  area.addEventListener("touchend", function (e) {
+    if (x0 === null) return;
+    var t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+    x0 = null;
+    if (Math.abs(dx) > 56 && Math.abs(dx) > 1.6 * Math.abs(dy)) {
+      var k = atual + (dx < 0 ? 1 : -1);
+      if (k >= 0 && k < n) ir(k);
+    }
+  }, { passive: true });
+})();
+
+/* rolagem: cada parte entra com fade e deslize curto; o índice à direita mostra a parte atual; no computador, uma
+   parte mais alta que a tela perde o encaixe obrigatório (scroll-snap-stop normal) para não prender a rolagem */
+(function () {
+  "use strict";
+  var partes = Array.prototype.slice.call(document.querySelectorAll("main > section.pg[id]"));
+  var topo = document.querySelector(".topo");
+  var pc = window.matchMedia ? window.matchMedia("(min-width: 900px) and (min-height: 700px)") : { matches: false };
+
+  if (document.documentElement.classList.contains("js-revela")) {
+    var itens = [];
+    partes.forEach(function (s) {
+      var env = s.querySelector(".envolve");
+      Array.prototype.forEach.call(env ? env.children : [], function (el) {
+        if (el.classList.contains("escalona")) Array.prototype.forEach.call(el.children, function (f) { itens.push(f); });
+        else itens.push(el);
+      });
+    });
+    var io = new IntersectionObserver(function (entradas) {
+      var k = 0;
+      entradas.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.style.setProperty("--atraso", Math.min(k++, 6) * 70 + "ms");
+        e.target.classList.add("visto");
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0 });
+    itens.forEach(function (el) { el.classList.add("rv"); io.observe(el); });
+  }
+
+  function altas() {
+    var vis = window.innerHeight - topo.offsetHeight;
+    partes.forEach(function (s) { s.classList.toggle("alta", pc.matches && s.offsetHeight > vis + 2); });
+  }
+  var indice = document.querySelector(".indice");
+  var pontos = indice ? Array.prototype.slice.call(indice.querySelectorAll("a")) : [];
+  var pedido = false;
+  function atual() {
+    pedido = false;
+    var linha = topo.offsetHeight + window.innerHeight * 0.4, cur = 0;
+    partes.forEach(function (s, i) { if (s.getBoundingClientRect().top <= linha) cur = i; });
+    pontos.forEach(function (a, i) { if (i === cur) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current"); });
+    if (indice) indice.classList.toggle("sobre-escuro", partes[cur].classList.contains("escura"));
+  }
+  window.addEventListener("scroll", function () { if (!pedido) { pedido = true; requestAnimationFrame(atual); } }, { passive: true });
+
+  /* roda do mouse no computador: um gesto, uma parte. O encaixe do CSS sozinho volta para a parte de origem quando a
+     roda manda deltas finos (trackpad e alguns mouses); aqui o gesto leva à parte seguinte. Numa parte alta, a roda
+     rola livre até a borda dela. Enquanto a página anda (ou a inércia do trackpad continua), o gesto não conta de novo. */
+  var calmo = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var travado = false, ultimaRoda = 0;
+  function destravar() { if (Date.now() - ultimaRoda > 220) travado = false; else setTimeout(destravar, 90); }
+  window.addEventListener("wheel", function (e) {
+    if (!pc.matches || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    var campo = e.target.closest ? e.target.closest("textarea") : null;
+    if (campo && campo.scrollHeight > campo.clientHeight + 1) return;
+    ultimaRoda = Date.now();
+    var h = topo.offsetHeight, y = window.pageYOffset, i = 0;
+    partes.forEach(function (s, k) { if (s.offsetTop - h <= y + 2) i = k; });
+    var r = partes[i].getBoundingClientRect(), desce = e.deltaY > 0;
+    if (partes[i].classList.contains("alta") && (desce ? r.bottom > window.innerHeight + 2 : r.top < h - 2)) return;
+    e.preventDefault();
+    if (travado || Math.abs(e.deltaY) < 2) return;
+    var alvo = i + (desce ? 1 : -1);
+    if (alvo < 0 || alvo >= partes.length) return;
+    travado = true;
+    window.scrollTo({ top: partes[alvo].offsetTop - h, behavior: calmo ? "auto" : "smooth" });
+    setTimeout(destravar, 650);
+  }, { passive: false });
+  var espera = null;
+  window.addEventListener("resize", function () { clearTimeout(espera); espera = setTimeout(function () { altas(); atual(); }, 150); });
+  window.addEventListener("load", function () { altas(); atual(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(altas);
+  altas(); atual();
+})();
+
+/* contato: POST com corpo JSON em text/plain (pedido simples, sem preflight); mesma origem no serviço e no local */
+(function () {
+  "use strict";
+  var form = document.getElementById("form-contato");
+  if (!form) return;
+  var status = document.getElementById("contato-status"), ok = document.getElementById("contato-ok");
+  var botao = form.querySelector('button[type="submit"]'), rotulo = botao.textContent;
+  var h = location.hostname;
+  var destino = (h.slice(-7) === "run.app" || h === "localhost" || h === "127.0.0.1")
+    ? "/api/contato" : "https://laudo-vivo-demo-w7k67asc5a-rj.a.run.app/api/contato";
+  var enviando = false;
+  function avisar(msg, erro) { status.textContent = msg; status.classList.toggle("erro", !!erro); }
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (enviando) return;
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    var f = form.elements;
+    var nome = f.nome.value.trim(), email = f.email.value.trim(), instituicao = f.instituicao.value.trim(),
+      cargo = f.cargo.value.trim(), mensagem = f.mensagem.value.trim(), consentimento = f.consentimento.checked, site = f.site.value;
+    enviando = true; botao.disabled = true; botao.textContent = "Enviando…"; form.setAttribute("aria-busy", "true");
+    avisar("Enviando…", false);
+    fetch(destino, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=UTF-8" },
+      body: JSON.stringify({ nome: nome, email: email, instituicao: instituicao, cargo: cargo, mensagem: mensagem, consentimento: consentimento, site: site })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) { return { s: r.status, j: j || {} }; });
+    }).then(function (x) {
+      if (x.s === 200) {
+        avisar("", false);
+        form.hidden = true; ok.hidden = false; ok.focus();
+      } else if (x.s === 422) avisar(x.j.erro || "Confira nome e e-mail.", true);
+      else if (x.s === 429) avisar("Muitos envios. Tente de novo em alguns minutos.", true);
+      else avisar(x.j.erro || "Não deu para enviar agora. Tente de novo.", true);
+    }, function () {
+      avisar("Não conseguimos falar com o servidor agora. Confira a conexão e tente de novo.", true);
+    }).then(function () {
+      enviando = false; botao.disabled = false; botao.textContent = rotulo; form.removeAttribute("aria-busy");
+    });
+  });
+})();
+</script>
 </body>
 </html>
