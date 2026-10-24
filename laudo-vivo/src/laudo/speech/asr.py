@@ -9,7 +9,10 @@ cache por `LAUDO_ASR_MODELO`, como o `medium` da demo pública em CPU).
 - **VAD** (Silero, embutido no faster-whisper, CPU): áudio sem fala volta como transcrição vazia sem passar
   pelo Whisper (evita "alucinação" em silêncio, como "Legendas pela comunidade Amara.org").
 - Idioma fixo `pt` e um prompt inicial com o vocabulário do domínio (cabeças, garrotes, GTA, NF-e...).
-- Um modelo por processo (`transcritor_padrao()`), carregado sob demanda e protegido por lock.
+- Um modelo por processo (`transcritor_padrao()`), carregado sob demanda e protegido por lock. A fala espera a
+  vez no máximo `LAUDO_ASR_ESPERA_S` segundos (padrão: 20 s na demo pública, `LAUDO_DEMO_PUBLICA=1`; sem teto no
+  uso normal); passou disso, `ErroASR("OCUPADO")` (a demo pública responde 429 e a fala não conta). Os threads da
+  CPU vêm de `LAUDO_ASR_THREADS` (padrão 4).
 
 O áudio do navegador chega em webm/ogg (Opus), mp4/aac (Safari) ou wav; o PyAV decodifica todos.
 """
@@ -37,6 +40,10 @@ os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 MODELO_PADRAO = "Systran/faster-whisper-large-v3"
 # Outro modelo do cache local (ex.: "Systran/faster-whisper-medium" na demo pública em CPU, Dockerfile.publico)
 ENV_MODELO = "LAUDO_ASR_MODELO"
+ENV_ESPERA = "LAUDO_ASR_ESPERA_S"  # teto da espera pela vez na fila do transcritor
+ENV_THREADS = "LAUDO_ASR_THREADS"  # threads da CPU do Whisper
+ESPERA_DEMO_PUBLICA_S = 20.0
+CPU_THREADS_PADRAO = 4
 TAXA = 16000
 PROMPT_DOMINIO = (
     "Fiscalização de crédito rural em Goiás. Contei 42 cabeças no curral: garrotes, novilhas, bezerros. "
@@ -53,7 +60,7 @@ _ALUCINACOES = (
 
 
 class ErroASR(Exception):
-    """Falha do ASR. `codigo` ∈ {MODELO_AUSENTE, CARGA, AUDIO_INVALIDO, DESLIGADO}."""
+    """Falha do ASR. `codigo` ∈ {MODELO_AUSENTE, CARGA, AUDIO_INVALIDO, DESLIGADO, OCUPADO}."""
 
     def __init__(self, codigo: str, msg: str):
         super().__init__(f"{codigo}: {msg}")
@@ -75,7 +82,8 @@ class Transcricao(BaseModel):
     prob_idioma: float = 1.0
     duracao_audio_s: float = 0.0
     duracao_fala_s: float = 0.0  # depois do VAD
-    latencia_ms: int = 0  # decodificação + VAD + Whisper (sem a carga do modelo)
+    latencia_ms: int = 0  # decodificação + VAD + Whisper (sem a carga do modelo nem a espera na fila)
+    espera_ms: int = 0  # espera pela vez na fila do transcritor (outra fala transcrevendo)
     rtf: float | None = None  # latência / duração do áudio
     confianca: float = 0.0  # exp(média de avg_logprob), 0–1
     vazio: bool = False
@@ -89,6 +97,32 @@ class Transcricao(BaseModel):
 def modelo_configurado() -> str:
     """Modelo do Whisper: `LAUDO_ASR_MODELO` (id do Hugging Face ou pasta com model.bin) ou o large-v3."""
     return (os.environ.get(ENV_MODELO) or "").strip() or MODELO_PADRAO
+
+
+def _num_env(nome: str) -> float | None:
+    bruto = (os.environ.get(nome) or "").strip().replace(",", ".")
+    if not bruto:
+        return None
+    try:
+        return float(bruto)
+    except ValueError:
+        log.warning("%s inválido (%r): ignorado", nome, bruto)
+        return None
+
+
+def espera_configurada() -> float | None:
+    """Teto da espera pela vez na fila (s): `LAUDO_ASR_ESPERA_S` (0 ou negativo: sem teto); sem ela, 20 s na demo
+    pública e sem teto no uso normal (um fiscal por vez)."""
+    v = _num_env(ENV_ESPERA)
+    if v is None:
+        publica = (os.environ.get("LAUDO_DEMO_PUBLICA") or "").strip().lower() in ("1", "true", "sim", "yes")
+        return ESPERA_DEMO_PUBLICA_S if publica else None
+    return v if v > 0 else None
+
+
+def threads_configurados() -> int:
+    v = _num_env(ENV_THREADS)
+    return max(1, int(v)) if v is not None else CPU_THREADS_PADRAO
 
 
 def localizar_modelo(repo_id: str = MODELO_PADRAO) -> Path:
@@ -191,8 +225,9 @@ class TranscritorWhisper:
         idioma: str = "pt",
         beam_size: int = 5,
         prompt: str | None = PROMPT_DOMINIO,
-        cpu_threads: int = 4,
+        cpu_threads: int | None = None,  # None: `LAUDO_ASR_THREADS` ou 4
         vad: bool = True,
+        espera_s: float | None | str = "ambiente",  # teto da espera na fila; "ambiente": espera_configurada()
     ):
         self.modelo_id = modelo or modelo_configurado()
         self.dispositivo_pedido = dispositivo
@@ -200,8 +235,9 @@ class TranscritorWhisper:
         self.idioma = idioma
         self.beam_size = beam_size
         self.prompt = prompt
-        self.cpu_threads = cpu_threads
+        self.cpu_threads = cpu_threads if cpu_threads is not None else threads_configurados()
         self.vad = vad
+        self.espera_s: float | None = espera_configurada() if espera_s == "ambiente" else espera_s  # type: ignore
         self._modelo = None
         self._lock = threading.Lock()
         self.dispositivo = ""
@@ -311,7 +347,11 @@ class TranscritorWhisper:
             return self._vazio(base, t0, "nenhuma fala detectada (VAD)")
         if not self.carregado:
             self.carregar()
-        with self._lock:
+        t_fila = time.perf_counter()
+        if not self._lock.acquire(timeout=self.espera_s if self.espera_s is not None else -1):
+            raise ErroASR("OCUPADO", f"transcritor ocupado: outra fala na fila há mais de {self.espera_s:g} s")
+        espera = time.perf_counter() - t_fila
+        try:
             segs, info = self._modelo.transcribe(  # type: ignore[union-attr]
                 x,
                 language=self.idioma,
@@ -332,11 +372,13 @@ class TranscritorWhisper:
                 )
                 for s in segs
             ]
+        finally:
+            self._lock.release()
         uteis = [s for s in segmentos if s.texto and not (s.no_speech_prob > 0.8 and s.avg_logprob < -1.0)]
         texto = " ".join(s.texto for s in uteis).strip()
         if texto and any(a in _sem_acento(texto) for a in _ALUCINACOES):
             texto, uteis = "", []
-        lat = int((time.perf_counter() - t0) * 1000)
+        lat = int((time.perf_counter() - t0 - espera) * 1000)
         conf = math.exp(sum(s.avg_logprob for s in uteis) / len(uteis)) if uteis else 0.0
         return Transcricao(
             texto=texto,
@@ -345,6 +387,7 @@ class TranscritorWhisper:
             duracao_audio_s=round(dur, 2),
             duracao_fala_s=round(float(getattr(info, "duration_after_vad", dur) or 0.0), 2),
             latencia_ms=lat,
+            espera_ms=int(espera * 1000),
             rtf=round(lat / 1000 / dur, 3) if dur else None,
             confianca=round(min(max(conf, 0.0), 1.0), 3),
             vazio=not texto,
