@@ -34,7 +34,9 @@ o resto.
 Demo pública (`LAUDO_DEMO_PUBLICA=1`, `laudo.api.publica`): cada rota atende a cópia da fiscalização do visitante
 (cookie `lv_sessao`); sem documentação da API, sem as rotas de aquecimento, sem abrir operação real; POST com
 `Origin` de outro site é recusado (403) e não há cabeçalho CORS (só a própria origem lê as respostas); limites de
-upload e de fala menores. Sem a variável, tudo como acima.
+upload e de fala menores; cópias novas limitadas por IP (o primeiro de X-Forwarded-For); CSP mínima
+(`frame-ancestors`, `object-src`, `base-uri`); erro de validação (422) sem ecoar a entrada; XML enviado servido para
+baixar; trace e laudo JSON sem caminho interno. Sem a variável, tudo como acima.
 
 Uso: `scripts/py.sh -m laudo.api --llm ollama --ferramentas mistas` (ver `scripts/rodar_demo.sh`).
 """
@@ -48,7 +50,8 @@ from typing import Annotated, Any
 from urllib.parse import urlsplit
 
 from fastapi import Depends, FastAPI, File, Form, Request, UploadFile
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, model_validator
 from starlette.concurrency import run_in_threadpool
@@ -152,6 +155,9 @@ class LimiteCorpo:
 
 
 async def _responder_413(send, limite: int) -> None:
+    # o 413 pelo Content-Length declarado (e o da leitura que escapou do tratador) também vai ao painel; sem a
+    # demo pública, `evento` não faz nada
+    eventos.evento("recusa_limite", limite="corpo", status=413)
     corpo = JSONResponse({"erro": f"requisição acima do limite de {limite // MIB} MB"}, status_code=413).body
     await send(
         {
@@ -168,6 +174,18 @@ async def _responder_413(send, limite: int) -> None:
 
 def _rota(request: Request) -> str:
     return request.url.path[:80]
+
+
+def ip_do_cliente(request: Request) -> str:
+    """IP do visitante: o último de X-Forwarded-For (o Cloud Run acrescenta no fim o IP de quem conectou; o que vem
+    antes o próprio cliente pode escrever) ou o da conexão."""
+    xff = (request.headers.get("x-forwarded-for") or "").split(",")[-1].strip()
+    return (xff or (request.client.host if request.client else ""))[:64]
+
+
+# Demo pública: CSP mínima, que não quebra a interface (o mapa usa tiles externos: script, estilo, imagem e conexão
+# ficam como estão)
+CSP_PUBLICA = "frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
 
 
 def _mesma_origem(request: Request) -> bool:
@@ -236,7 +254,8 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
         """O serviço da requisição: o único do processo; na demo pública, a cópia do visitante (criada aqui)."""
         if ger is None:
             return srv
-        return ger.fachada(getattr(request.state, "lv_token", None) or request.cookies.get(publica_mod.COOKIE))
+        return ger.fachada(getattr(request.state, "lv_token", None) or request.cookies.get(publica_mod.COOKIE),
+                           ip=ip_do_cliente(request))
 
     def _so_leitura(request: Request) -> Any:
         """Saúde, carteira e mapa: a cópia do visitante se ela já existe; senão a de base (sem criar cópia)."""
@@ -260,6 +279,13 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
         return JSONResponse({"erro": e.msg}, status_code=e.status)
 
     if publica:
+
+        @app.exception_handler(RequestValidationError)
+        async def _invalida(request: Request, e: RequestValidationError):
+            # sem ecoar a entrada (um texto de 50 mil caracteres voltaria inteiro): só onde está o erro
+            campos = [".".join(str(x) for x in (err.get("loc") or ()) if x != "body")[:60] for err in e.errors()[:5]]
+            eventos.evento("erro", codigo=422, rota=_rota(request))
+            return JSONResponse({"erro": "requisição inválida", "campo": [c for c in campos if c]}, status_code=422)
 
         @app.exception_handler(Exception)
         async def _erro_interno(request: Request, e: Exception):
@@ -299,6 +325,8 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
             resp.headers.setdefault("Cache-Control", "no-cache")
         # microfone, câmera e GPS só para a própria origem
         resp.headers.setdefault("Permissions-Policy", "microphone=(self), camera=(self), geolocation=(self)")
+        if publica:
+            resp.headers.setdefault("Content-Security-Policy", CSP_PUBLICA)
         return resp
 
     # -- saúde, carteira, mapa ------------------------------------------------------------
@@ -330,6 +358,8 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
                 instituicao=instituicao,
             )
         except ValueError as e:  # filtro inválido (pydantic)
+            if publica:  # sem o texto da validação (nomes internos e a entrada)
+                raise ErroServico(400, "filtro da carteira inválido") from e
             raise ErroServico(400, str(e)[:300]) from e
         casos = []
         for c in srv.listar_casos():
@@ -492,6 +522,9 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
     def trace(fis_id: str, span_id: str | None = None, srv=_SRV):
         if span_id:
             return {"spans": srv.trace(fis_id, checar_id(span_id))}
+        if publica:  # com os caminhos reduzidos ao nome do arquivo (`publica.sem_caminhos`)
+            return Response(srv.trace_publico(fis_id), media_type="application/x-ndjson",
+                            headers={"Content-Disposition": f'inline; filename="{checar_id(fis_id)}.trace.jsonl"'})
         p = srv.trace_arquivo(fis_id)
         if not p.exists():
             raise ErroServico(404, "trace ainda vazio")
@@ -505,10 +538,13 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
     @app.get("/api/fiscalizacoes/{fis_id}/evidencias/{ev_id}/arquivo")
     def arquivo(fis_id: str, ev_id: str, srv=_SRV):
         p = srv.arquivo_evidencia(fis_id, ev_id)
+        # demo pública: o XML enviado pelo visitante (na pasta da cópia; o do caso fica como está) não abre na mesma
+        # origem: um XML com XHTML rodaria script
+        baixar = publica and p.suffix.lower() == ".xml" and Path(srv.dados).resolve() in p.resolve().parents
         return FileResponse(
             p,
             media_type=_MIME.get(p.suffix.lower(), "application/octet-stream"),
-            content_disposition_type="inline",
+            content_disposition_type="attachment" if baixar else "inline",
             filename=p.name,
         )
 

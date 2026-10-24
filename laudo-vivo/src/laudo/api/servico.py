@@ -341,7 +341,7 @@ class Servico:
             llm |= {
                 "modelo": self.replay_publico.modelo,
                 "arquivo": str(self.replay_publico.caminho),
-                "substituicoes": 0,
+                "substituicoes": self.replay_publico.substituicoes,
                 "fora_da_gravacao": self.replay_publico.fora,
                 "ao_vivo": {"nome": getattr(vivo, "nome", ""), "modelo": getattr(vivo, "modelo", "")}
                 if vivo is not None
@@ -844,7 +844,9 @@ class Servico:
                     },
                 )
         except ErroASR as e:
-            raise ErroServico(503 if e.codigo in ("MODELO_AUSENTE", "CARGA") else 400, e.msg) from e
+            # OCUPADO: fila do transcritor cheia (espera com teto, `LAUDO_ASR_ESPERA_S`; sem teto no uso normal)
+            status = {"MODELO_AUSENTE": 503, "CARGA": 503, "OCUPADO": 429}.get(e.codigo, 400)
+            raise ErroServico(status, e.msg) from e
         trd = tr.model_dump(mode="json")
         with open(pasta / "asr.jsonl", "a", encoding="utf-8") as f:
             f.write(
@@ -1061,7 +1063,9 @@ class Servico:
                 )
             antes = self._status(fis)
             pin_ok = hmac.compare_digest((pin or "").encode(), self.cfg.pin.encode())
-            if not pin_ok:
+            # o PIN errado só gasta tentativa na etapa de assinar (RASCUNHO ou ASSINATURA, com rascunho emitido);
+            # fora dela a assinatura é recusada pela etapa e a trava não anda
+            if not pin_ok and self._etapa_de_assinar(fis):
                 self._pins[fis_id] = self._pins.get(fis_id, 0) + 1
             t0 = time.perf_counter()
             try:
@@ -1084,6 +1088,12 @@ class Servico:
             )
             out["tentativas_restantes"] = MAX_TENTATIVAS_PIN - self._pins.get(fis_id, 0)
             return out
+
+    @staticmethod
+    def _etapa_de_assinar(fis: Fiscalizacao) -> bool:
+        from laudo.tools import laudo as ferr_laudo
+
+        return fis.estado_fsm in ("RASCUNHO", "ASSINATURA") and bool(ferr_laudo.ultimo_rascunho(fis))
 
     def _recusa_selagem(self, fis_id: str, motivo: str) -> RespostaTurno:
         """Resposta de assinatura recusada quando `selar` não acha o rascunho assinado íntegro
