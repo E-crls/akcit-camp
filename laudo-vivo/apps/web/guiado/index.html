@@ -210,7 +210,7 @@ h1:focus { outline: none; }
       casa: (p) => /justificativa/i.test(p.titulo) },
     { id: "rascunho", titulo: "Rascunho", frase: "Sem pendências, o laudo vira rascunho e vai para a assinatura da fiscal.",
       casa: (p) => /emiss[aã]o|agente assinar|envio para assinatura/i.test(p.titulo) },
-    { id: "assinar", titulo: "Assinar e selar", frase: "A fiscal confere o hash e assina com o PIN. Depois disso, nada muda.",
+    { id: "assinar", titulo: "Assinar e selar", frase: "A fiscal confere o hash e assina com o PIN. Depois disso, qualquer alteração aparece.",
       casa: (p) => p.acao === "assinar" || /assinatura humana|selad/i.test(p.titulo) },
   ];
   // a ordem importa: o mais específico primeiro (a justificativa da GTA não é a GTA; o satélite "da gleba" não é a cerca)
@@ -690,7 +690,7 @@ h1:focus { outline: none; }
     const chips = [{ t: "Fiscal: assinou com o PIN" }].concat(recusou ? [{ t: "Política: alteração recusada", guarda: true }] : []);
     const res = h("div", { class: "resultado", "aria-live": "polite" });
     tela(h("div", { class: "titulo-selo" }, h("div", { class: "selo", "aria-hidden": "true" }, icone("selo")), h("h1", {}, "Laudo selado")),
-      h("p", { class: "frase" }, "Assinado pela fiscal. Cada item aponta para a prova, e o selo prova que nada mudou depois."), res);
+      h("p", { class: "frase" }, "Assinado pela fiscal. Cada item aponta para a prova, e uma cópia alterada não confere com o selo."), res);
     res.replaceChildren(cartao({
       destaque: total ? `⟦${conferidos}⟧ de ⟦${total}⟧ aspectos conferidos` : "Fiscalização concluída",
       hash: l.selo ? `selo ${curto(l.selo)}` : l.hash_raiz ? `hash ${curto(l.hash_raiz)}` : null,
