@@ -15,7 +15,7 @@
 @font-face { font-family: "Barlow Semi Condensed"; font-weight: 700; font-display: swap; src: url("/vendor/fonts/BarlowSemiCondensed-700.woff2") format("woff2"); }
 /* Paleta Cerrado */
 :root {
-  --areia: #F5F3EE; --sup: #FFFFFF; --texto: #14201A; --texto-2: #4A5650; --texto-3: #6B746F;
+  --areia: #F5F3EE; --sup: #FFFFFF; --texto: #14201A; --texto-2: #4A5650; --texto-3: #626B66;
   --cerrado: #1E5B43; --cerrado-2: #174834; --cerrado-claro: #E6EEEA;
   --terracota: #C0582E;
   --ok: #15803D; --div: #B42318; --falta: #B7791F;
@@ -27,9 +27,11 @@
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-html, body { overflow-x: hidden; }
+/* overflow-x: hidden no body o tornaria um contêiner de rolagem, e o cabeçalho sticky (com o progresso) sairia da tela
+   ao rolar; clip corta sem criar contêiner (hidden fica de reserva para navegador antigo) */
+html { overflow-x: hidden; }
 body { margin: 0; min-height: 100vh; min-height: 100dvh; background: var(--areia); color: var(--texto);
-  font-family: var(--f-texto); font-weight: 500; font-size: 1rem; line-height: 1.45; overflow-x: hidden; }
+  font-family: var(--f-texto); font-weight: 500; font-size: 1rem; line-height: 1.45; overflow-x: hidden; overflow-x: clip; }
 button, input, a { font: inherit; color: inherit; }
 :focus-visible { outline: 3px solid var(--cerrado); outline-offset: 2px; border-radius: 6px; }
 .sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -37,16 +39,20 @@ button, input, a { font: inherit; color: inherit; }
 /* moldura: celular ocupa a tela; no PC, um cartão central de ~480 px */
 .app { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; background: var(--areia); }
 .topo { position: sticky; top: 0; z-index: 3; background: var(--areia); padding: 14px 16px 10px; padding-top: calc(14px + env(safe-area-inset-top)); }
+/* esmaece o que rola por baixo do cabeçalho, em vez de cortar o texto seco */
+.topo::after { content: ""; position: absolute; left: 0; right: 0; bottom: -14px; height: 14px; pointer-events: none;
+  background: linear-gradient(rgba(245, 243, 238, 1), rgba(245, 243, 238, 0)); }
 .marca { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-.marca a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; min-height: 32px; }
+.marca a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; min-height: 44px; margin: -6px 0; }
 .marca svg { width: 24px; height: 24px; flex: none; }
 .marca b { font-family: var(--f-titulo); font-weight: 700; font-size: 1rem; letter-spacing: .06em; }
 .etiqueta { font-size: .78rem; font-weight: 600; color: var(--texto-2); }
 .progresso { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin: 0; padding: 0; list-style: none; }
-.progresso li { height: 6px; border-radius: 3px; background: var(--borda); transition: background var(--dur) ease; }
-.progresso li.feito { background: var(--cerrado); }
-.progresso li.atual { background: linear-gradient(90deg, var(--cerrado) 50%, var(--borda) 50%); }
-.progresso li.atual.feito { background: var(--cerrado); }
+/* o preenchimento é um ::after com largura animada: o segmento enche em vez de trocar de cor de repente */
+.progresso li { position: relative; overflow: hidden; height: 6px; border-radius: 3px; background: var(--borda); }
+.progresso li::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 0; background: var(--cerrado); transition: width 420ms cubic-bezier(.2,.7,.2,1); }
+.progresso li.atual::after { width: 50%; }
+.progresso li.feito::after { width: 100%; }
 .cap-rot { margin: 8px 0 0; font-size: .8rem; font-weight: 600; color: var(--texto-2); min-height: 1.2em; }
 
 /* o deslize da tela não pode alargar a página no celular (o navegador alargaria a viewport e a barra fixa sairia da tela) */
@@ -80,13 +86,16 @@ h1:focus { outline: none; }
 .destaque .num { color: var(--terracota); }
 .pilula { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 3px 10px; border-radius: 999px; font-size: .8rem; font-weight: 700; letter-spacing: .02em; }
 .pilula::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.pilula.verificado { color: var(--ok); background: #E8F3EC; }
+/* fundos claros o bastante para o texto da pílula passar de 4,5:1 */
+.pilula.verificado { color: var(--ok); background: #F0F7F2; }
 .pilula.divergente { color: var(--div); background: #FBEAE8; }
-.pilula.falta { color: var(--falta); background: #FBF2E2; }
+.pilula.falta { color: #8A5A12; background: #FBF2E2; }
+.pilula.falta::before { background: var(--falta); }
 .linhas { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
 .linhas li { display: flex; gap: 10px; align-items: flex-start; font-size: .97rem; line-height: 1.35; }
 .linhas svg { width: 18px; height: 18px; flex: none; margin-top: 1px; }
 .linhas .ok svg { color: var(--ok); } .linhas .div svg { color: var(--div); } .linhas .falta svg { color: var(--falta); } .linhas .guarda svg { color: var(--cerrado); }
+.linhas .info svg { color: var(--texto-2); }
 .fala { margin: 14px 0 0; padding-left: 12px; border-left: 3px solid var(--borda); color: var(--texto-2); font-size: .93rem; }
 .hash { font-family: var(--mono); font-size: .86rem; letter-spacing: .02em; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 0; padding: 0; list-style: none; }
@@ -100,8 +109,11 @@ h1:focus { outline: none; }
 .erro-msg { margin: 12px 0 0; color: var(--div); font-weight: 600; }
 
 /* entrada e selado */
-.selo { width: 64px; height: 64px; border-radius: 50%; background: var(--cerrado); display: grid; place-items: center; margin: 12px 0 4px; }
-.selo svg { width: 34px; height: 34px; color: #fff; }
+/* selo ao lado do título: no celular pequeno o cartão cabe acima da barra de três botões */
+.titulo-selo { display: flex; align-items: center; gap: 14px; margin: 8px 0 8px; }
+.titulo-selo h1 { margin: 0; }
+.selo { width: 48px; height: 48px; flex: none; border-radius: 50%; background: var(--cerrado); display: grid; place-items: center; }
+.selo svg { width: 26px; height: 26px; color: #fff; }
 .nota { margin: 18px 0 0; font-size: .82rem; color: var(--texto-3); }
 .pin { display: grid; gap: 6px; margin: 4px 0 16px; }
 .pin label { font-weight: 600; font-size: .9rem; }
@@ -119,6 +131,9 @@ h1:focus { outline: none; }
 .btn-pri { background: var(--cerrado); color: #fff; }
 .btn-pri:hover { background: var(--cerrado-2); }
 .btn-pri[disabled] { opacity: .65; cursor: progress; }
+/* executando: o botão fica legível (sem esmaecer) e mostra que está girando, em vez da seta */
+.btn-pri.ocupado[disabled] { opacity: 1; background: var(--cerrado-2); }
+.giro { width: 18px; height: 18px; flex: none; border-radius: 50%; border: 2.5px solid rgba(255, 255, 255, .35); border-top-color: #fff; animation: gira .8s linear infinite; }
 .btn-sec { background: var(--sup); color: var(--texto); border: 1px solid var(--borda); }
 .btn-sec:hover { border-color: var(--texto-3); }
 .btn svg { width: 18px; height: 18px; }
@@ -126,12 +141,16 @@ h1:focus { outline: none; }
 .secundarias .btn { min-height: 44px; padding: 0 16px; font-size: .95rem; font-family: var(--f-texto); font-weight: 600; white-space: nowrap; }
 .secundarias.uma { grid-template-columns: 1fr; }
 
+/* PC: cartão de altura fixa, com a barra presa no rodapé dele. O botão fica sempre no mesmo lugar (não pula quando
+   o resultado aparece), e só o meio rola se faltar altura. */
 @media (min-width: 640px) {
   body { padding: 40px 16px; }
-  .app { max-width: 480px; margin: 0 auto; min-height: 0; background: var(--sup); border: 1px solid var(--borda); border-radius: 20px;
+  .app { max-width: 480px; margin: 0 auto; height: 820px; height: min(880px, calc(100vh - 80px)); height: min(880px, calc(100dvh - 80px)); min-height: 560px;
+    background: var(--sup); border: 1px solid var(--borda); border-radius: 20px;
     box-shadow: 0 2px 4px rgba(20, 32, 26, .04), 0 20px 48px rgba(20, 32, 26, .08); overflow: hidden; }
   .topo { position: static; background: var(--sup); padding: 20px 28px 12px; }
-  main { padding: 8px 28px 24px; min-height: 480px; }
+  .topo::after { content: none; }
+  main { flex: 1 1 auto; min-height: 0; overflow-x: hidden; overflow-y: auto; padding: 8px 28px 24px; }
   .cartao { background: var(--areia); box-shadow: none; }
   .chip { background: var(--sup); }
   .barra { position: static; background: var(--sup); -webkit-backdrop-filter: none; backdrop-filter: none; padding: 16px 28px 24px; }
@@ -139,8 +158,8 @@ h1:focus { outline: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .tela, .tela.volta, .cartao { animation: none; }
-  .roda .ind { animation-duration: 2.4s; }
-  .progresso li { transition: none; }
+  .roda .ind, .giro { animation-duration: 2.4s; }
+  .progresso li::after { transition: none; }
 }
 </style>
 </head>
@@ -201,7 +220,7 @@ h1:focus { outline: none; }
     [/triagem/i, "Triagem e método"], [/sat[eé]lite/i, "Satélite da gleba"], [/independ/i, "Declaração de independência"],
     [/v[ií]deo/i, "Vídeo do curral"], [/press[aã]o/i, "Pedido para mudar o número"], [/danfe/i, "Foto da nota impressa"],
     [/residual/i, "A fiscal lê no papel o que faltou"], [/nf-e/i, "XML da NF-e"], [/gta/i, "GTA com instrução escondida"],
-    [/corre[cç][aã]o|nova foto/i, "Foto nova, de dentro da área"], [/foto da cerca/i, "Foto da cerca"], [/pedido de laudo/i, "Pedido de laudo"],
+    [/corre[cç][aã]o|nova foto/i, "Foto nova, de dentro da área"], [/foto da cerca/i, "Foto da cerca"], [/pedido de laudo/i, "Pedido de laudo antes da hora"],
     [/emiss/i, "Emissão do rascunho"], [/agente assinar/i, "Pedido para o agente assinar"], [/envio/i, "Envio para assinatura"],
     [/assinatura humana/i, "Assinatura com PIN"], [/selad/i, "Tentativa de alterar o laudo"],
   ];
@@ -264,6 +283,7 @@ h1:focus { outline: none; }
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>',
     ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.8 2.8L16.2 9.5"/></svg>',
     div: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.4v.1"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.1"/></svg>',
     guarda: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="M8.8 12.2l2.3 2.3 4.2-4.4" stroke-linecap="round"/></svg>',
     selo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg>',
     seta: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
@@ -273,7 +293,8 @@ h1:focus { outline: none; }
   const curto = (hx) => (hx && hx.length > 14 ? `${hx.slice(0, 6)}…${hx.slice(-6)}` : hx || "");
   const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
   const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
-  const mcr = (id) => { const m = /MCR-(\d+)-(\d+)(?:-item(\d+))?/.exec(id || ""); return m ? `MCR ${m[1]}-${m[2]}${m[3] ? `, item ${m[3]}` : ""}` : (id || "").replace(/^POL-\d+\//, ""); };
+  // só a citação legível do manual (MCR 2-7, item 15); id interno (OP-..., POL-...) não vai para a tela
+  const mcr = (id) => { const m = /MCR-(\d+)-(\d+)(?:-item(\d+))?/.exec(id || ""); return m ? `MCR ${m[1]}-${m[2]}${m[3] ? `, item ${m[3]}` : ""}` : null; };
   // uma frase do agente, no máximo, cortada na palavra
   function umaFrase(texto, preferida) {
     if (!texto) return null;
@@ -329,24 +350,32 @@ h1:focus { outline: none; }
   }
 
   // ------------------------------------------------------------ cartões de resultado (só o essencial)
+  // Cada cartão: um destaque, no máximo duas ou três linhas de fato, quem agiu e, quando existe, a citação legível
+  // do MCR. Ids internos de regra (OP-..., POL-...) ficam no laudo completo, não aqui.
+  const NIVEL = { baixa: "baixa", media: "média", "média": "média", alta: "alta" };
   const RESUMOS = {
     planejar(d) {
       const met = (S.est && S.est.metodo_rotulo) || "autofiscalização assistida";
-      const plano = d.acao("planejar_metodo")[0];
       const ndvi = d.acao("serie_ndvi")[0];
       const nd = ndvi && ndvi.dados;
       const med = nd && /mediano\s+([\d.]+)/.exec(nd.motivo || "");
       const linhas = [];
+      // por que a operação caiu na amostra: o motivo da triagem (estado), que a frase do capítulo promete
+      const tri = (S.est && S.est.triagem) || {};
+      const op = d.acao("carregar_operacao")[0];
+      const mot = (tri.motivos || [])[0] || (op && op.dados && op.dados.motivo) || "";
+      const lot = /lota[cç][aã]o[^\d]*([\d.,]+)\s*cab\/ha.*?\(acima de ([\d.,]+)\)/i.exec(mot);
+      const niv = NIVEL[tri.prioridade_nivel];
+      if (lot) linhas.push({ st: "info", t: `Na amostra pela lotação: ${lot[1]} cab/ha, acima de ${lot[2]}` });
+      else if (niv) linhas.push({ st: "info", t: `Prioridade ${niv} na amostra` });
       if (nd && med) linhas.push({ st: "ok", t: `Satélite: NDVI ${fmt(+med[1], 2)} em ${plural(nd.n_obs_limpas ?? nd.n_datas_lidas ?? 0, "data sem nuvem", "datas sem nuvem")}` });
       else linhas.push({ st: "ok", t: "Satélite: série do pasto lida e anexada" });
-      const reg = plano && plano.dados && plano.dados.metodos_por_item && plano.dados.metodos_por_item[0] && plano.dados.metodos_por_item[0].regra_id;
-      return { destaque: `Método pela regra: ${met}`, linhas, fala: umaFrase(d.fala(/indício/i), /indício/i),
-        regra: reg ? `Regra ${reg}` : "Regra de escolha do método", chips: chipsDe(d) };
+      return { destaque: `Método pela regra: ${met}`, linhas, fala: umaFrase(d.fala(/indício/i), /indício/i), chips: chipsDe(d) };
     },
     chegar(d) {
       const a = d.acao("declaracao_independencia")[0];
       return { destaque: "Independência declarada", status: "verificado", linhas: [{ st: "ok", t: "Registrada no laudo antes da primeira prova" }],
-        regra: a && a.rule_id ? mcr(a.rule_id) : "MCR 2-7, item 15", chips: chipsDe(d, { verificador: true }) };
+        regra: (a && mcr(a.rule_id)) || "MCR 2-7, item 15", chips: chipsDe(d, { verificador: true }) };
     },
     contar(d) {
       const m = d.matriz("item:bov1:quantidade");
@@ -361,7 +390,7 @@ h1:focus { outline: none; }
       const tol = m && m.valor && m.valor.tolerancia_pct;
       return { destaque: cont != null && fin ? `⟦${fmt(cont)}⟧ de ⟦${fmt(fin)}⟧ financiados` : "Lote contado no vídeo", status: st, linhas,
         fala: umaFrase(d.fala(/não posso alterar/i), /não posso alterar/i),
-        regra: [tol != null ? `Tolerância de ${fmt(tol)}%` : null, m && m.regra_id, pr ? "POL-07" : null].filter(Boolean).join(" · "), chips: chipsDe(d, { verificador: true }) };
+        regra: tol != null ? `Tolerância de ${fmt(tol)}%` : null, chips: chipsDe(d, { verificador: true }) };
     },
     papel(d) {
       const resid = d.rs.map((r) => r.resposta && r.resposta.residual).find((x) => x && x.campos);
@@ -378,8 +407,7 @@ h1:focus { outline: none; }
       if (gstat) linhas.push(gstat === "divergente" ? { st: "div", t: dias ? `GTA: divergente, emitida ${dias[1]} dias antes da nota` : "GTA: divergente" } : { st: "ok", t: "GTA: verificada" });
       if (d.ev("injecao").length) linhas.push({ st: "guarda", t: "Instrução escondida na GTA ignorada" });
       return { destaque: n ? `Nota conferida: ⟦${n}⟧ ${n === 1 ? "campo lido" : "campos lidos"} no papel` : "Nota conferida com a leitura da fiscal", linhas,
-        regra: [nfe ? mcr(nfe.regra_id) : "MCR 2-5, item 10", d.ev("injecao").length ? "POL-06" : null].filter(Boolean).join(" · "),
-        chips: chipsDe(d, { verificador: true }) };
+        regra: (nfe && mcr(nfe.regra_id)) || "MCR 2-5, item 10", chips: chipsDe(d, { verificador: true }) };
     },
     cerca(d) {
       const geos = d.acao("geofence");
@@ -393,14 +421,13 @@ h1:focus { outline: none; }
       if (dentro || (loc && loc.status === "verificado")) linhas.push({ st: "ok", t: "Cerca concluída e fotografada dentro da área" });
       const dist = fora && fora.dados && fora.dados.distancia_borda_m;
       return { destaque: dist != null ? `Foto a ⟦${fmt(Math.round(dist / 10) * 10)} m⟧ da área → refeita dentro` : "Foto fora da área → refeita dentro",
-        status: loc ? loc.status : dentro ? "verificado" : null, linhas,
-        regra: [loc ? loc.regra_id : "OP-benfeitoria-geofence", bloq ? "sem pendência não há laudo (default-deny)" : null].filter(Boolean).join(" · "), chips: chipsDe(d) };
+        status: loc ? loc.status : dentro ? "verificado" : null, linhas, chips: chipsDe(d) };
     },
     justificar(d) {
       const n = d.acao("registrar_justificativa", (a) => a.ok !== false).length
         || ((S.est && S.est.matriz) || []).filter((m) => m.status === "divergente" && m.justificativa && !m.agregado).length;
       return { destaque: n ? `⟦${n}⟧ ${n === 1 ? "divergência justificada" : "divergências justificadas"}` : "Divergências justificadas", status: "divergente",
-        linhas: [{ st: "div", t: "Seguem divergentes no laudo, com as palavras da fiscal" }], regra: "POL-02 · o valor vem da checagem, não da conversa", chips: chipsDe(d) };
+        linhas: [{ st: "div", t: "Seguem divergentes no laudo, com as palavras da fiscal" }], chips: chipsDe(d) };
     },
     rascunho(d) {
       const em = d.acao("emitir_rascunho", (a) => a.ok)[0];
@@ -408,23 +435,31 @@ h1:focus { outline: none; }
       const linhas = [];
       if (d.ev("assinatura").length || d.acao("guarda", (a) => a.rule_id === "POL-03").length) linhas.push({ st: "guarda", t: "Pedido para o agente assinar: recusado" });
       if (d.acao("solicitar_assinatura").length || (S.est && S.est.etapa === "ASSINATURA")) linhas.push({ st: "ok", t: "Enviado para a assinatura da fiscal" });
-      return { destaque: "Rascunho emitido", hash: hx ? `hash ${curto(hx)}` : null, linhas,
-        fala: umaFrase(d.fala(/não assino nem aprovo/i), /não assino nem aprovo/i), regra: "POL-03 · só a fiscal assina", chips: chipsDe(d) };
+      // sem a fala aqui: a linha da recusa e o chip da Política já contam o mesmo
+      return { destaque: "Rascunho emitido", hash: hx ? `hash ${curto(hx)}` : null, linhas, chips: chipsDe(d) };
     },
   };
 
   // ------------------------------------------------------------ desenho
   const el = { tela: document.getElementById("tela"), barra: document.getElementById("barra"), prog: document.getElementById("progresso"), rot: document.getElementById("cap-rot") };
   function progresso(cap, feitoAte) {
-    el.prog.replaceChildren(...CAPS.map((c, i) => h("li", { class: `${i < feitoAte ? "feito" : ""} ${i === cap ? "atual" : ""}`.trim(), "aria-current": i === cap ? "step" : null },
-      h("span", { class: "sr" }, `${i + 1}. ${c.titulo}${i < feitoAte ? ", concluído" : i === cap ? ", atual" : ""}`))));
-    el.rot.textContent = cap >= 0 && cap < CAPS.length ? `Capítulo ${cap + 1} de ${CAPS.length} · ${CAPS[cap].titulo}` : feitoAte >= CAPS.length ? "Fluxo completo" : "8 capítulos · cerca de 2 minutos";
+    // os segmentos são atualizados no lugar (não recriados) para a largura do preenchimento animar
+    if (el.prog.children.length !== CAPS.length) el.prog.replaceChildren(...CAPS.map(() => h("li", {}, h("span", { class: "sr" }))));
+    CAPS.forEach((c, i) => {
+      const li = el.prog.children[i];
+      li.className = `${i < feitoAte ? "feito" : ""} ${i === cap ? "atual" : ""}`.trim();
+      if (i === cap) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+      li.firstChild.textContent = `${i + 1}. ${c.titulo}${i < feitoAte ? ", concluído" : i === cap ? ", atual" : ""}`;
+    });
+    el.rot.textContent = cap >= 0 && cap < CAPS.length ? `Capítulo ${cap + 1} de ${CAPS.length} · ${CAPS[cap].titulo}`
+      : feitoAte >= CAPS.length ? "Fluxo completo" : feitoAte > 0 ? `${feitoAte} de ${CAPS.length} capítulos feitos` : `${CAPS.length} capítulos · cerca de 2 minutos`;
   }
   let sentido = 1;
   function tela(...filhos) {
     const t = h("div", { class: `tela${sentido < 0 ? " volta" : ""}` }, ...filhos);
     el.tela.replaceChildren(t);
     window.scrollTo({ top: 0 });
+    el.tela.scrollTop = 0;
     const h1 = t.querySelector("h1");
     if (h1) { h1.setAttribute("tabindex", "-1"); h1.focus({ preventScroll: true }); }
     return t;
@@ -446,7 +481,7 @@ h1:focus { outline: none; }
       destaque(c.destaque),
       c.status && ROT_STATUS[c.status] ? h("span", { class: `pilula ${c.status === "pendente" ? "falta" : c.status}` }, ROT_STATUS[c.status]) : null,
       c.hash ? h("p", { class: "hash", style: "margin:8px 0 0" }, c.hash) : null,
-      c.linhas && c.linhas.length ? h("ul", { class: "linhas" }, c.linhas.slice(0, 3).map((l) => h("li", { class: l.st }, icone(l.st === "guarda" ? "guarda" : l.st === "ok" ? "ok" : "div"), h("span", {}, l.t)))) : null,
+      c.linhas && c.linhas.length ? h("ul", { class: "linhas" }, c.linhas.slice(0, 3).map((l) => h("li", { class: l.st }, icone(l.st === "guarda" || l.st === "ok" || l.st === "info" ? l.st : "div"), h("span", {}, l.t)))) : null,
       c.fala ? h("p", { class: "fala" }, h("span", { class: "sr" }, "O agente disse: "), `“${c.fala}”`) : null,
       c.chips && c.chips.length ? h("ul", { class: "chips", "aria-label": "Quem agiu" }, c.chips.map((x) => h("li", { class: `chip${x.guarda ? " guarda" : ""}${x.c ? ` ${x.c}` : ""}` }, x.t))) : null,
       c.regra ? h("p", { class: "regra" }, c.regra) : null);
@@ -524,6 +559,19 @@ h1:focus { outline: none; }
     const c = f ? f(doCap(i)) : { destaque: "Capítulo concluído" };
     res.replaceChildren(cartao(c));
   }
+  // o cartão que acabou de aparecer não pode ficar escondido atrás da barra fixa (celular pequeno, ou o Safari com
+  // as barras dele): rola só o necessário, sem tirar o topo do cartão de baixo do cabeçalho
+  function revelar(alvo) {
+    if (!alvo) return;
+    const fixa = getComputedStyle(el.barra).position === "fixed";
+    const r = alvo.getBoundingClientRect();
+    const baixo = (fixa ? el.barra.getBoundingClientRect().top : el.tela.getBoundingClientRect().bottom) - 12;
+    const alto = (fixa ? document.querySelector(".topo").getBoundingClientRect().bottom : el.tela.getBoundingClientRect().top) + 8;
+    const d = Math.min(r.bottom - baixo, r.top - alto);
+    if (d <= 0) return;
+    const behavior = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+    (fixa ? window : el.tela).scrollBy({ top: d, behavior });
+  }
   function marcar(n, estado) {
     const li = el.tela.querySelector(`.passos li[data-n="${n}"]`);
     if (!li) return;
@@ -531,7 +579,10 @@ h1:focus { outline: none; }
     li.querySelector(".ind").replaceChildren(estado === "ok" ? icone("check") : estado === "erro" ? icone("x") : "");
     li.querySelector(".sr").textContent = estado === "ok" ? ", feito" : estado === "roda" ? ", em andamento" : estado === "erro" ? ", falhou" : "";
   }
-  function ocupar(b, rot) { S.ocupado = true; if (b) { b.disabled = true; b.firstChild.textContent = rot; } }
+  function ocupar(b, rot) {
+    S.ocupado = true;
+    if (b) { b.disabled = true; b.classList.add("ocupado"); b.setAttribute("aria-busy", "true"); b.replaceChildren(rot, h("span", { class: "giro", "aria-hidden": "true" })); }
+  }
 
   async function executarCap(i) {
     if (S.ocupado) return;
@@ -564,6 +615,7 @@ h1:focus { outline: none; }
     mostrarResultado(i, res);
     barraSeguir(i);
     document.getElementById("btn-proximo").focus({ preventScroll: true });
+    requestAnimationFrame(() => revelar(res.firstChild));
   }
 
   // ------------------------------------------------------------ capítulo 8: assinar e selar
@@ -631,15 +683,18 @@ h1:focus { outline: none; }
     const d = doCap(CAPS.length - 1);
     const linhas = [];
     if (total) linhas.push({ st: c.divergente ? "div" : "ok", t: `${plural(c.verificado || 0, "verificado", "verificados")} · ${plural(c.divergente || 0, "divergente", "divergentes")}${c.pendente ? ` · ${c.pendente} em falta` : ""}` });
-    if (d.eventos.some((e) => e.tipo === "selado" && e.nivel === "bloqueio")) linhas.push({ st: "guarda", t: "Tentativa de alterar depois do selo: recusada" });
-    const chips = [{ t: "Fiscal: assinou com o PIN" }].concat(chipsDe(d).filter((x) => x.guarda));
+    // a recusa da alteração vem da resposta do passo 19 ou, ao recarregar a página já selada, do registro da Política no estado
+    const recusou = d.eventos.some((e) => e.tipo === "selado" && e.nivel === "bloqueio")
+      || ((S.est && S.est.governanca) || []).some((g) => /POL-04/.test(g.rule_id || "") && /^negar/.test(g.resultado || ""));
+    if (recusou) linhas.push({ st: "guarda", t: "Tentativa de alterar depois do selo: recusada" });
+    const chips = [{ t: "Fiscal: assinou com o PIN" }].concat(recusou ? [{ t: "Política: alteração recusada", guarda: true }] : []);
     const res = h("div", { class: "resultado", "aria-live": "polite" });
-    tela(h("div", { class: "selo", "aria-hidden": "true" }, icone("selo")), h("h1", {}, "Laudo selado"),
+    tela(h("div", { class: "titulo-selo" }, h("div", { class: "selo", "aria-hidden": "true" }, icone("selo")), h("h1", {}, "Laudo selado")),
       h("p", { class: "frase" }, "Assinado pela fiscal. Cada item aponta para a prova, e o selo prova que nada mudou depois."), res);
     res.replaceChildren(cartao({
       destaque: total ? `⟦${conferidos}⟧ de ⟦${total}⟧ aspectos conferidos` : "Fiscalização concluída",
       hash: l.selo ? `selo ${curto(l.selo)}` : l.hash_raiz ? `hash ${curto(l.hash_raiz)}` : null,
-      linhas, chips, regra: "Cadeia de hash · assinatura humana com PIN · POL-04",
+      linhas, chips,
     }));
     const href = l.html_url || `${API}/${encodeURIComponent(FIS)}/laudo.html`;
     barra(link("Ver o laudo completo", href, { classe: "btn-pri", nova: true }),
