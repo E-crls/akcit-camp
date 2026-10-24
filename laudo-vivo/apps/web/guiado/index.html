@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Demonstração guiada · Laudo Vivo</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#F5F3EE">
+<link rel="icon" href="/icone.svg" type="image/svg+xml">
+<style>
+@font-face { font-family: "Barlow"; font-weight: 500; font-display: swap; src: url("/vendor/fonts/Barlow-500.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 600; font-display: swap; src: url("/vendor/fonts/Barlow-600.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 700; font-display: swap; src: url("/vendor/fonts/Barlow-700.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 600; font-display: swap; src: url("/vendor/fonts/BarlowSemiCondensed-600.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 700; font-display: swap; src: url("/vendor/fonts/BarlowSemiCondensed-700.woff2") format("woff2"); }
+/* Paleta Cerrado */
+:root {
+  --areia: #F5F3EE; --sup: #FFFFFF; --texto: #14201A; --texto-2: #4A5650; --texto-3: #6B746F;
+  --cerrado: #1E5B43; --cerrado-2: #174834; --cerrado-claro: #E6EEEA;
+  --terracota: #C0582E;
+  --ok: #15803D; --div: #B42318; --falta: #B7791F;
+  --borda: #E3DFD5;
+  --raio: 14px; --dur: 260ms;
+  --f-titulo: "Barlow Semi Condensed", "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-texto: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+html, body { overflow-x: hidden; }
+body { margin: 0; min-height: 100vh; min-height: 100dvh; background: var(--areia); color: var(--texto);
+  font-family: var(--f-texto); font-weight: 500; font-size: 1rem; line-height: 1.45; overflow-x: hidden; }
+button, input, a { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--cerrado); outline-offset: 2px; border-radius: 6px; }
+.sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* moldura: celular ocupa a tela; no PC, um cartão central de ~480 px */
+.app { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; background: var(--areia); }
+.topo { position: sticky; top: 0; z-index: 3; background: var(--areia); padding: 14px 16px 10px; padding-top: calc(14px + env(safe-area-inset-top)); }
+.marca { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.marca a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; min-height: 32px; }
+.marca svg { width: 24px; height: 24px; flex: none; }
+.marca b { font-family: var(--f-titulo); font-weight: 700; font-size: 1rem; letter-spacing: .06em; }
+.etiqueta { font-size: .78rem; font-weight: 600; color: var(--texto-2); }
+.progresso { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin: 0; padding: 0; list-style: none; }
+.progresso li { height: 6px; border-radius: 3px; background: var(--borda); transition: background var(--dur) ease; }
+.progresso li.feito { background: var(--cerrado); }
+.progresso li.atual { background: linear-gradient(90deg, var(--cerrado) 50%, var(--borda) 50%); }
+.progresso li.atual.feito { background: var(--cerrado); }
+.cap-rot { margin: 8px 0 0; font-size: .8rem; font-weight: 600; color: var(--texto-2); min-height: 1.2em; }
+
+/* o deslize da tela não pode alargar a página no celular (o navegador alargaria a viewport e a barra fixa sairia da tela) */
+main { flex: 1; padding: 8px 16px 168px; overflow-x: hidden; overflow-x: clip; }
+.tela { animation: entra var(--dur) cubic-bezier(.2,.7,.2,1) both; }
+.tela.volta { animation-name: entra-volta; }
+@keyframes entra { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+@keyframes entra-volta { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
+h1 { font-family: var(--f-titulo); font-weight: 700; font-size: 2rem; line-height: 1.08; letter-spacing: -.005em; margin: 8px 0 8px; }
+h1:focus { outline: none; }
+.frase { margin: 0 0 20px; color: var(--texto-2); font-size: 1.05rem; max-width: 36ch; }
+
+/* passos do capítulo */
+.passos { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 2px; }
+.passos li { display: flex; align-items: center; gap: 12px; min-height: 40px; color: var(--texto-2); font-weight: 600; font-size: .98rem; }
+.passos li.roda, .passos li.ok { color: var(--texto); }
+.passos li.erro { color: var(--div); }
+.ind { width: 22px; height: 22px; flex: none; border-radius: 50%; border: 2px solid var(--borda); display: grid; place-items: center; background: var(--sup); }
+.roda .ind { border-color: var(--cerrado-claro); border-top-color: var(--cerrado); animation: gira .8s linear infinite; }
+.ok .ind { background: var(--cerrado); border-color: var(--cerrado); }
+.erro .ind { background: var(--div); border-color: var(--div); }
+.ind svg { width: 14px; height: 14px; }
+@keyframes gira { to { transform: rotate(360deg); } }
+
+/* cartão de resultado */
+.resultado:empty { display: none; }
+.cartao { background: var(--sup); border: 1px solid var(--borda); border-radius: var(--raio); padding: 18px 18px 16px;
+  box-shadow: 0 1px 2px rgba(20, 32, 26, .05), 0 6px 20px rgba(20, 32, 26, .05); animation: surge var(--dur) ease-out both; }
+@keyframes surge { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.destaque { font-family: var(--f-titulo); font-weight: 700; font-size: 1.55rem; line-height: 1.15; margin: 0; }
+.destaque .num { color: var(--terracota); }
+.pilula { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 3px 10px; border-radius: 999px; font-size: .8rem; font-weight: 700; letter-spacing: .02em; }
+.pilula::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pilula.verificado { color: var(--ok); background: #E8F3EC; }
+.pilula.divergente { color: var(--div); background: #FBEAE8; }
+.pilula.falta { color: var(--falta); background: #FBF2E2; }
+.linhas { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+.linhas li { display: flex; gap: 10px; align-items: flex-start; font-size: .97rem; line-height: 1.35; }
+.linhas svg { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+.linhas .ok svg { color: var(--ok); } .linhas .div svg { color: var(--div); } .linhas .falta svg { color: var(--falta); } .linhas .guarda svg { color: var(--cerrado); }
+.fala { margin: 14px 0 0; padding-left: 12px; border-left: 3px solid var(--borda); color: var(--texto-2); font-size: .93rem; }
+.hash { font-family: var(--mono); font-size: .86rem; letter-spacing: .02em; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 0; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--borda); background: var(--areia);
+  font-size: .78rem; font-weight: 600; color: var(--texto-2); }
+.chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cerrado); }
+.chip.guarda { background: var(--sup); border-style: dashed; }
+.chip.guarda::before { border-radius: 1px; background: var(--texto); }
+.chip.c-div::before { background: var(--div); } .chip.c-ok::before { background: var(--ok); }
+.regra { margin: 10px 0 0; font-size: .76rem; color: var(--texto-3); }
+.erro-msg { margin: 12px 0 0; color: var(--div); font-weight: 600; }
+
+/* entrada e selado */
+.selo { width: 64px; height: 64px; border-radius: 50%; background: var(--cerrado); display: grid; place-items: center; margin: 12px 0 4px; }
+.selo svg { width: 34px; height: 34px; color: #fff; }
+.nota { margin: 18px 0 0; font-size: .82rem; color: var(--texto-3); }
+.pin { display: grid; gap: 6px; margin: 4px 0 16px; }
+.pin label { font-weight: 600; font-size: .9rem; }
+.pin input { width: 9.5rem; min-height: 48px; padding: 8px 14px; border: 1px solid var(--borda); border-radius: 10px; background: var(--sup);
+  font-family: var(--mono); font-size: 1.35rem; letter-spacing: .3em; }
+.pin input:focus { outline: 3px solid var(--cerrado); outline-offset: 1px; }
+.par { display: grid; gap: 2px; margin: 0 0 14px; }
+.par span { font-size: .8rem; color: var(--texto-3); font-weight: 600; }
+
+/* barra de ação: fixa embaixo no celular */
+.barra { position: fixed; z-index: 4; left: 0; right: 0; bottom: 0; padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  background: rgba(245, 243, 238, .94); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-top: 1px solid var(--borda); }
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 52px; padding: 0 18px; border-radius: 12px; border: 0;
+  font-family: var(--f-titulo); font-weight: 700; font-size: 1.12rem; letter-spacing: .01em; cursor: pointer; text-decoration: none; }
+.btn-pri { background: var(--cerrado); color: #fff; }
+.btn-pri:hover { background: var(--cerrado-2); }
+.btn-pri[disabled] { opacity: .65; cursor: progress; }
+.btn-sec { background: var(--sup); color: var(--texto); border: 1px solid var(--borda); }
+.btn-sec:hover { border-color: var(--texto-3); }
+.btn svg { width: 18px; height: 18px; }
+.secundarias { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; margin-top: 8px; }
+.secundarias .btn { min-height: 44px; padding: 0 16px; font-size: .95rem; font-family: var(--f-texto); font-weight: 600; white-space: nowrap; }
+.secundarias.uma { grid-template-columns: 1fr; }
+
+@media (min-width: 640px) {
+  body { padding: 40px 16px; }
+  .app { max-width: 480px; margin: 0 auto; min-height: 0; background: var(--sup); border: 1px solid var(--borda); border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(20, 32, 26, .04), 0 20px 48px rgba(20, 32, 26, .08); overflow: hidden; }
+  .topo { position: static; background: var(--sup); padding: 20px 28px 12px; }
+  main { padding: 8px 28px 24px; min-height: 480px; }
+  .cartao { background: var(--areia); box-shadow: none; }
+  .chip { background: var(--sup); }
+  .barra { position: static; background: var(--sup); -webkit-backdrop-filter: none; backdrop-filter: none; padding: 16px 28px 24px; }
+  h1 { font-size: 2.2rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tela, .tela.volta, .cartao { animation: none; }
+  .roda .ind { animation-duration: 2.4s; }
+  .progresso li { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topo">
+    <div class="marca">
+      <a href="/site/" aria-label="Laudo Vivo, página do produto">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="12" fill="#1E5B43"/><g fill="#FFFFFF"><path d="M13 11H26V40H53V53H13Z"/><rect x="30" y="24" width="12" height="12"/></g></svg>
+        <b>LAUDO VIVO</b>
+      </a>
+      <span class="etiqueta">Demonstração guiada</span>
+    </div>
+    <ol class="progresso" id="progresso" aria-label="Capítulos da demonstração"></ol>
+    <p class="cap-rot" id="cap-rot"></p>
+  </header>
+  <main id="tela" tabindex="-1"></main>
+  <div class="barra" id="barra"></div>
+</div>
+<script>
+(() => {
+  "use strict";
+  // Demonstração guiada: os 19 passos gravados do roteiro, agrupados em 8 capítulos, um por tela.
+  // Rotas usadas (as mesmas da interface completa, apps/web/js/api.js):
+  //   GET  /api/fiscalizacoes/{id}                 estado (roteiro.passos, roteiro.proximo, laudo, etapa, matriz)
+  //   POST /api/fiscalizacoes/{id}/roteiro/proximo executa o próximo passo gravado
+  //   POST /api/fiscalizacoes/{id}/assinar         {pin, hash_confirmado}
+  //   POST /api/fiscalizacoes                      {caso, reiniciar: true}: recomeça a demonstração
+  let FIS = "fis_demo_0001";
+  const CASO = "DEMO-0001";
+  const PIN = "2410";
+  const MIN_PASSO_MS = 450;
+  const API = "/api/fiscalizacoes";
+
+  // ------------------------------------------------------------ capítulos
+  const CAPS = [
+    { id: "planejar", titulo: "Planejar", frase: "Antes de sair, o agente explica por que esta operação caiu na amostra e olha o pasto pelo satélite.",
+      casa: (p) => /triagem|sat[eé]lite/i.test(p.titulo) },
+    { id: "chegar", titulo: "Chegar", frase: "Na fazenda, a fiscal declara que não tem vínculo com o produtor.",
+      casa: (p) => /chegada|independ/i.test(p.titulo) },
+    { id: "contar", titulo: "Contar o gado", frase: "O vídeo do curral conta os animais. Depois, alguém pede para marcar o número financiado.",
+      casa: (p) => /v[ií]deo|press[aã]o/i.test(p.titulo) || /\.mp4$/i.test(p.evidencia || "") },
+    { id: "papel", titulo: "Conferir o papel", frase: "O agente lê a foto da nota e pede só o que faltou. Depois confere a NF-e e a GTA.",
+      casa: (p) => p.acao === "residual" || /danfe|nota|nf-e|gta/i.test(p.titulo) },
+    { id: "cerca", titulo: "Provar a cerca", frase: "A foto da cerca financiada tem de ser tirada dentro da área do projeto.",
+      casa: (p) => /cerca|gleba|pedido de laudo/i.test(p.titulo) },
+    { id: "justificar", titulo: "Justificar", frase: "A fiscal explica as divergências com as palavras dela. O número não muda.",
+      casa: (p) => /justificativa/i.test(p.titulo) },
+    { id: "rascunho", titulo: "Rascunho", frase: "Sem pendências, o laudo vira rascunho e vai para a assinatura da fiscal.",
+      casa: (p) => /emiss[aã]o|agente assinar|envio para assinatura/i.test(p.titulo) },
+    { id: "assinar", titulo: "Assinar e selar", frase: "A fiscal confere o hash e assina com o PIN. Depois disso, nada muda.",
+      casa: (p) => p.acao === "assinar" || /assinatura humana|selad/i.test(p.titulo) },
+  ];
+  // a ordem importa: o mais específico primeiro (a justificativa da GTA não é a GTA; o satélite "da gleba" não é a cerca)
+  const ORDEM_CASA = ["assinar", "justificar", "rascunho", "planejar", "chegar", "contar", "papel", "cerca"];
+  const ROTULOS = [
+    [/justificativa da contagem/i, "Justificar a contagem"], [/justificativa da gta/i, "Justificar a GTA"],
+    [/triagem/i, "Triagem e método"], [/sat[eé]lite/i, "Satélite da gleba"], [/independ/i, "Declaração de independência"],
+    [/v[ií]deo/i, "Vídeo do curral"], [/press[aã]o/i, "Pedido para mudar o número"], [/danfe/i, "Foto da nota impressa"],
+    [/residual/i, "A fiscal lê no papel o que faltou"], [/nf-e/i, "XML da NF-e"], [/gta/i, "GTA com instrução escondida"],
+    [/corre[cç][aã]o|nova foto/i, "Foto nova, de dentro da área"], [/foto da cerca/i, "Foto da cerca"], [/pedido de laudo/i, "Pedido de laudo"],
+    [/emiss/i, "Emissão do rascunho"], [/agente assinar/i, "Pedido para o agente assinar"], [/envio/i, "Envio para assinatura"],
+    [/assinatura humana/i, "Assinatura com PIN"], [/selad/i, "Tentativa de alterar o laudo"],
+  ];
+  const rotuloPasso = (p) => (ROTULOS.find(([re]) => re.test(p.titulo || "")) || [0, (p.titulo || `Passo ${p.n}`).replace(/\s*\(.*?\)\s*/g, " ").trim()])[1];
+
+  // agrupa os passos do roteiro: pelo título e pela ação, sempre para a frente
+  function agrupar(passos) {
+    const grupos = CAPS.map(() => []);
+    let atual = 0;
+    for (const p of passos) {
+      const id = ORDEM_CASA.find((k) => CAPS.find((c) => c.id === k).casa(p));
+      const i = id ? CAPS.findIndex((c) => c.id === id) : atual;
+      atual = Math.max(atual, i);
+      grupos[atual].push(p);
+    }
+    return grupos;
+  }
+
+  // ------------------------------------------------------------ estado da página
+  const S = { est: null, grupos: CAPS.map(() => []), cap: -1, resp: {}, ocupado: false, selado: false, falha: null, ultimo: null };
+
+  // ------------------------------------------------------------ rede
+  async function pedir(metodo, url, corpo) {
+    let r;
+    try {
+      r = await fetch(url, { method: metodo, credentials: "same-origin",
+        headers: corpo !== undefined ? { "Content-Type": "application/json", Accept: "application/json" } : { Accept: "application/json" },
+        body: corpo !== undefined ? JSON.stringify(corpo) : undefined });
+    } catch (_) { const e = new Error("Sem conexão com o servidor."); e.rede = true; throw e; }
+    let j = null;
+    try { j = await r.json(); } catch (_) { j = null; }
+    if (r.status === 401 && j && j.entrar) { location.assign(j.entrar); throw new Error("Entre com a senha da demonstração."); }
+    if (!r.ok) {
+      const msg = (j && typeof j.erro === "string" && j.erro) || (r.status === 429 ? "Muita gente usando a demonstração agora. Espere alguns segundos e tente de novo." : `Não deu certo (erro ${r.status}).`);
+      throw new Error(msg);
+    }
+    return j;
+  }
+  const api = {
+    estado: () => pedir("GET", `${API}/${encodeURIComponent(FIS)}`),
+    proximo: () => pedir("POST", `${API}/${encodeURIComponent(FIS)}/roteiro/proximo`, {}),
+    assinar: (hash) => pedir("POST", `${API}/${encodeURIComponent(FIS)}/assinar`, { pin: PIN, hash_confirmado: hash }),
+    recomecar: (caso) => pedir("POST", API, { caso, reiniciar: true }),
+  };
+
+  // ------------------------------------------------------------ utilidades
+  const h = (tag, at, ...filhos) => {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(at || {})) {
+      if (v == null || v === false) continue;
+      if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+      else if (k === "class") el.className = v;
+      else el.setAttribute(k, v === true ? "" : v);
+    }
+    for (const f of filhos.flat()) if (f != null && f !== false) el.append(f.nodeType ? f : document.createTextNode(String(f)));
+    return el;
+  };
+  const SVG = {
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>',
+    ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.8 2.8L16.2 9.5"/></svg>',
+    div: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.4v.1"/></svg>',
+    guarda: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="M8.8 12.2l2.3 2.3 4.2-4.4" stroke-linecap="round"/></svg>',
+    selo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg>',
+    seta: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
+  };
+  const icone = (n) => { const s = document.createElement("span"); s.innerHTML = SVG[n]; return s.firstChild; };
+  const fmt = (n, casas = 0) => Number(n).toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas });
+  const curto = (hx) => (hx && hx.length > 14 ? `${hx.slice(0, 6)}…${hx.slice(-6)}` : hx || "");
+  const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+  const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
+  const mcr = (id) => { const m = /MCR-(\d+)-(\d+)(?:-item(\d+))?/.exec(id || ""); return m ? `MCR ${m[1]}-${m[2]}${m[3] ? `, item ${m[3]}` : ""}` : (id || "").replace(/^POL-\d+\//, ""); };
+  // uma frase do agente, no máximo, cortada na palavra
+  function umaFrase(texto, preferida) {
+    if (!texto) return null;
+    // sem lookbehind: o Safari antigo do iPhone não o entende
+    const frases = (texto.replace(/\s+/g, " ").match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)/g) || [texto]).map((s) => s.trim()).filter(Boolean);
+    let f = (preferida && frases.find((x) => preferida.test(x))) || frases[0];
+    f = f.trim();
+    if (f.length > 110) { f = f.slice(0, 108); f = f.slice(0, f.lastIndexOf(" ")).replace(/[,;:(\s]+$/, "") + "…"; }
+    return f;
+  }
+
+  // dados das respostas reais de um capítulo
+  function doCap(i) {
+    const rs = S.grupos[i].map((p) => S.resp[p.n]).filter(Boolean);
+    const acoes = rs.flatMap((r) => (r.resposta && r.resposta.acoes) || []);
+    const eventos = rs.flatMap((r) => r.eventos || []);
+    return {
+      rs, acoes, eventos,
+      acao: (nome, pred) => acoes.filter((a) => a.acao === nome && (!pred || pred(a))),
+      ev: (tipo) => eventos.filter((e) => e.tipo === tipo),
+      fala: (re) => { for (const r of rs) { const t = r.resposta && r.resposta.fala; if (t && (!re || re.test(t))) return t; } return null; },
+      matriz: (campo) => ((S.est && S.est.matriz) || []).find((m) => m.campo === campo) || null,
+    };
+  }
+  const AGENTE_DE = {
+    triar_carteira: "Triagem", checar_lotacao: "Triagem", planejar_metodo: "Triagem", carregar_operacao: "Triagem",
+    contar_bovinos_video: "Visão", classificar_foto: "Visão",
+    ler_documento_foto: "Documentos", completar_leitura_documento: "Documentos", conciliar_nfe: "Documentos", conciliar_gta: "Documentos",
+    serie_ndvi: "Território", geofence: "Território", integridade_foto: "Território",
+    conciliar_alegacoes: "Condutor", registrar_ocorrencia: "Condutor", explicar_regra: "Condutor", emitir_rascunho: "Condutor",
+    declaracao_independencia: "Condutor", registrar_justificativa: "Condutor", registrar_conclusao_obra: "Condutor", solicitar_assinatura: "Condutor",
+  };
+  const GUARDA_DE = { pressao: "pedido recusado", injecao: "instrução ignorada", bloqueio: "rascunho bloqueado", assinatura: "assinatura recusada" };
+  // chips: os agentes que agiram (das ações reais) e os guarda-corpos quando decidiram
+  function chipsDe(d, { verificador = false, fiscal = false } = {}) {
+    const ag = [];
+    for (const a of d.acoes) { const n = AGENTE_DE[a.acao]; if (n && a.permitido !== false && !ag.includes(n)) ag.push(n); }
+    const out = ag.map((n) => ({ t: n }));
+    if (fiscal) out.push({ t: "Fiscal: assinou com o PIN" });
+    if (verificador) {
+      const v = d.eventos.filter((e) => e.tipo === "verificado" && /^item:|independencia/.test(e.campo || "")).length;
+      const x = d.ev("divergencia").length;
+      if (v || x) out.push({ t: x && !v ? "Verificador: divergente" : v && !x ? "Verificador: verificado" : "Verificador", guarda: true, c: x && !v ? "c-div" : v && !x ? "c-ok" : "" });
+    }
+    const pol = [];
+    for (const e of d.eventos) {
+      let t = null;
+      if (e.nivel === "bloqueio") t = e.tipo === "selado" ? "alteração recusada" : GUARDA_DE[e.tipo] || "pedido negado";
+      if (t && !pol.includes(t)) pol.push(t);
+    }
+    for (const t of pol) out.push({ t: `Política: ${t}`, guarda: true });
+    return out;
+  }
+
+  // ------------------------------------------------------------ cartões de resultado (só o essencial)
+  const RESUMOS = {
+    planejar(d) {
+      const met = (S.est && S.est.metodo_rotulo) || "autofiscalização assistida";
+      const plano = d.acao("planejar_metodo")[0];
+      const ndvi = d.acao("serie_ndvi")[0];
+      const nd = ndvi && ndvi.dados;
+      const med = nd && /mediano\s+([\d.]+)/.exec(nd.motivo || "");
+      const linhas = [];
+      if (nd && med) linhas.push({ st: "ok", t: `Satélite: NDVI ${fmt(+med[1], 2)} em ${plural(nd.n_obs_limpas ?? nd.n_datas_lidas ?? 0, "data sem nuvem", "datas sem nuvem")}` });
+      else linhas.push({ st: "ok", t: "Satélite: série do pasto lida e anexada" });
+      const reg = plano && plano.dados && plano.dados.metodos_por_item && plano.dados.metodos_por_item[0] && plano.dados.metodos_por_item[0].regra_id;
+      return { destaque: `Método pela regra: ${met}`, linhas, fala: umaFrase(d.fala(/indício/i), /indício/i),
+        regra: reg ? `Regra ${reg}` : "Regra de escolha do método", chips: chipsDe(d) };
+    },
+    chegar(d) {
+      const a = d.acao("declaracao_independencia")[0];
+      return { destaque: "Independência declarada", status: "verificado", linhas: [{ st: "ok", t: "Registrada no laudo antes da primeira prova" }],
+        regra: a && a.rule_id ? mcr(a.rule_id) : "MCR 2-7, item 15", chips: chipsDe(d, { verificador: true }) };
+    },
+    contar(d) {
+      const m = d.matriz("item:bov1:quantidade");
+      const c = d.acao("contar_bovinos_video")[0];
+      const cont = (c && c.dados && c.dados.contagem) ?? (m && m.valor && m.valor.contagem);
+      const fin = m && m.valor && m.valor.financiado;
+      const st = d.ev("divergencia").length ? "divergente" : m ? m.status : null;
+      const pr = d.ev("pressao")[0];
+      const q = pr && /'([^']+)'/.exec(pr.texto || "");
+      const linhas = [];
+      if (pr) linhas.push({ st: "guarda", t: q ? `Pedido “${q[1]}” recusado e registrado` : "Pedido de pressão recusado e registrado" });
+      const tol = m && m.valor && m.valor.tolerancia_pct;
+      return { destaque: cont != null && fin ? `⟦${fmt(cont)}⟧ de ⟦${fmt(fin)}⟧ financiados` : "Lote contado no vídeo", status: st, linhas,
+        fala: umaFrase(d.fala(/não posso alterar/i), /não posso alterar/i),
+        regra: [tol != null ? `Tolerância de ${fmt(tol)}%` : null, m && m.regra_id, pr ? "POL-07" : null].filter(Boolean).join(" · "), chips: chipsDe(d, { verificador: true }) };
+    },
+    papel(d) {
+      const resid = d.rs.map((r) => r.resposta && r.resposta.residual).find((x) => x && x.campos);
+      const resp = d.rs.map((r) => r.resposta && r.resposta.llm && r.resposta.llm.residual).find((x) => x && x.campos_respondidos);
+      const n = resid ? resid.campos.length : resp ? resp.campos_respondidos.length : null;
+      const nfe = d.matriz("item:bov1:comprovante_nfe");
+      const gta = d.acao("conciliar_gta")[0];
+      const gm = d.matriz("item:bov1:gta");
+      const dias = gta && gta.dados && /(\d+)\s+dias? antes/.exec(gta.dados.motivo || "");
+      const linhas = [];
+      const nfeOk = d.eventos.some((e) => e.tipo === "verificado" && e.campo === "item:bov1:comprovante_nfe") || (nfe && nfe.status === "verificado");
+      linhas.push(nfeOk ? { st: "ok", t: "NF-e: verificada" } : { st: "falta", t: "NF-e: pendente" });
+      const gstat = (gta && gta.dados && gta.dados.status) || (gm && gm.status);
+      if (gstat) linhas.push(gstat === "divergente" ? { st: "div", t: dias ? `GTA: divergente, emitida ${dias[1]} dias antes da nota` : "GTA: divergente" } : { st: "ok", t: "GTA: verificada" });
+      if (d.ev("injecao").length) linhas.push({ st: "guarda", t: "Instrução escondida na GTA ignorada" });
+      return { destaque: n ? `Nota conferida: ⟦${n}⟧ ${n === 1 ? "campo lido" : "campos lidos"} no papel` : "Nota conferida com a leitura da fiscal", linhas,
+        regra: [nfe ? mcr(nfe.regra_id) : "MCR 2-5, item 10", d.ev("injecao").length ? "POL-06" : null].filter(Boolean).join(" · "),
+        chips: chipsDe(d, { verificador: true }) };
+    },
+    cerca(d) {
+      const geos = d.acao("geofence");
+      const fora = geos.find((g) => g.dados && g.dados.posicao === "fora");
+      const dentro = geos.find((g) => g.dados && g.dados.posicao === "dentro");
+      const loc = d.matriz("item:cerca1:localizacao");
+      const bloq = d.acao("emitir_rascunho", (a) => a.ok === false)[0];
+      const np = bloq && bloq.dados && bloq.dados.pendencias ? bloq.dados.pendencias.length : null;
+      const linhas = [];
+      if (bloq || d.ev("bloqueio").length) linhas.push({ st: "guarda", t: np ? `Pedido de laudo bloqueado: ${plural(np, "pendência", "pendências")}` : "Pedido de laudo bloqueado: há pendências" });
+      if (dentro || (loc && loc.status === "verificado")) linhas.push({ st: "ok", t: "Cerca concluída e fotografada dentro da área" });
+      const dist = fora && fora.dados && fora.dados.distancia_borda_m;
+      return { destaque: dist != null ? `Foto a ⟦${fmt(Math.round(dist / 10) * 10)} m⟧ da área → refeita dentro` : "Foto fora da área → refeita dentro",
+        status: loc ? loc.status : dentro ? "verificado" : null, linhas,
+        regra: [loc ? loc.regra_id : "OP-benfeitoria-geofence", bloq ? "sem pendência não há laudo (default-deny)" : null].filter(Boolean).join(" · "), chips: chipsDe(d) };
+    },
+    justificar(d) {
+      const n = d.acao("registrar_justificativa", (a) => a.ok !== false).length
+        || ((S.est && S.est.matriz) || []).filter((m) => m.status === "divergente" && m.justificativa && !m.agregado).length;
+      return { destaque: n ? `⟦${n}⟧ ${n === 1 ? "divergência justificada" : "divergências justificadas"}` : "Divergências justificadas", status: "divergente",
+        linhas: [{ st: "div", t: "Seguem divergentes no laudo, com as palavras da fiscal" }], regra: "POL-02 · o valor vem da checagem, não da conversa", chips: chipsDe(d) };
+    },
+    rascunho(d) {
+      const em = d.acao("emitir_rascunho", (a) => a.ok)[0];
+      const hx = (em && em.dados && em.dados.hash_raiz) || (S.est && S.est.laudo && S.est.laudo.hash_raiz);
+      const linhas = [];
+      if (d.ev("assinatura").length || d.acao("guarda", (a) => a.rule_id === "POL-03").length) linhas.push({ st: "guarda", t: "Pedido para o agente assinar: recusado" });
+      if (d.acao("solicitar_assinatura").length || (S.est && S.est.etapa === "ASSINATURA")) linhas.push({ st: "ok", t: "Enviado para a assinatura da fiscal" });
+      return { destaque: "Rascunho emitido", hash: hx ? `hash ${curto(hx)}` : null, linhas,
+        fala: umaFrase(d.fala(/não assino nem aprovo/i), /não assino nem aprovo/i), regra: "POL-03 · só a fiscal assina", chips: chipsDe(d) };
+    },
+  };
+
+  // ------------------------------------------------------------ desenho
+  const el = { tela: document.getElementById("tela"), barra: document.getElementById("barra"), prog: document.getElementById("progresso"), rot: document.getElementById("cap-rot") };
+  function progresso(cap, feitoAte) {
+    el.prog.replaceChildren(...CAPS.map((c, i) => h("li", { class: `${i < feitoAte ? "feito" : ""} ${i === cap ? "atual" : ""}`.trim(), "aria-current": i === cap ? "step" : null },
+      h("span", { class: "sr" }, `${i + 1}. ${c.titulo}${i < feitoAte ? ", concluído" : i === cap ? ", atual" : ""}`))));
+    el.rot.textContent = cap >= 0 && cap < CAPS.length ? `Capítulo ${cap + 1} de ${CAPS.length} · ${CAPS[cap].titulo}` : feitoAte >= CAPS.length ? "Fluxo completo" : "8 capítulos · cerca de 2 minutos";
+  }
+  let sentido = 1;
+  function tela(...filhos) {
+    const t = h("div", { class: `tela${sentido < 0 ? " volta" : ""}` }, ...filhos);
+    el.tela.replaceChildren(t);
+    window.scrollTo({ top: 0 });
+    const h1 = t.querySelector("h1");
+    if (h1) { h1.setAttribute("tabindex", "-1"); h1.focus({ preventScroll: true }); }
+    return t;
+  }
+  function barra(pri, sec) {
+    el.barra.replaceChildren(pri, sec || "");
+  }
+  const botao = (rot, onclick, { classe = "btn-pri", ic = null, id = null } = {}) => h("button", { class: `btn ${classe}`, type: "button", onclick, id }, rot, ic ? icone(ic) : null);
+  const link = (rot, href, { classe = "btn-sec", nova = false } = {}) => h("a", { class: `btn ${classe}`, href, target: nova ? "_blank" : null, rel: nova ? "noopener" : null }, rot);
+
+  function destaque(texto) {
+    const p = h("p", { class: "destaque" });
+    String(texto).split(/(⟦[^⟧]*⟧)/).forEach((s) => { if (!s) return; p.append(s.startsWith("⟦") ? h("span", { class: "num" }, s.slice(1, -1)) : s); });
+    return p;
+  }
+  const ROT_STATUS = { verificado: "Verificado", divergente: "Divergente", pendente: "Falta", falta: "Falta" };
+  function cartao(c) {
+    return h("div", { class: "cartao" },
+      destaque(c.destaque),
+      c.status && ROT_STATUS[c.status] ? h("span", { class: `pilula ${c.status === "pendente" ? "falta" : c.status}` }, ROT_STATUS[c.status]) : null,
+      c.hash ? h("p", { class: "hash", style: "margin:8px 0 0" }, c.hash) : null,
+      c.linhas && c.linhas.length ? h("ul", { class: "linhas" }, c.linhas.slice(0, 3).map((l) => h("li", { class: l.st }, icone(l.st === "guarda" ? "guarda" : l.st === "ok" ? "ok" : "div"), h("span", {}, l.t)))) : null,
+      c.fala ? h("p", { class: "fala" }, h("span", { class: "sr" }, "O agente disse: "), `“${c.fala}”`) : null,
+      c.chips && c.chips.length ? h("ul", { class: "chips", "aria-label": "Quem agiu" }, c.chips.map((x) => h("li", { class: `chip${x.guarda ? " guarda" : ""}${x.c ? ` ${x.c}` : ""}` }, x.t))) : null,
+      c.regra ? h("p", { class: "regra" }, c.regra) : null);
+  }
+  function listaPassos(i, estados) {
+    return h("ol", { class: "passos", "aria-label": "Passos deste capítulo" }, S.grupos[i].map((p) => {
+      const e = estados[p.n] || "espera";
+      return h("li", { class: e, "data-n": p.n }, h("span", { class: "ind", "aria-hidden": "true" }, e === "ok" ? icone("check") : e === "erro" ? icone("x") : ""),
+        h("span", {}, rotuloPasso(p)), h("span", { class: "sr" }, e === "ok" ? ", feito" : e === "roda" ? ", em andamento" : e === "erro" ? ", falhou" : ""));
+    }));
+  }
+
+  // ------------------------------------------------------------ fluxo
+  const proxN = () => (S.est && S.est.roteiro ? S.est.roteiro.proximo : 1);
+  const totalN = () => (S.est && S.est.roteiro ? S.est.roteiro.total : 0);
+  const capDoPasso = (n) => { const i = S.grupos.findIndex((g) => g.some((p) => p.n === n)); return i < 0 ? CAPS.length - 1 : i; };
+  function capFeito(i) { const g = S.grupos[i]; return !g.length || proxN() > g[g.length - 1].n || (i === CAPS.length - 1 && S.selado); }
+
+  async function iniciar() {
+    tela(h("h1", {}, "Carregando…"), h("p", { class: "frase" }, "Abrindo a fiscalização de demonstração."));
+    barra(botao("Carregando…", null));
+    el.barra.querySelector("button").disabled = true;
+    progresso(-1, 0);
+    try {
+      S.est = await api.estado();
+    } catch (e) { return falhaEntrada(e); }
+    if (S.est && S.est.id) FIS = S.est.id;
+    if (!S.est.roteiro || !(S.est.roteiro.passos || []).length) return falhaEntrada(new Error("Esta fiscalização não tem o roteiro de demonstração."));
+    S.grupos = agrupar(S.est.roteiro.passos);
+    S.selado = S.est.etapa === "SELADO";
+    entrada();
+  }
+  function falhaEntrada(e) {
+    tela(h("h1", {}, "Não deu para abrir a demonstração"), h("p", { class: "frase" }, e.message || "Tente de novo em alguns segundos."));
+    barra(botao("Tentar de novo", iniciar));
+  }
+  function entrada() {
+    const n = proxN();
+    if (S.selado) { sentido = 1; return telaSelado(); }
+    if (n > 1 && n <= totalN()) {
+      const i = capDoPasso(n);
+      progresso(-1, i);
+      tela(h("h1", {}, "A demonstração já começou"),
+        h("p", { class: "frase" }, `Ela parou no capítulo ${i + 1}: ${CAPS[i].titulo}. Continue dali ou recomece do início.`));
+      barra(botao("Continuar de onde parou", () => abrirCap(i), { ic: "seta" }),
+        h("div", { class: "secundarias uma" }, botao("Recomeçar do início", recomecar, { classe: "btn-sec" })));
+      return;
+    }
+    progresso(-1, 0);
+    tela(h("h1", {}, "Uma fiscalização de crédito rural, do satélite ao selo"),
+      h("p", { class: "frase" }, "São 8 capítulos curtos. Cada toque executa o que a fiscal faria no campo, e você vê o que o sistema decidiu."),
+      h("p", { class: "nota" }, "Operação fictícia, dados sintéticos e fiscal de demonstração."));
+    barra(botao("Começar", () => abrirCap(0), { ic: "seta" }));
+  }
+
+  function abrirCap(i) {
+    sentido = i >= S.cap ? 1 : -1;
+    S.cap = i; S.falha = null;
+    if (i === CAPS.length - 1) return telaAssinar();
+    const feito = capFeito(i);
+    const estados = {};
+    for (const p of S.grupos[i]) if (p.n < proxN()) estados[p.n] = "ok";
+    progresso(i, feito ? i + 1 : i);
+    const res = h("div", { class: "resultado", "aria-live": "polite", id: "resultado" });
+    tela(h("h1", {}, CAPS[i].titulo), h("p", { class: "frase" }, CAPS[i].frase), listaPassos(i, estados), res);
+    if (feito) { mostrarResultado(i, res); barraSeguir(i); }
+    else barra(botao("Continuar", () => executarCap(i), { ic: "seta", id: "btn-continuar" }));
+  }
+  function barraSeguir(i) {
+    const prox = i + 1;
+    barra(botao(`Próximo: ${CAPS[prox].titulo}`, () => abrirCap(prox), { ic: "seta", id: "btn-proximo" }));
+  }
+  function mostrarResultado(i, res) {
+    const f = RESUMOS[CAPS[i].id];
+    const c = f ? f(doCap(i)) : { destaque: "Capítulo concluído" };
+    res.replaceChildren(cartao(c));
+  }
+  function marcar(n, estado) {
+    const li = el.tela.querySelector(`.passos li[data-n="${n}"]`);
+    if (!li) return;
+    li.className = estado;
+    li.querySelector(".ind").replaceChildren(estado === "ok" ? icone("check") : estado === "erro" ? icone("x") : "");
+    li.querySelector(".sr").textContent = estado === "ok" ? ", feito" : estado === "roda" ? ", em andamento" : estado === "erro" ? ", falhou" : "";
+  }
+  function ocupar(b, rot) { S.ocupado = true; if (b) { b.disabled = true; b.firstChild.textContent = rot; } }
+
+  async function executarCap(i) {
+    if (S.ocupado) return;
+    const b = document.getElementById("btn-continuar");
+    ocupar(b, "Executando…");
+    const res = document.getElementById("resultado");
+    const erroAnt = el.tela.querySelector(".erro-msg"); if (erroAnt) erroAnt.remove();
+    try {
+      for (const p of S.grupos[i]) {
+        if (p.n < proxN()) { marcar(p.n, "ok"); continue; }
+        marcar(p.n, "roda");
+        const t0 = performance.now();
+        const r = await api.proximo();
+        if (r && r.estado) S.est = r.estado;
+        S.resp[p.n] = r;
+        const falta = MIN_PASSO_MS - (performance.now() - t0);
+        if (falta > 0) await esperar(falta);
+        marcar(p.n, "ok");
+      }
+    } catch (e) {
+      S.ocupado = false;
+      const rodando = el.tela.querySelector(".passos li.roda"); if (rodando) marcar(+rodando.dataset.n, "erro");
+      res.before(h("p", { class: "erro-msg", role: "alert" }, e.message || "Não deu certo."));
+      barra(botao("Tentar de novo", () => executarCap(i), { id: "btn-continuar" }));
+      try { S.est = await api.estado(); } catch (_) { /* segue com o último estado */ }
+      return;
+    }
+    S.ocupado = false;
+    progresso(i, i + 1);
+    mostrarResultado(i, res);
+    barraSeguir(i);
+    document.getElementById("btn-proximo").focus({ preventScroll: true });
+  }
+
+  // ------------------------------------------------------------ capítulo 8: assinar e selar
+  function telaAssinar() {
+    const i = CAPS.length - 1;
+    progresso(i, i);
+    const hx = S.est && S.est.laudo && S.est.laudo.hash_raiz;
+    const estados = {};
+    for (const p of S.grupos[i]) if (p.n < proxN()) estados[p.n] = "ok";
+    const pronto = S.est && S.est.laudo && S.est.laudo.valido_para_assinar !== false && S.est.etapa === "ASSINATURA";
+    tela(h("h1", {}, CAPS[i].titulo), h("p", { class: "frase" }, CAPS[i].frase),
+      h("div", { class: "par" }, h("span", {}, "Hash do rascunho"), h("strong", { class: "hash" }, hx ? curto(hx) : "aguardando o rascunho")),
+      h("div", { class: "pin" }, h("label", { for: "pin" }, "PIN da fiscal (demonstração)"),
+        h("input", { id: "pin", type: "text", inputmode: "numeric", value: PIN, readonly: true, "aria-describedby": "pin-nota" }),
+        h("span", { id: "pin-nota", class: "sr" }, "Já preenchido para a demonstração.")),
+      listaPassos(i, estados), h("div", { class: "resultado", "aria-live": "polite", id: "resultado" }));
+    barra(botao("Assinar", assinar, { id: "btn-assinar" }));
+    if (!pronto) {
+      const b = document.getElementById("btn-assinar");
+      b.disabled = true;
+      document.getElementById("resultado").before(h("p", { class: "erro-msg", role: "alert" }, "O rascunho ainda não está pronto para assinar. Recomece a demonstração."));
+      barra(botao("Recomeçar", recomecar));
+    }
+  }
+  async function assinar() {
+    if (S.ocupado) return;
+    const b = document.getElementById("btn-assinar");
+    ocupar(b, "Assinando…");
+    const i = CAPS.length - 1;
+    const erroAnt = el.tela.querySelector(".erro-msg"); if (erroAnt) erroAnt.remove();
+    try {
+      for (const p of S.grupos[i]) {
+        if (p.n < proxN()) { marcar(p.n, "ok"); continue; }
+        marcar(p.n, "roda");
+        const t0 = performance.now();
+        const r = p.acao === "assinar" ? await api.assinar(S.est.laudo.hash_raiz) : await api.proximo();
+        if (r && r.estado) S.est = r.estado;
+        S.resp[p.n] = r;
+        if (p.acao === "assinar") S.selado = S.est.etapa === "SELADO";
+        const falta = MIN_PASSO_MS - (performance.now() - t0);
+        if (falta > 0) await esperar(falta);
+        marcar(p.n, "ok");
+      }
+    } catch (e) {
+      S.ocupado = false;
+      const rodando = el.tela.querySelector(".passos li.roda"); if (rodando) marcar(+rodando.dataset.n, "erro");
+      document.getElementById("resultado").before(h("p", { class: "erro-msg", role: "alert" }, e.message || "Não deu para assinar."));
+      try { S.est = await api.estado(); S.selado = S.est.etapa === "SELADO"; } catch (_) { /* segue */ }
+      if (S.selado) { await esperar(300); sentido = 1; return telaSelado(); }
+      barra(botao("Tentar de novo", assinar, { id: "btn-assinar" }));
+      return;
+    }
+    S.ocupado = false;
+    await esperar(250);
+    sentido = 1;
+    telaSelado();
+  }
+  function telaSelado() {
+    S.cap = CAPS.length;
+    progresso(-1, CAPS.length);
+    const l = (S.est && S.est.laudo) || {};
+    const c = (S.est && S.est.contagem) || {};
+    const total = ["verificado", "divergente", "pendente", "abstencao"].reduce((s, k) => s + (c[k] || 0), 0);
+    const conferidos = (c.verificado || 0) + (c.divergente || 0);
+    const d = doCap(CAPS.length - 1);
+    const linhas = [];
+    if (total) linhas.push({ st: c.divergente ? "div" : "ok", t: `${plural(c.verificado || 0, "verificado", "verificados")} · ${plural(c.divergente || 0, "divergente", "divergentes")}${c.pendente ? ` · ${c.pendente} em falta` : ""}` });
+    if (d.eventos.some((e) => e.tipo === "selado" && e.nivel === "bloqueio")) linhas.push({ st: "guarda", t: "Tentativa de alterar depois do selo: recusada" });
+    const chips = [{ t: "Fiscal: assinou com o PIN" }].concat(chipsDe(d).filter((x) => x.guarda));
+    const res = h("div", { class: "resultado", "aria-live": "polite" });
+    tela(h("div", { class: "selo", "aria-hidden": "true" }, icone("selo")), h("h1", {}, "Laudo selado"),
+      h("p", { class: "frase" }, "Assinado pela fiscal. Cada item aponta para a prova, e o selo prova que nada mudou depois."), res);
+    res.replaceChildren(cartao({
+      destaque: total ? `⟦${conferidos}⟧ de ⟦${total}⟧ aspectos conferidos` : "Fiscalização concluída",
+      hash: l.selo ? `selo ${curto(l.selo)}` : l.hash_raiz ? `hash ${curto(l.hash_raiz)}` : null,
+      linhas, chips, regra: "Cadeia de hash · assinatura humana com PIN · POL-04",
+    }));
+    const href = l.html_url || `${API}/${encodeURIComponent(FIS)}/laudo.html`;
+    barra(link("Ver o laudo completo", href, { classe: "btn-pri", nova: true }),
+      h("div", { class: "secundarias" }, botao("Recomeçar", recomecar, { classe: "btn-sec" }), link("Ver a interface completa", "/")));
+  }
+
+  async function recomecar() {
+    if (S.ocupado) return;
+    S.ocupado = true;
+    const bs = el.barra.querySelectorAll("button, a");
+    bs.forEach((b) => { b.setAttribute("aria-disabled", "true"); if (b.tagName === "BUTTON") b.disabled = true; });
+    try {
+      const caso = (S.est && S.est.roteiro && S.est.roteiro.caso_id) || CASO;
+      const e = await api.recomecar(caso);
+      if (e && e.id) FIS = e.id;
+      S.est = e && e.roteiro ? e : await api.estado();
+      S.grupos = agrupar(S.est.roteiro.passos);
+      S.resp = {}; S.selado = S.est.etapa === "SELADO"; S.cap = -1;
+      S.ocupado = false;
+      sentido = -1;
+      entrada();
+      sentido = 1;
+    } catch (e) {
+      S.ocupado = false;
+      bs.forEach((b) => { b.removeAttribute("aria-disabled"); if (b.tagName === "BUTTON") b.disabled = false; });
+      el.tela.querySelector(".tela").append(h("p", { class: "erro-msg", role: "alert" }, e.message || "Não deu para recomeçar."));
+    }
+  }
+
+  iniciar();
+})();
+</script>
+</body>
+</html>
