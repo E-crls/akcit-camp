@@ -42,8 +42,8 @@ export function icone(nome, cls = "") {
   return s;
 }
 
-// Símbolos da marca: "selo-g" (a marca: o esquadro graduado na placa ipê, de 32 px para cima), "marca-p" (lisa, abaixo de 20 px), "agente"
-// (só o esquadro, na cor do texto: sem rosto, sem placa, sem círculo) e "pino-demo" (o piquete ipê com o esquadro).
+// Símbolos da marca: "selo-g" (a marca: o esquadro graduado branco na placa verde-cerrado, de 32 px para cima), "marca-p" (lisa, abaixo de 20 px),
+// "agente" (só o esquadro, na cor do texto: sem rosto, sem placa, sem círculo) e "pino-demo" (o piquete verde-cerrado com o esquadro).
 export function simbolo(id, cls) {
   const vb = { "marca-p": "0 0 64 64", "selo-g": "0 0 64 64", agente: "8 6 50 52", "pino-demo": "0 0 30 30" }[id] || "0 0 24 24";
   const s = document.createElementNS(NS, "svg");
@@ -60,8 +60,8 @@ export function simbolo(id, cls) {
 export const avatarAgente = () => h("span", { class: "avatar" }, simbolo("agente", "agente"), h("span", { class: "quem-ag" }, "Laudo Vivo"));
 
 // ---------------------------------------------------------------- status: ícone + palavra + cor (nunca só cor)
-// "divergente-j": a divergência justificada pela fiscal (pronta). Contorno ipê-roxo com o visto, para não se confundir
-// com a divergência aberta (roxo cheio): as duas só se distinguiam na régua.
+// "divergente-j": a divergência justificada pela fiscal (pronta). Contorno vermelho com o visto, para não se confundir
+// com a divergência aberta (vermelho cheio): as duas só se distinguiam na régua.
 export const ROTULO_STATUS = { verificado: "Verificado", divergente: "Divergente", "divergente-j": "Divergente · justificada", pendente: "Falta",
   abstencao: "Sem conclusão", ok: "Verificado", indeterminado: "Sem conclusão", erro: "Erro" };
 const CLS_STATUS = { verificado: "st-ok", ok: "st-ok", divergente: "st-div", "divergente-j": "st-divj", pendente: "st-falta", erro: "st-falta",
@@ -340,8 +340,8 @@ export const TEXTO_POL = {
   "POL-07": "Um número só muda com nova prova, nunca com um pedido.",
 };
 
-// Checklist do pacote: fora da regra de cor da conferência (verde só para "Verificado", ipê só para ação e falta).
-// Presente = visto em carvão; Parcial = contorno; Ausente = contorno com o x; Não aplicável = traço, em grafite.
+// Checklist do pacote: fora da regra de cor da conferência (verde só para "Verificado", verde-cerrado só para ação, âmbar só para falta).
+// Presente = visto em tinta; Parcial = contorno; Ausente = contorno com o x; Não aplicável = traço, em grafite.
 export const ROT_CHECK = { presente: "Presente", parcial: "Parcial", ausente: "Ausente", nao_aplicavel: "Não aplicável" };
 const CLS_CHECK = { presente: "chk-ok", parcial: "chk-parcial", ausente: "chk-ausente", nao_aplicavel: "chk-na" };
 const IC_CHECK = { presente: "check", parcial: "falta", ausente: "x", nao_aplicavel: null };

@@ -630,7 +630,7 @@ export function resumoPorObjeto(e, { daFiscal = true } = {}) {
     }
     let frase = partes.length ? `${maiuscula(partes.join("; "))}.` : "";
     if (filhos.some(justificada)) frase += " Justificado.";
-    // divergência justificada: o selo do objeto vira "Divergente · justificada" (contorno), não o roxo cheio
+    // divergência justificada: o selo do objeto vira "Divergente · justificada" (contorno), não o vermelho cheio
     const just = st === "divergente" && filhos.some(justificada) && !filhos.some(divergenteAberta);
     return { it, nome: nomeItem(it), status: just ? "divergente-j" : st, justificada: just, frase: frase.trim(), ic: ehBovino(it) ? "vaca" : "cerca" };
   }).filter(Boolean);

@@ -234,7 +234,7 @@ export async function telaCarteira(raiz, { abrirFis, saude = null }) {
     for (const o of itens) {
       if (!o.lat || !o.lon) continue;
       const sel = o.chave === S.sel;
-      if (sel) for (const anel of o.glebas || []) S.camadas.push(L.polygon(anel, { color: cor("--carvao"), weight: 2.5, fillColor: cor("--ipe"), fillOpacity: 0.35, interactive: false }).addTo(mapa));
+      if (sel) for (const anel of o.glebas || []) S.camadas.push(L.polygon(anel, { color: cor("--tinta"), weight: 2.5, fillColor: cor("--destaque"), fillOpacity: 0.3, interactive: false }).addTo(mapa));
       const mk = L.marker([o.lat, o.lon], { icon: iconeOperacao(o.nivel, sel), title: `${o.local}${o.nivel === "demo" ? " (demonstração)" : ""}`,
         keyboard: true, alt: o.local, zIndexOffset: sel ? 1000 : o.nivel === "demo" ? 500 : 0 });
       mk.on("click", () => selecionar(o.chave));

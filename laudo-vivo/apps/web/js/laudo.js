@@ -1,5 +1,5 @@
 // Laudo: rascunho → "Revisar e assinar" (a fiscal confere o resumo, marca que revisou e assina com o PIN; o agente
-// não assina); selado → "Laudo selado" (o lacre carvão com quem assinou e quando, a trilha Em campo → Rascunho →
+// não assina); selado → "Laudo selado" (o lacre tinta com quem assinou e quando, a trilha Em campo → Rascunho →
 // Assinado → Selado e o código do laudo; o placar, os pedidos recusados e o pacote BCB/Justiça). No computador a folha
 // do laudo fica ao lado; no celular, "Ler o laudo completo" abre a folha.
 // A API continua recebendo `hash_confirmado: laudo.hash_raiz`: marcar a caixa é a confirmação humana.
@@ -139,7 +139,7 @@ function conferenciaSelo(ctx) {
     h("span", {}, ok ? "O conteúdo confere com o rascunho assinado" : "O laudo selado não confere com o rascunho assinado"));
 }
 
-// O lacre: a chapa carvão de canto cortado com o símbolo, quem assinou e quando, a trilha das etapas e, depois do
+// O lacre: a chapa tinta de canto cortado com o símbolo, quem assinou e quando, a trilha das etapas e, depois do
 // picote, o código do laudo em blocos de 4 (o mesmo que o agente cita), que ninguém pode alterar.
 function lacre(ctx) {
   const { estado, laudo } = ctx;

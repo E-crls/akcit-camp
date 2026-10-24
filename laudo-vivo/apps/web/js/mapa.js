@@ -1,14 +1,14 @@
 // Mapas, como folha de carta. Carteira: Leaflet (vendorizado), sem fundo baixado, com o contorno de Goiás (IBGE) em
-// carvão, algumas cidades de referência e os piquetes quadrados de prioridade (carvão = alta; menor, em pedra = média); o
-// caso de demonstração é o piquete ipê com o esquadro. Prova da foto: Leaflet com o fundo do OpenStreetMap quando há internet. Cartão
-// de resultado: SVG puro (a área financiada contornada, o ponto da foto em ipê e a distância numa régua graduada de 100
-// em 100 m). As cores vêm dos tokens de app.css (nenhuma cor fixa aqui).
+// tinta, algumas cidades de referência e os piquetes quadrados de prioridade (tinta = alta; menor, em pedra = média); o
+// caso de demonstração é o piquete verde-cerrado com o esquadro branco. Prova da foto: Leaflet com o fundo do OpenStreetMap quando há internet. Cartão
+// de resultado: SVG puro (a área financiada contornada, o ponto da foto em terracota e a distância numa régua graduada de 100
+// em 100 m). As cores vêm dos tokens de app.css (nenhuma cor fixa aqui; a reserva abaixo é a mesma paleta Cerrado).
 
 import { h } from "./ui.js";
 
 // cor de um token de app.css (com o valor de reserva se a folha ainda não carregou)
-const RESERVA = { "--carvao": "#15130F", "--grafite": "#3C382F", "--branco": "#FFFFFF", "--ipe": "#FFC414", "--papel-mapa": "#FBFAF7",
-  "--cal-2": "#E4E0D6", "--poeira": "#D3CDC0" };
+const RESERVA = { "--tinta": "#14201A", "--grafite": "#3B4A42", "--branco": "#FFFFFF", "--destaque": "#C0582E", "--papel-mapa": "#FAF9F5",
+  "--cal-2": "#ECE9E1", "--poeira": "#E3DFD5" };
 export function cor(token) {
   const v = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
   return v || RESERVA[token] || "#000";
@@ -38,12 +38,12 @@ export function criarMapaCarteira(el) {
 
 export function desenharContorno(m, contorno) {
   if (!m || !contorno?.aneis) return null;
-  return window.L.polygon(contorno.aneis, { color: cor("--carvao"), weight: 2.5, fillColor: cor("--papel-mapa"), fillOpacity: 1, interactive: false })
+  return window.L.polygon(contorno.aneis, { color: cor("--tinta"), weight: 2.5, fillColor: cor("--papel-mapa"), fillOpacity: 1, interactive: false })
     .addTo(m).bringToBack();
 }
 
-// Ícone do piquete: nível alta|media|baixa|demo; o selecionado fica enquadrado em carvão. O caso da demonstração é o
-// piquete ipê com o esquadro (sem letra).
+// Ícone do piquete: nível alta|media|baixa|demo; o selecionado fica enquadrado em tinta. O caso da demonstração é o
+// piquete verde-cerrado com o esquadro branco (sem letra).
 export function iconeOperacao(nivel, selecionado = false) {
   const L = window.L;
   const demo = nivel === "demo";
@@ -70,14 +70,14 @@ export function miniMapa(el, glebas, gps, distancia = null) {
     t.addTo(m);
   }
   const grupo = [];
-  for (const anel of glebas || []) grupo.push(L.polygon(anel, { color: cor("--carvao"), weight: 2.5, fillColor: cor("--carvao"), fillOpacity: 0.12 }).addTo(m));
+  for (const anel of glebas || []) grupo.push(L.polygon(anel, { color: cor("--tinta"), weight: 2.5, fillColor: cor("--tinta"), fillOpacity: 0.12 }).addTo(m));
   if (gps) {
-    const p = L.circleMarker([gps.lat, gps.lon], { radius: 8, color: cor("--carvao"), weight: 2.5, fillColor: cor("--ipe"), fillOpacity: 1 }).addTo(m);
+    const p = L.circleMarker([gps.lat, gps.lon], { radius: 8, color: cor("--tinta"), weight: 2.5, fillColor: cor("--destaque"), fillOpacity: 1 }).addTo(m);
     grupo.push(p);
-    if (gps.precisao_m) grupo.push(L.circle([gps.lat, gps.lon], { radius: gps.precisao_m, color: cor("--carvao"), weight: 1, fillOpacity: 0.08 }).addTo(m));
+    if (gps.precisao_m) grupo.push(L.circle([gps.lat, gps.lon], { radius: gps.precisao_m, color: cor("--tinta"), weight: 1, fillOpacity: 0.08 }).addTo(m));
     const alvo = pontoMaisProximo(glebas, gps);
     if (alvo && distancia !== null && distancia > 0) {
-      L.polyline([[gps.lat, gps.lon], alvo], { color: cor("--carvao"), weight: 2.5, dashArray: "6 6" }).addTo(m)
+      L.polyline([[gps.lat, gps.lon], alvo], { color: cor("--tinta"), weight: 2.5, dashArray: "6 6" }).addTo(m)
         .bindTooltip(`${String(distancia).replace(".", ",")} m`, { permanent: true, direction: "center", className: "dist-tip" });
     }
   }
@@ -106,8 +106,8 @@ export function pontoMaisProximo(glebas, gps) {
 }
 
 // ---------------------------------------------------------------- mini-mapa do cartão de resultado (SVG)
-// O mesmo papel do mapa da carteira: fundo papel-mapa, a área financiada só contornada em carvão, o ponto da foto em ipê
-// e, fora da área, a régua graduada de 100 em 100 m da foto até a borda, com a distância grande numa etiqueta carvão.
+// O mesmo papel do mapa da carteira: fundo papel-mapa, a área financiada só contornada em tinta, o ponto da foto em
+// terracota e, fora da área, a régua graduada de 100 em 100 m da foto até a borda, com a distância grande numa etiqueta tinta.
 export function svgMiniMapa(glebas, gps, distancia, { w = 260, h: alt = 128, rotulo = null } = {}) {
   const ns = "http://www.w3.org/2000/svg";
   const mk = (tag, at) => { const e = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(at)) e.setAttribute(k, v); return e; };
@@ -129,7 +129,7 @@ export function svgMiniMapa(glebas, gps, distancia, { w = 260, h: alt = 128, rot
   const tela = (p) => { const [x, y] = xy(p); return [ox + (x - x0) * esc, oy + (y - y0) * esc]; };
   for (const anel of glebas || []) {
     const pts2 = anel.map((p) => tela(p).map((v) => v.toFixed(1)).join(",")).join(" ");
-    svg.append(mk("polygon", { points: pts2, fill: cor("--branco"), stroke: cor("--carvao"), "stroke-width": 2.5, "stroke-linejoin": "round" }));
+    svg.append(mk("polygon", { points: pts2, fill: cor("--branco"), stroke: cor("--tinta"), "stroke-width": 2.5, "stroke-linejoin": "round" }));
   }
   if (gps) {
     const [gx, gy] = tela([gps.lat, gps.lon]);
@@ -139,26 +139,26 @@ export function svgMiniMapa(glebas, gps, distancia, { w = 260, h: alt = 128, rot
       const dx = ax - gx; const dy = ay - gy; const L = Math.hypot(dx, dy) || 1;
       const ux = dx / L; const uy = dy / L; const nx = -uy; const ny = ux;
       // régua: a linha cheia e um tracinho a cada 100 m (maior a cada 500 m)
-      svg.append(mk("line", { x1: gx, y1: gy, x2: ax, y2: ay, stroke: cor("--carvao"), "stroke-width": 2.5 }));
+      svg.append(mk("line", { x1: gx, y1: gy, x2: ax, y2: ay, stroke: cor("--tinta"), "stroke-width": 2.5 }));
       const passo = 100 * L / Number(distancia);
       if (Number.isFinite(passo) && passo >= 3) {
         for (let i = 1, s = passo; s < L - 1; i += 1, s += passo) {
           const c = i % 5 === 0 ? 6 : 4;
           const px = gx + ux * s; const py = gy + uy * s;
-          svg.append(mk("line", { x1: px - nx * c, y1: py - ny * c, x2: px + nx * c, y2: py + ny * c, stroke: cor("--carvao"), "stroke-width": 1.75 }));
+          svg.append(mk("line", { x1: px - nx * c, y1: py - ny * c, x2: px + nx * c, y2: py + ny * c, stroke: cor("--tinta"), "stroke-width": 1.75 }));
         }
       }
-      svg.append(mk("line", { x1: ax - nx * 7, y1: ay - ny * 7, x2: ax + nx * 7, y2: ay + ny * 7, stroke: cor("--carvao"), "stroke-width": 2.5 }));
-      // a distância, grande, numa etiqueta carvão no pé do desenho
+      svg.append(mk("line", { x1: ax - nx * 7, y1: ay - ny * 7, x2: ax + nx * 7, y2: ay + ny * 7, stroke: cor("--tinta"), "stroke-width": 2.5 }));
+      // a distância, grande, numa etiqueta tinta no pé do desenho
       const txt = rotulo || `${distancia} m`;
       const th = 32; const tw = 16 + txt.length * 11.5;
       const tx = 8; const ty = alt - th - 8;
-      svg.append(mk("rect", { x: tx, y: ty, width: tw, height: th, rx: 2, fill: cor("--carvao") }));
+      svg.append(mk("rect", { x: tx, y: ty, width: tw, height: th, rx: 2, fill: cor("--tinta") }));
       const t = mk("text", { x: tx + tw / 2, y: ty + th / 2 + 8.5, "text-anchor": "middle", class: "mm-dist" });
       t.textContent = txt;
       svg.append(t);
     }
-    svg.append(mk("rect", { x: gx - 8, y: gy - 8, width: 16, height: 16, rx: 2, fill: cor("--ipe"), stroke: cor("--carvao"), "stroke-width": 2.5 }));
+    svg.append(mk("rect", { x: gx - 8, y: gy - 8, width: 16, height: 16, rx: 2, fill: cor("--destaque"), stroke: cor("--tinta"), "stroke-width": 2.5 }));
   }
   return svg;
 }
