@@ -97,8 +97,8 @@ MARCA = [
     # rótulo do agente (20 px): só o esquadro liso, sem rosto, sem placa, sem círculo (na cor do texto)
     f'<symbol id="agente" viewBox="8 6 50 52"><g fill="currentColor">{ESQ_P}</g></symbol>',
     # piquete do caso da demonstração no mapa: o quadrado ipê com contorno carvão e o esquadro (sem letra)
-    f'<symbol id="pino-demo" viewBox="0 0 30 30"><rect x="1.5" y="1.5" width="27" height="27" rx="2" fill="{IPE}" stroke="{CARVAO}" stroke-width="3"/>'
-    f'<g fill="{CARVAO}"><path d="M8 7h4.5v11.5H23V23H8Z"/><rect x="14.5" y="11.5" width="4.5" height="4.5"/></g></symbol>',
+    (f'<symbol id="pino-demo" viewBox="0 0 30 30"><rect x="1.5" y="1.5" width="27" height="27" rx="2" fill="{IPE}" stroke="{CARVAO}" stroke-width="3"/>'
+    f'<g fill="{CARVAO}"><path d="M8 7h4.5v11.5H23V23H8Z"/><rect x="14.5" y="11.5" width="4.5" height="4.5"/></g></symbol>'),
 ]
 
 
