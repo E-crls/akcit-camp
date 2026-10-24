@@ -187,6 +187,11 @@ function codigoRascunho(hx) {
 // não consegue assinar.
 function dicaPin(ctx) {
   if (!ctx.saude?.config?.pin_demo || !(ctx.estado.demonstracao || ctx.laudo.demonstracao)) return null;
+  // demonstração pública (QR code): quem chega sozinho vê o PIN na tela, sem precisar pedir
+  if (ctx.saude?.config?.demo_publica) {
+    return h("p", { class: "pin-dica t-sec" }, icone("info"), h("span", {}, "PIN da demonstração: ",
+      h("strong", { class: "mono", translate: "no" }, "2410"), " (dados sintéticos; na vida real, só a fiscal sabe o PIN)"));
+  }
   const valor = h("span", { class: "mono", translate: "no" }, "••••");
   const b = h("button", { class: "btn-ter link", type: "button", "aria-expanded": "false", onclick: () => {
     const ver = b.getAttribute("aria-expanded") !== "true";
