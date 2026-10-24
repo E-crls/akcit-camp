@@ -87,8 +87,9 @@ EOF
   cod=$(curl -s -o /dev/null -w '%{http_code}' -m 30 "$URL/api/fiscalizacoes"); echo "        API sem login: HTTP $cod (401 com a senha ligada, 200 sem ela)"
   CURTA=$(terraform output -raw url_curta 2>/dev/null)
   if [ -n "$CURTA" ]; then
-    loc=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' -m 30 "$CURTA/site/")
-    case "$loc" in "302 $URL/site/"*) ok "link curto $CURTA → $URL" ;; *) ruim "link curto: $loc" ;; esac
+    loc=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' -m 30 "$CURTA/")
+    case "$loc" in "302 $URL/"*) ok "link curto $CURTA → demo" ;; *) ruim "link curto: $loc" ;; esac
+    cod=$(curl -s -o /dev/null -w '%{http_code}' -m 30 "$CURTA/site/"); [ "$cod" = 200 ] && ok "página do produto em $CURTA/site/" || ruim "página do produto no link curto: $cod"
   fi
   curl -s -m 30 "$URL/api/saude" | python -c "import json,sys; d=json.load(sys.stdin); print('        saude:', json.dumps({k: d.get(k) for k in ('ok','llm','asr','demo_publica','cfg') if k in d}, ensure_ascii=False)[:400])" 2>/dev/null
   cod=$(curl -s -o /dev/null -w '%{http_code}' -m 10 -H "Origin: https://exemplo.invalido" -X OPTIONS "$URL/api/saude")
