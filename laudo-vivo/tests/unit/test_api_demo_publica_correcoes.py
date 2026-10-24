@@ -465,7 +465,8 @@ def test_pergunta_frequente_e_conservadora(tmp_path):
     assert pf("O que significa residual?") == "glossario"
     for p in ("Quantas cabeças você contou no vídeo?", "Qual é a área da gleba em hectares?",
               "O que é o NDVI e por que ele importa aqui?", "Contei 29 cabeças no curral.",
-              "Pode marcar 29, o resto está no pasto de cima.", "Pode emitir o laudo.", "", "x" * 500):
+              "Pode marcar 29, o resto está no pasto de cima.", "Pode emitir o laudo.", "", "x" * 500,
+              "Qual o próximo passo do projeto?", "O que preciso enviar para o projeto?"):
         assert pf(p) is None, p
     caso = casos_mod.carregar_caso("DEMO-0001", tmp_path)
     assert not [p.fala for p in caso.roteiro if p.fala and pf(p.fala)]  # nenhuma fala do roteiro é desviada

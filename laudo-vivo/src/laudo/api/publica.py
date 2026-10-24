@@ -37,8 +37,10 @@ tipo do arquivo (só foto JPEG/PNG/WebP, vídeo MP4/MOV/WebM de até 20 s e XML 
 enviado. A cota só é gasta pelo que passou da validação. Estourou: 429 (ou 413/415 para tamanho e tipo) com
 mensagem para a tela e o evento `recusa_limite` (`api.eventos`).
 
-**Pronto no build.** `python -m laudo.api.publica --preparar` roda o roteiro inteiro numa cópia, confere SELADO e 0
-requisição fora da gravação e guarda o resultado da contagem do vídeo do caso (`LAUDO_DEMO_CACHE_CONTAGEM`): na
+**Pronto no build.** `python -m laudo.api.publica --preparar` roda o roteiro inteiro numa cópia, e de novo noutra
+depois de uma mensagem livre e de uma foto do visitante (com GPS no EXIF); confere SELADO, 0 requisição fora da
+gravação e 0 substituição nos passos, os mesmos vereditos e a mesma cadeia nas duas, e guarda o resultado da
+contagem do vídeo do caso (`LAUDO_DEMO_CACHE_CONTAGEM`): na
 demo, o YOLOX não roda de novo para o vídeo pronto do caso (só para vídeo enviado pelo visitante).
 """
 
@@ -367,6 +369,7 @@ _RX_LAUDO = re.compile(r"\b(?:laudo|emitir|emissao|rascunho|concluir|terminar|fe
 _RX_PERGUNTA = re.compile(r"\b(?:quant[oa]s?|qual|quais|o que|que)\b")
 _RX_FINANCIADO = re.compile(r"\b(?:financi\w*|projeto|valor|credito|contrat\w*|orcamento)\b")
 _RX_CONTAGEM = re.compile(r"\b(?:cont(?:ou|ei|agem|ar|ados?|aram)|video|curral|nota|gta|foto|vi|viu)\b")
+_RX_OUTRA = re.compile(r"\b(?:passo|proximo|preciso|devo|fazer|envi\w*|mandar|como|onde|quando|porque|por que)\b")
 _RX_CAMPO = re.compile(r"\s*\(?\b(?:item|documento|laudo|operacao):[\w:]+\)?")
 
 
@@ -390,7 +393,7 @@ def pergunta_frequente(texto: str) -> str | None:
         return "glossario"
     if _RX_FALTA.search(t) and _RX_LAUDO.search(t):
         return "falta"
-    if _RX_PERGUNTA.search(t) and _RX_FINANCIADO.search(t) and not _RX_CONTAGEM.search(t) and not _RX_FALTA.search(t):
+    if _RX_PERGUNTA.search(t) and _RX_FINANCIADO.search(t) and not (_RX_CONTAGEM.search(t) or _RX_OUTRA.search(t)):
         return "financiado"
     return None
 
