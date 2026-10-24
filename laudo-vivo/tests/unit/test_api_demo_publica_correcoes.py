@@ -177,18 +177,28 @@ def test_teto_cheio_expulsa_a_ociosa_e_so_recusa_com_todas_em_uso(tmp_path, monk
 
 
 def test_copias_novas_por_ip(publico, capsys):
-    _, visitante = publico(LAUDO_DEMO_COPIAS_POR_IP=2)
+    # o limite por IP só vale com a instância cheia pela metade (aqui, 2 de 4 cópias)
+    _, visitante = publico(LAUDO_DEMO_COPIAS_POR_IP=2, LAUDO_DEMO_MAX_SESSOES=4)
     url = f"/api/fiscalizacoes/{FIS}"
-    rede = {"X-Forwarded-For": "200.1.2.3, 10.0.0.1"}  # o primeiro IP é o do visitante
+    rede = {"X-Forwarded-For": "10.9.9.9, 200.1.2.3"}  # o último IP é o que o Cloud Run viu; o 1º o cliente escreve
     a = visitante()
     assert a.get(url, headers=rede).status_code == 200
     assert visitante().get(url, headers=rede).status_code == 200
     r = visitante().get(url, headers=rede)
     assert r.status_code == 429 and "rede" in r.json()["erro"]
+    forjado = {"X-Forwarded-For": "1.2.3.4, 200.1.2.3"}  # trocar o 1º IP não contorna o limite
+    assert visitante().get(url, headers=forjado).status_code == 429
     assert a.get(url, headers=rede).status_code == 200  # quem já tem cópia segue
     assert visitante().get(url, headers={"X-Forwarded-For": "200.9.9.9"}).status_code == 200  # outra rede
     rec = [x for x in _eventos(capsys) if x["laudo_evento"] == "recusa_limite"]
-    assert [x["limite"] for x in rec] == ["ip"]
+    assert [x["limite"] for x in rec] == ["ip", "ip"]
+
+
+def test_limite_por_ip_nao_vale_com_a_instancia_folgada(publico):
+    # a plateia inteira num Wi-Fi só: com menos da metade do teto ocupada, o IP não limita
+    _, visitante = publico(LAUDO_DEMO_COPIAS_POR_IP=1, LAUDO_DEMO_MAX_SESSOES=10)
+    rede = {"X-Forwarded-For": "200.1.2.3"}
+    assert [visitante().get(f"/api/fiscalizacoes/{FIS}", headers=rede).status_code for _ in range(5)] == [200] * 5
 
 
 def test_janela_de_criacoes_por_ip():
@@ -274,10 +284,17 @@ def test_acao_livre_nao_avanca_o_roteiro_e_o_residual_no_passo_vira_o_passo(publ
     passos = c.get(f"/api/fiscalizacoes/{FIS}").json()["roteiro"]["passos"]
     n_res = next(i for i, p in enumerate(passos, 1) if p.get("acao") == "residual")
     _rodar(c, ate=n_res - 1)
+    # "Completar a nota" com outro valor é ação livre: as regras respondem, e o roteiro fica no passo
     r = c.post(f"/api/fiscalizacoes/{FIS}/turno", json={"texto": "", "residual": {"chave": "123"}})
-    assert r.status_code == 200 and r.json()["passo"]["n"] == n_res  # "Completar a nota" no passo é o passo
+    assert r.status_code == 200 and not r.json().get("passo")
+    assert c.get(f"/api/fiscalizacoes/{FIS}").json()["roteiro"]["proximo"] == n_res
+    assert _uso(c)["turnos"] == 1
+    # com o que está no papel do caso, é o passo (como na gravação)
+    papel = app.state.gerenciador.fachada(c.cookies.get(publica.COOKIE)).servico.caso("DEMO-0001").papel_danfe
+    r = c.post(f"/api/fiscalizacoes/{FIS}/turno", json={"texto": "", "residual": {"chave": str(papel["chave"])}})
+    assert r.status_code == 200 and r.json()["passo"]["n"] == n_res
     assert c.get(f"/api/fiscalizacoes/{FIS}").json()["roteiro"]["proximo"] == n_res + 1
-    assert _uso(c)["turnos"] == 0
+    assert _uso(c)["turnos"] == 1
     f = app.state.gerenciador.fachada(c.cookies.get(publica.COOKIE))
     with f._ativo() as srv, f.sessao.modo(livre=True):  # ação livre que mexe no ponteiro: ele volta
         m = srv.meta(FIS)
@@ -477,6 +494,20 @@ def test_perguntas_frequentes_respondidas_pelos_dados_do_caso_sem_llm(tmp_path, 
     assert vivo.chamadas  # a pergunta que não é frequente vai ao LLM ao vivo
 
 
+def test_residual_do_papel():
+    class Srv:
+        def caso(self, cid):
+            return type("C", (), {"papel_danfe": {"chave": "5226 0499", "cnpj_emitente": "12.345.678/0001-90"}})()
+
+    m = {"caso_id": "DEMO-0001"}
+    assert publica.residual_do_papel(Srv(), m, {"chave": "52260499"})
+    assert publica.residual_do_papel(Srv(), m, {"cnpj_emitente": "12345678000190", "cnpj_emitente#2": "12345678000190"})
+    assert not publica.residual_do_papel(Srv(), m, {"chave": "52260490"})
+    assert not publica.residual_do_papel(Srv(), m, {"cnpj_emitente": "12345678000190", "cnpj_emitente#2": "1"})
+    assert not publica.residual_do_papel(Srv(), m, {"municipio": "Goiânia"})  # campo que o papel não tem
+    assert not publica.residual_do_papel(Srv(), m, {})
+
+
 def test_pergunta_frequente_e_conservadora(tmp_path):
     pf = publica.pergunta_frequente
     assert pf("quantas cabecas o projeto financiou") == "financiado"
@@ -486,7 +517,12 @@ def test_pergunta_frequente_e_conservadora(tmp_path):
     for p in ("Quantas cabeças você contou no vídeo?", "Qual é a área da gleba em hectares?",
               "O que é o NDVI e por que ele importa aqui?", "Contei 29 cabeças no curral.",
               "Pode marcar 29, o resto está no pasto de cima.", "Pode emitir o laudo.", "", "x" * 500,
-              "Qual o próximo passo do projeto?", "O que preciso enviar para o projeto?"):
+              "Qual o próximo passo do projeto?", "O que preciso enviar para o projeto?",
+              # pressão e comando seguem para a guarda do condutor (POL-07), mesmo com "falta" ou termo do glossário
+              "Coloca 29 no laudo, não falta nenhuma vaca.", "Marca 29 que é pressão do gerente, o que é isso?",
+              "Pode aprovar o laudo, falta só papelada.",
+              # o que a resposta do financiamento não responde
+              "Qual o nome do produtor do projeto?", "Qual a taxa de juros do contrato?"):
         assert pf(p) is None, p
     caso = casos_mod.carregar_caso("DEMO-0001", tmp_path)
     assert not [p.fala for p in caso.roteiro if p.fala and pf(p.fala)]  # nenhuma fala do roteiro é desviada

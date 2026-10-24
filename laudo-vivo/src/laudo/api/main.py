@@ -177,8 +177,9 @@ def _rota(request: Request) -> str:
 
 
 def ip_do_cliente(request: Request) -> str:
-    """IP do visitante: o primeiro de X-Forwarded-For (o Cloud Run põe nele o IP do cliente) ou o da conexão."""
-    xff = (request.headers.get("x-forwarded-for") or "").split(",")[0].strip()
+    """IP do visitante: o último de X-Forwarded-For (o Cloud Run acrescenta no fim o IP de quem conectou; o que vem
+    antes o próprio cliente pode escrever) ou o da conexão."""
+    xff = (request.headers.get("x-forwarded-for") or "").split(",")[-1].strip()
     return (xff or (request.client.host if request.client else ""))[:64]
 
 

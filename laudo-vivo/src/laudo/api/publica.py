@@ -398,6 +398,9 @@ _RX_PERGUNTA = re.compile(r"\b(?:quant[oa]s?|qual|quais|o que|que)\b")
 _RX_FINANCIADO = re.compile(r"\b(?:financi\w*|projeto|valor|credito|contrat\w*|orcamento)\b")
 _RX_CONTAGEM = re.compile(r"\b(?:cont(?:ou|ei|agem|ar|ados?|aram)|video|curral|nota|gta|foto|vi|viu)\b")
 _RX_OUTRA = re.compile(r"\b(?:passo|proximo|preciso|devo|fazer|envi\w*|mandar|como|onde|quando|porque|por que)\b")
+# o que a resposta "o que o projeto financiou" não responde (vai ao LLM)
+_RX_NAO_FINANCIADO = re.compile(r"\b(?:nome|taxa|juros|prazo|produtor|mutuari\w*|banco|cooperativa|data|cpf|cnpj|"
+                                r"parcela\w*|carencia|vencimento|garantia\w*)\b")
 _RX_CAMPO = re.compile(r"\s*\(?\b(?:item|documento|laudo|operacao):[\w:]+\)?")
 
 
@@ -412,16 +415,44 @@ def _termos(texto: str) -> list[str]:
     return [k for k, rx in _TERMOS.items() if rx.search(t)]
 
 
+def residual_do_papel(srv: Any, meta: dict[str, Any], residual: dict[str, str]) -> bool:
+    """O que o visitante digitou no cartão "Complete a nota" é o que está impresso no DANFE do caso (só letras e
+    dígitos; a cópia de confirmação "#2", se veio, tem de ser igual). Na dúvida, False (vira ação livre)."""
+    try:
+        papel = srv.caso(meta["caso_id"]).papel_danfe or {}
+    except Exception:  # noqa: BLE001 - sem caso, não há papel com que comparar
+        return False
+
+    def limpo(v: Any) -> str:
+        return re.sub(r"[^0-9A-Za-z]", "", str(v or "")).upper()
+
+    campos = {k: v for k, v in residual.items() if not str(k).endswith("#2")}
+    if not campos or not papel:
+        return False
+    for k, v in campos.items():
+        if papel.get(k) is None or limpo(v) != limpo(papel[k]):
+            return False
+        if f"{k}#2" in residual and limpo(residual[f"{k}#2"]) != limpo(v):
+            return False
+    return True
+
+
 def pergunta_frequente(texto: str) -> str | None:
     """"glossario", "falta", "financiado" ou None. Conservador: na dúvida, None (a pergunta vai ao LLM)."""
+    from laudo.agent.intencao import classificar_pressao, comando_humano
+
     t = _normal(texto)
-    if not t or len(t) > 200:
+    if not t or len(t) > 200 or re.search(r"\d", t):
         return None
+    if classificar_pressao(texto) is not None or comando_humano(texto) is not None:
+        return None  # pressão e comando seguem para o condutor (POL-07 registra a ocorrência)
     if _termos(texto) and _RX_DEFINICAO.search(t):
         return "glossario"
-    if _RX_FALTA.search(t) and _RX_LAUDO.search(t):
+    pergunta = "?" in texto or bool(_RX_PERGUNTA.search(t))
+    if pergunta and _RX_FALTA.search(t) and _RX_LAUDO.search(t):  # "Pode aprovar, falta só papelada" não é pergunta
         return "falta"
-    if _RX_PERGUNTA.search(t) and _RX_FINANCIADO.search(t) and not (_RX_CONTAGEM.search(t) or _RX_OUTRA.search(t)):
+    if (_RX_PERGUNTA.search(t) and _RX_FINANCIADO.search(t)
+            and not (_RX_CONTAGEM.search(t) or _RX_OUTRA.search(t) or _RX_NAO_FINANCIADO.search(t))):
         return "financiado"
     return None
 
@@ -836,8 +867,10 @@ class FachadaSessao:
             if not residual and srv.passo_do_texto(fis_id, texto):
                 return self._passo(fis_id, canal="texto")
             atual = srv._passo_atual(fis_id)
-            if residual and atual is not None and atual[2].acao == "residual":
-                # "Completar a nota" no passo do residual é o passo: os campos vêm do papel do caso, como na gravação
+            if residual and atual is not None and atual[2].acao == "residual" and residual_do_papel(srv, atual[0],
+                                                                                                  residual):
+                # "Completar a nota" com o que está no papel, no passo do residual, é o passo (como na gravação);
+                # com outro valor, é ação livre, e as regras dizem o que não validou (dígito verificador, soma)
                 return self._passo(fis_id, canal="texto")
             self._tocar()
             with self._cota("turnos", self._ger.limites.max_turnos, self._msg_turnos()):
@@ -1121,7 +1154,7 @@ class GerenciadorSessoes:
                     agora = self.relogio()
                     velhas = self._expiradas()
                     vivas = len(self.sessoes) + len(self._criando)
-                    if ip and not self._por_ip.permitir(ip, agora):
+                    if ip and vivas * 2 >= self.limites.max_sessoes and not self._por_ip.permitir(ip, agora):
                         recusa = "ip"
                     elif vivas >= self.limites.max_sessoes:
                         expulsa = self._escolher_expulsa(agora)
