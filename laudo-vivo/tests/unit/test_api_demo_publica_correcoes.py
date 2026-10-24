@@ -563,6 +563,9 @@ def test_saida_publica_sem_eco_sem_caminho_e_com_csp(publico, tmp_path, capsys):
     rec = [x for x in _eventos(capsys) if x["laudo_evento"] == "recusa_limite"]
     assert [(x["limite"], x["status"]) for x in rec] == [("corpo", 413)]  # o 413 pelo Content-Length vai ao painel
     _rodar(c)
+    do_caso = [e for e in c.get(f"/api/fiscalizacoes/{FIS}").json()["evidencias"] if e["tipo"] == "nfe_xml"][-1]
+    arq = c.get(f"/api/fiscalizacoes/{FIS}/evidencias/{do_caso['id']}/arquivo")
+    assert arq.status_code == 200 and arq.headers["content-disposition"].startswith("inline")  # o XML do caso, como antes
     locais = {str(tmp_path), str(tmp_path).replace("\\", "/"), "../"}
     for rota in ("laudo", "trace"):
         corpo = c.get(f"/api/fiscalizacoes/{FIS}/{rota}").text

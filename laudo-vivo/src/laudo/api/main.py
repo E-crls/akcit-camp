@@ -537,8 +537,9 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
     @app.get("/api/fiscalizacoes/{fis_id}/evidencias/{ev_id}/arquivo")
     def arquivo(fis_id: str, ev_id: str, srv=_SRV):
         p = srv.arquivo_evidencia(fis_id, ev_id)
-        # demo pública: o XML enviado pelo visitante não abre na mesma origem (um XML com XHTML rodaria script)
-        baixar = publica and p.suffix.lower() == ".xml"
+        # demo pública: o XML enviado pelo visitante (na pasta da cópia; o do caso fica como está) não abre na mesma
+        # origem: um XML com XHTML rodaria script
+        baixar = publica and p.suffix.lower() == ".xml" and Path(srv.dados).resolve() in p.resolve().parents
         return FileResponse(
             p,
             media_type=_MIME.get(p.suffix.lower(), "application/octet-stream"),
