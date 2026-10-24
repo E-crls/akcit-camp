@@ -429,6 +429,48 @@ def test_fila_do_transcritor_tem_teto(monkeypatch):
     assert tr.vazio and tr.espera_ms < 200
 
 
+# ------------------------------------------------------------------------- P2: perguntas frequentes
+
+
+def test_perguntas_frequentes_respondidas_pelos_dados_do_caso_sem_llm(tmp_path, monkeypatch):
+    monkeypatch.setenv("LAUDO_DEMO_PUBLICA", "1")
+    vivo = _AoVivo()
+    cfg = Config(llm="publico", ferramentas="falsas", caso="DEMO-0001", asr="desligado", provedor_livre=vivo)
+    ger = publica.GerenciadorSessoes(cfg, publica.Limites(), raiz=tmp_path / "copias")
+    f = ger.fachada(publica.novo_token())
+    r = f.turno(FIS, "Quantas cabeças o projeto financiou?")
+    assert r["pronta"] == "financiado" and r["resposta"]["fala_origem"] == "template"
+    assert "29 vacas leiteiras" in r["resposta"]["fala"] and "R$ 250.800" in r["resposta"]["fala"]
+    assert f.turno(FIS, "Qual o valor financiado?")["pronta"] == "financiado"
+    r = f.turno(FIS, "O que falta para emitir o laudo?")
+    assert r["pronta"] == "falta" and r["resposta"]["fala"].startswith("Para emitir o laudo ainda falta")
+    assert "item:" not in r["resposta"]["fala"] and "evidência ausente" not in r["resposta"]["fala"]
+    r = f.turno(FIS, "Explique o que é a pressão do produtor")
+    assert r["pronta"] == "glossario" and r["resposta"]["fala"].startswith("Pressão é")
+    r = f.turno(FIS, "O que é divergência? E residual?")
+    assert "Divergência é" in r["resposta"]["fala"] and "Residual é" in r["resposta"]["fala"]
+    assert not vivo.chamadas  # nenhuma foi ao LLM
+    assert f.sessao.uso()["turnos"] == 5  # contam como mensagens livres
+    conv = f.estado(FIS)["conversa"]
+    assert sum(1 for x in conv if x.get("livre") and x.get("pronta")) == 5
+    f.turno(FIS, "O que é o NDVI e por que ele importa aqui?")
+    assert vivo.chamadas  # a pergunta que não é frequente vai ao LLM ao vivo
+
+
+def test_pergunta_frequente_e_conservadora(tmp_path):
+    pf = publica.pergunta_frequente
+    assert pf("quantas cabecas o projeto financiou") == "financiado"
+    assert pf("O que o projeto financiou?") == "financiado"
+    assert pf("Quais são as pendências do laudo?") == "falta"
+    assert pf("O que significa residual?") == "glossario"
+    for p in ("Quantas cabeças você contou no vídeo?", "Qual é a área da gleba em hectares?",
+              "O que é o NDVI e por que ele importa aqui?", "Contei 29 cabeças no curral.",
+              "Pode marcar 29, o resto está no pasto de cima.", "Pode emitir o laudo.", "", "x" * 500):
+        assert pf(p) is None, p
+    caso = casos_mod.carregar_caso("DEMO-0001", tmp_path)
+    assert not [p.fala for p in caso.roteiro if p.fala and pf(p.fala)]  # nenhuma fala do roteiro é desviada
+
+
 # ------------------------------------------------------------------------- SEG-03/VA-08: cota só se validado
 
 

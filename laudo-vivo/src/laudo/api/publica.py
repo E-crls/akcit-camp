@@ -22,6 +22,8 @@ uma ação livre (`Sessao.modo`):
   passo seguinte volta a ele. O visitante vê o efeito da pergunta ou do arquivo dele até tocar em "Executar
   passo"; o roteiro segue com os arquivos do caso e o laudo sai igual ao do roteiro limpo.
 O texto (ou a fala transcrita) igual à fala do próximo passo, e o arquivo pronto do próximo passo, viram o passo.
+As perguntas frequentes do visitante (o que o projeto financiou, o que falta para emitir o laudo, o que é pressão,
+divergência ou residual) têm resposta pronta, dos dados do caso, sem LLM (`pergunta_frequente`).
 
 **Arquivo do visitante.** A foto perde o GPS do EXIF (e o XMP) antes de entrar na fiscalização: nada da
 localização do visitante vai ao estado, ao laudo ou ao trace; o GPS do aparelho também não entra. A foto fora do
@@ -344,6 +346,78 @@ def _gravar_atomico(destino: Path, dados: bytes) -> None:
     os.replace(tmp, destino)
 
 
+# -- perguntas frequentes do visitante (texto normalizado: sem acento, minúsculo, só palavras) ---------------------
+_TERMOS = {"pressao": re.compile(r"\bpress(?:ao|oes)\b"), "divergencia": re.compile(r"\bdivergen\w*"),
+           "residual": re.compile(r"\bresidua(?:l|is)\b")}
+_GLOSSARIO = {
+    "pressao": "Pressão é o pedido para mudar um resultado sem prova nova, como “pode marcar 29” quando o vídeo "
+               "contou menos. O agente não muda o valor: registra a tentativa como ocorrência (regra POL-07) e o "
+               "número continua o da evidência.",
+    "divergencia": "Divergência é quando a prova não bate com o contrato ou com outra prova, como o vídeo contar "
+                   "menos animais que a nota fiscal. O item fica divergente, e o rascunho do laudo só sai com a "
+                   "justificativa da fiscal para cada divergência (regra POL-02).",
+    "residual": "Residual é o que a leitura da foto de um documento, como a nota impressa (DANFE), não conseguiu "
+                "validar: o agente pede só esses campos, a fiscal lê no papel ou digita, e as regras conferem o que "
+                "foi informado (dígito verificador e somas).",
+}
+_RX_DEFINICAO = re.compile(r"\b(?:o que (?:e|sao|significa|quer dizer)|que e|explique|explica|defina|definicao|"
+                           r"significa|significado|como funciona)\b")
+_RX_FALTA = re.compile(r"\b(?:falta|faltam|faltando|pendencia|pendencias|pendente|pendentes)\b")
+_RX_LAUDO = re.compile(r"\b(?:laudo|emitir|emissao|rascunho|concluir|terminar|fechar|assinar)\b")
+_RX_PERGUNTA = re.compile(r"\b(?:quant[oa]s?|qual|quais|o que|que)\b")
+_RX_FINANCIADO = re.compile(r"\b(?:financi\w*|projeto|valor|credito|contrat\w*|orcamento)\b")
+_RX_CONTAGEM = re.compile(r"\b(?:cont(?:ou|ei|agem|ar|ados?|aram)|video|curral|nota|gta|foto|vi|viu)\b")
+_RX_CAMPO = re.compile(r"\s*\(?\b(?:item|documento|laudo|operacao):[\w:]+\)?")
+
+
+def _normal(texto: str) -> str:
+    from laudo.api.servico import _normalizar_fala
+
+    return _normalizar_fala(texto)
+
+
+def _termos(texto: str) -> list[str]:
+    t = _normal(texto)
+    return [k for k, rx in _TERMOS.items() if rx.search(t)]
+
+
+def pergunta_frequente(texto: str) -> str | None:
+    """"glossario", "falta", "financiado" ou None. Conservador: na dúvida, None (a pergunta vai ao LLM)."""
+    t = _normal(texto)
+    if not t or len(t) > 200:
+        return None
+    if _termos(texto) and _RX_DEFINICAO.search(t):
+        return "glossario"
+    if _RX_FALTA.search(t) and _RX_LAUDO.search(t):
+        return "falta"
+    if _RX_PERGUNTA.search(t) and _RX_FINANCIADO.search(t) and not _RX_CONTAGEM.search(t) and not _RX_FALTA.search(t):
+        return "financiado"
+    return None
+
+
+def _fala_financiado(fis: Any) -> str:
+    """O que o projeto financiou, item a item, com quantidade e valor (do contrato do caso)."""
+    from laudo.formatacao import fmt_milhar
+
+    partes = []
+    for i in fis.operacao.itens:
+        d = re.split(r"\s+[—(]", i.descricao or "", maxsplit=1)[0].strip() or i.tipo
+        if i.quantidade is not None and fmt_milhar(i.quantidade) not in d and str(int(i.quantidade)) not in d:
+            d = f"{fmt_milhar(i.quantidade)} {i.unidade or ''} de {d}".replace("  ", " ")
+        d = d[:1].lower() + d[1:]
+        if d.split(" ", 1)[0].endswith(("ção", "são", "gem")):
+            d = "a " + d
+        if i.valor_rs:
+            d += f" (R$ {fmt_milhar(i.valor_rs)})"
+        partes.append(d)
+    if not partes:
+        return ""
+    lista = partes[0] if len(partes) == 1 else ", ".join(partes[:-1]) + " e " + partes[-1]
+    v = fis.operacao.valor_rs
+    total = f"; total de R$ {fmt_milhar(v)}" if v and len(partes) > 1 else ""
+    return f"O projeto financiou {lista}{total}. A fiscalização confere se cada item existe como foi financiado."
+
+
 def _passo_da_fala(p: Any, texto: str) -> bool:
     return bool(p) and p.acao == "turno" and not p.evidencia and bool(p.fala) and fala_corresponde(p.fala, texto)
 
@@ -501,9 +575,65 @@ class ServicoPublico(Servico):
                     with self.sessao.modo(livre=False):
                         out = self.passo_roteiro(fis_id)
                     return out | (extra or {}) | {"pelo_roteiro": True}
+        # pergunta frequente do visitante (digitada ou falada): resposta pronta dos dados do caso, sem LLM
+        if origem in ("texto", "asr") and evidencia is None and not residual and not do_roteiro and not nome_caso:
+            pronta = self.resposta_pronta(fis_id, texto)
+            if pronta is not None:
+                return pronta | (extra or {})
         return super().turno(fis_id, texto, origem=origem, evidencia=evidencia, passos_llm=passos_llm,
                              extra=extra, confianca_asr=confianca_asr, residual=residual,
                              do_roteiro=do_roteiro, nome_caso=nome_caso)
+
+    # -- perguntas frequentes (P2): resposta pronta, dos dados do caso, antes do LLM -------------------------
+    def resposta_pronta(self, fis_id: str, texto: str) -> dict[str, Any] | None:
+        """Resposta por template para as perguntas que o visitante mais faz (`pergunta_frequente`): o que o projeto
+        financiou (quantidade e valor), o que falta para emitir o laudo e o que é pressão, divergência ou residual.
+        Vai à conversa como turno livre e não muda o estado. None: não é uma delas (segue para o LLM)."""
+        tipo = pergunta_frequente(texto)
+        if tipo is None:
+            return None
+        with self.lock:
+            fis = self.carregar(fis_id)
+            t0 = time.perf_counter()
+            if tipo == "financiado":
+                fala = _fala_financiado(fis)
+            elif tipo == "falta":
+                fala = self._fala_falta(fis)
+            else:
+                fala = " ".join(_GLOSSARIO[t] for t in _termos(texto))
+            if not fala:
+                return None
+            n = len(self.repo.ler_conversa(fis_id)) + 1
+            from laudo.agent.condutor import RespostaTurno
+
+            resp = RespostaTurno(fiscalizacao_id=fis.id, turno=n, etapa=fis.estado_fsm, fala=fala,
+                                 fala_origem="template")
+            self.repo.anexar_conversa(fis_id, {"turno": n, "fiscal": texto[:2000], "agente": fala,
+                                               "etapa": fis.estado_fsm, "acoes": [], "pronta": tipo})
+            out = self._resultado(fis_id, resp.model_dump(mode="json"), self._status(fis),
+                                  int((time.perf_counter() - t0) * 1000))
+        return out | {"pronta": tipo}
+
+    def _fala_falta(self, fis: Any) -> str:
+        from laudo.tools import laudo as ferr_laudo
+
+        if fis.estado_fsm == "SELADO":
+            return "Nada: o laudo desta fiscalização já está assinado e selado."
+        if fis.estado_fsm in ("RASCUNHO", "ASSINATURA") and ferr_laudo.ultimo_rascunho(fis):
+            return ("O rascunho do laudo já foi emitido: falta a assinatura da fiscal, com o PIN e a conferência do "
+                    "hash. O agente nunca assina.")
+        faltas: list[str] = []
+        for p in self.cond.politica.pendencias_emissao(fis):
+            f = _RX_CAMPO.sub("", str(p.get("falta") or "")).strip(" .;")
+            f = re.sub(r"^evidência ausente:\s*", "", f)
+            if f and f not in faltas:
+                faltas.append(f)
+        if not faltas:
+            return "Nada bloqueia: o rascunho do laudo já pode ser emitido; a assinatura continua sendo da fiscal."
+        n = len(faltas)
+        lista = "; ".join(faltas[:4]) + (f"; e mais {n - 4}" if n > 4 else "")
+        return (f"Para emitir o laudo ainda falta{'m' if n > 1 else ''} {n} ponto{'s' if n > 1 else ''}: {lista}. "
+                "O roteiro em “Executar passo” traz cada prova.")
 
 
 # ---------------------------------------------------------------------------
@@ -638,6 +768,8 @@ class FachadaSessao:
 
     def _evento_turno(self, canal: str, out: dict[str, Any], t0: float, fora0: int, livre: bool, **extra: Any):
         est_ = out.get("estado") or {}
+        if out.get("pronta"):
+            extra["pronta"] = out["pronta"]  # pergunta frequente: resposta pronta, sem LLM
         self._ev("turno", canal=canal, livre=livre, etapa=est_.get("etapa"), passo=(out.get("passo") or {}).get("n"),
                  latencia_ms=int((time.perf_counter() - t0) * 1000), fora_da_gravacao=self._fora() - fora0, **extra)
 
