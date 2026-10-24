@@ -56,7 +56,28 @@ export async function telaLaudo(raiz, fisId, { focarAssinatura = false, abrirPac
     h("a", { class: "btn btn-sec", href: `/api/fiscalizacoes/${encodeURIComponent(fisId)}/laudo`, target: "_blank", rel: "noopener" }, icone("codigo"), "Laudo (JSON)"),
     h("a", { class: "btn btn-sec", href: `/api/fiscalizacoes/${encodeURIComponent(fisId)}/laudo.html`, target: "_blank", rel: "noopener" }, icone("imprimir"), "Para imprimir"))));
   if (focarAssinatura && !selado) setTimeout(() => document.getElementById("conf-hash")?.focus({ preventScroll: true }), 80);
+  // demonstração pública no celular: quem chega pelo QR não sabe que precisa rolar até o PIN
+  if (movel && !completo && !selado && publica(ctx) && papel() === "fiscal") requestAnimationFrame(mostrarCaixaEPin);
   if (abrirPacote && selado) gerarPacote(fisId);
+}
+
+function publica(ctx) { return !!ctx?.saude?.config?.demo_publica; }
+
+// "Revisar e assinar" no celular: a tela abre com a caixa "Revisei o laudo" e o PIN (com a dica do PIN da demonstração)
+// à vista, entre o topo fixo e o rodapé fixo (sem rolar, o PIN ficava atrás do rodapé e a dica, fora da tela).
+function mostrarCaixaEPin() {
+  const form = document.querySelector("form.assinar-m");
+  const pin = form?.querySelector(".pin-campo");
+  const conf = form?.querySelector(".confere-chk");
+  const rod = form?.querySelector(".rodape-fixo");
+  if (!pin || !conf || !rod) return;
+  const y = window.scrollY;
+  const topo = document.getElementById("cabecalho")?.offsetHeight || 0;
+  // o mínimo para o PIN sair de trás do rodapé; o máximo sem esconder a caixa atrás do topo
+  const min = pin.getBoundingClientRect().bottom + y - (window.innerHeight - rod.offsetHeight - 8);
+  const max = conf.getBoundingClientRect().top + y - topo - 8;
+  const alvo = Math.max(0, Math.min(Math.max(y, min), max));
+  if (Math.abs(alvo - y) > 1) window.scrollTo(0, alvo);
 }
 
 // ---------------------------------------------------------------- folha do laudo (o documento)
@@ -158,13 +179,20 @@ function ladoSelado(ctx) {
 // ---------------------------------------------------------------- selado (celular)
 function seladoMovel(ctx) {
   const { estado, base } = ctx;
+  // demonstração pública: depois do selo ainda há passo do roteiro (o 19, a tentativa de alterar o laudo selado), que
+  // fecha a história; o botão principal volta à fiscalização, onde a barra da demonstração mostra o passo
+  const resta = publica(ctx) && papel() === "fiscal" ? R.passoDepoisDoSelo(estado) : null;
   return h("div", { class: "pagina estreita selado-m laudo-tela" },
     h("section", { class: "laudo-cab" }, lacre(ctx)),
     placarLaudo(estado),
     cartaoResumo(R.resumoPorObjeto(estado)),
     h("p", { class: "nota-cad" }, icone("cadeado-cheio"), "Ninguém pode mudar este laudo. Correção abre uma nova fiscalização."),
-    h("div", { class: "rodape-fixo" }, h("a", { class: "btn btn-pri btn-cheio", href: `${base}/laudo?completo=1` }, icone("nota"), "Ver o laudo completo"),
-      h("a", { class: "btn btn-ter", href: "#/fiscalizacoes" }, "Voltar às fiscalizações")));
+    h("div", { class: "rodape-fixo" },
+      resta ? h("a", { class: "btn btn-pri btn-cheio", id: "btn-continuar-demo", href: base, "aria-label": `Continuar a demonstração, passo ${resta} de ${estado.roteiro.total}` },
+        icone("play"), "Continuar a demonstração") : null,
+      h("a", { class: `btn ${resta ? "btn-sec" : "btn-pri"} btn-cheio`, href: `${base}/laudo?completo=1` }, icone("nota"), "Ver o laudo completo"),
+      // com o botão da demonstração, o rodapé fixo fica em dois botões (a seta do topo também volta)
+      resta ? null : h("a", { class: "btn btn-ter", href: "#/fiscalizacoes" }, "Voltar às fiscalizações")));
 }
 
 function telaCompleto(ctx) {

@@ -671,11 +671,16 @@ function contadorMarcas(c, max, fin) {
 }
 
 function bolhaFalhou(f) {
+  // demonstração pública: a recusa do app (limites da demonstração, voz ocupada, arquivo grande) vem escrita para a tela;
+  // o erro interno (5xx) continua com a frase de sempre
+  const doServidor = publica() && f.amigavel && !f.rede && f.status < 500;
+  // arquivo grande demais ou de tipo errado: mandar o mesmo de novo não adianta
+  const repetir = !(doServidor && [413, 415].includes(f.status));
   return h("div", { class: "msg sistema", role: "alert" },
-    h("div", { class: "bolha" }, h("p", {}, f.rede ? "Sem conexão. Nada foi enviado." : "Não consegui falar com o servidor. Tente de novo."),
+    h("div", { class: "bolha" }, h("p", {}, f.rede ? "Sem conexão. Nada foi enviado." : doServidor ? f.erro : "Não consegui falar com o servidor. Tente de novo."),
       f.texto ? h("p", { class: "t-sec" }, `Sua mensagem: “${f.texto}”`) : null,
-      h("div", { class: "acoes-linha" }, h("button", { class: "btn btn-sec", type: "button", onclick: tentarDeNovo }, icone("recomecar"), "Tentar de novo"),
-        h("button", { class: "btn btn-ter", type: "button", onclick: () => { S.falhou = null; renderChat(); } }, "Descartar"))));
+      h("div", { class: "acoes-linha" }, repetir ? h("button", { class: "btn btn-sec", type: "button", onclick: tentarDeNovo }, icone("recomecar"), "Tentar de novo") : null,
+        h("button", { class: "btn btn-ter", type: "button", onclick: () => { S.falhou = null; renderChat(); } }, repetir ? "Descartar" : "Fechar"))));
 }
 function tentarDeNovo() {
   const f = S?.falhou;
@@ -706,7 +711,10 @@ function cartaoAgora() {
     S.el.confTexto = h("input", { type: "text", class: "entrada", value: a.confirmacao.texto || "", "aria-label": "O que entendi (pode corrigir)" });
     extra.push(h("label", { class: "campo-agora" }, h("span", { class: "t-sec" }, "O que entendi (pode corrigir)"), S.el.confTexto));
   }
-  const acoes = a.acoes.map((ac, i) => {
+  // demonstração pública: a câmera só é a ação principal quando o passo do roteiro pede aquele arquivo
+  const lista = publica() && ehFiscal() && S.estado.roteiro ? R.acoesAgoraPublica(a.acoes, passoAtual(), { doPasso: acaoDoPasso, ehArquivo: (x) => !!ACAO_ARQ[x] })
+    : a.acoes;
+  const acoes = lista.map((ac, i) => {
     const pri = i === 0;
     const realce = ac.acao === "emitir" && passoEmissao();
     const b = h("button", { class: `btn ${pri ? "btn-pri" : "btn-sec"}${realce ? " realce" : ""}`, type: "button", id: ac.acao === "emitir" ? "btn-rascunho" : null,
@@ -716,7 +724,7 @@ function cartaoAgora() {
   });
   return h("section", { class: cls, id: "agora", role: "region", "aria-label": a.acomp ? "Acompanhamento" : "Próxima ação" },
     h("div", { class: "agora-txt" }, h("span", { class: "rot" }, a.rot), h("h3", {}, a.titulo), ...extra),
-    acoes.length ? h("div", { class: "acoes" }, acoes) : null);
+    acoes.length ? h("div", { class: `acoes${lista !== a.acoes ? " com-passo" : ""}` }, acoes) : null);
 }
 
 function camposResidual(p) {
@@ -752,11 +760,18 @@ const ACAO_ARQ = {
   "galeria-foto": { tipo: "foto", accept: "image/*" },
 };
 const COMPATIVEL = { video: ["video"], documento: ["documento"], nfe_xml: ["nfe_xml"], gta: ["gta", "documento"], foto: ["foto"] };
+// a ação abre o arquivo pronto do próximo passo do roteiro (o modal "Arquivo da demonstração", não a câmera)
+function acaoDoPasso(acao) {
+  const d = ACAO_ARQ[acao];
+  const arq = arquivoDoPasso(passoAtual());
+  return !!(d && arq && (COMPATIVEL[d.tipo] || []).includes(arq.tipo));
+}
 
 function executarAcao(acao, botao = null) {
   if (!S || S.ocupado) return;
   const p = passoAtual();
   const replay = emReplay();
+  if (acao === "executar-passo") { proximoPasso(); return; }
   if (ACAO_ARQ[acao]) { capturar(ACAO_ARQ[acao]); return; }
   if (acao.startsWith("justificar:")) {
     const campo = acao.slice(11);
@@ -883,9 +898,8 @@ function abrirAnexar(sub = null) {
     corpo = (S.estado.roteiro?.arquivos || []).map((a) => linha(rotuloArquivoDemo(a), a.disponivel === false ? "simulado nesta execução" : null,
       { video: "video", foto: "camera", documento: "nota", nfe_xml: "arquivo", gta: "gta" }[a.tipo] || "arquivo", () => { fecharAnexar(); enviarDoCaso(a.nome, a.tipo); }));
   } else {
-    const maxVideo = S.saude?.demo_publica?.limites?.video_max_s || 20;
     corpo = [linha("Fotografar", "Cerca, obra ou animais", "camera", arq("fotografar-cerca")),
-      linha("Filmar", pub ? `O lote no corredor, até ${maxVideo} s (a contagem leva até ~1 min)` : "O lote passando no corredor", "video", arq("filmar")),
+      linha("Filmar", pub ? `O lote no corredor, ${R.regraVideoPublico(S.saude?.demo_publica?.limites)} (a contagem leva até ~1 min)` : "O lote passando no corredor", "video", arq("filmar")),
       linha("Nota fiscal", pub ? "Arquivo da NF-e (.xml)" : "Foto da nota ou arquivo da NF-e", "nota", () => abrirAnexar("nota")),
       pub ? null : linha("GTA", "Foto da guia ou arquivo", "gta", () => abrirAnexar("gta")),
       S.estado.roteiro?.arquivos?.length ? linha("Arquivo da demonstração", "Usar um arquivo pronto do caso", "info", () => abrirAnexar("demo"), "demo") : null].filter(Boolean);
@@ -1311,7 +1325,7 @@ function renderRoteiro() {
     ehDemo() ? h("p", { class: "roteiro-marca marca-demo so-movel" }, "Demonstração · dados sintéticos") : null,
     h("div", { class: "roteiro-barra ok-pequeno" },
       h("span", { class: "pos" }, `${Math.min(r.proximo, r.total)} / ${r.total}`),
-      h("span", { class: "titulo", title: p?.fala || null }, titulo, apoio ? h("span", { class: "fala-passo" }, apoio) : null),
+      h("span", { class: "titulo", title: p?.fala || null }, h("span", { class: "titulo-txt" }, titulo), apoio ? h("span", { class: "fala-passo" }, apoio) : null),
       exec, recomecar, pular, mais,
       S.el.menuRoteiro.parentElement === document.body ? null : S.el.menuRoteiro));
   if (foco) bar.querySelector(`[data-k="${foco}"]`)?.focus({ preventScroll: true });
@@ -1416,7 +1430,8 @@ async function executar(fn, opcoes = {}, extra = {}) {
   let r;
   try { r = await fn(); } catch (e) {
     if (!S) return null;
-    S.falhou = { texto: opcoes.fala, erro: e.message, rede: !!e.rede, restaurar: opcoes.restaurar || null, repetir: () => executar(fn, opcoes, extra) };
+    S.falhou = { texto: opcoes.fala, erro: e.message, rede: !!e.rede, amigavel: !!e.amigavel, status: e.status || null, restaurar: opcoes.restaurar || null,
+      repetir: () => executar(fn, opcoes, extra) };
     if (opcoes.restaurar && !S.el.texto.value.trim()) { S.el.texto.value = opcoes.restaurar; ajustarAltura(S.el.texto); }
     ocupar(null);
     atualizarSaude();
@@ -1541,8 +1556,47 @@ async function enviarDoCaso(nome, tipo) {
   await executar(() => api.evidenciaCaso(S.id, nome, texto), { fala: texto, evidencia: tipo, nome, texto: STATUS_ENVIO[tipo], restaurar: texto });
 }
 
+// Demonstração pública: o arquivo cabe nos limites (tamanho e, no vídeo, a duração)? A mensagem para a tela, ou null.
+// Acima de 32 MiB o front-end do Cloud Run barra o pedido com uma página HTML, antes do app: por isso confere aqui.
+async function foraDoLimitePublico(arquivo, tipo) {
+  const lim = S.saude?.demo_publica?.limites;
+  const msg = R.conferirArquivoPublico({ tipo, bytes: arquivo.size }, lim);
+  if (msg || tipo !== "video") return msg;
+  return R.conferirArquivoPublico({ tipo, bytes: arquivo.size, duracao: await duracaoDoVideo(arquivo) }, lim);
+}
+// a duração pelos metadados, num <video> fora da página; null quando o navegador não lê o formato (aí a API confere)
+function duracaoDoVideo(arquivo, espera = 5000) {
+  return new Promise((resolve) => {
+    const v = document.createElement("video");
+    let url = null; let feito = false;
+    const fim = (d) => {
+      if (feito) return;
+      feito = true;
+      clearTimeout(t);
+      v.onloadedmetadata = null; v.onerror = null;
+      v.removeAttribute("src");
+      if (url) URL.revokeObjectURL(url);
+      resolve(Number.isFinite(d) && d > 0 ? d : null);
+    };
+    const t = setTimeout(() => fim(null), espera);
+    v.preload = "metadata";
+    v.muted = true;
+    v.onloadedmetadata = () => fim(v.duration);
+    v.onerror = () => fim(null);
+    try { url = URL.createObjectURL(arquivo); v.src = url; } catch { fim(null); }
+  });
+}
+
 async function enviarArquivo(arquivo, tipo, itemId) {
-  if (S.ocupado) return;
+  if (S.ocupado || S.conferindoArquivo) return;
+  if (publica()) {
+    S.conferindoArquivo = true;
+    let msg = null;
+    try { msg = await foraDoLimitePublico(arquivo, tipo); } finally { if (S) S.conferindoArquivo = false; }
+    if (!S) return;
+    // nada sai do aparelho: o comentário fica no campo
+    if (msg) { avisar(msg, true); return; }
+  }
   const comentario = S.el.texto.value.trim();
   S.el.texto.value = "";
   ajustarAltura(S.el.texto);

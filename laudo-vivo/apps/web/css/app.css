@@ -223,6 +223,8 @@ img { max-width: 100%; }
 @media (max-width: 1099.98px) { .publica-faixa small { font-size: .8125rem; } }
 @media (min-width: 1100px) { .demo-faixa { display: none !important; } .demo-pilula:not([hidden]) { display: inline-flex; } }
 @media (max-width: 1099.98px) { body.com-roteiro .demo-faixa { display: none !important; } }
+/* na demonstração pública a faixa escura já diz "Demonstração · dados sintéticos": sem a faixa fina repetida embaixo dela */
+body.demo-publica .demo-faixa { display: none !important; }
 
 /* ---------------------------------------------------------------- topo (claro: no sol, faixa escura grande reflete) */
 .cabecalho { position: sticky; top: 0; z-index: 10; }
@@ -770,6 +772,12 @@ body:not(.topo-casa) .usuario-wrap { display: none; }
 .agora .acoes .btn-sec:hover:not(:disabled) { box-shadow: inset 0 0 0 1.5px var(--nevoa); }
 .agora .acoes .btn-sec:hover:not(:disabled) { background: var(--carvao-2); }
 .agora .btn:disabled { background: var(--carvao-3); color: var(--nevoa); box-shadow: none; }
+/* demonstração pública, passo do roteiro sem arquivo: no celular, "Executar passo" numa linha só e a câmera e a galeria
+   embaixo (no computador os botões já ficam em coluna) */
+@media (max-width: 1099.98px) {
+  .agora .acoes.com-passo { flex-wrap: wrap; }
+  .agora .acoes.com-passo .btn-pri { flex: 1 1 100%; }
+}
 .agora .erro-campo { color: var(--ipe); }
 /* o analista acompanha: claro, contorno carvão, sem botão */
 .agora.acomp { background: var(--regua-clara), var(--branco); color: var(--carvao); box-shadow: var(--contorno-sem-topo); border-radius: 0 0 var(--r) var(--r); }
@@ -1041,6 +1049,15 @@ p.div-txt { margin-top: .375rem; }
   .roteiro.retomar .titulo { flex: 1 1 calc(100% - 7rem); white-space: normal; }
   .roteiro.retomar .fala-passo { white-space: normal; }
   .roteiro.retomar .btn-pri, .roteiro.retomar .btn-esc.com-texto { flex: 1 1 auto; }
+  /* demonstração pública: quem chega pelo QR lê o passo e a frase antes de tocar em Executar (o title não aparece no
+     toque), então o título e a fala quebram em até 2 linhas cada, em vez de cortar numa linha só; o texto fica com a
+     largura toda da barra e os botões descem para a linha de baixo. A marca da barra sai: a faixa escura do topo já a dá */
+  body.demo-publica .roteiro-marca { display: none; }
+  body.demo-publica .roteiro-barra { flex-wrap: wrap; row-gap: .375rem; padding: .5rem .5rem .5rem .75rem; }
+  body.demo-publica .roteiro .titulo { flex: 1 1 calc(100% - 4.5rem); white-space: normal; }
+  body.demo-publica .roteiro .titulo-txt, body.demo-publica .roteiro .fala-passo { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+    line-clamp: 2; overflow: hidden; white-space: normal; overflow-wrap: break-word; }
+  body.demo-publica .roteiro .btn-pri { flex: 1 1 auto; }
 }
 @media (min-width: 1100px) {
   .roteiro.retomar .roteiro-barra { flex-wrap: wrap; padding: .75rem .75rem .75rem 1rem; }
@@ -1225,6 +1242,9 @@ p.div-txt { margin-top: .375rem; }
 .pin-dica .ic { width: 1.25rem; height: 1.25rem; color: var(--grafite); }
 .pin-dica .btn-ter { min-height: 3rem; padding: 0 .5rem; }
 @media (min-width: 1100px) { .pin-dica .btn-ter { min-height: 2.5rem; } }
+/* demonstração pública: o PIN vem escrito (sem "Mostrar"); o ícone fica ao lado do texto, sem uma linha só para ele */
+body.demo-publica .pin-dica { flex-wrap: nowrap; align-items: flex-start; }
+body.demo-publica .pin-dica .ic { flex: none; margin-top: .125rem; }
 .rodape-fixo .erro-campo, .rodape-ass .erro-campo { margin: 0; text-align: center; background: var(--ipe-claro); box-shadow: inset 0 0 0 2px var(--carvao); border-radius: var(--r); padding: .5rem .75rem; }
 .assinar-pagina .assinatura { scroll-padding-bottom: 12rem; }
 .pin-campo, .confere-chk { scroll-margin-bottom: 12rem; }
