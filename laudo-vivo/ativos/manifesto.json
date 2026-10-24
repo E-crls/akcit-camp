@@ -21,6 +21,13 @@
    "origem": "python -m laudo.api.publica --preparar, na máquina em que a contagem confere com a gravação",
    "licenca": "CC BY-SA 4.0 (quadros do vídeo semissintético; ver THIRD_PARTY.md)",
    "atribuicao": "Gpkp (CC BY-SA 4.0) e Marie Nouvellon (CC BY 2.0), via Wikimedia Commons"
+  },
+  {
+   "prefixo": "mapa/",
+   "o_que_e": "contorno de Goiás simplificado (1 anel, 727 pontos) para o mapa da carteira sem a malha do IBGE (imagem Docker e demo pública)",
+   "origem": "laudo.api.mapa.contorno_go sobre a Malha Municipal de Goiás do IBGE (simplificada a 0,01 grau)",
+   "licenca": "dados públicos do IBGE (uso livre com citação da fonte)",
+   "atribuicao": "IBGE, Malha Municipal"
   }
  ],
  "arquivos": [
@@ -156,6 +163,13 @@
    "sha256": "abbd4b389016f64a1ed88ef9e717d79f97caae470ea136933a6ef2ef2d8a1482",
    "bytes": 86984,
    "grupo": "contagem/"
+  },
+  {
+   "caminho": "mapa/contorno_go.json",
+   "destino": "dados_locais/mapa/contorno_go.json",
+   "sha256": "1939302057db8c46671d9a4493a6c738d42e3eb398235a55d8e6601a0028a1ac",
+   "bytes": 15916,
+   "grupo": "mapa/"
   }
  ]
 }

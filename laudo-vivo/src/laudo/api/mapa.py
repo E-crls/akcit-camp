@@ -135,7 +135,12 @@ def contorno_go(dados_dir: Path | None = None) -> dict[str, Any] | None:
             pass
     p = REPO / "dados_locais" / "ibge" / "municipios_go.parquet"
     if not p.exists():
-        return None
+        # sem a malha do IBGE (imagem Docker, clone novo): o contorno simplificado versionado em ativos/ (preparar_demo)
+        pronto = REPO / "dados_locais" / "mapa" / "contorno_go.json"
+        try:
+            return json.loads(pronto.read_text(encoding="utf-8")) if pronto.exists() else None
+        except (OSError, json.JSONDecodeError):
+            return None
     c = _contorno_cache(str(p), p.stat().st_mtime)
     if c and cache:
         try:

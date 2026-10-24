@@ -62,7 +62,9 @@ export function miniMapa(el, glebas, gps, distancia = null) {
     .setView(gps ? [gps.lat, gps.lon] : (glebas?.[0]?.[0] || [-16, -49]), 15);
   if (navigator.onLine !== false) {
     let ok = false; let erros = 0;
-    const t = L.tileLayer(OSM, { maxZoom: 19, attribution: ATRIB, crossOrigin: true });
+    // O OpenStreetMap exige o Referer (sem ele, devolve o tile "Access blocked"); o site manda no-referrer, então só
+    // os tiles levam a origem (nunca o caminho da página)
+    const t = L.tileLayer(OSM, { maxZoom: 19, attribution: ATRIB, crossOrigin: true, referrerPolicy: "strict-origin-when-cross-origin" });
     t.on("tileload", () => { ok = true; });
     t.on("tileerror", () => { erros += 1; if (!ok && erros >= 3) m.removeLayer(t); });
     t.addTo(m);

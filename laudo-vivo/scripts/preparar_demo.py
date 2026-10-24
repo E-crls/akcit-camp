@@ -76,6 +76,14 @@ GRUPOS = [
         "licenca": "CC BY-SA 4.0 (quadros do vídeo semissintético; ver THIRD_PARTY.md)",
         "atribuicao": "Gpkp (CC BY-SA 4.0) e Marie Nouvellon (CC BY 2.0), via Wikimedia Commons",
     },
+    {
+        "prefixo": "mapa/",
+        "o_que_e": "contorno de Goiás simplificado (1 anel, 727 pontos) para o mapa da carteira sem a malha do IBGE "
+        "(imagem Docker e demo pública)",
+        "origem": "laudo.api.mapa.contorno_go sobre a Malha Municipal de Goiás do IBGE (simplificada a 0,01 grau)",
+        "licenca": "dados públicos do IBGE (uso livre com citação da fonte)",
+        "atribuicao": "IBGE, Malha Municipal",
+    },
 ]
 VIDEO_DEMO = "videos/sinteticos/s03_fila_colada.mp4"  # relativo a dados_locais/ (caso.yaml do DEMO-0001)
 
@@ -110,6 +118,7 @@ def gerar_manifesto() -> int:
         pares.append((p, curto))
     for p in sorted((DESTINO / "cache_contagem").glob("*/*")):  # cache da demo pública (só vídeos do caso)
         pares.append((p, f"contagem/{p.parent.name}/{p.name}"))
+    pares.append((DESTINO / "mapa" / "contorno_go.json", "mapa/contorno_go.json"))  # o mapa da carteira sem o IBGE
     faltam = [str(o) for o, _ in pares if not o.is_file()]
     if faltam or len(pares) < 3:
         print(f"faltam arquivos em dados_locais/ para gerar os ativos: {faltam or 'cache de NDVI'}",
