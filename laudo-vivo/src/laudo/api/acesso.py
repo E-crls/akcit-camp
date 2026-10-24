@@ -18,7 +18,7 @@ from collections import deque
 COOKIE = "lv_acesso"
 ENV = "LAUDO_DEMO_SENHA"
 DURACAO_S = 12 * 3600
-ABERTOS = ("/entrar.html", "/api/entrar", "/api/saude", "/icone.svg", "/favicon.ico")
+ABERTOS = ("/entrar.html", "/api/entrar", "/api/saude", "/api/contato", "/icone.svg", "/favicon.ico")
 PREFIXOS_ABERTOS = ("/site/", "/vendor/fonts/")
 TENTATIVAS, JANELA_S = 20, 600
 

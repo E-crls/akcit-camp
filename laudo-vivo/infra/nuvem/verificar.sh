@@ -38,7 +38,7 @@ SERVICO=$(g run services describe "$NOME" --region "$REG" --format=json)
 TEM_SERVICO=$([ -n "$SERVICO" ] && echo 1 || echo 0)
 conta "serviços do Cloud Run" "$TEM_SERVICO" g run services list --format="value(metadata.name)"
 conta "repositórios do Artifact Registry" 1 g artifacts repositories list --location "$REG" --format="value(name)"
-conta "buckets" 1 g storage buckets list --format="value(name)"
+conta "buckets" 2 g storage buckets list --format="value(name)"
 conta "contas de serviço da demo" 2 bash -c "gcloud --project $PROJ iam service-accounts list --format='value(email)' 2>/dev/null | grep '^$NOME-'"
 conta "métricas de log" 4 bash -c "gcloud --project $PROJ logging metrics list --format='value(name)' 2>/dev/null | grep '^laudo_'"
 conta "painéis" 1 bash -c "curl -s -H 'Authorization: Bearer $TOKEN' https://monitoring.googleapis.com/v1/projects/$PROJ/dashboards | python -c \"import json,sys; [print(d['displayName']) for d in json.load(sys.stdin).get('dashboards',[])]\""
