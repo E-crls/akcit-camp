@@ -783,6 +783,8 @@ def _gravar_contagem(destino: Path, env: Envelope) -> None:
             if origem.is_file():
                 shutil.copyfile(origem, tmp / origem.name)
             q["caminho"] = origem.name
+        if isinstance(d["data"].get("video"), dict):  # o caminho local não vai para o cache (a restauração repõe)
+            d["data"]["video"]["caminho"] = Path(d["data"]["video"].get("caminho") or "").name
         (tmp / "envelope.json").write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
         shutil.rmtree(destino, ignore_errors=True)
         tmp.replace(destino)
