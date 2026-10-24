@@ -34,7 +34,7 @@ from typing import Any
 
 from pydantic import BaseModel, ValidationError
 
-from laudo import privacidade
+from laudo import isolamento, privacidade
 from laudo.agent.estado import evidencia_por_id
 from laudo.agent.indice import argumentos_de_consulta
 from laudo.agent.pii import mascarar
@@ -210,7 +210,9 @@ class ExecutorFerramentas:
 
     def _uma_vez(self, ferr: Ferramenta, entrada, timeout: float) -> Envelope:
         t0 = time.perf_counter()
-        futuro = _POOL.submit(ferr.funcao, entrada)
+        # demo pública: a ferramenta roda na thread do executor com o contexto da cópia do visitante
+        # (laudo.isolamento); no uso normal, `no_contexto` devolve a própria função
+        futuro = _POOL.submit(isolamento.no_contexto(ferr.funcao), entrada)
         try:
             env = futuro.result(timeout=timeout)
         except cf.TimeoutError:

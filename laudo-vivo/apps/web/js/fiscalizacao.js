@@ -168,6 +168,10 @@ function montar() {
 // desalinha tudo o que vem depois. Então, no replay, só passa o que corresponde ao próximo passo do roteiro; o resto
 // ganha um aviso ("use Executar passo").
 function emReplay() { return S?.saude?.llm?.tipo === "replay" && !!S?.estado?.roteiro; }
+// Demonstração pública (QR code): o passo do roteiro sai da gravação e o resto (texto, voz, arquivo do aparelho) vai
+// ao agente; o servidor reconhece a fala e o arquivo do próximo passo. Do aparelho, só foto, vídeo curto e XML.
+function publica() { return !!S?.saude?.config?.demo_publica; }
+const TIPOS_PUBLICOS = ["foto", "video", "nfe_xml"];
 function passoAtual() { const r = S?.estado?.roteiro; return r?.passos?.[r.proximo - 1] || null; }
 function arquivoDoPasso(p) { return p?.evidencia ? (S.estado.roteiro?.arquivos || []).find((a) => a.nome === p.evidencia) || null : null; }
 const norm = (t) => String(t || "").toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/[^a-z0-9]+/g, " ").trim();
@@ -757,12 +761,13 @@ function executarAcao(acao, botao = null) {
   if (acao.startsWith("justificar:")) {
     const campo = acao.slice(11);
     const suf = campo.split(":").pop();
-    // na gravação, a justificativa é a do roteiro (o agente responde à frase gravada): ela vem pronta no campo
-    if (replay) {
+    // na gravação, a justificativa é a do roteiro (o agente responde à frase gravada): ela vem pronta no campo; na
+    // demonstração pública também, quando é o próximo passo (sai da gravação, sem custo); senão, o modelo da frase
+    if (replay || publica()) {
       const doPasso = p && p.acao === "turno" && !p.evidencia && /^confirmo a diverg|justific/i.test(norm(p.fala))
         && (suf !== "quantidade" || /contagem/i.test(p.fala)) && (suf !== "gta" || /gta/i.test(p.fala));
-      if (doPasso) { marcarVista(); escrever(p.fala); } else avisoRoteiro();
-      return;
+      if (doPasso) { marcarVista(); escrever(p.fala); return; }
+      if (replay) { avisoRoteiro(); return; }
     }
     const modelo = suf === "quantidade" ? "Confirmo a divergência na contagem: " : suf === "gta" ? "Confirmo a divergência da GTA: "
       : suf === "localizacao" ? "Justifico a foto fora da área: " : "Confirmo a divergência: ";
@@ -806,6 +811,10 @@ function capturar(d) {
   const arq = doPasso && (COMPATIVEL[d.tipo] || []).includes(doPasso.tipo) ? doPasso : null;
   if (!S.estado.roteiro) { doAparelho(d); return; }
   if (emReplay() && !arq) { avisoRoteiro(); return; }
+  if (publica() && !arq && !TIPOS_PUBLICOS.includes(d.tipo)) {
+    avisar("Na demonstração pública, a foto da nota e a GTA vêm dos arquivos prontos do caso (+ › Arquivo da demonstração).");
+    return;
+  }
   if (!arq) { doAparelho(d); return; }
   marcarVista();
   const corpo = h("div", { class: "texto demo-arquivo" },
@@ -814,8 +823,8 @@ function capturar(d) {
     p.fala ? h("p", { class: "t-sec" }, "Vai junto a mensagem: ", h("q", {}, p.fala)) : null,
     h("div", { class: "acoes-linha" },
       h("button", { class: "btn btn-pri", type: "button", onclick: () => { fecharModal(); proximoPasso(); } }, icone("enviar"), "Enviar este arquivo"),
-      emReplay() ? null : h("button", { class: "btn btn-sec", type: "button", onclick: () => { fecharModal(); doAparelho(d); } },
-        icone(d.tipo === "video" ? "video" : "camera"), "Usar um meu")),
+      emReplay() || (publica() && !TIPOS_PUBLICOS.includes(d.tipo)) ? null : h("button", { class: "btn btn-sec", type: "button",
+        onclick: () => { fecharModal(); doAparelho(d); } }, icone(d.tipo === "video" ? "video" : "camera"), "Usar um meu")),
     emReplay() ? h("p", { class: "t-sec" }, "Esta demonstração roda uma gravação: só o arquivo do roteiro.") : null);
   abrirModal("Arquivo da demonstração", corpo);
 }
@@ -867,16 +876,18 @@ function abrirAnexar(sub = null) {
     h("span", { class: "ic-quadro" }, icone(ic)), h("span", { class: "txt" }, h("strong", {}, rot), apoio ? h("span", {}, apoio) : null), icone("direita"));
   const arq = (acao) => () => { fecharAnexar(); executarArquivo(acao); };
   let corpo;
-  if (sub === "nota") corpo = [linha("Fotografar a nota", "A nota impressa (DANFE)", "camera", arq("fotografar-nota")), linha("Arquivo da NF-e (.xml)", "O arquivo que o vendedor enviou", "arquivo", arq("arquivo-nfe"))];
+  const pub = publica();
+  if (sub === "nota") corpo = [pub ? null : linha("Fotografar a nota", "A nota impressa (DANFE)", "camera", arq("fotografar-nota")), linha("Arquivo da NF-e (.xml)", "O arquivo que o vendedor enviou", "arquivo", arq("arquivo-nfe"))].filter(Boolean);
   else if (sub === "gta") corpo = [linha("Fotografar a guia", "A GTA impressa", "camera", arq("fotografar-gta")), linha("Arquivo da GTA", "O arquivo da guia eletrônica", "arquivo", arq("arquivo-gta"))];
   else if (sub === "demo") {
     corpo = (S.estado.roteiro?.arquivos || []).map((a) => linha(rotuloArquivoDemo(a), a.disponivel === false ? "simulado nesta execução" : null,
       { video: "video", foto: "camera", documento: "nota", nfe_xml: "arquivo", gta: "gta" }[a.tipo] || "arquivo", () => { fecharAnexar(); enviarDoCaso(a.nome, a.tipo); }));
   } else {
+    const maxVideo = S.saude?.demo_publica?.limites?.video_max_s || 20;
     corpo = [linha("Fotografar", "Cerca, obra ou animais", "camera", arq("fotografar-cerca")),
-      linha("Filmar", "O lote passando no corredor", "video", arq("filmar")),
-      linha("Nota fiscal", "Foto da nota ou arquivo da NF-e", "nota", () => abrirAnexar("nota")),
-      linha("GTA", "Foto da guia ou arquivo", "gta", () => abrirAnexar("gta")),
+      linha("Filmar", pub ? `O lote no corredor, até ${maxVideo} s (a contagem leva até ~1 min)` : "O lote passando no corredor", "video", arq("filmar")),
+      linha("Nota fiscal", pub ? "Arquivo da NF-e (.xml)" : "Foto da nota ou arquivo da NF-e", "nota", () => abrirAnexar("nota")),
+      pub ? null : linha("GTA", "Foto da guia ou arquivo", "gta", () => abrirAnexar("gta")),
       S.estado.roteiro?.arquivos?.length ? linha("Arquivo da demonstração", "Usar um arquivo pronto do caso", "info", () => abrirAnexar("demo"), "demo") : null].filter(Boolean);
   }
   const titulo = { nota: "Nota fiscal", gta: "GTA", demo: "Arquivo da demonstração" }[sub] || "Anexar";
@@ -884,7 +895,8 @@ function abrirAnexar(sub = null) {
     h("div", { class: "folha-cab" }, sub ? h("button", { class: "btn-icone", type: "button", "aria-label": "Voltar", onclick: () => abrirAnexar() }, icone("voltar")) : null,
       h("h2", { class: "t-sub" }, titulo), h("button", { class: "btn-icone", type: "button", "aria-label": "Fechar", onclick: () => fecharAnexar(true) }, icone("x"))),
     h("div", { class: "lista-anexo" }, corpo),
-    sub === "demo" ? null : h("p", { class: "gps-linha", id: "gps-linha" }, icone("gps"), h("span", {}, "A localização vai junto com a foto."))].filter(Boolean));
+    sub === "demo" ? null : pub ? h("p", { class: "gps-linha" }, icone("gps"), h("span", {}, "Na demonstração pública, a localização do aparelho não é enviada."))
+      : h("p", { class: "gps-linha", id: "gps-linha" }, icone("gps"), h("span", {}, "A localização vai junto com a foto."))].filter(Boolean));
   alternarFolha(m, true, { foco: m.querySelector(".linha-anexo") });
   S.el.anexar.setAttribute("aria-expanded", "true");
   estadoGps();
@@ -1541,7 +1553,8 @@ async function enviarArquivo(arquivo, tipo, itemId) {
   if (comentario) form.append("texto", comentario);
   if (arquivo.lastModified) form.append("capturada_em", new Date(arquivo.lastModified).toISOString());
   const base = { fala: comentario, evidencia: tipo, nome: arquivo.name };
-  if (tipo === "foto" || tipo === "video") {
+  // demonstração pública: a localização do visitante não sai do aparelho (só os presets do caso têm GPS)
+  if ((tipo === "foto" || tipo === "video") && !publica()) {
     ocupar({ ...base, texto: "Lendo a localização…" });
     const g = await lerGPS();
     if (!S) return;
@@ -1552,7 +1565,10 @@ async function enviarArquivo(arquivo, tipo, itemId) {
   await executar(() => postFormProgresso(`/api/fiscalizacoes/${encodeURIComponent(S.id)}/evidencias`, form, (f) => {
     if (!S) return;
     S.progresso = f;
-    if (f >= 1) { S.ocupadoTexto = STATUS_ENVIO[tipo] || "Conferindo…"; S.progresso = null; }
+    if (f >= 1) {
+      S.ocupadoTexto = publica() && tipo === "video" ? "Contando os animais do vídeo na CPU… pode levar ~1 min" : STATUS_ENVIO[tipo] || "Conferindo…";
+      S.progresso = null;
+    }
     const t = document.querySelector("#pensando .pensando-txt");
     if (t) t.textContent = S.ocupadoTexto;
     const i = document.querySelector("#pensando .barra-envio i");

@@ -33,12 +33,15 @@ function secaoSistema() {
   const asr = saude.asr || {};
   const fer = saude.ferramentas || {};
   const modo = llm.tipo === "replay" ? "Contingência: respostas do modelo reproduzidas de uma gravação real deste caso (replay)"
-    : llm.tipo === "roteiro" ? "Roteiro fixo, sem modelo (testes)" : "Ao vivo";
+    : llm.tipo === "publico" ? "Demonstração pública: cada passo do roteiro sai de uma gravação real deste caso; o texto livre vai ao modelo ao vivo"
+      : llm.tipo === "roteiro" ? "Roteiro fixo, sem modelo (testes)" : "Ao vivo";
+  const vivo = llm.ao_vivo ? `gravação + ${llm.ao_vivo.modelo || llm.ao_vivo.nome} ao vivo` : "gravação; fora dela, as regras e as falas prontas";
   return blocoTec("Sistema",
-    linhaEstado("Modo", modo, llm.tipo === "replay" ? "alerta" : "ok"),
-    linhaEstado("Modelo de linguagem", llm.tipo === "replay" ? "gravação do modelo local" : llm.tipo === "roteiro" ? "sem modelo" : "modelo local, nesta máquina",
-      llm.disponivel ? "ok" : "erro"),
+    linhaEstado("Modo", modo, llm.tipo === "replay" || llm.tipo === "publico" ? "alerta" : "ok"),
+    linhaEstado("Modelo de linguagem", llm.tipo === "replay" ? "gravação do modelo local" : llm.tipo === "publico" ? vivo
+      : llm.tipo === "roteiro" ? "sem modelo" : "modelo local, nesta máquina", llm.disponivel ? "ok" : "erro"),
     llm.tipo === "replay" ? linhaEstado("Fora da gravação", `${llm.substituicoes || 0}`, llm.substituicoes ? "alerta" : "ok") : null,
+    llm.tipo === "publico" ? linhaEstado("Fora da gravação", `${llm.fora_da_gravacao || 0}`, "ok") : null,
     linhaEstado("Voz (transcrição)", !asr.disponivel ? "desligada (digite)" : asr.carregado ? `${asr.dispositivo === "cuda" ? "GPU" : "CPU"} (Whisper)` : "carrega no 1º uso",
       asr.disponivel ? "ok" : ""),
     linhaEstado("Ferramentas", fer.modo || "?", fer.modo === "reais" ? "ok" : "alerta"),
@@ -46,8 +49,16 @@ function secaoSistema() {
     kv([["Versão", saude.versao || "—", "mono"], ["Perfil", saude.config?.perfil || "—"], ["Caso padrão", saude.caso_padrao || "—"]]));
 }
 
+// Demonstração pública (QR code do slide): o caso de demonstração abre direto, cada visitante com a sua cópia
+function publica() { return !!saude?.config?.demo_publica; }
+
 async function carregarSaude() {
   try { saude = await api.saude(); semConexaoAvisado = false; } catch { saude = null; }
+  if (saude) {
+    document.body.classList.toggle("demo-publica", publica());
+    const faixa = document.getElementById("faixa-publica");
+    if (faixa) faixa.hidden = !publica();
+  }
   const ponto = document.getElementById("ponto-tec");
   if (!saude) {
     ponto.className = "ponto-tec erro";
@@ -122,6 +133,7 @@ function telaInicio() {
 
 // ---------------------------------------------------------------- rotas
 function rotaPadrao() {
+  if (publica() && saude.demo_publica?.fis_id) return `#/fis/${encodeURIComponent(saude.demo_publica.fis_id)}`;
   if (apresentacaoLigada() || demoPelaUrl()) return papelEscolhido() && papel() === "fiscal" && ehMovel() ? "#/fiscalizacoes" : "#/carteira";
   return CASA[papel()] || "#/carteira";
 }
@@ -133,7 +145,7 @@ async function rotear() {
   const [tela, id, sub] = caminho.split("/").filter(Boolean);
   limparAnuncios();
   if (!tela) {
-    if (!papelEscolhido() && !demoPelaUrl() && !apresentacaoLigada()) { sairFiscalizacao(); telaInicio(); renderUsuario(); return; }
+    if (!papelEscolhido() && !demoPelaUrl() && !apresentacaoLigada() && !publica()) { sairFiscalizacao(); telaInicio(); renderUsuario(); return; }
     location.replace(rotaPadrao()); return;
   }
   if (tela !== "fis" || sub === "laudo") sairFiscalizacao();

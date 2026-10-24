@@ -19,9 +19,16 @@ from pathlib import Path
 
 
 def main() -> int:
+    from laudo.api import eventos
+
+    # demo pública (LAUDO_DEMO_PUBLICA=1, laudo.api.publica): o padrão do LLM é a cadeia gravação → LLM ao vivo, e a
+    # porta é a do Cloud Run (PORT)
+    publica = eventos.ligado()
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument(
-        "--llm", choices=["roteiro", "ollama", "replay"], default=os.environ.get("LAUDO_LLM", "roteiro")
+        "--llm",
+        choices=["roteiro", "ollama", "replay", "publico"],
+        default=os.environ.get("LAUDO_LLM", "publico" if publica else "roteiro"),
     )
     ap.add_argument(
         "--ferramentas",
@@ -48,7 +55,7 @@ def main() -> int:
     )
     ap.add_argument("--hoje", default=None, help="data de referência AAAA-MM-DD (replay determinístico)")
     ap.add_argument("--host", default="127.0.0.1", help="0.0.0.0 para o celular na mesma rede")
-    ap.add_argument("--porta", type=int, default=8000)
+    ap.add_argument("--porta", type=int, default=int(os.environ.get("PORT") or 8000) if publica else 8000)
     ap.add_argument("--ssl-certfile", default=None, help="HTTPS (o celular só libera microfone/GPS em HTTPS)")
     ap.add_argument("--ssl-keyfile", default=None)
     ap.add_argument(
@@ -66,7 +73,7 @@ def main() -> int:
     a = ap.parse_args()
     # contingência: a leitura da foto do DANFE vem do cache gravado (a mesma foto e o mesmo pedido), sem GPU
     repo = Path(__file__).resolve().parents[3]
-    if a.llm == "replay":
+    if a.llm in ("replay", "publico"):
         os.environ["LAUDO_VLM_CACHE"] = a.vlm_cache or str(
             repo / "tests" / "unit" / "dados_agente" / "vlm_cache_demo"
         )

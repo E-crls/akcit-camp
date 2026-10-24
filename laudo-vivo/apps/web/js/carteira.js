@@ -215,7 +215,8 @@ export async function telaCarteira(raiz, { abrirFis, saude = null }) {
 
   async function abrir(o) {
     try {
-      const est = o.caso_id ? await api.abrirCaso(o.caso_id, true) : await api.abrirRef(o.ref_bacen);
+      // na demonstração pública, voltar à carteira e abrir o caso de novo não apaga o que o visitante já fez
+      const est = o.caso_id ? await api.abrirCaso(o.caso_id, !saude?.config?.demo_publica) : await api.abrirRef(o.ref_bacen);
       abrirFis(est.id);
     } catch (e) { avisar(`Não abri a fiscalização: ${e.message}`, true); }
   }

@@ -1,4 +1,5 @@
-"""ASR local em pt-BR com faster-whisper (modelo `Systran/faster-whisper-large-v3`, já em cache).
+"""ASR local em pt-BR com faster-whisper (modelo `Systran/faster-whisper-large-v3`, já em cache; outro modelo do
+cache por `LAUDO_ASR_MODELO`, como o `medium` da demo pública em CPU).
 
 - **Sem download**: o modelo vem só do cache local do Hugging Face (`local_files_only`); se não houver,
   `ErroASR("MODELO_AUSENTE")` (a interface cai para texto digitado).
@@ -34,6 +35,8 @@ log = logging.getLogger(__name__)
 os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 MODELO_PADRAO = "Systran/faster-whisper-large-v3"
+# Outro modelo do cache local (ex.: "Systran/faster-whisper-medium" na demo pública em CPU, Dockerfile.publico)
+ENV_MODELO = "LAUDO_ASR_MODELO"
 TAXA = 16000
 PROMPT_DOMINIO = (
     "Fiscalização de crédito rural em Goiás. Contei 42 cabeças no curral: garrotes, novilhas, bezerros. "
@@ -81,6 +84,11 @@ class Transcricao(BaseModel):
     dispositivo: str = ""
     compute_type: str = ""
     segmentos: list[Segmento] = Field(default_factory=list)
+
+
+def modelo_configurado() -> str:
+    """Modelo do Whisper: `LAUDO_ASR_MODELO` (id do Hugging Face ou pasta com model.bin) ou o large-v3."""
+    return (os.environ.get(ENV_MODELO) or "").strip() or MODELO_PADRAO
 
 
 def localizar_modelo(repo_id: str = MODELO_PADRAO) -> Path:
@@ -177,7 +185,7 @@ class TranscritorWhisper:
 
     def __init__(
         self,
-        modelo: str = MODELO_PADRAO,
+        modelo: str | None = None,  # None: `LAUDO_ASR_MODELO` ou o large-v3 (modelo_configurado)
         dispositivo: str = "auto",  # auto | cuda | cpu
         compute_type: str | None = None,
         idioma: str = "pt",
@@ -186,7 +194,7 @@ class TranscritorWhisper:
         cpu_threads: int = 4,
         vad: bool = True,
     ):
-        self.modelo_id = modelo
+        self.modelo_id = modelo or modelo_configurado()
         self.dispositivo_pedido = dispositivo
         self.compute_type_pedido = compute_type
         self.idioma = idioma

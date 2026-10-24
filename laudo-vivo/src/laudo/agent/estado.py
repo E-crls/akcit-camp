@@ -19,6 +19,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from laudo import isolamento
 from laudo.agent.pii import mascarar_obj
 from laudo.audit import hashchain
 from laudo.contracts import (
@@ -43,17 +44,26 @@ _LISTAS_APPEND_ONLY = ("evidencias", "checagens", "alegacoes", "ocorrencias", "a
 _IDS: dict[str, Any] = {"semente": None, "n": 0}
 
 
+def _ids() -> dict[str, Any]:
+    """Contador de ids em uso: o da cópia do visitante na demo pública (`laudo.isolamento`), senão o do
+    processo."""
+    ctx = isolamento.atual()
+    return ctx.ids if ctx is not None else _IDS
+
+
 def ids_deterministicos(semente: str | None) -> None:
     """Liga (semente) ou desliga (None) ids reprodutíveis para evidências, checagens, ocorrências e alegações.
     Usado no replay da demo e em testes; em produção os ids são aleatórios."""
-    _IDS["semente"], _IDS["n"] = semente, 0
+    ids = _ids()
+    ids["semente"], ids["n"] = semente, 0
 
 
 def novo_id(prefixo: str) -> str:
-    if _IDS["semente"] is None:
+    ids = _ids()
+    if ids["semente"] is None:
         return f"{prefixo}_{uuid.uuid4().hex[:10]}"
-    _IDS["n"] += 1
-    return f"{prefixo}_{sha256_bytes(f'{_IDS["semente"]}:{_IDS["n"]}'.encode())[:10]}"
+    ids["n"] += 1
+    return f"{prefixo}_{sha256_bytes(f'{ids["semente"]}:{ids["n"]}'.encode())[:10]}"
 
 
 def diretorio_dados() -> Path:

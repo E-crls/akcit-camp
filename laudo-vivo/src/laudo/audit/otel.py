@@ -36,6 +36,7 @@ from opentelemetry.sdk.trace import ReadableSpan, SpanProcessor, TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter, SpanExportResult
 from opentelemetry.trace import Span, Status, StatusCode
 
+from laudo import isolamento
 from laudo.agent.pii import mascarar_obj
 from laudo.contracts import hash_entrada
 
@@ -121,13 +122,18 @@ class ExportadorJSONL(SpanExporter):
         self.diretorio.mkdir(parents=True, exist_ok=True)
 
     def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:
+        # demo pública: o span vai para a pasta da cópia do visitante (laudo.isolamento), não a do processo
+        ctx = isolamento.atual()
+        diretorio = ctx.traces if ctx is not None else self.diretorio
         try:
             with _lock:
+                if ctx is not None:
+                    diretorio.mkdir(parents=True, exist_ok=True)
                 for s in spans:
                     d = mascarar_span(span_para_dict(s))
                     fis = d["attributes"].get("laudo.fiscalizacao_id") or "geral"
                     nome = "".join(c for c in str(fis) if c.isalnum() or c in "_-") or "geral"
-                    with open(self.diretorio / f"{nome}.jsonl", "a", encoding="utf-8") as f:
+                    with open(diretorio / f"{nome}.jsonl", "a", encoding="utf-8") as f:
                         f.write(json.dumps(d, ensure_ascii=False, default=str) + "\n")
             return SpanExportResult.SUCCESS
         except OSError:
@@ -177,6 +183,9 @@ def tracer():
 
 
 def diretorio_traces() -> Path:
+    ctx = isolamento.atual()
+    if ctx is not None:  # demo pública: a pasta da cópia do visitante
+        return ctx.traces
     if _estado["diretorio"] is None:
         configurar()
     return _estado["diretorio"]
