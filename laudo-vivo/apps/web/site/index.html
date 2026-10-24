@@ -65,6 +65,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 :focus-visible { outline: 2px solid var(--tinta); outline-offset: 3px; border-radius: 4px; }
 .ic { width: 1em; height: 1em; flex: none; fill: currentColor; }
 .envolve { max-width: var(--larg); margin: 0 auto; padding: 0 var(--gut); }
+.nw { white-space: nowrap; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 .pular { position: absolute; left: -9999px; top: 0; }
 .pular:focus { left: 1rem; top: .75rem; z-index: 20; background: var(--acao); color: var(--sobre-acao); padding: .5rem 1rem; border-radius: var(--r-s); }
@@ -103,7 +104,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .pg.palco { background: var(--cal); }
 @media (min-width: 900px) and (min-height: 700px) {
   html { scroll-snap-type: y mandatory; }
-  .pg { min-height: calc(100svh - var(--topo-h)); display: flex; flex-direction: column; justify-content: center; padding: 2.25rem 0; scroll-snap-stop: always; }
+  .pg { min-height: calc(100svh - var(--topo-h)); display: flex; flex-direction: column; justify-content: center; padding: clamp(1rem, 3.5vh, 2.25rem) 0; scroll-snap-stop: always; }
   .pg.alta { scroll-snap-stop: normal; justify-content: flex-start; }
 }
 /* entrada de cada parte: fade e deslize de 24 px, com escalonamento curto entre os filhos (sem movimento, nada some) */
@@ -380,7 +381,7 @@ h1 { font-family: var(--f-titulo); font-weight: 700; font-size: 3.25rem; line-he
 .aba:focus-visible { outline-offset: -2px; border-radius: var(--r); }
 .paineis { margin-top: 1.75rem; }
 @media (min-width: 1181px) and (min-height: 700px) {
-  .pg.palco { padding: 1.5rem 0; }
+  .pg.palco { padding: clamp(.75rem, 2.5vh, 1.5rem) 0; }
   .etapas { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 2.5rem; align-items: end; }
   .etapas > .cab { margin-bottom: 1.25rem; }
   .etapas > .cab h2 { font-size: 1.875rem; }
@@ -421,6 +422,38 @@ code { font-family: var(--f-titulo); font-weight: 600; font-size: .8rem; color: 
   padding: .05rem .35rem; overflow-wrap: anywhere; }
 .ep-tela { min-width: 0; }
 .ep-tela .legenda { margin-top: .6rem; }
+
+/* tela baixa do computador (1366x768, 1280x720): o "Como funciona" se compacta para caber numa tela só. Sai a linha de
+   apoio (os papéis dizem o mesmo) e o título repetido da etapa (a aba já diz); a recriação fica um pouco menor. */
+@media (min-width: 1181px) and (min-height: 700px) and (max-height: 899px) {
+  .etapas > .cab { margin-bottom: .85rem; }
+  .etapas > .cab .sub { display: none; }
+  .etapas > .cab h2 { font-size: 1.75rem; }
+  .etapas > .papeis { gap: .25rem; margin-bottom: .85rem; }
+  .etapas > .papeis li { padding-block: .1rem; font-size: .875rem; }
+  .etapas > .papeis .tag { padding-block: .05rem; font-size: .85rem; }
+  .aba { padding: .4rem .8rem .65rem; }
+  .aba .n { width: 1.75rem; height: 1.75rem; font-size: .95rem; }
+  .palco .foto-grid .mapa { max-height: 9.5em; }
+  .paineis { margin-top: .7rem; }
+  .palco .app { --a: 11px; }
+  .ep-texto h3 { display: none; }
+  .decide { margin-top: .9rem; }
+  .decide li { padding: .5rem 1rem; }
+  .decide li.g { padding-top: .8rem; }
+  .decide li p { font-size: .9rem; margin-top: .2rem; }
+  .ep-tela .legenda { margin-top: .4rem; }
+}
+@media (min-width: 1181px) and (min-height: 700px) and (max-height: 759px) {
+  .palco .app { --a: 10.25px; }
+  .palco .foto-grid .mapa { max-height: 8.5em; }
+  .decide li p { font-size: .875rem; line-height: 1.4; }
+  .ep-texto > p { font-size: .95rem; line-height: 1.45; }
+  .decide { margin-top: .7rem; }
+  .decide summary { padding: .55rem 1rem; }
+  .decide li { padding: .4rem .9rem; }
+  .decide li.g { padding-top: .7rem; }
+}
 
 /* ---------- resultados */
 .res-grade { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
@@ -691,12 +724,12 @@ code { font-family: var(--f-titulo); font-weight: 600; font-size: .8rem; color: 
     <div>
       <span class="chip"><span class="ponto" aria-hidden="true"></span>Fiscalização do crédito rural · MCR 2-7 · Res. CMN 5.267</span>
       <h1 id="t-heroi">O agente que confere a fiscalização do crédito rural.</h1>
-      <p class="lead">Recebe a prova de onde ela vier, aplica o MCR 2-7 item a item, diz “inconclusivo” quando falta prova e pede à fiscal só o que falta. <b>Só a fiscal assina.</b></p>
+      <p class="lead">Recebe a prova de onde ela vier, aplica o <span class="nw">MCR 2-7</span> item a item, diz “inconclusivo” quando falta prova e pede à fiscal só o que falta. <b>Só a fiscal assina.</b></p>
       <div class="acoes">
         <a class="btn btn-pri" href="/guiado/">Testar a demo<svg class="ic" aria-hidden="true"><use href="#i-seta"/></svg></a>
         <a class="link-sec" href="https://github.com/E-crls/akcit-camp"><svg class="ic" aria-hidden="true"><use href="#i-codigo"/></svg>Código e relatórios</a>
       </div>
-      <p class="senha"><svg class="ic" aria-hidden="true"><use href="#i-cadeado"/></svg><span>A demo pede uma senha: <b>a senha está na apresentação.</b> Dados sintéticos e fiscal fictícia; abre no celular.</span></p>
+      <p class="senha"><svg class="ic" aria-hidden="true"><use href="#i-cadeado"/></svg><span>A demo pede uma senha: <b>a senha está na apresentação.</b> Abre no celular.</span></p>
     </div>
 
     <figure>
@@ -787,7 +820,7 @@ code { font-family: var(--f-titulo); font-weight: 600; font-size: .8rem; color: 
     <div class="cab">
       <p class="olho">Onde entra</p>
       <h2 id="t-compl">Gerar evidência já tem quem faça. Falta quem confira.</h2>
-      <p class="sub">Falta conferir a prova contra o que foi financiado, item por item do MCR 2-7, e entregar um laudo que a auditoria consiga refazer.</p>
+      <p class="sub">Falta conferir a prova contra o que foi financiado, item por item do <span class="nw">MCR 2-7</span>, e entregar um laudo que a auditoria consiga refazer.</p>
     </div>
     <div class="ev-grade escalona">
       <article class="ev ev-gera" aria-labelledby="t-gera">
@@ -798,7 +831,7 @@ code { font-family: var(--f-titulo); font-weight: 600; font-size: .8rem; color: 
           <li><span class="ico-ev" aria-hidden="true"><svg class="ic"><use href="#i-drone"/></svg></span>Drone</li>
           <li><span class="ico-ev" aria-hidden="true"><svg class="ic"><use href="#i-nota"/></svg></span>Leitura de nota</li>
         </ul>
-        <p class="ev-pe">Tudo isso gera prova. Nenhum deles confere a prova contra o item financiado.</p>
+        <p class="ev-pe">Tudo isso gera prova. Falta saber se ela confere com o que foi financiado.</p>
       </article>
       <div class="ev-liga" aria-hidden="true">
         <svg class="h" viewBox="0 0 60 12" preserveAspectRatio="none"><path d="M0 6H54" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M52 1l6 5-6 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
@@ -810,7 +843,7 @@ code { font-family: var(--f-titulo); font-weight: 600; font-size: .8rem; color: 
         <ul>
           <li><svg class="ic" aria-hidden="true"><use href="#i-ok"/></svg><span><b>Animal × nota × GTA × item financiado</b><small>A contagem, a nota e a GTA batendo entre si e com o que foi financiado.</small></span></li>
           <li><svg class="ic" aria-hidden="true"><use href="#i-ok"/></svg><span><b>“Inconclusivo” quando falta prova</b><small>E pede à fiscal só o que falta, na hora da visita.</small></span></li>
-          <li><svg class="ic" aria-hidden="true"><use href="#i-ok"/></svg><span><b>Laudo que a auditoria refaz</b><small>Cada status aponta a prova e o item do MCR 2-7. Só a fiscal assina.</small></span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-ok"/></svg><span><b>Laudo que a auditoria refaz</b><small>Cada status aponta a prova e o item do <span class="nw">MCR 2-7</span>. Só a fiscal assina.</small></span></li>
         </ul>
         <p class="ev-pe">Na demo, a prova chega pela própria visita guiada.</p>
       </article>
@@ -1102,7 +1135,7 @@ code { font-family: var(--f-titulo); font-weight: 600; font-size: .8rem; color: 
       <div class="mod-cab">
         <p class="olho">Modelo de negócio</p>
         <h2 id="t-modelo">A cooperativa paga por fiscalização concluída.</h2>
-        <p class="sub">Nunca pelo resultado do laudo e nunca pelo mutuário da operação. Preços-alvo do plano de negócio, ainda não testados com cliente.</p>
+        <p class="sub">Nunca pelo resultado do laudo e nunca pelo mutuário da operação.</p>
       </div>
       <div class="precos">
         <div class="preco dest"><span>Avulsa</span><p class="vl-p"><b>R$ 79</b><small>preço-alvo</small></p><small>por fiscalização</small></div>
@@ -1130,7 +1163,7 @@ code { font-family: var(--f-titulo); font-weight: 600; font-size: .8rem; color: 
             <div class="agora empilha"><span class="rotulo">AGORA</span><div><p class="h">Refaça a foto de dentro da área</p></div><div class="bts"><span class="bt bt-pri"><svg class="ic"><use href="#i-cam"/></svg>Refazer foto</span></div></div>
           </div>
         </div>
-        <figcaption><b>Recriação da demo no celular</b><p>O caso é uma operação fictícia: 29 vacas leiteiras e 1.200 m de cerca em Petrolina de Goiás, com vídeo, fotos, nota, GTA e falas sintéticos. A fiscal Ana também é fictícia.</p></figcaption>
+        <figcaption><b>Recriação da demo no celular</b><p>Operação fictícia: 29 vacas leiteiras e 1.200 m de cerca em Petrolina de Goiás. Vídeo, fotos, nota, GTA, falas e a fiscal Ana são sintéticos.</p></figcaption>
       </figure>
     </article>
   </div>
@@ -1352,14 +1385,19 @@ code { font-family: var(--f-titulo); font-weight: 600; font-size: .8rem; color: 
     ultimaRoda = Date.now();
     var h = topo.offsetHeight, y = window.pageYOffset, i = 0;
     partes.forEach(function (s, k) { if (s.offsetTop - h <= y + 2) i = k; });
-    var r = partes[i].getBoundingClientRect(), desce = e.deltaY > 0;
+    /* numa parte alta, a roda rola por dentro até o conteúdo acabar (o respiro de cima e de baixo não conta) */
+    var env = partes[i].querySelector(".envolve") || partes[i];
+    var r = env.getBoundingClientRect(), desce = e.deltaY > 0;
     if (partes[i].classList.contains("alta") && (desce ? r.bottom > window.innerHeight + 2 : r.top < h - 2)) return;
     e.preventDefault();
     if (travado || Math.abs(e.deltaY) < 2) return;
     var alvo = i + (desce ? 1 : -1);
     if (alvo < 0 || alvo >= partes.length) return;
     travado = true;
-    window.scrollTo({ top: partes[alvo].offsetTop - h, behavior: calmo ? "auto" : "smooth" });
+    var s = partes[alvo], topoAlvo = s.offsetTop - h;
+    /* subindo para uma parte alta, chega-se ao fim dela, de onde se veio */
+    if (!desce && s.classList.contains("alta")) topoAlvo = Math.max(topoAlvo, s.offsetTop + s.offsetHeight - window.innerHeight);
+    window.scrollTo({ top: topoAlvo, behavior: calmo ? "auto" : "smooth" });
     setTimeout(destravar, 650);
   }, { passive: false });
   var espera = null;
