@@ -52,7 +52,7 @@ export async function telaCarteira(raiz, { abrirFis, saude = null }) {
     tela.classList.toggle("mapa-aberto", S.mapaAberto);
     btnMapa.setAttribute("aria-expanded", S.mapaAberto ? "true" : "false");
     btnMapa.lastChild.textContent = S.mapaAberto ? "Esconder o mapa" : "Ver no mapa";
-    setTimeout(() => { mapa?.invalidateSize(); posicionarBalao(); }, 60);
+    setTimeout(() => { mapa?.invalidateSize(); if (S.mapaAberto && !S.enquadrado) desenhar(); posicionarBalao(); }, 60);
   }
 
   // ---------------------------------------------------------------- dados
@@ -242,7 +242,9 @@ export async function telaCarteira(raiz, { abrirFis, saude = null }) {
       S.marcadores.set(o.chave, mk);
       limites.push([o.lat, o.lon]);
     }
-    if (enquadrar && limites.length && !S.enquadrado) {
+    // enquadra só com o mapa à vista: no celular ele nasce escondido (0 px) e o fitBounds ia ao zoom máximo, num canto
+    // vazio; o "Ver no mapa" enquadra quando abre
+    if (enquadrar && limites.length && !S.enquadrado && mapa.getSize().x > 0) {
       mapa.fitBounds(L.latLngBounds(limites).pad(0.08), { paddingTopLeft: [10, 10], paddingBottomRight: [ehMovel() ? 10 : 380, 60] });
       S.enquadrado = true;
     }
