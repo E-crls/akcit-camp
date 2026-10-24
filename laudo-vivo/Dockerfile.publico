@@ -16,11 +16,14 @@
 #   até ~1 min) e o XML da NF-e.
 # - Voz ao vivo na CPU: faster-whisper int8, 4 threads, com o modelo baixado no build (ASR_MODELO). Medido em
 #   24/10/2026 num Ryzen 9 9950X3D (4 threads, beam 1, VAD), 6 s de fala pt-BR: small 0,93 s, medium 2,56 s; nesta
-#   imagem, com `docker run --cpus 4`, o medium levou 1,9 a 2,0 s (o critério era < 4 s; nas vCPUs do Cloud Run
-#   espere até ~2x isso). Padrão: medium; `--build-arg ASR_MODELO=Systran/faster-whisper-small` deixa a fala ~2,7x
-#   mais rápida e a imagem ~1 GB menor.
+#   imagem, com `docker run --cpus 4`, o medium levou 1,9 a 2,0 s. No Cloud Run (4 vCPU) o medium levou 5,6 s por
+#   fala, e o transcritor atende uma fala por vez: com a plateia falando junto, a fila cresce. Padrão: small. Nas 16
+#   falas sintéticas do caso UFG-EVZ-0001 (beam 1, VAD, prompt de domínio), WER médio 0,153 no small e 0,139 no
+#   medium (quase tudo é "sete" x "7"), com o small 2,8x mais rápido; `--build-arg
+#   ASR_MODELO=Systran/faster-whisper-medium` volta ao medium.
 # - Porta pela variável PORT do Cloud Run (padrão 8080); saúde em /api/saude; sem rota de administração (documentação
-#   da API e aquecimento desligados), sem CORS, POST de outro site recusado.
+#   da API e aquecimento desligados), sem CORS, POST de outro site recusado; o roteiro interno e os testes de aceite
+#   da interface (apps/web/ROTEIRO_DEMO.md, apps/web/aceite) não vão para a imagem.
 FROM mambaorg/micromamba:2.9.0-debian12-slim
 
 # ativa o ambiente base nos RUN abaixo (convenção da imagem mambaorg/micromamba)
@@ -55,7 +58,7 @@ ENV PYTHONPATH=/app/src \
     HF_HOME=/app/modelos/hf
 
 # Whisper no cache do Hugging Face da imagem (o código só lê do cache: laudo.speech.asr.localizar_modelo)
-ARG ASR_MODELO=Systran/faster-whisper-medium
+ARG ASR_MODELO=Systran/faster-whisper-small
 RUN python -c "import sys; from huggingface_hub import snapshot_download as s; print(s(sys.argv[1]))" "$ASR_MODELO"
 
 COPY --chown=$MAMBA_USER:$MAMBA_USER . /app
@@ -64,7 +67,8 @@ COPY --chown=$MAMBA_USER:$MAMBA_USER . /app
 # criado nesse ensaio sai da imagem: cada instância cria o seu na subida.
 RUN python scripts/preparar_demo.py \
     && python -m laudo.api.publica --preparar \
-    && rm -rf dados_locais/config dados_locais/api /tmp/laudo-demo-*
+    && rm -rf dados_locais/config dados_locais/api /tmp/laudo-demo-* \
+    && rm -rf apps/web/ROTEIRO_DEMO.md apps/web/aceite
 
 # TZ: os horários do laudo (abertura, rascunho, assinatura, selo) no fuso da demo, não em UTC
 ENV LAUDO_DEMO_PUBLICA=1 \
@@ -72,6 +76,7 @@ ENV LAUDO_DEMO_PUBLICA=1 \
     HF_HUB_OFFLINE=1 \
     LAUDO_DEMO_DIR=/tmp/laudo-demo-publica \
     TZ=America/Sao_Paulo \
+    LAUDO_ASR_ESPERA_S=20 \
     PORT=8080
 
 EXPOSE 8080
