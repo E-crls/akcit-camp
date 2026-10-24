@@ -183,13 +183,23 @@ def provedor_livre(cfg: Config) -> Any | None:
 
     classe = getattr(provider, "VertexProvider", None)
     if classe is None:
-        log.warning("LLM ao vivo: VertexProvider ausente neste ramo; fora da gravação, plano mínimo e template")
+        _avisar_uma_vez("LLM ao vivo: VertexProvider ausente neste ramo; fora da gravação, plano mínimo e template")
         return None
     try:
         return classe()
     except Exception as e:  # noqa: BLE001 - sem credencial, a demo segue pela gravação e pelo template
-        log.warning("LLM ao vivo indisponível (%s: %s)", type(e).__name__, e)
+        _avisar_uma_vez(f"LLM ao vivo indisponível ({type(e).__name__}: {e})")
         return None
+
+
+_AVISADOS: set[str] = set()
+
+
+def _avisar_uma_vez(msg: str) -> None:
+    """Na demo pública cada visitante monta o seu provedor: o mesmo aviso vai ao log uma vez só."""
+    if msg not in _AVISADOS:
+        _AVISADOS.add(msg)
+        log.warning("%s", msg)
 
 
 class ErroServico(Exception):

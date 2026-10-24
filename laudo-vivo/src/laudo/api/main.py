@@ -281,8 +281,10 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
             resp = await call_next(request)
             if novo:
                 https = request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https"
-                resp.set_cookie(publica_mod.COOKIE, novo, max_age=int(ger.limites.ttl_s), httponly=True,
-                                samesite="lax", secure=https, path="/")
+                # o cookie dura mais que a cópia: quem usa por mais de 2 h seguidas não perde a dele (a cópia só
+                # some depois de 2 h parada)
+                resp.set_cookie(publica_mod.COOKIE, novo, max_age=24 * 3600, httponly=True, samesite="lax",
+                                secure=https, path="/")
             resp.headers.setdefault("X-Frame-Options", "DENY")
             return resp
 

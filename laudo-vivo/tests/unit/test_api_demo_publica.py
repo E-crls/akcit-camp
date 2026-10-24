@@ -271,6 +271,35 @@ def test_upload_so_foto_video_curto_e_xml_com_teto(publico, tmp_path):
     assert not any(p.name == "_entrada" and any(p.iterdir()) for p in (tmp_path / "copias").rglob("_entrada"))
 
 
+def _video(caminho: Path, segundos: int) -> Path | None:
+    cv2 = pytest.importorskip("cv2")
+    import numpy as np
+
+    w = cv2.VideoWriter(str(caminho), cv2.VideoWriter_fourcc(*"mp4v"), 2, (64, 48))
+    if not w.isOpened():
+        return None
+    for i in range(segundos * 2):
+        w.write(np.full((48, 64, 3), (i * 7) % 255, dtype=np.uint8))
+    w.release()
+    return caminho if caminho.is_file() and caminho.stat().st_size else None
+
+
+def test_video_do_aparelho_com_teto_de_duracao(publico, tmp_path):
+    longo, curto = _video(tmp_path / "longo.mp4", 25), _video(tmp_path / "curto.mp4", 4)
+    if longo is None or curto is None:
+        pytest.skip("OpenCV sem codificador mp4v")
+    assert 24 <= (publica.duracao_video(longo) or 0) <= 26 and 3 <= (publica.duracao_video(curto) or 0) <= 5
+    assert publica.duracao_video(tmp_path / "nao_existe.mp4") is None
+    _, visitante = publico()
+    c = visitante()
+    url = f"/api/fiscalizacoes/{FIS}/evidencias"
+    r = c.post(url, data={"tipo": "video"}, files={"arquivo": ("longo.mp4", longo.read_bytes())})
+    assert r.status_code == 413 and "20 s" in r.json()["erro"]
+    r = c.post(url, data={"tipo": "video"}, files={"arquivo": ("curto.mp4", curto.read_bytes())})
+    assert r.status_code == 200, r.text
+    assert any(e["tipo"] == "video" for e in r.json()["estado"]["evidencias"])
+
+
 def test_post_de_outro_site_e_recusado(publico):
     _, visitante = publico()
     c = visitante()

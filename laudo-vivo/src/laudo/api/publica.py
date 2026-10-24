@@ -656,6 +656,7 @@ class GerenciadorSessoes:
         sid = self.sid_de(token or "")
         while True:
             velhas: list[Sessao] = []
+            cheio = dono = False
             with self.lock:
                 s = self.sessoes.get(sid)
                 if s is not None:
@@ -666,16 +667,17 @@ class GerenciadorSessoes:
                 espera = self._criando.get(sid)
                 if espera is None:
                     velhas = self._expiradas()
-                    if len(self.sessoes) + len(self._criando) >= self.limites.max_sessoes:
-                        self._apagar(velhas)
-                        raise ErroLimite("sessoes", "Limite da demonstração: muita gente usando agora. Tente de novo "
-                                         "em alguns minutos.", sessao=sid[:10], vivas=len(self.sessoes))
-                    espera = self._criando[sid] = threading.Event()
-                    dono = True
-                else:
-                    dono = False
-            self._apagar(velhas)
+                    vivas = len(self.sessoes) + len(self._criando)
+                    cheio = vivas >= self.limites.max_sessoes
+                    if not cheio:
+                        espera = self._criando[sid] = threading.Event()
+                        dono = True
+            self._apagar(velhas)  # fora da trava do mapa: espera o turno em andamento da cópia vencida
+            if cheio:
+                raise ErroLimite("sessoes", "Limite da demonstração: muita gente usando agora. Tente de novo em "
+                                 "alguns minutos.", sessao=sid[:10], vivas=vivas)
             if not dono:
+                assert espera is not None
                 espera.wait(60)
                 continue
             nova: Sessao | None = None

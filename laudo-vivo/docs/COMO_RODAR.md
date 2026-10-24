@@ -232,7 +232,70 @@ primeira instalação demora mais.
 | `caso 'X' não encontrado (procurei em …)` com um caso fora do repositório | confira `LAUDO_CASOS_DIR` ou `--casos-dir` (caminho relativo a `laudo-vivo/`; separador `;` no Windows) e o `id` do `caso.yaml`. Outros sintomas de caso novo (GPS da foto, duplicata, replay) estão na [seção 8 do guia](TESTAR_COM_DADOS_NOVOS.md#8-problemas-comuns) |
 | "foto sem localização: o aparelho não mandou o GPS e a foto não tem GPS no EXIF…" | tire a foto pela página, com a localização do aparelho ligada, ou envie o arquivo original da câmera, com GPS |
 
-## 9. Mais
+## 9. Demonstração pública (QR code)
+
+Para a plateia usar sozinha (o QR code do slide leva ao app), a mesma interface roda com `LAUDO_DEMO_PUBLICA=1`, na
+imagem do [`Dockerfile.publico`](../Dockerfile.publico): só CPU, porta pela variável `PORT` (padrão 8080, a do Cloud
+Run), saúde em `/api/saude`. Sem a variável, nada muda (o código fica em
+[`src/laudo/api/publica.py`](../src/laudo/api/publica.py)).
+
+```bash
+docker build -f Dockerfile.publico -t laudo-vivo:publico .     # o build roda o roteiro inteiro e confere a gravação
+docker run --rm -p 127.0.0.1:8080:8080 laudo-vivo:publico      # http://127.0.0.1:8080
+# rede que bloqueia files.pythonhosted.org: --build-arg PIP_INDEX_URL=<espelho do PyPI> (o sha256 segue conferido)
+```
+
+- **Uma cópia por visitante.** O visitante é um cookie aleatório (`lv_sessao`, HttpOnly, SameSite=Lax, Secure em
+  HTTPS). Cada um ganha a sua cópia da fiscalização do `DEMO-0001`, já aberta no passo 1, numa pasta do disco temporário
+  da instância (`LAUDO_DEMO_DIR`, na imagem `/tmp/laudo-demo-publica`). O id da fiscalização é o mesmo em todas as
+  cópias (`fis_demo_0001`): ele entra no estado, e a chave do replay depende do histórico e dos ids, então a
+  gravação casa em todas. O contador de ids, a pasta dos traces e o contexto da ferramenta de laudo ficam por cópia
+  ([`src/laudo/isolamento.py`](../src/laudo/isolamento.py)), e as cópias rodam em paralelo sem se misturar.
+- **Pronto para usar.** O caso abre direto, com a barra "Controle da demonstração" ("Executar passo"), os arquivos
+  do caso em "+" › "Arquivo da demonstração", o PIN de demonstração (**2410**) escrito na tela da assinatura e o aviso
+  "Demonstração · dados sintéticos" fixo no topo de todas as telas.
+- **Gravação e LLM ao vivo** (`--llm publico`, o padrão com a variável). O passo do roteiro sai da gravação do
+  `qwen3.5:4b`, sem custo. O que não está nela (texto livre e voz) vai ao LLM ao vivo (`LAUDO_LLM_LIVRE`: `vertex`, o
+  padrão, com o Gemini no Vertex AI; `roteiro`, resposta fixa para teste; `nenhum`); sem ele, ao plano mínimo e às
+  falas por template, sem erro. O texto (ou a fala) igual ao do próximo passo e o arquivo pronto do próximo passo
+  viram o passo. A mensagem livre usa ids próprios e sai do histórico que o passo gravado manda ao modelo: os passos
+  seguintes continuam saindo da gravação.
+- **Presets.** Vídeo, satélite, GPS e leitura do DANFE são os do caso, com o resultado em cache; a contagem do vídeo
+  do caso é feita no build. Do aparelho entram só foto (JPEG, PNG ou WebP, até 10 MB), vídeo (MP4, MOV ou WebM, até
+  20 s e 30 MB; o YOLOX roda na CPU e leva até ~1 min) e o XML da NF-e (até 2 MB), conferidos pelo conteúdo do
+  arquivo. A foto da nota e a da GTA precisariam do modelo de visão e não entram. A localização do aparelho não é
+  enviada.
+- **Voz na CPU.** faster-whisper int8, 4 threads, beam 1, com o modelo baixado no build (`ASR_MODELO`, que vira
+  `LAUDO_ASR_MODELO`). Em 24/10/2026, num Ryzen 9 9950X3D com 4 threads, 6 s de fala pt-BR: `small` 0,93 s e
+  `medium` 2,56 s; na imagem, com `docker run --cpus 4`, o `medium` levou de 1,9 a 2,0 s. O critério era menos de
+  4 s, e o padrão é o `medium`. Nas vCPUs do Cloud Run, espere até ~2x isso. `--build-arg ASR_MODELO=Systran/faster-whisper-small` deixa a fala ~2,7x mais rápida e a imagem ~1 GB menor.
+- **Sem administração e sem CORS.** Sem `/api/docs`, `/api/openapi.json` e as rotas de aquecimento (o Whisper carrega
+  na subida). Só o caso de demonstração abre, e operação real do Sicor não abre. Não há cabeçalho CORS, POST com
+  `Origin` de outro site volta 403, e a página manda `X-Frame-Options: DENY`.
+
+| Limite (variável) | Padrão | Ao estourar |
+|---|---|---|
+| cópias vivas por instância (`LAUDO_DEMO_MAX_SESSOES`) | 300 | 429 "muita gente usando agora" |
+| cópia parada some depois de (`LAUDO_DEMO_TTL_MIN`) | 120 min | a próxima visita recomeça do passo 1 |
+| mensagens livres por visitante (`LAUDO_DEMO_MAX_TURNOS`; "Executar passo" não conta) | 40 | 429 |
+| falas pelo microfone por visitante (`LAUDO_DEMO_MAX_FALAS`) | 25 | 429 |
+| arquivos do aparelho por visitante (`LAUDO_DEMO_MAX_UPLOADS`) e soma (`LAUDO_DEMO_UPLOAD_TOTAL_MB`) | 12 e 60 MB | 429 |
+| foto, vídeo, XML (`LAUDO_DEMO_FOTO_MB`, `LAUDO_DEMO_VIDEO_MB`, `LAUDO_DEMO_XML_MB`) | 10, 30 e 2 MB | 413 |
+| duração do vídeo (`LAUDO_DEMO_VIDEO_MAX_S`) e da fala (`LAUDO_DEMO_AUDIO_MAX_S`, `LAUDO_DEMO_AUDIO_MB`) | 20 s; 30 s e 3 MB | 413 |
+
+Observabilidade: com a variável, o servidor escreve uma linha JSON por evento no stdout (o Cloud Logging transforma
+em registro estruturado), com `severity`, `laudo_evento` e `sessao` (hash curto do visitante, nunca o cookie):
+`sessao_nova`, `turno` (`canal` texto, voz, arquivo ou passo; `fora_da_gravacao`), `asr` (`audio_s`, `latencia_ms`),
+`upload` (`tipo`, `mb`), `assinatura`, `selo`, `recusa_limite` (`limite`) e `erro` (`codigo`)
+([`src/laudo/api/eventos.py`](../src/laudo/api/eventos.py)).
+
+Cuidados: as cópias ficam no disco temporário e na memória da instância. Com mais de uma instância, o balanceador
+precisa de afinidade de sessão; sem ela, ou depois de um reinício, o visitante recomeça do passo 1. Os limites por
+visitante valem por cookie: quem apaga o cookie ganha outra cópia, e o teto de cópias vivas continua valendo. O
+detector de vídeo e o Whisper atendem um pedido por vez por instância: um vídeo do aparelho ou uma fala longa põe os
+outros na fila.
+
+## 10. Mais
 
 - O fluxo do agente está em [`docs/fluxo_do_agente.md`](fluxo_do_agente.md) e a arquitetura em
   [`docs/arquitetura.md`](arquitetura.md).
