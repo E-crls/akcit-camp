@@ -55,9 +55,10 @@ rotulo "bucket" "$(g storage buckets describe "gs://$PROJ-$NOME-fontes" --format
 
 if [ "$TEM_SERVICO" = 1 ]; then
   echo "3. Cloud Run com a configuração de custo"
-  echo "$SERVICO" | python - "$NOME" <<'EOF' || FALHAS=$((FALHAS + 1))
+  echo "$SERVICO" > "$TMPD/servico.json"
+  python - "$NOME" "$TMPD/servico.json" <<'EOF' || FALHAS=$((FALHAS + 1))
 import json, sys
-s = json.load(sys.stdin); nome = sys.argv[1]
+nome = sys.argv[1]; s = json.load(open(sys.argv[2], encoding="utf-8"))
 t = s["spec"]["template"]; a = t["metadata"].get("annotations", {}); c = t["spec"]["containers"][0]
 lim = c.get("resources", {}).get("limits", {})
 checks = [
@@ -110,7 +111,7 @@ tot = (run if run == run else 0) + (llm if llm == llm else 0)
 print(f"  Total estimado 24 h: US$ {tot:.4f} (~R$ {tot * cambio:.2f}; câmbio de referência {cambio})")
 print("  (nan = métrica ainda sem dado; o valor oficial está no relatório de faturamento, com atraso de horas)")
 EOF
-SZ=$(g artifacts docker images list "$REG-docker.pkg.dev/$PROJ/$NOME" --include-tags --format="value(sizeBytes)" | awk '{s+=$1} END {printf "%.2f", s/1e9}')
+SZ=$(g artifacts repositories describe "$NOME" --location "$REG" --format="value(sizeBytes)" | awk '{printf "%.2f", $1/1e9}')
 N_IMG=$(g artifacts docker images list "$REG-docker.pkg.dev/$PROJ/$NOME" --format="value(version)" | sort -u | grep -c . || true)
 echo "  Registro: $N_IMG versão(ões), ${SZ:-0} GB (0,5 GB grátis; US$ 0,10/GB-mês acima)"
 
