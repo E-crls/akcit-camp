@@ -44,3 +44,6 @@ Thumbs.db
 
 # ativos da demo com ferramentas reais (vídeo semissintético do DEMO-0001; ativos/README.md, THIRD_PARTY.md)
 !ativos/demo/video/s03_fila_colada.mp4
+
+# imagem publicada na demo da nuvem (infra/nuvem/publicar.sh grava a cada versão)
+infra/**/*.auto.tfvars

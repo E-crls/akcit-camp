@@ -15,10 +15,13 @@
   de contingência). A chave de replay é o hash canônico da requisição *antes* da injeção da data e depois do
   mascaramento de PII, então o replay funciona em outro dia e a gravação não guarda CPF/telefone.
 - `ProvedorRoteirizado`: respostas fixas ou geradas por função (testes e demo sem modelo).
+- `VertexProvider` + `ProvedorEmCadeia`: só na demo pública na nuvem (infra/nuvem). Os passos gravados saem do
+  replay, sem custo; o texto livre vai ao Gemini do Vertex AI (`externo=True`, com teto diário de tokens); se
+  nenhum responder, o condutor segue com o plano mínimo e a fala por template.
 
 Interface: qualquer objeto com `nome`, `modelo`, `externo` e `chat(...) -> RespostaLLM` serve
-(`ProvedorLLM`). Um provedor Bedrock entraria em `criar_provedor` com `externo=True`, o que faz o condutor
-mascarar PII antes de enviar. Não implementado nesta versão, que usa só modelo local.
+(`ProvedorLLM`). Um provedor externo (`externo=True`, como o `VertexProvider`) faz o condutor mascarar PII
+antes de enviar. O produto em campo usa só modelo local.
 """
 
 from __future__ import annotations
@@ -30,7 +33,7 @@ import sys
 import time
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
@@ -624,12 +627,301 @@ class OllamaProvider:
         )
 
 
+# ---------------------------------------------------------------------------
+# Vertex AI (Gemini) — demo pública na nuvem
+# ---------------------------------------------------------------------------
+
+# US$ por milhão de tokens (entrada, saída), do catálogo do Cloud Billing (serviço Vertex AI C7E2-9256-1C43,
+# SKUs "Global Text Input/Output - Predictions", consultado em 24/10/2026). Só para o custo estimado do painel.
+PRECOS_GEMINI_USD_MTOK: dict[str, tuple[float, float]] = {
+    "gemini-3.1-flash-lite": (0.25, 1.50),
+    "gemini-3.5-flash-lite": (0.30, 2.50),
+}
+# O Gemini 3 exige a assinatura do raciocínio em toda chamada de ferramenta do histórico. As que vieram do
+# replay (ou de outro modelo) não têm: vai o valor neutro que a documentação do Gemini prevê para isso.
+_ASSINATURA_NEUTRA = "skip_thought_signature_validator"
+_CODIGOS_PROXIMO = frozenset({"REPLAY_AUSENTE", "INDISPONIVEL", "TIMEOUT", "HTTP", "LIMITE"})
+
+
+def evento_llm(**campos: Any) -> None:
+    """Uma linha JSON no stdout por chamada de LLM, só na demo pública (o Cloud Logging guarda e as métricas
+    de log em infra/nuvem somam tokens e custo). Sem texto de prompt nem resposta."""
+    if os.environ.get("LAUDO_DEMO_PUBLICA") != "1":
+        return
+    print(json.dumps({"severity": "INFO", "laudo_evento": "llm", **campos}, ensure_ascii=False), flush=True)
+
+
+class _CotaDiaria:
+    """Teto de tokens por dia (UTC) no processo, somado entre todos os provedores Vertex da instância."""
+
+    def __init__(self) -> None:
+        self.dia = ""
+        self.usados = 0
+
+    def restante(self, teto: int) -> int:
+        hoje = datetime.now(UTC).strftime("%Y-%m-%d")
+        if hoje != self.dia:
+            self.dia, self.usados = hoje, 0
+        return teto - self.usados
+
+
+_COTA = _CotaDiaria()
+
+
+class VertexProvider:
+    """Gemini no Vertex AI pela API compatível com a da OpenAI (`/endpoints/openapi/chat/completions`).
+
+    Recebe as mensagens no formato do Ollama (o do condutor) e converte: chamadas de ferramenta ganham id e a
+    assinatura do raciocínio (guardada da resposta ou neutra), e o resultado da ferramenta (`tool_name`) casa
+    com a chamada pendente de mesmo nome. Token: o do metadata server do Cloud Run, ou `LAUDO_VERTEX_TOKEN`
+    (teste local, com `gcloud auth print-access-token`). `externo=True`: o condutor mascara PII antes do envio.
+    Teto diário de tokens (`LAUDO_LLM_TOKENS_DIA`): estourou, falha como LIMITE e a cadeia segue sem LLM."""
+
+    externo = True
+    espera_disjuntor_s = None
+
+    def __init__(
+        self,
+        modelo: str | None = None,
+        projeto: str | None = None,
+        local: str | None = None,
+        timeout_s: float = 30.0,
+        tokens_dia: int | None = None,
+        hoje: date | None = None,
+        cliente: httpx.Client | None = None,
+        espera_falha_s: float = 60.0,
+        relogio: Callable[[], float] = time.monotonic,
+    ):
+        self.nome = "vertex"
+        self.modelo = modelo or os.environ.get("LAUDO_VERTEX_MODELO") or "gemini-3.1-flash-lite"
+        self.projeto = projeto or os.environ.get("LAUDO_VERTEX_PROJETO") or ""
+        self.local = local or os.environ.get("LAUDO_VERTEX_LOCAL") or "global"
+        host = "aiplatform.googleapis.com" if self.local == "global" else f"{self.local}-aiplatform.googleapis.com"
+        self.base_url = (
+            f"https://{host}/v1/projects/{self.projeto}/locations/{self.local}/endpoints/openapi/chat/completions"
+        )
+        self.tokens_dia = int(tokens_dia or os.environ.get("LAUDO_LLM_TOKENS_DIA") or 3_000_000)
+        self.hoje = hoje
+        self.timeout = httpx.Timeout(connect=5.0, read=timeout_s, write=10.0, pool=5.0)
+        self._cliente = cliente or httpx.Client(timeout=self.timeout)
+        self._relogio = relogio
+        self._espera_falha_s = espera_falha_s
+        self._fora_ate = 0.0  # depois de falha de transporte, não tenta de novo por `espera_falha_s`
+        self._token = ("", 0.0)
+        self._assinaturas: dict[str, str] = {}
+
+    # -- credencial ---------------------------------------------------------
+    def _credencial(self) -> str:
+        if tok := os.environ.get("LAUDO_VERTEX_TOKEN"):
+            return tok
+        valor, expira = self._token
+        if valor and self._relogio() < expira:
+            return valor
+        try:
+            r = self._cliente.get(
+                "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token",
+                headers={"Metadata-Flavor": "Google"},
+                timeout=3.0,
+            )
+            r.raise_for_status()
+            d = r.json()
+        except (httpx.HTTPError, ValueError) as e:
+            raise ErroLLM("INDISPONIVEL", f"sem credencial do Vertex AI: {e}", retryable=False) from e
+        self._token = (d["access_token"], self._relogio() + int(d.get("expires_in", 300)) - 60)
+        return self._token[0]
+
+    # -- conversão ----------------------------------------------------------
+    @staticmethod
+    def _chave_chamada(nome: str, argumentos: Any) -> str:
+        return nome + json.dumps(argumentos, sort_keys=True, ensure_ascii=False, default=str)
+
+    def montar_requisicao(self, mensagens, ferramentas=None, formato=None) -> dict[str, Any]:
+        msgs: list[dict[str, Any]] = []
+        pendentes: list[tuple[str, str]] = []  # (id, nome) das chamadas sem resultado ainda
+        for i, m in enumerate(injetar_data(mensagens, self.hoje or datetime.now().astimezone().date())):
+            papel = m.get("role")
+            if papel == "assistant" and m.get("tool_calls"):
+                chamadas = []
+                for j, tc in enumerate(m["tool_calls"]):
+                    fn = tc.get("function") or {}
+                    args = fn.get("arguments") or {}
+                    if isinstance(args, str):
+                        try:
+                            args = json.loads(args)
+                        except json.JSONDecodeError:
+                            args = {}
+                    cid = f"c{i}_{j}"
+                    assinatura = self._assinaturas.get(self._chave_chamada(fn.get("name", ""), args))
+                    chamadas.append({
+                        "id": cid,
+                        "type": "function",
+                        "function": {"name": fn.get("name", ""), "arguments": json.dumps(args, ensure_ascii=False)},
+                        "extra_content": {"google": {"thought_signature": assinatura or _ASSINATURA_NEUTRA}},
+                    })
+                    pendentes.append((cid, fn.get("name", "")))
+                msgs.append({"role": "assistant", "content": m.get("content") or None, "tool_calls": chamadas})
+            elif papel == "tool":
+                nome = m.get("tool_name", "")
+                k = next((k for k, (_, n) in enumerate(pendentes) if n == nome), 0 if pendentes else -1)
+                if k < 0:  # resultado sem chamada (não acontece no condutor): vira texto para não quebrar
+                    msgs.append({"role": "user", "content": f"[resultado de {nome}] {m.get('content') or ''}"})
+                    continue
+                cid, _ = pendentes.pop(k)
+                msgs.append({"role": "tool", "tool_call_id": cid, "content": m.get("content") or ""})
+            else:
+                msgs.append({"role": papel, "content": m.get("content") or ""})
+        corpo: dict[str, Any] = {
+            "model": f"google/{self.modelo}",
+            "messages": msgs,
+            "temperature": 0,
+            "max_tokens": 1024,
+            "reasoning_effort": "low",
+        }
+        if ferramentas:
+            corpo["tools"] = ferramentas
+        if formato:
+            corpo["response_format"] = {"type": "json_schema", "json_schema": {"name": "saida", "schema": formato}}
+        return corpo
+
+    # -- chamada ------------------------------------------------------------
+    def chat(self, mensagens, ferramentas=None, formato=None, metadados=None) -> RespostaLLM:
+        if self._relogio() < self._fora_ate:
+            raise ErroLLM("INDISPONIVEL", "Vertex AI falhou há pouco; tentando de novo em instantes")
+        if _COTA.restante(self.tokens_dia) <= 0:
+            evento_llm(detalhe="limite", modelo=self.modelo, tokens=0, custo_usd=0.0)
+            raise ErroLLM("LIMITE", f"teto diário de {self.tokens_dia} tokens do LLM atingido")
+        corpo = self.montar_requisicao(mensagens, ferramentas, formato)
+        with otel.span_llm("vertex", self.modelo, **{"llm.n_tools": len(ferramentas or []), **(metadados or {})}) as s:
+            t0 = time.perf_counter()
+            dados = self._post(corpo, s)
+            resp = self._parse(dados)
+            resp.latencia_ms = int((time.perf_counter() - t0) * 1000)
+            resp.span_id = otel.id_span(s)
+            ent, sai = PRECOS_GEMINI_USD_MTOK.get(self.modelo, (0.0, 0.0))
+            custo = (resp.tokens_entrada * ent + resp.tokens_saida * sai) / 1e6
+            _COTA.usados += resp.tokens_entrada + resp.tokens_saida
+            otel.definir(
+                s,
+                **{
+                    "gen_ai.usage.input_tokens": resp.tokens_entrada,
+                    "gen_ai.usage.output_tokens": resp.tokens_saida,
+                    "llm.latency_ms": resp.latencia_ms,
+                    "llm.uso_origem": "medido",
+                    "llm.custo_usd": round(custo, 6),
+                    "llm.n_tool_calls": len(resp.chamadas),
+                },
+            )
+        evento_llm(
+            detalhe="vertex", modelo=self.modelo, tokens=resp.tokens_entrada + resp.tokens_saida,
+            tokens_entrada=resp.tokens_entrada, tokens_saida=resp.tokens_saida, custo_usd=round(custo, 6),
+            latencia_ms=resp.latencia_ms,
+        )
+        return resp
+
+    def _post(self, corpo: dict[str, Any], s) -> dict[str, Any]:
+        for tentativa in range(2):  # uma repetição só, para 429 e 5xx
+            try:
+                r = self._cliente.post(
+                    self.base_url,
+                    json=corpo,
+                    headers={"Authorization": f"Bearer {self._credencial()}"},
+                    timeout=self.timeout,
+                )
+            except httpx.TimeoutException as e:
+                self._fora_ate = self._relogio() + self._espera_falha_s
+                erro = ErroLLM("TIMEOUT", str(e) or "timeout")
+                otel.marcar_erro(s, str(erro))
+                raise erro from e
+            except httpx.TransportError as e:
+                self._fora_ate = self._relogio() + self._espera_falha_s
+                erro = ErroLLM("INDISPONIVEL", str(e) or "falha de conexão")
+                otel.marcar_erro(s, str(erro))
+                raise erro from e
+            if (r.status_code == 429 or r.status_code >= 500) and tentativa == 0:
+                time.sleep(1.0)
+                continue
+            if r.status_code >= 400:
+                erro = ErroLLM("HTTP", f"{r.status_code}: {r.text[:300]}")
+                otel.marcar_erro(s, str(erro))
+                raise erro
+            try:
+                dados = r.json()
+            except json.JSONDecodeError as e:
+                raise ErroLLM("FORMATO", f"resposta não é JSON: {e}") from e
+            return dados[0] if isinstance(dados, list) and dados else dados
+        raise ErroLLM("HTTP", "Vertex AI sem resposta válida")
+
+    def _parse(self, dados: dict[str, Any]) -> RespostaLLM:
+        escolha = (dados.get("choices") or [{}])[0]
+        msg = escolha.get("message") or {}
+        chamadas = []
+        for tc in msg.get("tool_calls") or []:
+            fn = tc.get("function") or {}
+            args = fn.get("arguments")
+            if isinstance(args, str):
+                try:
+                    args = json.loads(args)
+                except json.JSONDecodeError:
+                    args = {"_bruto": args}
+            args = args or {}
+            assinatura = ((tc.get("extra_content") or {}).get("google") or {}).get("thought_signature")
+            if assinatura:
+                if len(self._assinaturas) > 2000:
+                    self._assinaturas.clear()
+                self._assinaturas[self._chave_chamada(fn.get("name", ""), args)] = assinatura
+            chamadas.append(ChamadaFerramenta(nome=fn.get("name", ""), argumentos=args))
+        uso = dados.get("usage") or {}
+        return RespostaLLM(
+            conteudo=msg.get("content") or "",
+            chamadas=chamadas,
+            modelo=self.modelo,
+            provedor="vertex",
+            tokens_entrada=int(uso.get("prompt_tokens") or 0),
+            tokens_saida=int(uso.get("completion_tokens") or 0),
+        )
+
+
+class ProvedorEmCadeia:
+    """Tenta os provedores em ordem: o primeiro que responder vale. REPLAY_AUSENTE, INDISPONIVEL, TIMEOUT, HTTP
+    e LIMITE passam ao próximo; FORMATO não (o modelo respondeu, a contingência é do condutor). Se todos
+    falham, relança o último erro, e o condutor segue com o plano mínimo e a fala por template.
+    Na demo pública: replay (passos gravados, sem custo) → Vertex AI (texto livre)."""
+
+    espera_disjuntor_s = None
+
+    def __init__(self, provedores: list[Any]):
+        if not provedores:
+            raise ValueError("cadeia sem provedores")
+        self.provedores = provedores
+        self.nome = "cadeia"
+        self.modelo = "+".join(getattr(p, "modelo", "?") for p in provedores)
+        self.externo = any(getattr(p, "externo", False) for p in provedores)
+
+    def chat(self, mensagens, ferramentas=None, formato=None, metadados=None) -> RespostaLLM:
+        ultimo: ErroLLM | None = None
+        for p in self.provedores:
+            try:
+                r = p.chat(mensagens, ferramentas=ferramentas, formato=formato, metadados=metadados)
+            except ErroLLM as e:
+                if e.codigo not in _CODIGOS_PROXIMO:
+                    raise
+                ultimo = e
+                continue
+            if r.replay:
+                evento_llm(detalhe="replay", modelo=r.modelo, tokens=0, custo_usd=0.0, latencia_ms=0)
+            return r
+        assert ultimo is not None
+        raise ultimo
+
+
 def criar_provedor(tipo: str = "ollama", perfil: str = "escritorio", **kw: Any) -> ProvedorLLM:
-    """Fábrica. `tipo` ∈ {ollama, replay}. Bedrock: ponto de extensão (classe com `externo=True`)."""
+    """Fábrica. `tipo` ∈ {ollama, replay, vertex}. Bedrock: ponto de extensão (classe com `externo=True`)."""
     if tipo == "ollama":
         return OllamaProvider(perfil=perfil, **kw)
     if tipo == "replay":
         return ReplayProvider(**kw)
+    if tipo == "vertex":
+        return VertexProvider(**kw)
     if tipo == "bedrock":
         raise NotImplementedError(
             "Bedrock fica para a final (DECISAO.md); implemente uma classe ProvedorLLM "

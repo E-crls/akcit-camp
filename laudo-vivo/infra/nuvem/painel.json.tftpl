@@ -1,0 +1,222 @@
+{
+  "displayName": "Laudo Vivo: demo pública (acessos e custos)",
+  "labels": {"laudo-vivo": ""},
+  "mosaicLayout": {
+    "columns": 48,
+    "tiles": [
+      {
+        "width": 48, "height": 5,
+        "widget": {
+          "title": "Como ler",
+          "text": {
+            "format": "MARKDOWN", "style": {},
+            "content": "Demo pública com dados sintéticos. **Custo do Gemini** = tokens medidos x preço do catálogo (só texto livre; passos gravados saem do replay, sem custo). **Custo do Cloud Run** = tempo faturável x (${cpu} vCPU x US$ ${preco_cpu}/s + ${memoria} GiB x US$ ${preco_mem}/s), cobrança por requisição em southamerica-east1. O valor oficial está em Faturamento > Relatórios, filtrado pelo rótulo centro-custo=laudo-vivo-demo."
+          }
+        }
+      },
+      {
+        "yPos": 5, "width": 10, "height": 8,
+        "widget": {
+          "title": "Visitantes (24 h)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "prometheusQuery": "sum(increase(logging_googleapis_com:user_laudo_eventos{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\",evento=\"sessao_nova\"}[1d]))"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 10, "yPos": 5, "width": 10, "height": 8,
+        "widget": {
+          "title": "Turnos de conversa (24 h)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "prometheusQuery": "sum(increase(logging_googleapis_com:user_laudo_eventos{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\",evento=\"turno\"}[1d]))"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 20, "yPos": 5, "width": 9, "height": 8,
+        "widget": {
+          "title": "Gemini: custo estimado US$ (24 h)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "prometheusQuery": "sum(increase(logging_googleapis_com:user_laudo_llm_custo_usd_sum{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[1d]))"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 29, "yPos": 5, "width": 9, "height": 8,
+        "widget": {
+          "title": "Cloud Run: custo estimado US$ (24 h)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "prometheusQuery": "sum(increase(run_googleapis_com:container_billable_instance_time{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[1d])) * (${cpu} * ${preco_cpu} + ${memoria} * ${preco_mem})"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 38, "yPos": 5, "width": 10, "height": 8,
+        "widget": {
+          "title": "Requisições (24 h)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "prometheusQuery": "sum(increase(run_googleapis_com:request_count{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[1d]))"
+            }
+          }
+        }
+      },
+      {
+        "yPos": 13, "width": 24, "height": 14,
+        "widget": {
+          "title": "Acessos: requisições por classe de resposta",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_BAR", "targetAxis": "Y1",
+              "timeSeriesQuery": {
+                "prometheusQuery": "sum by (response_code_class) (increase(run_googleapis_com:request_count{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[5m]))"
+              }
+            }]
+          }
+        }
+      },
+      {
+        "xPos": 24, "yPos": 13, "width": 24, "height": 14,
+        "widget": {
+          "title": "Uso: eventos da demo por tipo",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_BAR", "targetAxis": "Y1",
+              "timeSeriesQuery": {
+                "prometheusQuery": "sum by (evento) (increase(logging_googleapis_com:user_laudo_eventos{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[5m]))"
+              }
+            }]
+          }
+        }
+      },
+      {
+        "yPos": 27, "width": 24, "height": 14,
+        "widget": {
+          "title": "LLM: chamadas por origem (replay sem custo x Gemini x teto atingido)",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_BAR", "targetAxis": "Y1",
+              "timeSeriesQuery": {
+                "prometheusQuery": "sum by (detalhe) (increase(logging_googleapis_com:user_laudo_eventos{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\",evento=\"llm\"}[5m]))"
+              }
+            }]
+          }
+        }
+      },
+      {
+        "xPos": 24, "yPos": 27, "width": 24, "height": 14,
+        "widget": {
+          "title": "LLM: tokens do Gemini e custo acumulado (US$)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "LINE", "targetAxis": "Y1",
+                "legendTemplate": "tokens (5 min)",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "sum(increase(logging_googleapis_com:user_laudo_llm_tokens_sum{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\",detalhe=\"vertex\"}[5m]))"
+                }
+              },
+              {
+                "plotType": "LINE",
+                "targetAxis": "Y2",
+                "legendTemplate": "custo US$ (24 h)",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "sum(increase(logging_googleapis_com:user_laudo_llm_custo_usd_sum{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[1d]))"
+                }
+              }
+            ],
+            "y2Axis": {"label": "US$", "scale": "LINEAR"}
+          }
+        }
+      },
+      {
+        "yPos": 41, "width": 16, "height": 14,
+        "widget": {
+          "title": "Latência p50 e p95 (ms)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "LINE", "targetAxis": "Y1",
+                "legendTemplate": "p95",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "histogram_quantile(0.95, sum by (le) (rate(run_googleapis_com:request_latencies_bucket{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[5m])))"
+                }
+              },
+              {
+                "plotType": "LINE", "targetAxis": "Y1",
+                "legendTemplate": "p50",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "histogram_quantile(0.5, sum by (le) (rate(run_googleapis_com:request_latencies_bucket{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[5m])))"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 16, "yPos": 41, "width": 16, "height": 14,
+        "widget": {
+          "title": "Instâncias (ativas e ociosas; teto = 1)",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_AREA", "targetAxis": "Y1",
+              "timeSeriesQuery": {
+                "prometheusQuery": "sum by (state) (run_googleapis_com:container_instance_count{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"})"
+              }
+            }]
+          }
+        }
+      },
+      {
+        "xPos": 32, "yPos": 41, "width": 16, "height": 14,
+        "widget": {
+          "title": "Recusas por limite e erros",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_BAR", "targetAxis": "Y1",
+              "timeSeriesQuery": {
+                "prometheusQuery": "sum by (evento, detalhe) (increase(logging_googleapis_com:user_laudo_eventos{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\",evento=~\"recusa_limite|erro\"}[5m]))"
+              }
+            }]
+          }
+        }
+      },
+      {
+        "yPos": 55, "width": 24, "height": 14,
+        "widget": {
+          "title": "Voz: segundos de áudio transcritos (5 min)",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_BAR", "targetAxis": "Y1",
+              "timeSeriesQuery": {
+                "prometheusQuery": "sum(increase(logging_googleapis_com:user_laudo_asr_audio_s_sum{monitored_resource=\"cloud_run_revision\",service_name=\"${nome}\"}[5m]))"
+              }
+            }]
+          }
+        }
+      },
+      {
+        "xPos": 24, "yPos": 55, "width": 24, "height": 14,
+        "widget": {
+          "title": "Disponibilidade (/api/saude de 3 regiões)",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "LINE", "targetAxis": "Y1",
+              "timeSeriesQuery": {
+                "prometheusQuery": "avg by (checker_location) (monitoring_googleapis_com:uptime_check_check_passed{monitored_resource=\"uptime_url\"})"
+              }
+            }]
+          }
+        }
+      }
+    ]
+  }
+}

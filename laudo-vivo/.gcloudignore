@@ -1,0 +1,7 @@
+# Contexto enviado ao Cloud Build (infra/nuvem/publicar.sh): o mesmo do docker build, mais o estado do Terraform.
+#!include:.dockerignore
+.gcloudignore
+infra/**/.terraform/
+infra/**/*.tfstate*
+infra/**/*.tfvars
+infra/**/*.tfplan

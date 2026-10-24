@@ -1,0 +1,20 @@
+# Build da imagem da demo pública no Cloud Build (região da demo, conta de serviço própria, logs só no Cloud
+# Logging). Chamado por publicar.sh; o contexto é a pasta laudo-vivo/.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    env: ["DOCKER_BUILDKIT=1"]
+    args:
+      - -c
+      - |
+        docker pull "${_REPOSITORIO}/site:ultima" || true
+        docker build -f Dockerfile.publico \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
+          --cache-from "${_REPOSITORIO}/site:ultima" \
+          -t "${_REPOSITORIO}/site:${_TAG}" -t "${_REPOSITORIO}/site:ultima" .
+images:
+  - "${_REPOSITORIO}/site:${_TAG}"
+  - "${_REPOSITORIO}/site:ultima"
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 3600s
