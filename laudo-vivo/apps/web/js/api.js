@@ -36,6 +36,10 @@ async function tratar(r) {
   const tipo = r.headers.get("content-type") || "";
   if (tipo.includes("application/json")) corpo = await r.json();
   else corpo = await r.text();
+  // demo pública com senha: o acesso venceu (12 h) ou não houve login: volta à tela de entrada
+  if (r.status === 401 && corpo && typeof corpo === "object" && corpo.entrar && typeof location !== "undefined") {
+    location.assign(corpo.entrar);
+  }
   if (!r.ok) throw erroHttp(r.status, corpo);
   return corpo;
 }

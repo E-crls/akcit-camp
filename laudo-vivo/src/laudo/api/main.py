@@ -43,6 +43,7 @@ Uso: `scripts/py.sh -m laudo.api --llm ollama --ferramentas mistas` (ver `script
 
 from __future__ import annotations
 
+import hmac
 import logging
 from collections.abc import Callable
 from pathlib import Path
@@ -51,13 +52,20 @@ from urllib.parse import urlsplit
 
 from fastapi import Depends, FastAPI, File, Form, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, Response
+from fastapi.responses import (
+    FileResponse,
+    HTMLResponse,
+    JSONResponse,
+    PlainTextResponse,
+    RedirectResponse,
+    Response,
+)
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, model_validator
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from laudo.api import eventos
+from laudo.api import acesso, eventos
 from laudo.api import publica as publica_mod
 from laudo.api.servico import LIMITE_AUDIO_MB, LIMITE_UPLOAD_MB, Config, ErroServico, Servico, checar_id
 
@@ -226,6 +234,10 @@ class EvidenciaCaso(BaseModel):
     texto: str = ""
 
 
+class Entrada(BaseModel):
+    senha: str = Field("", max_length=100)
+
+
 class Assinatura(BaseModel):
     pin: str = Field(min_length=1, max_length=12)
     hash_confirmado: str = Field(min_length=16, max_length=128)
@@ -313,6 +325,40 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
                                 secure=https, path="/")
             resp.headers.setdefault("X-Frame-Options", "DENY")
             return resp
+
+        senha_demo = acesso.senha()
+        if senha_demo:
+            tentativas = acesso.Tentativas()
+            valido = acesso.token(senha_demo)
+
+            @app.middleware("http")
+            async def _barreira(request: Request, call_next):
+                # senha compartilhada: roda antes da sessão (sem a senha, nem a cópia do visitante é criada)
+                caminho = request.url.path
+                if acesso.aberto(caminho) or hmac.compare_digest(request.cookies.get(acesso.COOKIE) or "", valido):
+                    return await call_next(request)
+                if caminho.startswith("/api/"):
+                    return JSONResponse({"erro": "senha da demonstração necessária", "entrar": "/entrar.html"},
+                                        status_code=401)
+                return RedirectResponse("/entrar.html", status_code=302)
+
+            @app.post("/api/entrar")
+            async def entrar(request: Request, corpo: Entrada):
+                ip = ip_do_cliente(request)
+                if tentativas.bloqueado(ip):
+                    eventos.evento("recusa_limite", limite="senha", status=429)
+                    return JSONResponse({"erro": "Muitas tentativas. Espere alguns minutos."}, status_code=429)
+                if not acesso.confere(corpo.senha, senha_demo):
+                    tentativas.errou(ip)
+                    eventos.evento("acesso", ok=False)
+                    return JSONResponse({"erro": "Senha incorreta. Ela está no slide da apresentação."},
+                                        status_code=401)
+                eventos.evento("acesso", ok=True)
+                https = request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https"
+                resp = JSONResponse({"ok": True})
+                resp.set_cookie(acesso.COOKIE, valido, max_age=acesso.DURACAO_S, httponly=True, samesite="lax",
+                                secure=https, path="/")
+                return resp
 
     @app.middleware("http")
     async def _cabecalhos(request: Request, call_next):

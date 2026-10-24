@@ -71,6 +71,13 @@ resource "google_cloud_run_v2_service" "site" {
         name  = "LAUDO_VERTEX_TIMEOUT_S"
         value = tostring(var.timeout_gemini_s)
       }
+      dynamic "env" {
+        for_each = var.senha_demo != "" ? [1] : []
+        content {
+          name  = "LAUDO_DEMO_SENHA"
+          value = var.senha_demo
+        }
+      }
 
       startup_probe {
         http_get {

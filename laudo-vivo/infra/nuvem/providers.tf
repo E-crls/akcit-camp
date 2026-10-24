@@ -9,3 +9,12 @@ provider "google" {
   # Etiqueta de custo em todo recurso que aceita rótulo: o relatório de faturamento filtra por elas.
   default_labels = local.rotulos
 }
+
+# O Firebase Hosting (link curto) só existe no provedor beta
+provider "google-beta" {
+  project               = var.projeto
+  region                = var.regiao
+  user_project_override = true
+  billing_project       = var.projeto
+  default_labels        = local.rotulos
+}

@@ -81,7 +81,15 @@ EOF
   URL=$(echo "$SERVICO" | python -c "import json,sys; print(json.load(sys.stdin)['status']['url'])")
   echo "4. Site em $URL"
   cod=$(curl -s -o /dev/null -w '%{http_code}' -m 60 "$URL/api/saude"); [ "$cod" = 200 ] && ok "/api/saude 200" || ruim "/api/saude $cod"
-  cod=$(curl -s -o $TMPD/index.html -w '%{http_code}' -m 30 "$URL/"); [ "$cod" = 200 ] && grep -qi "laudo" $TMPD/index.html && ok "página inicial 200" || ruim "página inicial $cod"
+  # com a senha da demo (LAUDO_DEMO_SENHA), a raiz leva à tela de entrada; a página do produto é aberta
+  cod=$(curl -s -L -o $TMPD/index.html -w '%{http_code}' -m 30 "$URL/"); [ "$cod" = 200 ] && grep -qi "laudo" $TMPD/index.html && ok "página inicial ou tela de entrada 200" || ruim "página inicial $cod"
+  cod=$(curl -s -o /dev/null -w '%{http_code}' -m 30 "$URL/site/"); [ "$cod" = 200 ] && ok "página do produto (/site/) 200" || ruim "página do produto $cod"
+  cod=$(curl -s -o /dev/null -w '%{http_code}' -m 30 "$URL/api/fiscalizacoes"); echo "        API sem login: HTTP $cod (401 com a senha ligada, 200 sem ela)"
+  CURTA=$(terraform output -raw url_curta 2>/dev/null)
+  if [ -n "$CURTA" ]; then
+    loc=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' -m 30 "$CURTA/site/")
+    case "$loc" in "302 $URL/site/"*) ok "link curto $CURTA → $URL" ;; *) ruim "link curto: $loc" ;; esac
+  fi
   curl -s -m 30 "$URL/api/saude" | python -c "import json,sys; d=json.load(sys.stdin); print('        saude:', json.dumps({k: d.get(k) for k in ('ok','llm','asr','demo_publica','cfg') if k in d}, ensure_ascii=False)[:400])" 2>/dev/null
   cod=$(curl -s -o /dev/null -w '%{http_code}' -m 10 -H "Origin: https://exemplo.invalido" -X OPTIONS "$URL/api/saude")
   echo "        CORS de origem estranha: HTTP $cod (esperado 400/403/405)"

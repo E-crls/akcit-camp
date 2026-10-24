@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar · Laudo Vivo</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icone.svg" type="image/svg+xml">
+<style>
+@font-face { font-family: "Barlow"; font-weight: 500; font-display: swap; src: url("/vendor/fonts/Barlow-500.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 600; font-display: swap; src: url("/vendor/fonts/Barlow-600.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 700; font-display: swap; src: url("/vendor/fonts/BarlowSemiCondensed-700.woff2") format("woff2"); }
+:root { --carvao: #15130F; --grafite: #3C382F; --pedra: #5C564B; --borda: #D3CDC0; --linha: #E4E0D6; --papel: #FBFAF7;
+  --fundo: #EFECE5; --ipe: #FFC414; --ipe-2: #E8AA00; --roxo: #861D4C; }
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; display: grid; place-items: center; padding: 1.5rem; background: var(--fundo); color: var(--carvao);
+  font-family: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-weight: 500; font-size: 1rem; line-height: 1.5; }
+main { width: 100%; max-width: 24rem; }
+.marca { display: flex; align-items: center; gap: .6rem; margin-bottom: 1.5rem; text-decoration: none; color: inherit; }
+.marca svg { width: 2rem; height: 2rem; }
+.marca b { font-family: "Barlow Semi Condensed", "Barlow", sans-serif; font-weight: 700; font-size: 1.25rem; letter-spacing: .02em; }
+.cartao { background: var(--papel); border: 1px solid var(--linha); border-radius: 12px; padding: 1.75rem;
+  box-shadow: 0 1px 2px rgba(21, 19, 15, .06), 0 8px 24px rgba(21, 19, 15, .06); }
+h1 { font-family: "Barlow Semi Condensed", "Barlow", sans-serif; font-weight: 700; font-size: 1.6rem; line-height: 1.15; margin: 0 0 .35rem; }
+.sub { margin: 0 0 1.5rem; color: var(--grafite); }
+label { display: block; font-weight: 600; margin-bottom: .4rem; }
+input { width: 100%; min-height: 3rem; padding: .65rem .85rem; border: 1px solid var(--borda); border-radius: 8px; background: #fff;
+  font: inherit; color: inherit; }
+input:focus { outline: 2px solid var(--carvao); outline-offset: 1px; border-color: var(--carvao); }
+button { width: 100%; min-height: 3rem; margin-top: 1rem; border: 0; border-radius: 8px; background: var(--ipe); color: var(--carvao);
+  font-family: "Barlow Semi Condensed", "Barlow", sans-serif; font-weight: 700; font-size: 1.1rem; cursor: pointer; }
+button:hover { background: var(--ipe-2); }
+button:focus-visible { outline: 2px solid var(--carvao); outline-offset: 2px; }
+button[disabled] { opacity: .7; cursor: wait; }
+.erro { min-height: 1.5rem; margin: .75rem 0 0; color: var(--roxo); font-weight: 600; }
+.dica { margin: 1.25rem 0 0; font-size: .9rem; color: var(--pedra); }
+.dica a { color: var(--carvao); }
+.aviso { margin-top: 1rem; font-size: .82rem; color: var(--pedra); text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <a class="marca" href="/site/" aria-label="Laudo Vivo, página do produto">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="11" fill="#FFC414"/><g fill="#15130F"><path d="M13 11H26V40H53V53H13Z"/><rect x="30" y="24" width="12" height="12"/></g></svg>
+    <b>LAUDO VIVO</b>
+  </a>
+  <div class="cartao">
+    <h1>Entrar na demonstração</h1>
+    <p class="sub">Fiscalização do crédito rural com o agente, do satélite ao curral.</p>
+    <form id="f" novalidate>
+      <label for="senha">Senha da demonstração</label>
+      <input id="senha" name="senha" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" required>
+      <button id="b" type="submit">Entrar</button>
+      <p class="erro" id="erro" role="alert" aria-live="polite"></p>
+    </form>
+    <p class="dica">A senha está no slide da apresentação. Conheça o produto na <a href="/site/">página do Laudo Vivo</a>.</p>
+  </div>
+  <p class="aviso">Demonstração com dados sintéticos e fiscal fictícia. Não envie dados pessoais.</p>
+</main>
+<script>
+(() => {
+  const f = document.getElementById("f"), b = document.getElementById("b"), erro = document.getElementById("erro"), campo = document.getElementById("senha");
+  campo.focus();
+  f.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    erro.textContent = "";
+    if (!campo.value.trim()) { erro.textContent = "Digite a senha."; campo.focus(); return; }
+    b.disabled = true; b.textContent = "Entrando…";
+    try {
+      const r = await fetch("/api/entrar", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ senha: campo.value }) });
+      if (r.ok) { location.replace("/"); return; }
+      let msg = "Não deu para entrar. Tente de novo.";
+      try { const j = await r.json(); if (j && j.erro) msg = j.erro; } catch (_) {}
+      erro.textContent = msg; campo.select();
+    } catch (_) {
+      erro.textContent = "Sem conexão com o servidor.";
+    }
+    b.disabled = false; b.textContent = "Entrar";
+  });
+})();
+</script>
+</body>
+</html>

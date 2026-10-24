@@ -113,3 +113,16 @@ variable "preco_gib_s" {
   type        = number
   default     = 0.0000035
 }
+
+variable "senha_demo" {
+  description = "Senha compartilhada da demo (mostrada no slide). Vazia: demo aberta. Fica no terraform.tfvars, fora do git"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "site_curto" {
+  description = "Nome do site no Firebase Hosting: <site_curto>.web.app redireciona para a demo (link curto do QR)"
+  type        = string
+  default     = "laudovivo"
+}
