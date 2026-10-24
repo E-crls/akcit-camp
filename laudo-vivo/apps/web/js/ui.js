@@ -1,5 +1,6 @@
-// Utilitários de interface: criação segura de elementos (sem innerHTML com dados), ícones, status, avisos,
-// faixa e selo de demonstração e a gaveta "Detalhes técnicos".
+// Utilitários de interface: criação segura de elementos (sem innerHTML com dados), ícones do sprite, status, avisos,
+// folhas e menus, topo (trilha no computador; voltar e título no celular), marca de demonstração e a gaveta
+// "Detalhes técnicos".
 
 export function h(tag, attrs = {}, ...filhos) {
   const el = document.createElement(tag);
@@ -7,8 +8,11 @@ export function h(tag, attrs = {}, ...filhos) {
     if (v === null || v === undefined || v === false) continue;
     if (k === "class") el.className = v;
     else if (k === "dataset") Object.assign(el.dataset, v);
+    else if (k === "style" && typeof v === "object") {
+      // propriedades personalizadas ("--n") só entram por setProperty
+      for (const [pk, pv] of Object.entries(v)) { if (pk.startsWith("--")) el.style.setProperty(pk, pv); else el.style[pk] = pv; }
+    }
     else if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2), v);
-    else if (k === "html") el.innerHTML = v; // só com conteúdo estático (ícones)
     else if (v === true) el.setAttribute(k, "");
     else el.setAttribute(k, v);
   }
@@ -19,84 +23,57 @@ export function h(tag, attrs = {}, ...filhos) {
   return el;
 }
 
-// Ícones SVG inline, traço de 2 px numa grade de 24 (um só estilo em toda a interface).
-const T = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
-const P = {
-  verificado: `<path d="M5 12.5l4.5 4.5L19 7.5" ${T} stroke-width="2.6"/>`,
-  divergente: `<path d="M7 7l10 10M17 7L7 17" ${T} stroke-width="2.6"/>`,
-  pendente: `<circle cx="12" cy="12" r="8.5" ${T}/><path d="M12 7.5V12l3 2" ${T}/>`,
-  abstencao: `<circle cx="12" cy="12" r="8.5" ${T}/><path d="M6.2 17.8L17.8 6.2" ${T}/>`,
-  cadeado: `<rect x="5" y="10.5" width="14" height="10" rx="2" ${T}/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" ${T}/>`,
-  escudo: `<path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.3-7.5 9.5-4.3-1.2-7.5-4.9-7.5-9.5V6z" ${T}/><path d="M9 12.2l2.2 2.2L15.5 10" ${T}/>`,
-  alerta: `<path d="M12 3.8L21 19.5H3z" ${T}/><path d="M12 10v4.2" ${T}/><circle cx="12" cy="17" r="1.1" fill="currentColor"/>`,
-  info: `<circle cx="12" cy="12" r="8.5" ${T}/><path d="M12 11v5.5" ${T}/><circle cx="12" cy="7.8" r="1.1" fill="currentColor"/>`,
-  mic: `<rect x="9" y="3" width="6" height="11" rx="3" ${T}/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" ${T}/>`,
-  camera: `<path d="M4 8h3.5l1.5-2.5h6L16.5 8H20v11H4z" ${T}/><circle cx="12" cy="13" r="3.4" ${T}/>`,
-  video: `<rect x="3" y="6.5" width="12.5" height="11" rx="2" ${T}/><path d="M15.5 10.5l5-3v9l-5-3z" ${T}/>`,
-  doc: `<path d="M6 3h8l4 4v14H6z" ${T}/><path d="M14 3v4h4M9 12h6M9 15.5h6" ${T}/>`,
-  nota: `<path d="M6 3h12v18l-2-1.5L14 21l-2-1.5L10 21l-2-1.5L6 21z" ${T}/><path d="M9 8h6M9 11.5h6M9 15h3" ${T}/>`,
-  gta: `<path d="M3 16V8h11v8M14 11h4l3 3v2h-7" ${T}/><circle cx="7" cy="17.5" r="1.8" ${T}/><circle cx="17" cy="17.5" r="1.8" ${T}/>`,
-  xml: `<path d="M6 3h8l4 4v14H6z" ${T}/><path d="M10 12l-2 2 2 2M14 12l2 2-2 2" ${T}/>`,
-  pino: `<path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z" ${T}/><circle cx="12" cy="10" r="2.2" fill="currentColor"/>`,
-  som: `<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" ${T}/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" ${T}/>`,
-  enviar: `<path d="M5 12h13M13 6l6 6-6 6" ${T}/>`,
-  trace: `<path d="M4 6h10M4 12h16M4 18h7" ${T}/><circle cx="17" cy="6" r="2" fill="currentColor"/><circle cx="14" cy="18" r="2" fill="currentColor"/>`,
-  assinar: `<path d="M4 18c3-1 4-6 6-6s1 4 3 4 2.5-3 4-3 2 1.5 3 1.5" ${T}/><path d="M4 21h16" ${T}/>`,
-  play: '<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>',
-  pular: `<path d="M6 6l7 6-7 6zM17 6v12" ${T}/>`,
-  reiniciar: `<path d="M5 12a7 7 0 1 0 2.1-5M5 4.5V9h4.5" ${T}/>`,
-  clipe: `<path d="M20 11.5l-7.6 7.6a5 5 0 0 1-7.1-7.1l8-8a3.4 3.4 0 0 1 4.8 4.8l-8 8a1.7 1.7 0 0 1-2.4-2.4l7.3-7.3" ${T}/>`,
-  ajustes: `<path d="M4 7h10M18 7h2M4 17h4M12 17h8" ${T}/><circle cx="16" cy="7" r="2" ${T}/><circle cx="10" cy="17" r="2" ${T}/>`,
-  fechar: `<path d="M6 6l12 12M18 6L6 18" ${T}/>`,
-  baixo: `<path d="M6 9l6 6 6-6" ${T}/>`,
-  direita: `<path d="M9 6l6 6-6 6" ${T}/>`,
-  voltar: `<path d="M19 12H6M11 6l-6 6 6 6" ${T}/>`,
-  codigo: `<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14" ${T}/>`,
-  copiar: `<rect x="8" y="8" width="12" height="12" rx="2" ${T}/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" ${T}/>`,
-  baixar: `<path d="M12 4v11M7 10l5 5 5-5M5 20h14" ${T}/>`,
-  imprimir: `<path d="M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2" ${T}/><path d="M7 14h10v6H7z" ${T}/>`,
-  hash: `<path d="M9 4L7 20M17 4l-2 16M4.5 9h15M3.5 15h15" ${T}/>`,
-  agente: `<rect x="4" y="7" width="16" height="12" rx="4" ${T}/><path d="M12 3.5V7M9 12.5v1M15 12.5v1M9.5 16h5" ${T}/>`,
-  pessoa: `<circle cx="12" cy="8" r="3.6" ${T}/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" ${T}/>`,
-  folha: `<path d="M5 19c0-8 5-13.5 14-14-0.5 9-6 14-14 14z" ${T}/><path d="M5 19l7-7" ${T}/>`,
-  mapa: `<path d="M3.5 6.5l5.5-2 6 2 5.5-2v13l-5.5 2-6-2-5.5 2z" ${T}/><path d="M9 4.5v13M15 6.5v13" ${T}/>`,
-  lupa: `<circle cx="11" cy="11" r="6.5" ${T}/><path d="M16 16l4 4" ${T}/>`,
-  olho: `<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" ${T}/><circle cx="12" cy="12" r="3" ${T}/>`,
-  galeria: `<rect x="3.5" y="4.5" width="17" height="15" rx="2" ${T}/><circle cx="9" cy="10" r="1.8" ${T}/><path d="M20.5 16l-5-5-8.5 8.5" ${T}/>`,
-  lista: `<path d="M9 6h11M9 12h11M9 18h11" ${T}/><path d="M4.5 6l1 1 1.8-2M4.5 12l1 1 1.8-2M4.5 18l1 1 1.8-2" ${T}/>`,
-  satelite: `<path d="M9.5 14.5l-4 4M7 9l3-3 8 8-3 3z" ${T}/><path d="M13 5l2-2 6 6-2 2M5 13l-2 2 6 6 2-2" ${T}/>`,
-  selo: `<circle cx="12" cy="10" r="6" ${T}/><path d="M9.5 15.3L8 21l4-2 4 2-1.5-5.7" ${T}/><path d="M9.6 10l1.6 1.6 3.2-3.2" ${T}/>`,
-  externo: `<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" ${T}/>`,
-  mais: '<circle cx="5.5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="18.5" cy="12" r="1.8" fill="currentColor"/>',
-  cima: `<path d="M12 19V6M6 11l6-6 6 6" ${T}/>`,
-  descer: `<path d="M12 5v13M6 13l6 6 6-6" ${T}/>`,
-  semrede: `<path d="M3 3l18 18M8.5 16.5a5 5 0 0 1 7 0M5 12.6a10 10 0 0 1 4.2-2.4M19 12.6a10 10 0 0 0-2.6-1.8M2 9a15 15 0 0 1 4.4-2.9M22 9a15 15 0 0 0-9.6-3.9" ${T}/><circle cx="12" cy="20" r="1.1" fill="currentColor"/>`,
-};
+// Ícones: o sprite de index.html (Phosphor Bold e Fill, MIT; o satélite da Lucide, ISC; cerca, área e esquadro próprios),
+// montado por scripts/montar_sprite_web.py. Nomes antigos continuam valendo.
+const DE_PARA = { verificado: "check", divergente: "diverge", pendente: "falta", abstencao: "sem-conclusao", compartilhar: "telao",
+  doc: "nota", clipe: "mais", fechar: "x", lupa: "busca", reiniciar: "recomecar", pessoa: "vaca", trace: "codigo",
+  ajustes: "opcoes", som: "mic", semrede: "info", xml: "arquivo", cima: "baixo", descer: "baixo", ok: "check" };
+const NS = "http://www.w3.org/2000/svg";
 
 export function icone(nome, cls = "") {
-  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  s.setAttribute("viewBox", "0 0 24 24");
+  const id = DE_PARA[nome] || nome;
+  const s = document.createElementNS(NS, "svg");
   s.setAttribute("aria-hidden", "true");
   s.setAttribute("focusable", "false");
-  s.setAttribute("class", cls ? `ico ${cls}` : "ico");
-  s.innerHTML = P[nome] || P.info;
+  s.setAttribute("class", `ic${cls ? ` ${cls}` : ""}${nome === "cima" ? " girar" : ""}`);
+  const u = document.createElementNS(NS, "use");
+  u.setAttribute("href", `#i-${id}`);
+  s.append(u);
   return s;
 }
 
-export const ROTULO_STATUS = { verificado: "Verificado", divergente: "Divergente", pendente: "Pendente", abstencao: "Abstenção",
-  ok: "Concluída", indeterminado: "Inconclusiva", erro: "Erro" };
-const ICONE_STATUS = { verificado: "verificado", ok: "verificado", divergente: "divergente", pendente: "pendente", erro: "pendente",
-  abstencao: "abstencao", indeterminado: "abstencao" };
-export const DICA_STATUS = {
-  verificado: "Verificado: a evidência confere com o financiado.",
-  divergente: "Divergente: a evidência não confere com o financiado.",
-  pendente: "Pendente: falta evidência para concluir.",
-  abstencao: "Abstenção: a evidência não permite concluir (o sistema não chuta).",
-};
+// Símbolos da marca: "selo-g" (a marca: o esquadro graduado na placa ipê, de 32 px para cima), "marca-p" (lisa, abaixo de 20 px), "agente"
+// (só o esquadro, na cor do texto: sem rosto, sem placa, sem círculo) e "pino-demo" (o piquete ipê com o esquadro).
+export function simbolo(id, cls) {
+  const vb = { "marca-p": "0 0 64 64", "selo-g": "0 0 64 64", agente: "8 6 50 52", "pino-demo": "0 0 30 30" }[id] || "0 0 24 24";
+  const s = document.createElementNS(NS, "svg");
+  s.setAttribute("aria-hidden", "true");
+  s.setAttribute("focusable", "false");
+  s.setAttribute("viewBox", vb);
+  s.setAttribute("class", cls || id);
+  const u = document.createElementNS(NS, "use");
+  u.setAttribute("href", `#${id}`);
+  s.append(u);
+  return s;
+}
+// quem fala: o esquadro de 20 px e o nome em rótulo (o agente aparece pelo trabalho que fez, sem rosto)
+export const avatarAgente = () => h("span", { class: "avatar" }, simbolo("agente", "agente"), h("span", { class: "quem-ag" }, "Laudo Vivo"));
 
-export function chipStatus(status, grande = false) {
-  return h("span", { class: `st st-${status}${grande ? " st-grande" : ""}`, title: DICA_STATUS[status] || null },
-    icone(ICONE_STATUS[status] || "info"), ROTULO_STATUS[status] || status);
+// ---------------------------------------------------------------- status: ícone + palavra + cor (nunca só cor)
+// "divergente-j": a divergência justificada pela fiscal (pronta). Contorno ipê-roxo com o visto, para não se confundir
+// com a divergência aberta (roxo cheio): as duas só se distinguiam na régua.
+export const ROTULO_STATUS = { verificado: "Verificado", divergente: "Divergente", "divergente-j": "Divergente · justificada", pendente: "Falta",
+  abstencao: "Sem conclusão", ok: "Verificado", indeterminado: "Sem conclusão", erro: "Erro" };
+const CLS_STATUS = { verificado: "st-ok", ok: "st-ok", divergente: "st-div", "divergente-j": "st-divj", pendente: "st-falta", erro: "st-falta",
+  abstencao: "st-sem", indeterminado: "st-sem" };
+const IC_STATUS = { verificado: "check-cheio", ok: "check-cheio", divergente: "diverge", "divergente-j": "check", pendente: "falta", erro: "falta",
+  abstencao: "sem-conclusao", indeterminado: "sem-conclusao" };
+
+export function chipStatus(status, rotulo = null) {
+  return h("span", { class: `st ${CLS_STATUS[status] || "st-neutro"}` }, icone(IC_STATUS[status] || "info"), rotulo || ROTULO_STATUS[status] || status);
+}
+export function chipNeutro(texto, ic = null, cls = "st-neutro") {
+  return h("span", { class: `st ${cls}` }, ic ? icone(ic) : null, texto);
 }
 
 export function fmtNum(v) {
@@ -109,246 +86,218 @@ export function fmtNum(v) {
 export function fmtData(iso) {
   if (!iso) return "—";
   const d = new Date(iso);
-  if (isNaN(d)) return iso;
+  if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
 }
 
 export function hashAgrupado(hx) {
-  const el = h("span", { class: "hash", translate: "no" });
+  const el = h("span", { class: "hash mono", translate: "no" });
   (hx || "").match(/.{1,4}/g)?.forEach((g) => el.append(h("span", { class: "g" }, g)));
   return el;
 }
 
-// Aviso flutuante. O de erro fica até ser fechado (botão ✕): no campo, com 4G ruim, ninguém lê um erro que some em
-// 4 s. O mesmo texto não empilha: o aviso que já está na tela só pisca de novo.
-export function avisar(texto, erro = false, ms = 4500) {
+// ---------------------------------------------------------------- avisos e leitor de tela
+// O aviso de erro fica até ser fechado (no campo, com 4G ruim, ninguém lê um erro que some em 4 s). O aviso comum
+// aparece no topo, abaixo do cabeçalho, por 3 s, e nunca cobre o botão principal nem o campo de mensagem.
+export function avisar(texto, erro = false, ms = 3000) {
   const box = document.getElementById("avisos");
   const igual = [...box.children].find((a) => a.dataset.texto === String(texto));
-  if (igual) {
-    igual.classList.remove("repete");
-    void igual.offsetWidth; // reinicia a animação
-    igual.classList.add("repete");
-    return igual;
-  }
+  if (igual) { igual.classList.remove("repete"); void igual.offsetWidth; igual.classList.add("repete"); return igual; }
   const a = h("div", { class: `aviso${erro ? " erro" : ""}`, role: erro ? "alert" : "status", dataset: { texto: String(texto) } },
     icone(erro ? "alerta" : "info"), h("span", { class: "aviso-txt" }, texto));
-  if (erro) {
-    a.append(h("button", { class: "aviso-fechar", type: "button", "aria-label": "Fechar o aviso", title: "Fechar",
-      onclick: () => a.remove() }, icone("fechar")));
-  } else setTimeout(() => a.remove(), ms);
+  if (erro) a.append(h("button", { class: "btn-icone aviso-fechar", type: "button", "aria-label": "Fechar o aviso", onclick: () => a.remove() }, icone("x")));
+  else setTimeout(() => a.remove(), ms);
   box.append(a);
   return a;
 }
-
-// Tira da tela os avisos de erro (ex.: o "Assinatura recusada" depois que a assinatura deu certo).
-export function limparErros() {
-  document.querySelectorAll("#avisos .aviso.erro").forEach((a) => a.remove());
-}
+export function limparErros() { document.querySelectorAll("#avisos .aviso.erro").forEach((a) => a.remove()); }
 
 export function anunciar(texto, urgente = false) {
   const el = document.getElementById(urgente ? "anuncio-urgente" : "anuncio");
   el.textContent = "";
   setTimeout(() => { el.textContent = texto; }, 30);
 }
+// ao trocar de tela, o leitor de tela não repete o que foi anunciado na anterior
+export function limparAnuncios() {
+  for (const id of ["anuncio", "anuncio-urgente"]) { const el = document.getElementById(id); if (el) el.textContent = ""; }
+}
 
-export function abrirModal(titulo, conteudo) {
+// ---------------------------------------------------------------- modal
+export function abrirModal(titulo, conteudo, { largo = false } = {}) {
   const m = document.getElementById("modal");
   document.getElementById("modal-titulo").textContent = titulo;
+  m.classList.toggle("largo", !!largo);
   const corpo = document.getElementById("modal-corpo");
   corpo.replaceChildren(conteudo);
   corpo.scrollTop = 0;
   if (!m.open) m.showModal();
   return corpo;
 }
+export function fecharModal() { const m = document.getElementById("modal"); if (m.open) m.close(); }
 
 export function iniciarModal() {
   const m = document.getElementById("modal");
-  const fechar = m.querySelector("[data-fechar]");
-  fechar.replaceChildren(icone("fechar"));
-  fechar.addEventListener("click", () => m.close());
+  m.querySelector("[data-fechar]").addEventListener("click", () => m.close());
   m.addEventListener("click", (e) => { if (e.target === m) m.close(); });
 }
 
 export function limpar(el) { el.replaceChildren(); return el; }
 
-// ---------------------------------------------------------------- demonstração (regra de honestidade)
-// Operação sintética (demo ou golden set): faixa fina no topo e selo discreto fixo no canto. Nenhuma tela de
-// demonstração pode sugerir irregularidade de um produtor real. A faixa também diz quando as respostas do modelo
-// vêm de uma gravação (replay) ou quando há ferramentas simuladas.
-const FAIXA = { demo: null, modo: [] };
+// ---------------------------------------------------------------- menus (popover no computador, folha no celular)
+const MENUS = new Set();
+export function ehMovel() { return !window.matchMedia("(min-width: 1100px)").matches; }
 
-export function definirDemo(bloco) {
-  FAIXA.demo = bloco || null;
-  renderFaixa();
+// itens: [{ rot, ic, acao, perigo, sub }] ou um nó pronto. O menu se fecha no clique fora, no Esc e ao escolher.
+export function abrirMenu(menu, botao, itens, { titulo = null } = {}) {
+  fecharMenus();
+  const lista = itens.filter(Boolean).map((it) => (it instanceof Node ? it : h("button", {
+    class: `menu-item${it.perigo ? " perigo" : ""}`, type: "button", role: "menuitem",
+    onclick: (ev) => { ev.stopPropagation(); if (!it.manter) fecharMenus(); it.acao?.(ev); } },
+  it.ic ? icone(it.ic) : null, h("span", { class: "menu-rot" }, it.rot, it.sub ? h("small", {}, it.sub) : null))));
+  menu.replaceChildren(...(titulo ? [h("div", { class: "menu-cab" }, h("strong", {}, titulo),
+    h("button", { class: "btn-icone", type: "button", "aria-label": "Fechar", onclick: () => fecharMenus(true) }, icone("x")))] : []), ...lista);
+  // no celular o menu é uma folha inferior: vai para o <body> enquanto está aberto, para ficar acima do véu (o topo e a
+  // barra da demonstração criam o seu próprio empilhamento, e uma folha dentro deles ficaria por baixo do véu)
+  if (ehMovel() && menu.parentElement !== document.body) {
+    menu._casa = [menu.parentElement, menu.nextSibling];
+    document.body.append(menu);
+  }
+  menu.hidden = false;
+  menu._botao = botao;
+  botao?.setAttribute("aria-expanded", "true");
+  MENUS.add(menu);
+  if (ehMovel()) document.getElementById("veu-global").hidden = false;
+  menu.querySelector(".menu-item")?.focus({ preventScroll: true });
 }
-
-export function definirAvisosModo(lista) {
-  FAIXA.modo = lista || [];
-  renderFaixa();
+export function fecharMenus(devolver = false) {
+  for (const m of MENUS) {
+    m.hidden = true;
+    m._botao?.setAttribute("aria-expanded", "false");
+    if (m._casa) {
+      const [pai, prox] = m._casa;
+      m._casa = null;
+      if (pai?.isConnected) pai.insertBefore(m, prox && prox.parentNode === pai ? prox : null); else m.remove();
+    }
+    if (devolver && m._botao?.isConnected) m._botao.focus({ preventScroll: true });
+  }
+  MENUS.clear();
+  if (!document.querySelector(".folha-m.aberta")) document.getElementById("veu-global").hidden = true;
 }
+export function menuAberto() { return MENUS.size > 0; }
+document.addEventListener("pointerdown", (e) => {
+  for (const m of MENUS) if (!m.contains(e.target) && !m._botao?.contains(e.target)) { fecharMenus(); break; }
+}, true);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && MENUS.size) { e.stopImmediatePropagation(); fecharMenus(true); } }, true);
 
-function renderFaixa() {
-  const el = document.getElementById("faixa-demo");
-  const selo = document.getElementById("selo-demo");
-  if (!el) return;
-  const d = FAIXA.demo;
-  const partes = [];
-  if (d) {
-    partes.push(h("strong", {}, d.marca_dagua || "DEMONSTRAÇÃO — dados sintéticos"),
-      h("span", { class: "faixa-sub" }, "Operação fictícia; não descreve nenhum produtor real."));
-  }
-  for (const m of FAIXA.modo) {
-    if (partes.length) partes.push(h("span", { class: "faixa-sep", "aria-hidden": "true" }, "·"));
-    partes.push(h("span", { class: "faixa-sub", title: m.dica || null }, m.curto));
-  }
-  el.hidden = !partes.length;
-  if (partes.length) {
-    // o texto vai num bloco só: no celular ele cabe numa linha (com reticências) e o "Saiba mais" abre o aviso inteiro
-    el.replaceChildren(h("span", { class: "faixa-txt" }, icone("info", "faixa-ic"), ...partes),
-      h("button", { class: "faixa-mais", type: "button", onclick: sobreDemonstracao }, "Saiba mais"));
-  }
-  if (selo) {
-    selo.hidden = !d;
-    selo.replaceChildren(icone("selo"), h("span", {}, "Demonstração"), h("small", {}, "dados sintéticos"));
-  }
+// ---------------------------------------------------------------- topo
+// { trilha: [{ rot, href }], titulo, sub, voltar: href | função, mais: [itens], casa: bool }
+export function definirTopo({ trilha = [], titulo = "", sub = "", voltar = null, mais = null, casa = false } = {}) {
+  const nav = document.getElementById("trilha");
+  nav.replaceChildren(...trilha.flatMap((t, i) => [i ? icone("direita") : null,
+    t.href ? h("a", { href: t.href }, t.rot) : h("span", { "aria-current": "page" }, t.rot)]).filter(Boolean));
+  const v = document.getElementById("topo-voltar");
+  v.hidden = !voltar;
+  if (typeof voltar === "string") { v.href = voltar; v.onclick = null; } else if (voltar) { v.href = "#"; v.onclick = (e) => { e.preventDefault(); voltar(); }; }
+  document.getElementById("topo-h1").textContent = titulo;
+  document.getElementById("topo-sub").textContent = sub;
+  document.getElementById("topo-sub").hidden = !sub;
+  document.getElementById("topo-titulo").hidden = casa || !titulo;
+  document.body.classList.toggle("topo-casa", !!casa);
+  const b = document.getElementById("topo-mais");
+  b.hidden = !mais;
+  b.onclick = mais ? () => abrirMenu(document.getElementById("menu-mais"), b, typeof mais === "function" ? mais() : mais, { titulo: ehMovel() ? "Opções" : null }) : null;
   window.dispatchEvent(new Event("lv:topo"));
 }
 
-function sobreDemonstracao() {
-  const d = FAIXA.demo;
-  abrirModal("Sobre esta demonstração", h("div", { class: "texto" },
-    d ? h("p", {}, h("strong", {}, `${d.marca_dagua}. `), d.aviso || "") : null,
-    FAIXA.modo.map((m) => h("p", {}, m.longo || m.curto)),
-    h("p", { class: "nota" }, "Prioridade de verificação não é indício de irregularidade.")));
+// ---------------------------------------------------------------- folha inferior (celular) e gaveta
+export function alternarFolha(el, abrir, { foco = null } = {}) {
+  const vai = abrir === undefined ? !el.classList.contains("aberta") : !!abrir;
+  el.classList.toggle("aberta", vai);
+  el.setAttribute("aria-hidden", vai ? "false" : "true");
+  // o véu escuro só no celular (folha que sobe de baixo); no computador a gaveta e o menu ficam sobre a tela
+  const veu = document.getElementById("veu-global");
+  veu.hidden = !ehMovel() || (!document.querySelector(".folha-m.aberta") && !menuAberto());
+  if (vai) (foco || el.querySelector("button, a, input"))?.focus({ preventScroll: true });
+  return vai;
 }
 
-// Bloco de aviso (pacote de exibição, laudo): o texto da demonstração inteiro, sem marca d'água na tela.
-export function faixaDemonstracao(bloco) {
-  if (!bloco) return null;
-  return h("div", { class: "demo-faixa", role: "note" }, icone("info"),
-    h("div", {}, h("strong", {}, bloco.marca_dagua), " ", bloco.aviso || ""));
+// ---------------------------------------------------------------- marca de demonstração (uma por tela)
+let DEMO = null;
+export function definirDemo(bloco) {
+  DEMO = bloco || null;
+  document.getElementById("faixa-demo").hidden = !DEMO;
+  document.getElementById("demo-pilula").hidden = !DEMO;
+  document.body.classList.toggle("com-demo", !!DEMO);
+  window.dispatchEvent(new Event("lv:topo"));
 }
+export function demoAtual() { return DEMO; }
 
 // ---------------------------------------------------------------- gaveta "Detalhes técnicos"
-// Estado do modelo, ferramentas, etapas da máquina de estados, decisões da política e trace: tudo o que a banca quer
-// ver e o fiscal não precisa ler. Cada tela registra as suas seções; a gaveta junta e mostra.
+// Estado do sistema (replay/ao vivo, fora da gravação), decisões da política, checagens e ferramentas, etapas,
+// evidências, trace e o aviso longo da demonstração. Cada tela registra as suas seções; a gaveta junta e mostra.
 const TEC = new Map();
+const ORDEM_TEC = ["sistema", "fis", "laudo", "carteira"];
 
 export function secaoTecnica(chave, construir) {
-  if (construir) TEC.set(chave, construir);
-  else TEC.delete(chave);
-  const g = document.getElementById("tecnico");
-  if (g && !g.hidden) renderTecnico();
+  if (construir) TEC.set(chave, construir); else TEC.delete(chave);
+  if (tecnicoAberto()) renderTecnico();
 }
-
 function renderTecnico() {
   const corpo = document.getElementById("tecnico-corpo");
-  if (!corpo) return;
-  const ordem = ["sistema", "fis", "laudo"];
-  const chaves = [...TEC.keys()].sort((a, b) => (ordem.indexOf(a) + 9) % 9 - (ordem.indexOf(b) + 9) % 9);
+  const chaves = [...TEC.keys()].sort((a, b) => ORDEM_TEC.indexOf(a) - ORDEM_TEC.indexOf(b));
   const nos = [];
   for (const k of chaves) {
-    try { nos.push(TEC.get(k)()); } catch (e) { nos.push(h("p", { class: "nota" }, `seção ${k}: ${e.message}`)); }
+    try { nos.push(TEC.get(k)()); } catch (e) { nos.push(h("p", { class: "t-sec" }, `seção ${k}: ${e.message}`)); }
   }
+  if (DEMO) nos.push(blocoTec("Demonstração", h("p", {}, h("strong", {}, `${DEMO.marca_dagua}. `), DEMO.aviso || "")));
   corpo.replaceChildren(...nos);
 }
-
 export function abrirTecnico(abrir) {
   const g = document.getElementById("tecnico");
   const b = document.getElementById("btn-tecnico");
-  if (!g) return;
   const vai = abrir === undefined ? g.hidden : !!abrir;
   if (vai) renderTecnico();
   g.hidden = !vai;
   b?.setAttribute("aria-expanded", vai ? "true" : "false");
+  document.getElementById("veu-global").hidden = !vai && !document.querySelector(".folha-m.aberta");
   if (vai) g.querySelector("[data-fechar-tec]")?.focus({ preventScroll: true });
-  else if (document.activeElement && g.contains(document.activeElement)) b?.focus({ preventScroll: true });
 }
-
-export function tecnicoAberto() {
-  const g = document.getElementById("tecnico");
-  return !!g && !g.hidden;
+export function tecnicoAberto() { const g = document.getElementById("tecnico"); return !!g && !g.hidden; }
+export function blocoTec(titulo, ...conteudo) { return h("section", { class: "tec-sec" }, h("h3", {}, titulo), ...conteudo); }
+export function kv(pares) {
+  return h("dl", { class: "kv" }, pares.filter(Boolean).map(([k, v, cls]) => [h("dt", {}, k), h("dd", { class: cls || null }, v ?? "—")]));
 }
-
-// Uma seção da gaveta: título + conteúdo.
-export function blocoTec(titulo, ...conteudo) {
-  return h("section", { class: "tec-sec" }, h("h3", {}, titulo), ...conteudo);
-}
+export function atualizarSaude() { window.dispatchEvent(new Event("lv:saude")); }
 
 // ---------------------------------------------------------------- textos
-// Descrições do Sicor são longas ("Aquisição de 29 vacas … — Sicor: AQUISIÇÃO DE ANIMAIS — …"): na tela vai a
-// primeira parte; o texto inteiro fica no atributo title.
-export function curto(texto, max = 64) {
-  const t = String(texto || "");
-  let c = t.split(/ — Sicor:| — | \(projeto sintético;/)[0];
-  if (c.length > max) c = `${c.slice(0, max - 1).trimEnd()}…`;
-  return c;
-}
-
-// "Por que está na amostra": abertura da prioridade de verificação (motivos de laudo.geo.triagem com código, pontos
-// e critério). `amostra` = estado.amostra ou operacao.amostra da carteira. Nunca acusa: o aviso vai junto.
-export function aberturaAmostra(amostra, { aberto = false, titulo = "Por que está na amostra" } = {}) {
-  if (!amostra) return null;
-  const corpo = [];
-  if (!amostra.tem_triagem) corpo.push(h("p", { class: "nota" }, amostra.resumo || "sem triagem registrada"));
-  if (amostra.motivos?.length) {
-    // o código do critério (LOTACAO_ALTA) fica no title: na tela vão o nome do critério e os pontos por extenso
-    corpo.push(h("ul", { class: "motivos-amostra" }, amostra.motivos.map((m) => h("li", { title: m.codigo ? `critério ${m.codigo}` : null },
-      m.titulo ? h("strong", {}, `${m.titulo}: `) : null, m.texto,
-      m.pontos !== null && m.pontos !== undefined ? h("span", { class: "pontos-amostra" }, `${m.pontos} ${m.pontos === 1 ? "ponto" : "pontos"}`) : null,
-      m.criterio ? h("div", { class: "nota" }, `Como se calcula: ${semCaminho(m.criterio)}`) : null))));
-  }
-  (amostra.observacoes || []).forEach((o) => corpo.push(h("p", { class: "nota" }, `Observação (não pontua): ${o}`)));
-  if (amostra.regra_nivel) {
-    corpo.push(h("p", { class: "nota", title: amostra.nota || null },
-      `Faixas de prioridade: ${String(amostra.regra_nivel).replace(/(\d+) ponto\(s\)/g, (m, n) => `${n} ${n === "1" ? "ponto" : "pontos"}`)}. ${semCaminho(amostra.nota || "")}`));
-  }
-  corpo.push(h("p", { class: "nota aviso-nao-indicio" }, icone("info"),
-    h("strong", {}, amostra.aviso || "Prioridade de verificação não é indício de irregularidade.")));
-  const pontos = amostra.pontos !== null && amostra.pontos !== undefined ? ` · ${amostra.pontos} pt` : "";
-  const nivel = amostra.nivel_rotulo ? `prioridade ${amostra.nivel_rotulo}${pontos}` : "sem triagem";
-  return h("details", { class: "abertura-amostra", open: aberto || null, onclick: (e) => e.stopPropagation() },
-    h("summary", { title: titulo }, icone("direita", "seta-det"), icone("info", "ic-amostra"), h("span", { class: "rot-amostra" }, titulo),
-      h("span", { class: "nivel-amostra" }, nivel)),
-    h("div", { class: "abertura-corpo" }, ...corpo));
-}
-
-// "(laudo.geo.triagem.LIMIARES)" e outros caminhos de configuração saem do texto da tela.
-function semCaminho(t) {
-  return String(t || "").replace(/\s*\((?:[a-z_]+\.)+[A-Za-z_]+\)/g, "").replace(/\s{2,}/g, " ").trim();
-}
-
-// Rótulos legíveis (L98): mesmos nomes de `src/laudo/tools/laudo.py` (ROTULO_FERRAMENTA, ROTULO_TIPO_EVIDENCIA). O
-// id técnico fica no atributo title (passar o mouse), não no texto da tela.
+// Rótulos legíveis das ferramentas e dos tipos de evidência (o id técnico fica em Detalhes técnicos).
 export const ROT_FERRAMENTA = {
-  contar_bovinos_video: "Contagem no vídeo", conciliar_nfe: "Conciliação da NF-e", conciliar_gta: "Conciliação da GTA",
-  integridade_foto: "Integridade da foto", geofence: "Foto na gleba", classificar_foto: "Classificação da foto",
-  serie_ndvi: "Série NDVI (satélite)", planejar_metodo: "Plano de método", avaliar_regras: "Regras do MCR",
+  contar_bovinos_video: "Contagem no vídeo", conciliar_nfe: "Conferência da NF-e", conciliar_gta: "Conferência da GTA",
+  integridade_foto: "Integridade da foto", geofence: "Foto na área financiada", classificar_foto: "O que a foto mostra",
+  serie_ndvi: "Série do satélite", planejar_metodo: "Plano de método", avaliar_regras: "Regras do MCR",
   checar_lotacao: "Lotação", ler_documento_foto: "Leitura da foto do documento",
   completar_leitura_documento: "Campos lidos pela fiscal", conciliar_alegacoes: "Alegações × evidência",
-  carregar_operacao: "Operação (Sicor)", explicar_regra: "Explicação da regra", declaracao_conclusao: "Declaração do fiscal",
+  carregar_operacao: "Operação (Sicor)", explicar_regra: "Explicação da regra", declaracao_conclusao: "Declaração da fiscal",
   declaracao_independencia: "Declaração de independência", registrar_conclusao_obra: "Conclusão da obra (fiscal)",
-  registrar_justificativa: "Justificativa do fiscal", emitir_rascunho: "Emissão do rascunho",
+  registrar_justificativa: "Justificativa da fiscal", emitir_rascunho: "Emissão do rascunho",
   solicitar_assinatura: "Envio para assinatura", registrar_ocorrencia: "Registro de ocorrência",
 };
-export const ROT_TIPO_EV = { video: "Vídeo", foto: "Foto", nfe_xml: "NF-e (XML)", gta: "e-GTA", documento: "Documento",
-  declaracao: "Fala do fiscal", ocorrencia: "Ocorrência", audio: "Áudio", quadro_chave: "Quadro-chave", satelite: "Cena de satélite" };
-export const ROT_OCORRENCIA = { pressao: "Pressão", injecao: "Instrução embutida", fora_de_escopo: "Fora do escopo",
-  falha_ferramenta: "Falha de ferramenta", outro: "Outro" };
+export const ROT_TIPO_EV = { video: "Vídeo", foto: "Foto", nfe_xml: "Arquivo da NF-e", gta: "GTA", documento: "Foto do documento",
+  declaracao: "Fala da fiscal", ocorrencia: "Ocorrência", audio: "Áudio", quadro_chave: "Quadro do vídeo", satelite: "Cena de satélite" };
+export function rotuloFerramenta(nome) { return ROT_FERRAMENTA[nome] || String(nome || "").replaceAll("_", " "); }
 
-// Texto para a tela sem ids técnicos crus (L98): "(item:bov1:quantidade)", "checagem chk_2d88ee1829" e
-// "item:bov1:gta_data: " saem do texto exibido; "integridade_foto: ok" vira "Integridade da foto: ok" e um
-// trecho repetido entre "; " aparece uma vez. O texto original fica no title de quem chama. Espelho de
-// `laudo.formatacao.texto_sem_ids` (o laudo HTML para imprimir usa aquele).
+// Texto da API sem ids técnicos crus: "(item:bov1:quantidade)", "checagem chk_…", "item:bov1:gta_data: " saem; um
+// trecho repetido entre "; " aparece uma vez. Espelho de `laudo.formatacao.texto_sem_ids`.
 export function semIds(texto) {
   const s = String(texto || "")
     .replace(/\s*\((?:item|documento|operacao|laudo)(?::[\w-]+)+\)/g, "")
+    .replace(/\s*\(item [\w-]+:[\w-]+\)/g, "")
     .replace(/\b(?:item|documento|laudo):[\w:-]+:\s+/g, "")
     .replace(/\s*(?:—\s*)?checagem\s+chk_[0-9a-z]+/gi, "")
     .replace(/\b(?:chk|ev|oc|alg|al)_[0-9a-z_]+\b/g, "")
     .replace(/\bautofiscalizacao_assistida\b/g, "autofiscalização assistida")
-    .replace(/\b([a-z]+(?:_[a-z]+)*)(?=:\s)/g, (m) => ROT_FERRAMENTA[m] || m);
-  // um trecho repetido aparece uma vez, mesmo quando a repetição é a última frase (com o ponto final)
+    .replace(/\?{3,}[?…]*/g, "(ilegível)")
+    .replace(/\b([a-z]+(?:_[a-z]+)+)(?=:\s)/g, (m) => ROT_FERRAMENTA[m] || m);
   const partes = [];
   const vistas = new Set();
   for (const p of s.split("; ").map((x) => x.trim())) {
@@ -356,84 +305,24 @@ export function semIds(texto) {
     if (p && !vistas.has(chave)) { vistas.add(chave); partes.push(p); }
   }
   if (/\.\s*$/.test(s) && partes.length && !/[.!?]$/.test(partes.at(-1))) partes[partes.length - 1] += ".";
-  return partes.join("; ")
-    .replace(/\s{2,}/g, " ")
-    .replace(/\s+([.,;:)])/g, "$1")
-    .replace(/^[\s:;,.—-]+/, "")
-    .trim();
+  return partes.join("; ").replace(/\s{2,}/g, " ").replace(/\s+([.,;:)])/g, "$1").replace(/^[\s:;,.—-]+/, "").trim();
 }
 
-// Texto do verificador em linguagem de gente (só na tela; o original fica no title de quem chama):
-// "contagem 12 [12, 17] vs financiado 29 (limite 27,55)" vira "contados 12 (até 17), financiado 29, mínimo aceito
-// 27,55"; a chave ilegível "??????…????" e o "indeterminado" saem; datas ISO viram dd/mm/aaaa.
+// Texto do verificador em linguagem de gente (só na gaveta da prova e em Detalhes)
 export function legivel(texto) {
   let s = semIds(texto);
   s = s.replace(/contagem (\d+) \[(\d+), (\d+)\] vs financiado ([\d.,]+) \(limite ([\d.,]+)\)(:\s*abaixo do limite mesmo no extremo superior)?/gi,
     (m, c, a, b, f, l, abaixo) => `contados ${c} (até ${b}), financiado ${f}, mínimo aceito ${l}${abaixo ? `: mesmo ${b} fica abaixo do mínimo` : ""}`);
-  s = s.replace(/^checagem inconclusiva \(\d+\/\d+\):\s*indeterminado\s*\((.*)\)\s*$/i, "Não deu para conferir: $1");
   s = s.replace(/^checagem inconclusiva \(\d+\/\d+\):\s*/i, "Não deu para conferir: ");
-  s = s.replace(/\b(?:NF-e|chave)\s+[?…]{3,}[?…]*:\s*/g, "");
-  s = s.replace(/\?{3,}[?…]*/g, "ilegível");
   s = s.replace(/\bindeterminado\b/gi, "não deu para conferir");
-  s = s.replace(/(^|:\s)divergente \((.*)\)$/i, "$1$2"); // "GTA: divergente (GTA … antes da NF-e)" → "GTA: GTA … antes da NF-e"
+  s = s.replace(/(^|:\s)divergente \((.*)\)$/i, "$1$2");
   s = s.replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, "$3/$2/$1");
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-// Valor de um aspecto do laudo para a tela: { rot, txt } ou null. Contagem: "Contados: 12 (até 17) · financiado 29";
-// aspecto pendente mostra a referência ("Referência: financiado 29 · mínimo aceito 27,55"), nunca "Apurado".
-export function valorLegivel(l) {
-  const v = l?.valor;
-  if (v && typeof v === "object" && !Array.isArray(v)) {
-    if (v.contagem !== undefined && v.contagem !== null) {
-      const max = Array.isArray(v.intervalo) ? v.intervalo[1] : null;
-      return { rot: "Contados", txt: `${fmtNum(v.contagem)}${max !== null && max !== v.contagem ? ` (até ${fmtNum(max)})` : ""}` +
-        (v.financiado !== undefined ? ` · financiado ${fmtNum(v.financiado)}` : "") };
-    }
-    if (l.status === "pendente" && v.financiado !== undefined) {
-      return { rot: "Referência", txt: `financiado ${fmtNum(v.financiado)}` +
-        (v.limite_inferior !== undefined ? ` · mínimo aceito ${fmtNum(v.limite_inferior)}` : "") };
-    }
-  }
-  const f = l?.valor_fmt && l.valor_fmt !== "—" ? String(l.valor_fmt).replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, "$3/$2/$1") : null;
-  if (!f) return null;
-  return { rot: l.status === "pendente" ? "Referência" : "Apurado", txt: f };
-}
-
-// Motivo de um aspecto em uma frase curta (o texto cru do verificador vai no title). Na contagem, o valor já está na
-// linha: o motivo diz só o mínimo aceito e a conclusão.
-export function motivoLegivel(l) {
-  const v = l?.valor;
-  const m = String(l?.motivo || "");
-  if (v && typeof v === "object" && v.contagem !== undefined && v.limite_inferior !== undefined) {
-    const max = Array.isArray(v.intervalo) ? v.intervalo[1] : v.contagem;
-    const tol = v.tolerancia_pct !== undefined ? ` (tolerância de ${fmtNum(v.tolerancia_pct)}%)` : "";
-    const fim = /abaixo do limite mesmo/i.test(m) ? ` Mesmo ${fmtNum(max)} fica abaixo.` : "";
-    return `Mínimo aceito: ${fmtNum(v.limite_inferior)}${tol}.${fim}`;
-  }
-  const t = legivel(m);
-  return l?.status === "pendente" ? t.replace(/^Evidência ausente:\s*/i, "Falta: ") : t;
-}
-
-export function rotuloFerramenta(nome) {
-  return ROT_FERRAMENTA[nome] || String(nome || "").replaceAll("_", " ");
-}
-
-// Id de regra (MCR-2-7-item16-benfeitorias-conclusao) com quebra só nos hífens, nunca no meio da palavra.
-export function regraQuebravel(id) {
-  const el = h("span", { class: "regra-id", translate: "no" });
-  String(id || "").split("-").forEach((parte, i) => {
-    if (i) el.append("-", h("wbr"));
-    el.append(parte);
-  });
-  return el;
-}
-
-// Regra curta para a tela: "MCR-2-7-item16-benfeitorias-conclusao" e "PROVISORIO/MCR-2-7" viram "MCR 2-7";
-// "POL-01/OP-…" vira "POL-01"; "OP-bovinos-gta" vira "Regra operacional". O id inteiro vai na dica.
+// Regra curta: "MCR-2-7-item16-…" → "MCR 2-7"; "POL-01/…" → "POL-01"; "OP-…" → "Regra operacional".
 export function regraCurta(id) {
   const s = String(id || "");
-  if (!s) return "";
   const mcr = s.match(/MCR[-\s]?(\d+)-(\d+)/i);
   if (mcr) return `MCR ${mcr[1]}-${mcr[2]}`;
   const pol = s.match(/POL-(\d+)/);
@@ -441,32 +330,54 @@ export function regraCurta(id) {
   if (/^OP-/.test(s)) return "Regra operacional";
   return s.split(/[-/]/).slice(0, 2).join(" ");
 }
+export const TEXTO_POL = {
+  "POL-00": "Cada ação só vale na etapa certa da fiscalização.",
+  "POL-01": "O rascunho só sai com a prova mínima de cada item.",
+  "POL-02": "Toda divergência precisa da justificativa da fiscal.",
+  "POL-03": "A assinatura é sempre humana: o agente não assina.",
+  "POL-04": "Laudo selado não muda: correção abre uma nova fiscalização.",
+  "POL-06": "Instrução escondida num documento é dado, não ordem.",
+  "POL-07": "Um número só muda com nova prova, nunca com um pedido.",
+};
 
-const DICA_POL = { "POL-00": "Política: ação permitida na etapa", "POL-01": "Política: evidência mínima antes de emitir",
-  "POL-02": "Política: divergência exige justificativa do fiscal", "POL-03": "Política: a assinatura é sempre humana",
-  "POL-04": "Política: laudo selado não muda", "POL-06": "Política: instrução embutida em documento é dado, não comando",
-  "POL-07": "Política: valor só muda com nova evidência" };
-
-export function chipRegra(id) {
-  if (!id) return null;
-  const curtaR = regraCurta(id);
-  const pol = curtaR.startsWith("POL-") ? DICA_POL[curtaR] : null;
-  const prov = /PROVISORIO/i.test(id) ? " (provisória, até o método ser definido)" : "";
-  return h("span", { class: "regra-chip", title: `${pol ? `${pol} · ` : ""}regra ${id}${prov}`, translate: "no" }, curtaR);
-}
-
-// Pede ao topo que recarregue /api/saude (estado do modelo e da gravação) — L34.
-export function atualizarSaude() {
-  window.dispatchEvent(new Event("lv:saude"));
-}
-
-const ROT_CHECK = { presente: "presente", parcial: "parcial", ausente: "ausente", nao_aplicavel: "não aplicável" };
-
+// Checklist do pacote: fora da regra de cor da conferência (verde só para "Verificado", ipê só para ação e falta).
+// Presente = visto em carvão; Parcial = contorno; Ausente = contorno com o x; Não aplicável = traço, em grafite.
+export const ROT_CHECK = { presente: "Presente", parcial: "Parcial", ausente: "Ausente", nao_aplicavel: "Não aplicável" };
+const CLS_CHECK = { presente: "chk-ok", parcial: "chk-parcial", ausente: "chk-ausente", nao_aplicavel: "chk-na" };
+const IC_CHECK = { presente: "check", parcial: "falta", ausente: "x", nao_aplicavel: null };
 export function chipChecklist(status) {
-  return h("span", { class: `st st-chk-${status}` }, ROT_CHECK[status] || status);
+  return h("span", { class: `chk ${CLS_CHECK[status] || "chk-na"}` }, IC_CHECK[status] ? icone(IC_CHECK[status]) : null, ROT_CHECK[status] || status);
 }
 
-// Copiar para a área de transferência, com aviso.
+// "3 presente(s)", "1 vídeo(s)", "1 parcial(is)", "12 cena(s) de satélite datada(s)" → a concordância certa, pelo
+// número mais próximo antes da palavra (0 e 2+ no plural; 1 no singular).
+export function concordar(texto) {
+  const s = String(texto || "");
+  return s.replace(/([\p{L}]+)\((s|is|es)\)/gu, (m, base, suf, pos) => {
+    const antes = s.slice(0, pos);
+    const nums = antes.match(/\d+(?:[.,]\d+)?/g);
+    const n = nums ? Number(nums.at(-1).replace(/\./g, "").replace(",", ".")) : 2;
+    if (n === 1) return base;
+    if (suf === "is") return base.replace(/l$/, "") + "is";
+    return base + suf;
+  });
+}
+
 export async function copiar(texto, rotulo = "Copiado") {
   try { await navigator.clipboard.writeText(texto); avisar(`${rotulo}.`); } catch { avisar("Não consegui copiar; selecione o texto.", true); }
+}
+
+// "Por que está na amostra" completo (critérios, pontos, faixas): fica em Detalhes técnicos → Amostra.
+export function blocoAmostra(amostra, motivos = []) {
+  if (!amostra && !motivos.length) return null;
+  const corpo = [];
+  if (amostra?.motivos?.length) {
+    corpo.push(h("ul", { class: "tec-lista" }, amostra.motivos.map((m) => h("li", {},
+      m.titulo ? h("strong", {}, `${m.titulo}: `) : null, m.texto,
+      m.pontos !== null && m.pontos !== undefined ? ` (${m.pontos} ${m.pontos === 1 ? "ponto" : "pontos"}; critério ${m.codigo || "—"})` : "",
+      m.criterio ? h("div", { class: "t-sec" }, `Como se calcula: ${m.criterio}`) : null))));
+  } else if (motivos.length) corpo.push(h("ul", { class: "tec-lista" }, motivos.map((m) => h("li", {}, m))));
+  if (amostra?.regra_nivel) corpo.push(h("p", { class: "t-sec" }, `Faixas de prioridade: ${amostra.regra_nivel}. ${amostra.nota || ""}`));
+  corpo.push(h("p", { class: "t-sec" }, amostra?.aviso || "Prioridade de verificação não é indício de irregularidade."));
+  return blocoTec("Amostra", ...corpo);
 }

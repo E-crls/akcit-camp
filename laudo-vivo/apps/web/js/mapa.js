@@ -1,124 +1,164 @@
-// Mapa: Leaflet (vendorizado) com tiles do OpenStreetMap quando há internet. Sem internet, o mapa fica sem
-// fundo, com o contorno de Goiás (IBGE) e as glebas em vetor. Se nem o Leaflet carregar, desenha SVG puro.
+// Mapas, como folha de carta. Carteira: Leaflet (vendorizado), sem fundo baixado, com o contorno de Goiás (IBGE) em
+// carvão, algumas cidades de referência e os piquetes quadrados de prioridade (carvão = alta; menor, em pedra = média); o
+// caso de demonstração é o piquete ipê com o esquadro. Prova da foto: Leaflet com o fundo do OpenStreetMap quando há internet. Cartão
+// de resultado: SVG puro (a área financiada contornada, o ponto da foto em ipê e a distância numa régua graduada de 100
+// em 100 m). As cores vêm dos tokens de app.css (nenhuma cor fixa aqui).
 
 import { h } from "./ui.js";
 
+// cor de um token de app.css (com o valor de reserva se a folha ainda não carregou)
+const RESERVA = { "--carvao": "#15130F", "--grafite": "#3C382F", "--branco": "#FFFFFF", "--ipe": "#FFC414", "--papel-mapa": "#FBFAF7",
+  "--cal-2": "#E4E0D6", "--poeira": "#D3CDC0" };
+export function cor(token) {
+  const v = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+  return v || RESERVA[token] || "#000";
+}
+
 const OSM = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const ATRIB = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
-export const COR_PRIO = { alta: "#a1191c", media: "#b35f00", baixa: "#4f6475", sem_sinal: "#8b98a5", demo: "#4a3b94" };
-export const LETRA_PRIO = { alta: "A", media: "M", baixa: "B", sem_sinal: "·", demo: "D" };
+const CIDADES = [["Goiânia", -16.686, -49.264], ["Anápolis", -16.328, -48.953], ["Rio Verde", -17.792, -50.919],
+  ["Jataí", -17.881, -51.714], ["Catalão", -18.166, -47.946], ["Itumbiara", -18.419, -49.215], ["Porangatu", -13.441, -49.149],
+  ["Posse", -14.093, -46.369], ["Iporá", -16.442, -51.118]];
 
 export function leafletDisponivel() { return typeof window.L !== "undefined"; }
 
-function semInternet(aviso) {
-  if (aviso) {
-    aviso.textContent = "Sem internet: mapa sem fundo (contorno de GO, IBGE). As glebas vêm do Sicor/BCB.";
-    aviso.hidden = false;
-  }
-}
-
-export function criarMapa(el, { aviso, centro = [-16.0, -49.6], zoom = 7, interativo = true } = {}) {
+export function criarMapaCarteira(el) {
   if (!leafletDisponivel()) return null;
   const L = window.L;
-  const m = L.map(el, { zoomControl: interativo, attributionControl: true, scrollWheelZoom: interativo,
-    dragging: interativo, preferCanvas: false }).setView(centro, zoom);
-  let carregou = false;
-  let erros = 0;
-  if (navigator.onLine === false) {
-    semInternet(aviso);
-  } else {
-    const camada = L.tileLayer(OSM, { maxZoom: 19, attribution: ATRIB, crossOrigin: true });
-    camada.on("tileload", () => { carregou = true; if (aviso) aviso.hidden = true; });
-    camada.on("tileerror", () => {
-      erros += 1;
-      if (!carregou && erros >= 3) { m.removeLayer(camada); semInternet(aviso); }
-    });
-    camada.addTo(m);
-  }
+  const m = L.map(el, { zoomControl: true, attributionControl: false, zoomSnap: 0.25, minZoom: 5, maxZoom: 16 }).setView([-15.9, -49.6], 6.5);
+  // os nomes das cidades ficam numa camada própria, acima dos piquetes, com halo do papel: um piquete nunca come o nome
+  // (os piquetes são pequenos e o nome, curto; o balão e a legenda ficam por cima de tudo)
+  m.createPane("cidades");
+  m.getPane("cidades").style.zIndex = 620;
+  m.getPane("cidades").style.pointerEvents = "none";
+  CIDADES.forEach(([n, la, lo]) => L.marker([la, lo], { interactive: false, keyboard: false, pane: "cidades",
+    icon: L.divIcon({ className: "cidade", html: `<span>${n}</span>`, iconSize: [0, 0] }) }).addTo(m));
   return m;
 }
 
 export function desenharContorno(m, contorno) {
-  if (!m || !contorno || !contorno.aneis) return null;
-  return window.L.polygon(contorno.aneis, { color: "#14324f", weight: 1.5, fill: false, dashArray: "4 4",
-    interactive: false }).addTo(m);
+  if (!m || !contorno?.aneis) return null;
+  return window.L.polygon(contorno.aneis, { color: cor("--carvao"), weight: 2.5, fillColor: cor("--papel-mapa"), fillOpacity: 1, interactive: false })
+    .addTo(m).bringToBack();
 }
 
-export function iconePrioridade(nivel, destaque = false) {
+// Ícone do piquete: nível alta|media|baixa|demo; o selecionado fica enquadrado em carvão. O caso da demonstração é o
+// piquete ipê com o esquadro (sem letra).
+export function iconeOperacao(nivel, selecionado = false) {
   const L = window.L;
-  const n = nivel || "sem_sinal";
-  // no celular o marcador é maior e a área de toque tem 44 px (o desenho fica no centro dela)
-  const movel = window.matchMedia?.("(max-width: 767px)").matches;
-  const tam = movel ? 44 : { alta: 26, media: 24, baixa: 20, sem_sinal: 16, demo: 26 }[n] || 18;
-  return L.divIcon({
-    className: movel ? "alvo-marcador" : "",
-    html: `<span class="marcador ${n}${destaque ? " ativo" : ""}" title="prioridade ${n}"><span>${LETRA_PRIO[n] || ""}</span></span>`,
-    iconSize: [tam, tam],
-    iconAnchor: [tam / 2, tam / 2],
-  });
+  const demo = nivel === "demo";
+  const miolo = demo ? '<svg class="pino-demo" viewBox="0 0 30 30" aria-hidden="true"><use href="#pino-demo"/></svg>'
+    : `<span class="ponto ${nivel || "baixa"}"></span>`;
+  const tam = selecionado ? 48 : demo ? 30 : 22;
+  return L.divIcon({ className: `marcador${selecionado ? " sel" : ""}${demo ? " demo" : ""}`, html: `<span class="anel">${miolo}</span>`,
+    iconSize: [tam, tam], iconAnchor: [tam / 2, tam / 2] });
 }
 
-// ---------------------------------------------------------------- fallback SVG (sem Leaflet)
-export function mapaSVG(el, itens, aoClicar) {
-  const pts = itens.flatMap((o) => (o.glebas || []).flat()).concat(itens.filter((o) => o.lat).map((o) => [o.lat, o.lon]));
-  if (!pts.length) { el.replaceChildren(h("p", { class: "vazio" }, "Sem geometria para desenhar.")); return; }
-  const lats = pts.map((p) => p[0]); const lons = pts.map((p) => p[1]);
-  const [la0, la1, lo0, lo1] = [Math.min(...lats), Math.max(...lats), Math.min(...lons), Math.max(...lons)];
-  const k = Math.cos(((la0 + la1) / 2) * Math.PI / 180);
-  const W = 1000; const H = Math.max(300, Math.round(W * ((la1 - la0) || 1) / (((lo1 - lo0) || 1) * k)));
-  const x = (lon) => ((lon - lo0) / ((lo1 - lo0) || 1)) * (W - 40) + 20;
-  const y = (lat) => H - (((lat - la0) / ((la1 - la0) || 1)) * (H - 40) + 20);
-  const ns = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(ns, "svg");
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", "Contorno das glebas (mapa simplificado, sem fundo)");
-  svg.style.width = "100%"; svg.style.height = "100%"; svg.style.background = "#eef2f5";
-  for (const o of itens) {
-    const cor = COR_PRIO[o.nivel] || "#555";
-    for (const anel of o.glebas || []) {
-      const p = document.createElementNS(ns, "polygon");
-      p.setAttribute("points", anel.map(([la, lo]) => `${x(lo).toFixed(1)},${y(la).toFixed(1)}`).join(" "));
-      p.setAttribute("fill", cor); p.setAttribute("fill-opacity", ".35"); p.setAttribute("stroke", cor); p.setAttribute("stroke-width", "2");
-      svg.append(p);
-    }
-    if (o.lat) {
-      const g = document.createElementNS(ns, "g");
-      g.setAttribute("tabindex", "0"); g.setAttribute("role", "button");
-      g.setAttribute("aria-label", `${o.titulo || o.ref_bacen}: prioridade ${o.nivel}`);
-      g.style.cursor = "pointer";
-      const c = document.createElementNS(ns, "circle");
-      c.setAttribute("cx", x(o.lon)); c.setAttribute("cy", y(o.lat)); c.setAttribute("r", "11");
-      c.setAttribute("fill", cor); c.setAttribute("stroke", "#fff"); c.setAttribute("stroke-width", "2");
-      const t = document.createElementNS(ns, "text");
-      t.setAttribute("x", x(o.lon)); t.setAttribute("y", y(o.lat) + 4); t.setAttribute("text-anchor", "middle");
-      t.setAttribute("font-size", "12"); t.setAttribute("font-weight", "800"); t.setAttribute("fill", "#fff");
-      t.textContent = LETRA_PRIO[o.nivel] || "";
-      g.append(c, t);
-      g.addEventListener("click", () => aoClicar(o));
-      g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") aoClicar(o); });
-      svg.append(g);
-    }
-  }
-  el.replaceChildren(svg);
-}
-
-// Mini-mapa da prova: gleba + ponto da foto + círculo de precisão.
-export function miniMapa(el, glebas, gps) {
-  if (!leafletDisponivel()) {
-    mapaSVG(el, [{ glebas, nivel: "media", lat: gps?.lat, lon: gps?.lon, titulo: "foto" }], () => {});
-    return null;
-  }
+// ---------------------------------------------------------------- prova da foto (gaveta): Leaflet com fundo, se houver
+export function miniMapa(el, glebas, gps, distancia = null) {
+  if (!leafletDisponivel()) { el.replaceChildren(svgMiniMapa(glebas, gps, distancia, { w: 520, h: 240 })); return null; }
   const L = window.L;
-  const m = criarMapa(el, { interativo: true, zoom: 14, centro: gps ? [gps.lat, gps.lon] : (glebas[0]?.[0] || [-16, -49]) });
+  const m = L.map(el, { zoomControl: true, attributionControl: true, scrollWheelZoom: false })
+    .setView(gps ? [gps.lat, gps.lon] : (glebas?.[0]?.[0] || [-16, -49]), 15);
+  if (navigator.onLine !== false) {
+    let ok = false; let erros = 0;
+    const t = L.tileLayer(OSM, { maxZoom: 19, attribution: ATRIB, crossOrigin: true });
+    t.on("tileload", () => { ok = true; });
+    t.on("tileerror", () => { erros += 1; if (!ok && erros >= 3) m.removeLayer(t); });
+    t.addTo(m);
+  }
   const grupo = [];
-  for (const anel of glebas || []) grupo.push(L.polygon(anel, { color: "#1b4a74", weight: 2, fillOpacity: 0.15 }).addTo(m));
+  for (const anel of glebas || []) grupo.push(L.polygon(anel, { color: cor("--carvao"), weight: 2.5, fillColor: cor("--carvao"), fillOpacity: 0.12 }).addTo(m));
   if (gps) {
-    grupo.push(L.circleMarker([gps.lat, gps.lon], { radius: 7, color: "#fff", weight: 2, fillColor: "#a1191c", fillOpacity: 1 })
-      .bindTooltip(`foto (±${gps.precisao_m ?? "?"} m)`, { permanent: true, direction: "top" }).addTo(m));
-    if (gps.precisao_m) grupo.push(L.circle([gps.lat, gps.lon], { radius: gps.precisao_m, color: "#a1191c", weight: 1, fillOpacity: 0.1 }).addTo(m));
+    const p = L.circleMarker([gps.lat, gps.lon], { radius: 8, color: cor("--carvao"), weight: 2.5, fillColor: cor("--ipe"), fillOpacity: 1 }).addTo(m);
+    grupo.push(p);
+    if (gps.precisao_m) grupo.push(L.circle([gps.lat, gps.lon], { radius: gps.precisao_m, color: cor("--carvao"), weight: 1, fillOpacity: 0.08 }).addTo(m));
+    const alvo = pontoMaisProximo(glebas, gps);
+    if (alvo && distancia !== null && distancia > 0) {
+      L.polyline([[gps.lat, gps.lon], alvo], { color: cor("--carvao"), weight: 2.5, dashArray: "6 6" }).addTo(m)
+        .bindTooltip(`${String(distancia).replace(".", ",")} m`, { permanent: true, direction: "center", className: "dist-tip" });
+    }
   }
   if (grupo.length) m.fitBounds(L.featureGroup(grupo).getBounds().pad(0.25));
   setTimeout(() => m.invalidateSize(), 50);
   return m;
 }
+
+// Ponto da borda mais próximo (lat, lon), em projeção local (metros).
+export function pontoMaisProximo(glebas, gps) {
+  if (!gps || !glebas?.length) return null;
+  const k = Math.cos(gps.lat * Math.PI / 180);
+  const P = (la, lo) => [(lo - gps.lon) * 111320 * k, (la - gps.lat) * 110540];
+  let melhor = null;
+  for (const anel of glebas) {
+    for (let i = 0; i < anel.length - 1; i++) {
+      const [ax, ay] = P(...anel[i]); const [bx, by] = P(...anel[i + 1]);
+      const dx = bx - ax; const dy = by - ay;
+      const t = Math.max(0, Math.min(1, -(ax * dx + ay * dy) / ((dx * dx + dy * dy) || 1)));
+      const x = ax + t * dx; const y = ay + t * dy;
+      const d = Math.hypot(x, y);
+      if (!melhor || d < melhor.d) melhor = { d, la: anel[i][0] + t * (anel[i + 1][0] - anel[i][0]), lo: anel[i][1] + t * (anel[i + 1][1] - anel[i][1]) };
+    }
+  }
+  return melhor ? [melhor.la, melhor.lo] : null;
+}
+
+// ---------------------------------------------------------------- mini-mapa do cartão de resultado (SVG)
+// O mesmo papel do mapa da carteira: fundo papel-mapa, a área financiada só contornada em carvão, o ponto da foto em ipê
+// e, fora da área, a régua graduada de 100 em 100 m da foto até a borda, com a distância grande numa etiqueta carvão.
+export function svgMiniMapa(glebas, gps, distancia, { w = 260, h: alt = 128, rotulo = null } = {}) {
+  const ns = "http://www.w3.org/2000/svg";
+  const mk = (tag, at) => { const e = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(at)) e.setAttribute(k, v); return e; };
+  const svg = mk("svg", { viewBox: `0 0 ${w} ${alt}`, class: "mini-svg", role: "img",
+    "aria-label": distancia ? `Área financiada e o ponto da foto, a ${rotulo || `${distancia} m`} da borda` : "Área financiada e o ponto da foto" });
+  svg.append(mk("rect", { x: 0, y: 0, width: w, height: alt, fill: cor("--papel-mapa") }));
+  const pts = (glebas || []).flat().concat(gps ? [[gps.lat, gps.lon]] : []);
+  if (!pts.length) return svg;
+  const lat0 = pts.reduce((s, p) => s + p[0], 0) / pts.length;
+  const k = Math.cos(lat0 * Math.PI / 180);
+  const xy = ([la, lo]) => [lo * k, -la];
+  const P = pts.map(xy);
+  const [x0, x1] = [Math.min(...P.map((p) => p[0])), Math.max(...P.map((p) => p[0]))];
+  const [y0, y1] = [Math.min(...P.map((p) => p[1])), Math.max(...P.map((p) => p[1]))];
+  // a etiqueta da distância fica embaixo, à esquerda: o desenho usa o resto
+  const padX = 18; const padTop = 14; const padBase = distancia ? 46 : 14;
+  const esc = Math.min((w - 2 * padX) / ((x1 - x0) || 1e-9), (alt - padTop - padBase) / ((y1 - y0) || 1e-9));
+  const ox = (w - (x1 - x0) * esc) / 2; const oy = padTop + (alt - padTop - padBase - (y1 - y0) * esc) / 2;
+  const tela = (p) => { const [x, y] = xy(p); return [ox + (x - x0) * esc, oy + (y - y0) * esc]; };
+  for (const anel of glebas || []) {
+    const pts2 = anel.map((p) => tela(p).map((v) => v.toFixed(1)).join(",")).join(" ");
+    svg.append(mk("polygon", { points: pts2, fill: cor("--branco"), stroke: cor("--carvao"), "stroke-width": 2.5, "stroke-linejoin": "round" }));
+  }
+  if (gps) {
+    const [gx, gy] = tela([gps.lat, gps.lon]);
+    const alvo = pontoMaisProximo(glebas, gps);
+    if (alvo && distancia) {
+      const [ax, ay] = tela(alvo);
+      const dx = ax - gx; const dy = ay - gy; const L = Math.hypot(dx, dy) || 1;
+      const ux = dx / L; const uy = dy / L; const nx = -uy; const ny = ux;
+      // régua: a linha cheia e um tracinho a cada 100 m (maior a cada 500 m)
+      svg.append(mk("line", { x1: gx, y1: gy, x2: ax, y2: ay, stroke: cor("--carvao"), "stroke-width": 2.5 }));
+      const passo = 100 * L / Number(distancia);
+      if (Number.isFinite(passo) && passo >= 3) {
+        for (let i = 1, s = passo; s < L - 1; i += 1, s += passo) {
+          const c = i % 5 === 0 ? 6 : 4;
+          const px = gx + ux * s; const py = gy + uy * s;
+          svg.append(mk("line", { x1: px - nx * c, y1: py - ny * c, x2: px + nx * c, y2: py + ny * c, stroke: cor("--carvao"), "stroke-width": 1.75 }));
+        }
+      }
+      svg.append(mk("line", { x1: ax - nx * 7, y1: ay - ny * 7, x2: ax + nx * 7, y2: ay + ny * 7, stroke: cor("--carvao"), "stroke-width": 2.5 }));
+      // a distância, grande, numa etiqueta carvão no pé do desenho
+      const txt = rotulo || `${distancia} m`;
+      const th = 32; const tw = 16 + txt.length * 11.5;
+      const tx = 8; const ty = alt - th - 8;
+      svg.append(mk("rect", { x: tx, y: ty, width: tw, height: th, rx: 2, fill: cor("--carvao") }));
+      const t = mk("text", { x: tx + tw / 2, y: ty + th / 2 + 8.5, "text-anchor": "middle", class: "mm-dist" });
+      t.textContent = txt;
+      svg.append(t);
+    }
+    svg.append(mk("rect", { x: gx - 8, y: gy - 8, width: 16, height: 16, rx: 2, fill: cor("--ipe"), stroke: cor("--carvao"), "stroke-width": 2.5 }));
+  }
+  return svg;
+}
+
+export function contornoSimples(texto) { return h("div", { class: "mapa-vazio" }, texto); }

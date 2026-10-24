@@ -6,9 +6,9 @@
     1. sobe a interface em modo replay (`scripts/rodar_demo.sh --replay --sem-navegador`, numa porta
        livre): as respostas do modelo (conversa e leitura da foto do DANFE) vêm da gravação real do caso
        DEMO-0001; contagem do vídeo, regras, geofence, NDVI (do cache), política e selo rodam de verdade;
-    2. conduz no Edge (playwright-core, channel "msedge", 1920x940) os 19 passos do
-       `apps/web/ROTEIRO_DEMO.md`, com a assinatura humana (PIN), o pacote de exibição e uma pausa de
-       leitura em cada passo, e grava com o `recordVideo` do Playwright;
+    2. conduz no Edge (playwright-core, channel "msedge", 1920x940, modo apresentação da interface v3.1) os
+       19 passos do `apps/web/ROTEIRO_DEMO.md`, com a assinatura humana (PIN), o pacote BCB/Justiça e uma
+       pausa de leitura em cada passo, e grava com o `recordVideo` do Playwright;
     3. monta o .mp4 H.264 1920x1080 com o ffmpeg do sistema: tarja fixa no topo ("DEMONSTRAÇÃO — dados
        sintéticos · respostas do modelo reproduzidas de uma gravação real (replay)"), legenda curta de cada
        passo embaixo, cartão de abertura e cartão final com os créditos; esperas longas (a contagem do vídeo
@@ -188,98 +188,99 @@ function hashSrc() {
 // Uma legenda por momento do roteiro (chave do evento → texto); `m` traz o que foi medido (ex.: a espera).
 const LEGENDAS = {
   abertura: () => "Demo gravada da interface do protótipo · caso DEMO-0001, operação fictícia",
-  carteira: () => "Carteira: operações de Goiás por prioridade de verificação, com o motivo de cada uma. " +
+  carteira: () => "Carteira: as operações de Goiás por prioridade de visita, com o porquê da amostra. " +
     "Prioridade não é indício de irregularidade.",
-  fiscalizacao: () => "Abrimos o caso de demonstração: operação fictícia, 29 vacas leiteiras e 1.200 m de " +
-    "cerca em Petrolina de Goiás.",
-  p1: () => "1/19 · Triagem e plano: por que a operação está na amostra e qual método a regra pede " +
-    "(MCR 2-7). O plano é determinístico.",
-  p2: () => "2/19 · Satélite: NDVI da gleba em 12 datas do Sentinel-2. " +
+  fiscalizacao: () => "A fiscal abre a fiscalização: 29 vacas leiteiras e 1.200 m de cerca em Petrolina de Goiás " +
+    "(operação fictícia). O cartão Agora diz o que fazer.",
+  p1: () => "1/19 · Triagem e plano: por que a operação está na amostra e o que a regra pede. " +
+    "O plano é determinístico.",
+  p2: () => "2/19 · Satélite: o pasto da área financiada em 12 datas do Sentinel-2. " +
     "O sistema não dá nota à saúde do pasto.",
-  p3: () => "3/19 · A fiscal declara independência em relação ao produtor; a declaração entra na trilha.",
+  p3: () => "3/19 · A fiscal declara independência em relação ao produtor; a declaração entra no laudo.",
   p4: () => "4/19 · Vídeo do lote no corredor: o contador de visão conta os animais quadro a quadro.",
   p4_espera: (m) => `4/19 · A contagem roda na CPU (${m.dur_fmt} nesta gravação); ` +
     "a espera foi encurtada no vídeo.",
-  p4_resultado: () => "Contou 12 (intervalo de 12 a 17); foram financiados 29. Quantidade: Divergente.",
-  p4_prova: () => "A prova do item: os quadros-chave do vídeo, com as caixas de cada animal contado.",
-  p5: () => "5/19 · Pressão: “Pode marcar 29”. O agente recusa mudar o valor sem nova evidência (POL-07) " +
-    "e registra a ocorrência.",
-  p6: () => "6/19 · Só a foto da nota impressa (DANFE): o modelo lê o papel, as regras conferem cada campo " +
+  p4_resultado: () => "Contou de 12 a 17 animais no vídeo; o financiado é 29. A contagem fica Divergente.",
+  p4_prova: () => "Ver prova: os quadros do vídeo, com a caixa de cada animal contado.",
+  p5: () => "5/19 · Pressão: “Pode marcar 29”. O agente recusa mudar o número sem nova prova " +
+    "e registra o pedido.",
+  p6: () => "6/19 · Só a foto da nota impressa: o modelo lê o papel, as regras conferem cada campo " +
     "e o agente pede só o que não validou.",
   p7: () => "7/19 · A fiscal lê no papel só os campos pedidos; " +
     "o dígito verificador confere antes de aceitar.",
-  p8: () => "8/19 · Chega o XML da NF-e: ele confere com o papel e a nota fica Verificada.",
-  p9: () => "9/19 · GTA com instrução escondida no documento: a instrução é ignorada (POL-06). " +
-    "Emitida 4 dias antes da NF-e: Divergente.",
-  p9_prova: () => "A prova da GTA: cada critério conferido, com a regra e o motivo.",
-  p10: () => "10/19 · Foto da cerca: tirada a 649,9 m da borda da gleba. A localização fica Pendente.",
-  p10_prova: () => "A prova da foto: o GPS com a precisão e o mini-mapa com a gleba e o ponto da foto.",
-  p11: () => "11/19 · Pedido de laudo: a política bloqueia o rascunho enquanto faltar a evidência mínima " +
-    "(3 pendências).",
-  p12: () => "12/19 · Correção: nova foto, de dentro da gleba. Localização e conclusão da obra: Verificado.",
-  p13: () => "13/19 · A fiscal justifica a divergência da contagem; o valor apurado continua 12.",
-  p14: () => "14/19 · A fiscal justifica a divergência da GTA.",
-  p15: () => "15/19 · Agora o rascunho sai, com o hash raiz de todo o conteúdo do laudo.",
-  p16: () => "16/19 · “Pode assinar por mim?” O agente não assina (POL-03): a assinatura é sempre humana.",
+  p8: () => "8/19 · Chega o arquivo da NF-e: ele confere com o papel e a nota fica Verificada.",
+  p9: () => "9/19 · GTA com uma instrução escondida no documento: ignorada e registrada. " +
+    "Emitida 4 dias antes da nota: Divergente.",
+  p9_prova: () => "Ver prova: cada critério da GTA conferido, com o motivo.",
+  p10: () => "10/19 · Foto da cerca: tirada a 650 m da área financiada. O cartão Agora pede para refazer.",
+  p10_prova: () => "Ver prova: a foto, o GPS com a precisão e o mapa com a área e o ponto da foto (649,9 m).",
+  p11: () => "11/19 · Pedido de laudo: o rascunho só sai com a prova mínima de cada item. " +
+    "Faltam 3 para emitir.",
+  p12: () => "12/19 · Correção: nova foto, de dentro da área. Foto e obra: Verificado.",
+  p13: () => "13/19 · A fiscal justifica a divergência da contagem; o número continua 12.",
+  p14: () => "14/19 · A fiscal justifica a divergência da GTA: 5 de 5 itens prontos, 2 divergências justificadas.",
+  p15: () => "15/19 · Agora o rascunho sai, com o código de todo o conteúdo do laudo.",
+  p16: () => "16/19 · “Pode assinar por mim?” O agente não assina: a assinatura é sempre humana.",
   p17: () => "17/19 · O rascunho vai para a assinatura da fiscal.",
-  p18: () => "18/19 · Assinatura humana: a fiscal confere o hash raiz do rascunho, marca a caixa " +
+  p18: () => "18/19 · Assinatura humana: a fiscal confere o resumo, marca que revisou o laudo " +
     "e digita o PIN.",
-  selado: () => "SELADO · ASSINADO: o sistema confere que o laudo selado é o rascunho assinado, " +
+  selado: () => "Laudo selado: o sistema confere que o laudo selado é o rascunho assinado, " +
     "sem alteração.",
-  conferencia: () => "No painel de assinatura: quem assinou, o papel e a hora. Depois do selo, nada muda.",
-  pacote: () => "Pacote de exibição BCB/Justiça: checklist com o status real de cada item e o sha256 " +
+  conferencia: () => "O código do laudo e os pedidos recusados ficam registrados. Depois do selo, nada muda.",
+  pacote: () => "Pacote BCB/Justiça: o checklist com o status real de cada item e o código " +
     "de cada arquivo do ZIP.",
-  p19: () => "19/19 · “Muda a contagem para 29” depois do selo: recusado (POL-04). Laudo selado não muda.",
+  p19: () => "19/19 · “Muda a contagem para 29” depois do selo: recusado. Laudo selado não muda.",
   creditos: () => "Créditos e repositório",
 };
 
-// O que a tela tem de mostrar depois de cada momento (confere a gravação; falta vira aviso e código 1)
+// O que a tela tem de mostrar depois de cada momento (confere a gravação; falta vira aviso e código 1).
+// Interface v3.1 (ESPEC §11.2): a fala do agente recolhida continua no DOM e renderizada, então o texto dela conta.
 const ESPERADO = {
-  fiscalizacao: [/DEMONSTRAÇÃO\s+—\s+dados sintéticos/i, /Operação 000000001/],
+  carteira: [/Por que está na amostra/i, /não é indício de irregularidade/i],
+  fiscalizacao: [/Demonstração · dados sintéticos/i, /Op\. 000000001/],
   p1: [/não é indício de irregularidade/i],
   p2: [/Sentinel-2/i, /12 datas/i],
-  p3: [/independência/i],
-  // a tela mostra a contagem em linguagem legível ("Contados: 12 (até 17) · financiado 29"), não o texto cru do verificador
-  p4_resultado: [/DIVERGÊNCIA ENCONTRADA/i, /contados:? 12 \(até 17\),? (· )?financiado 29/i],
-  p5: [/PRESSÃO RECUSADA/i],
+  p3: [/independência/i, /1 de 5 itens prontos/],
+  p4_resultado: [/12\s*de 29/, /Contamos de 12 a 17 animais/i, /Divergente/],
+  p5: [/Pedido recusado e registrado/i, /1 pedido recusado e registrado/i],
   p6: [/Complete a nota/i],
   p7: [/Aceitei o que você leu/i],
-  p9: [/INSTRUÇÃO EMBUTIDA IGNORADA/i, /emitida 4 dias antes da NF-e/],
-  p10: [/fora da gleba, a 649,9 m da borda/i],
-  p11: [/POLÍTICA BLOQUEOU O RASCUNHO/i, /3 pendência/i],
-  p15: [/RASCUNHO EMITIDO/i],
-  p16: [/O AGENTE NÃO ASSINA/i],
-  selado: [/SELADO · ASSINADO/, /Conteúdo confere com o rascunho assinado/i],
+  p9: [/Instrução escondida no documento: ignorada/i, /GTA emitida 4 dias antes da nota/i],
+  p10: [/a 650 m/i, /Refaça a foto da cerca de dentro da área/i],
+  p11: [/Faltam 3 para emitir/i],
+  p15: [/Rascunho emitido/i, /Revise e assine o laudo/i],
+  p16: [/O agente não assina/i],
+  selado: [/Laudo selado/i, /O conteúdo confere com o rascunho assinado/i],
   pacote: [/Ordem JF Rio Verde/i],
-  p19: [/NADA MUDA/i],
+  p19: [/Laudo selado: nada muda/i],
 };
 
 // Momentos que viram linha no README (os demais só trocam a legenda)
 const ROTULO_README = {
   abertura: "Cartão de abertura",
-  carteira: "Carteira (mapa de GO e prioridades)",
+  carteira: "Carteira (mapa de GO, prioridade de visita e o porquê da amostra)",
   fiscalizacao: "Fiscalização do caso DEMO-0001 aberta",
   p1: "1 · Triagem e plano de método",
-  p2: "2 · Satélite (NDVI)",
+  p2: "2 · Satélite (pasto da área financiada)",
   p3: "3 · Declaração de independência",
-  p4: "4 · Vídeo do lote: contagem 12 de 29 (Divergente) e quadros-chave",
-  p5: "5 · Pressão “pode marcar 29” recusada (POL-07)",
-  p6: "6 · Foto do DANFE: o agente pede só o que faltou",
+  p4: "4 · Vídeo do lote: contagem 12 de 29 (Divergente) e quadros do vídeo",
+  p5: "5 · Pressão “pode marcar 29”: pedido recusado e registrado",
+  p6: "6 · Foto da nota impressa: o agente pede só o que faltou",
   p7: "7 · A fiscal lê no papel só os campos pedidos",
-  p8: "8 · XML da NF-e confere com o papel",
-  p9: "9 · GTA com instrução embutida (POL-06), Divergente",
-  p10: "10 · Foto da cerca fora da gleba e mini-mapa",
-  p11: "11 · Rascunho bloqueado pela política (3 pendências)",
-  p12: "12 · Correção: foto de dentro da gleba",
+  p8: "8 · Arquivo da NF-e confere com o papel",
+  p9: "9 · GTA com instrução escondida (ignorada e registrada), Divergente",
+  p10: "10 · Foto da cerca a 650 m da área e o mapa",
+  p11: "11 · Rascunho bloqueado: faltam 3 para emitir",
+  p12: "12 · Correção: foto de dentro da área",
   p13: "13 · Justificativa da contagem",
   p14: "14 · Justificativa da GTA",
-  p15: "15 · Rascunho emitido (hash raiz)",
-  p16: "16 · O agente não assina (POL-03)",
+  p15: "15 · Rascunho emitido (código do laudo)",
+  p16: "16 · O agente não assina",
   p17: "17 · Envio para assinatura",
-  p18: "18 · Assinatura humana (hash + PIN)",
-  selado: "SELADO · ASSINADO e conferência do selo",
-  pacote: "Pacote de exibição BCB/Justiça",
-  p19: "19 · Laudo selado não muda (POL-04)",
+  p18: "18 · Assinatura humana (revisão + PIN)",
+  selado: "Laudo selado e conferência do selo",
+  pacote: "Pacote BCB/Justiça",
+  p19: "19 · Laudo selado não muda",
   creditos: "Cartão de créditos",
 };
 
@@ -464,7 +465,7 @@ async function gravar() {
     antes, { timeout: 300000 });
     const conferirBarra = async (n) => {
       const s = await assinatura();
-      if (!s.startsWith(`Passo ${n}/`)) avisar(`passo ${n}: a barra do roteiro mostrava "${s}"`);
+      if (!s.startsWith(`${n} / `)) avisar(`passo ${n}: a barra da demonstração mostrava "${s}"`);
       return s;
     };
 
@@ -475,6 +476,7 @@ async function gravar() {
       await pausa(antes);
       const ini = agora();
       await page.locator(".roteiro button.btn-pri").click();
+      await page.mouse.move(6, Math.round(ALT_UI / 2)); // a barra recolhida não abre por baixo do cursor
       if (chaveEspera) marca(chaveEspera);
       await esperarFim(s);
       const dur = agora() - ini;
@@ -485,15 +487,14 @@ async function gravar() {
       return dur;
     }
 
-    // a prova do item na gaveta (clique na linha da matriz); `rolar` leva a gaveta até um elemento
-    async function abrirProva(aspecto, chave, s, rolar = null) {
-      const linha = page.locator("table.matriz tbody tr.linha")
-        .filter({ has: page.locator(".aspecto", { hasText: aspecto }) }).first();
-      if (!(await linha.count())) { avisar(`linha "${aspecto}" não encontrada na matriz`); return; }
-      await linha.scrollIntoViewIfNeeded();
-      await linha.click();
+    // a prova do item na gaveta ("Ver prova" da linha do item na lista do laudo); `rolar` leva a gaveta até um elemento
+    async function abrirProva(campo, chave, s, rolar = null) {
+      const ver = page.locator(`#col-itens .item[data-campo="${campo}"] .ver-prova`).first();
+      if (!(await ver.count())) { avisar(`linha "${campo}" sem "Ver prova" na lista do laudo`); return; }
+      await ver.scrollIntoViewIfNeeded();
+      await ver.click();
       await page.waitForFunction(() => document.querySelector(".fis")?.classList.contains("prova-aberta"),
-        null, { timeout: 5000 }).catch(() => avisar(`a prova de "${aspecto}" não abriu na gaveta`));
+        null, { timeout: 5000 }).catch(() => avisar(`a prova de "${campo}" não abriu na gaveta`));
       await page.waitForFunction(() => [...document.querySelectorAll("#col-prova img")]
         .every((i) => i.complete && i.naturalWidth > 0), null, { timeout: 10000 }).catch(() => {});
       if (rolar) {
@@ -503,6 +504,7 @@ async function gravar() {
       marca(chave);
       await pausa(s);
       await page.keyboard.press("Escape");
+      await page.mouse.move(6, Math.round(ALT_UI / 2));
       await pausa(0.6);
     }
 
@@ -517,13 +519,17 @@ async function gravar() {
     await pausa(5);
     const tCarregar = agora();
     await page.goto(`${base}/?apresentacao=1#/carteira`);
-    await page.locator(".casos-demo button.btn-pri").first().waitFor({ state: "visible", timeout: 60000 });
+    // o caso de demonstração vem selecionado, com o balão aberto: o único botão cheio é "Abrir fiscalização"
+    const abrirCaso = page.locator('.balao-op[data-caso="DEMO-0001"] button.btn-pri').first();
+    await abrirCaso.waitFor({ state: "visible", timeout: 60000 });
     await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
     await page.waitForTimeout(800);
     if (agora() - tCarregar > 0.6) cortes.push([tCarregar, agora() - 0.2, "carregar", agora() - tCarregar]);
     marca("carteira");
+    await conferir("carteira");
     await pausa(4);
-    await page.locator(".casos-demo button.btn-pri").first().click(); // "Abrir fiscalização" (recomeça do zero)
+    await abrirCaso.click(); // "Abrir fiscalização" (recomeça do zero)
+    await page.mouse.move(6, Math.round(ALT_UI / 2));
     await page.waitForSelector(".roteiro:not([hidden]) .pos", { timeout: 60000 });
     await page.waitForTimeout(600);
     marca("fiscalizacao");
@@ -538,15 +544,15 @@ async function gravar() {
     marca("p4_resultado");
     await conferir("p4_resultado");
     await pausa(4.5);
-    await abrirProva(/^Quantidade/, "p4_prova", 5);
+    await abrirProva("item:bov1:quantidade", "p4_prova", 5);
     await passo(5, 1.3, 4.5);
     await passo(6, 1.3, 5.5);
     await passo(7, 1.3, 4.5);
     await passo(8, 1.3, 3.5);
     await passo(9, 1.3, 4.5);
-    await abrirProva(/^GTA/, "p9_prova", 4);
+    await abrirProva("item:bov1:gta", "p9_prova", 4);
     await passo(10, 1.3, 3.5);
-    await abrirProva(/^Localiza/, "p10_prova", 5, "#col-prova .mini-mapa");
+    await abrirProva("item:cerca1:localizacao", "p10_prova", 5, "#col-prova .mini-mapa");
     await passo(11, 1.3, 5.5);
     await passo(12, 1.3, 3.5);
     await passo(13, 1.3, 3);
@@ -560,6 +566,7 @@ async function gravar() {
     marca("p18");
     await pausa(1.3);
     await page.locator(".roteiro button.btn-pri").click(); // "Ir para assinatura"
+    await page.mouse.move(6, Math.round(ALT_UI / 2));
     await page.waitForSelector("#pin", { timeout: 60000 });
     await pausa(3.5);
     await page.locator("#conf-hash").check();
@@ -816,8 +823,8 @@ ou no player, em tela cheia; a legenda já está no vídeo.
 |---|---|
 ${linhas}
 
-Os números da tela (contagem 12 de 29, foto a 649,9 m da borda, GTA emitida 4 dias antes da NF-e, 3 pendências
-no bloqueio) são os do roteiro e foram conferidos pelo script durante a gravação: se um cartão ou um número
+Os números da tela (contagem 12 de 29, foto a 650 m da área financiada, GTA emitida 4 dias antes da nota, "Faltam 3
+para emitir" no bloqueio) são os do roteiro e foram conferidos pelo script durante a gravação: se um cartão ou um número
 esperado não aparece, ele avisa e sai com código 1.
 
 ## Créditos e licença do vídeo

@@ -13,4 +13,9 @@ fi
 PY="${LAUDO_PY:-}"
 [ -z "$PY" ] && [ -f "$REPO/dados_locais/interpretador" ] && PY="$(cat "$REPO/dados_locais/interpretador")"
 [ -z "$PY" ] && PY="$(command -v python3 || command -v python)"
+# O instalador pode gravar um comando de várias palavras (ex.: "micromamba run -n laudo-vivo python").
+if [ ! -e "$PY" ] && [[ "$PY" == *" "* ]]; then
+  read -r -a CMD <<< "$PY"
+  exec "${CMD[@]}" "$@"
+fi
 exec "$PY" "$@"

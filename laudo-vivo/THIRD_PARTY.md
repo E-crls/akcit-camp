@@ -34,6 +34,7 @@ para um clone novo rodar a demo com ferramentas reais, e a demo gravada da inter
 | Gravações do LLM para o replay | sim | `tests/unit/dados_agente/*.jsonl` | saídas do `qwen3.5:4b` gravadas pela demo |
 | Fala sintética do teste de ASR | sim | `tests/unit/dados_voz/fala_contagem_sapi.wav` | — |
 | Leaflet 1.9.4 | sim (vendorizado) | `apps/web/vendor/leaflet-1.9.4/` | — |
+| Fonte Barlow (OFL-1.1) e ícones Phosphor (MIT) e Lucide (ISC) | sim (vendorizados) | `apps/web/vendor/fonts/`, `apps/web/vendor/icones/` | — (origem e licenças na seção 4) |
 | Detector YOLOX (`yolox_tiny/s/m.onnx`) | não | `dados_locais/modelos/` | `scripts/preparar_demo.py` (o `yolox_m` da demo) ou `scripts/baixar_modelos.py --todos`; ambos conferem o sha256 |
 | Whisper (`Systran/faster-whisper-large-v3`) | não | cache do Hugging Face do usuário | baixado à parte; o código só lê do cache (`local_files_only`) |
 | `qwen3.5:4b`, `qwen3:14b` | não | servidor Ollama local | `ollama pull qwen3.5:4b` |
@@ -144,6 +145,18 @@ das saídas.
   arquivo local e na API do GitHub (`Leaflet/Leaflet`).
 - **Nenhuma outra biblioteca JS**: o `index.html` carrega só o Leaflet e os módulos próprios de
   `apps/web/js/`; não há npm, CDN, axe nem build.
+- **Fonte Barlow** (Barlow 500, 600 e 700; Barlow Semi Condensed 600 e 700; Barlow Condensed 700 e 800), da
+  The Barlow Project Authors, sob a **SIL Open Font License 1.1**. Os 7 arquivos `.woff2` (subconjunto latino) vêm
+  do Google Fonts (`fonts.gstatic.com`, baixados em 23/10/2026) e ficam locais em `apps/web/vendor/fonts/`,
+  com o `OFL.txt` ao lado. A interface funciona offline. A fonte não foi modificada e não é vendida à parte.
+- **Ícones Phosphor 2.1.1** (pesos Bold e Fill), **MIT**, `LICENSE-phosphor.txt` ao lado. São 48 SVGs (45 Bold e 3 Fill) de
+  `https://unpkg.com/@phosphor-icons/core@2.1.1/assets/`, em `apps/web/vendor/icones/phosphor-bold/` e
+  `phosphor-fill/`.
+- **Ícone Lucide 0.460.0** (`satellite`), **ISC**, `LICENSE-lucide.txt` ao lado, em `apps/web/vendor/icones/lucide/`.
+  O traço foi ajustado para 2,25 px, o peso da Phosphor Bold.
+- Os ícones `cerca`, `area` e `esquadro`, a marca (o esquadro na placa ipê) e o favicon (`apps/web/icone.svg`)
+  são **desenhos próprios do projeto**, com a licença do projeto. O sprite inline do `index.html` sai de
+  `scripts/montar_sprite_web.py`. Nenhum logotipo, nome ou ativo de marca de terceiros entrou na interface.
 - **Tiles do OpenStreetMap** (`tile.openstreetmap.org`), carregados pelo navegador só quando há internet, com
   a atribuição "© OpenStreetMap" e link para `openstreetmap.org/copyright` no mapa. Dados © colaboradores do
   OpenStreetMap, ODbL; uso leve de demonstração dentro da política de tiles da OSMF.

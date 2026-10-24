@@ -1,496 +1,678 @@
-// Tela da fiscalização (fiscal de campo). A conversa com o agente fica no centro, com o compositor fixo embaixo
-// (anexar Foto, Vídeo, NF-e, GTA, Nota impressa; microfone; texto). Ao lado, o painel "Laudo" com o progresso por
-// item, o que falta para emitir e o botão principal; à esquerda (ou numa aba), as evidências enviadas. Clicar num
-// item abre a prova numa gaveta. Avisos da política e das guardas entram na conversa como cartões de sistema. O
-// técnico (etapas, ações, decisões da política, trace) vai para a gaveta "Detalhes técnicos".
+// Fiscalização: a conversa com o agente no centro, limpa como um app de mensagens. Cada resposta com prova visual
+// começa por um cartão de resultado (um número, um status); a fala do agente fica a um toque. Quando o agente recusa
+// um pedido, a bolha ganha o rodapé de guarda. O último elemento da conversa é sempre o cartão "Agora": a próxima ação
+// em um verbo e um botão. Ao lado (computador) ou numa folha (celular), o laudo: o indicador, o que falta e o que está
+// pronto. "Ver prova" abre a prova do item numa gaveta. O técnico (regras, ferramentas, etapas, trace) fica em
+// Detalhes técnicos. O analista acompanha a mesma tela, sem compositor e sem botões de ação.
 
 import { api, postForm, postFormProgresso } from "./api.js";
-import { miniMapa } from "./mapa.js";
-import { aberturaAmostra, abrirModal, anunciar, atualizarSaude, avisar, blocoTec, chipRegra, chipStatus, curto, definirDemo,
-  fmtData, fmtNum, h, icone, legivel, motivoLegivel, rotuloFerramenta, secaoTecnica, semIds, valorLegivel } from "./ui.js";
-import { Gravador, lerGPS, tts } from "./voz.js";
+import { justificativa, linhaIndicador, trilhaEtapas } from "./componentes.js";
+import { falaFiscal, falaSimples } from "./fala.js";
+import { miniMapa, svgMiniMapa } from "./mapa.js";
+import * as R from "./regras.js";
+import { PERFIS, definirTela, papel, primeiroNome } from "./sessao.js";
+import { TEXTO_POL, abrirMenu, abrirModal, abrirTecnico, alternarFolha, anunciar, atualizarSaude, avatarAgente, avisar, blocoAmostra,
+  blocoTec, chipNeutro, chipStatus, definirDemo, definirTopo, ehMovel, fecharMenus, fecharModal, fmtData, fmtNum, h, icone, kv,
+  legivel, regraCurta, rotuloFerramenta, secaoTecnica, semIds } from "./ui.js";
+import { Gravador, confirmarNumeros, lerGPS, preferenciasVoz, tts } from "./voz.js";
 
-const ROT_TIPO = { video: "Vídeo", foto: "Foto", nfe_xml: "NF-e (XML)", gta: "e-GTA", documento: "Nota impressa / documento",
-  audio: "Áudio", quadro_chave: "Quadro-chave" };
-const IC_TIPO = { video: "video", foto: "camera", nfe_xml: "xml", gta: "gta", documento: "nota", quadro_chave: "galeria" };
-// A GTA eletrônica é o JSON; PDF ou foto da GTA vão como documento em papel (o servidor também converte, L38)
-const ACEITA = { foto: "image/*", video: "video/*", nfe_xml: ".xml,text/xml,application/xml", gta: ".json,application/json",
-  documento: ".pdf,image/*" };
-const ANEXOS = [
-  { k: "foto", rot: "Foto", ic: "camera", opcoes: [{ tipo: "foto", rot: "Tirar ou escolher uma foto", captura: true }] },
-  { k: "video", rot: "Vídeo", ic: "video", opcoes: [{ tipo: "video", rot: "Gravar ou escolher um vídeo", captura: true }] },
-  { k: "nfe", rot: "NF-e", ic: "xml", opcoes: [{ tipo: "nfe_xml", rot: "Escolher o XML da NF-e" }] },
-  { k: "gta", rot: "GTA", ic: "gta", opcoes: [{ tipo: "gta", rot: "Escolher a e-GTA (JSON)" },
-    { tipo: "documento", rot: "GTA em papel (foto ou PDF)", item: "gta" }] },
-  { k: "papel", rot: "Nota impressa", ic: "nota", opcoes: [{ tipo: "documento", rot: "Fotografar a nota impressa (DANFE)" }] },
-];
-const TIPOS_ANEXO = { foto: ["foto"], video: ["video"], nfe: ["nfe_xml"], gta: ["gta"], papel: ["documento"] };
-const STATUS_ENVIO = { video: "Contando os animais no vídeo…", documento: "Lendo o documento…", nfe_xml: "Conferindo a NF-e…",
-  gta: "Conferindo a GTA…", foto: "Conferindo a foto e a localização…" };
-const PRIORIDADE_EVENTO = { bloqueio: 0, abstencao: 1, pressao: 2, injecao: 2, assinatura: 2, selado: 3, negado: 3,
-  divergencia: 4, emitido: 5, justificativa: 5, pendente: 6, verificado: 7, ocorrencia: 8 };
-const IC_EVENTO = { bloqueio: "cadeado", abstencao: "abstencao", pressao: "escudo", injecao: "escudo", assinatura: "escudo",
-  selado: "cadeado", negado: "cadeado", divergencia: "divergente", emitido: "doc", pendente: "pendente",
-  verificado: "verificado", ocorrencia: "info", justificativa: "alerta", guarda: "escudo" };
-// Texto curto, sem jargão, para cada aviso da política (o texto técnico fica na dica)
-const EXPLICA = {
-  pressao: "O valor só muda com nova evidência. O pedido ficou registrado.",
-  injecao: "O documento trazia uma instrução escondida; ela foi tratada como dado, não como ordem.",
-  assinatura: "Só o fiscal assina, com PIN, depois de conferir o hash.",
-  selado: "O laudo está selado: correção só com uma nova fiscalização.",
-  negado: "A política não permitiu esta ação.",
-};
-const NIVEL_FORTE = ["bloqueio", "abstencao", "divergente"];
-// Guardas que funcionaram (pressão recusada, instrução ignorada, o agente não assina, laudo selado não muda): são uma
-// garantia, não uma falha. Ficam em ardósia com escudo; o vermelho fica só para o bloqueio por falta de evidência.
-const GUARDA = new Set(["pressao", "injecao", "assinatura", "selado", "negado"]);
-// O que a fiscal envia em cada passo do roteiro que não tem fala (a barra mostra isto, não o nome do arquivo)
-const ENVIO_TIPO = { nfe_xml: "a fiscal anexa o XML da NF-e da compra", gta: "a fiscal anexa a e-GTA da compra",
-  video: "a fiscal envia o vídeo do lote", foto: "a fiscal envia a foto", documento: "a fiscal fotografa a nota impressa" };
+const STATUS_ENVIO = { video: "Contando os animais do vídeo… isso leva uns 15 s", documento: "Lendo a foto do documento…",
+  nfe_xml: "Conferindo a nota fiscal…", gta: "Conferindo a GTA…", foto: "Conferindo a foto e o local…" };
+const ACEITA = { foto: "image/*", video: "video/*", nfe_xml: ".xml,text/xml,application/xml", gta: ".json,application/json,.pdf",
+  documento: "image/*,.pdf" };
+const ORDEM_CARTAO = ["contar_bovinos_video", "geofence", "conciliar_gta", "conciliar_nfe", "ler_documento_foto"];
+const ENVIO_TIPO = { nfe_xml: "a fiscal envia o arquivo da NF-e", gta: "a fiscal envia a GTA", video: "a fiscal envia o vídeo do lote",
+  foto: "a fiscal envia a foto", documento: "a fiscal fotografa a nota impressa" };
 
-let S = null; // estado da tela
+let S = null;
+// o foco só volta para o botão da barra depois de um novo desenho se a pessoa usava o teclado (senão a barra
+// recolhida do telão abriria sozinha, como se o operador tivesse focado pelo teclado)
+let usaTeclado = false;
+document.addEventListener("keydown", (e) => { if (e.key === "Tab" || e.key.startsWith("Arrow") || e.key === "Enter" || e.key === " ") usaTeclado = true; }, true);
+document.addEventListener("pointerdown", () => { usaTeclado = false; }, true);
 
 export function sairFiscalizacao() {
   if (!S) return;
   clearTimeout(S.tReinicio);
-  S.obsRoteiro?.disconnect();
+  S.timers?.forEach(clearTimeout);
   document.removeEventListener("keydown", S.teclaDown);
   document.removeEventListener("keyup", S.teclaUp);
-  document.removeEventListener("pointerdown", S.foraMenu, true);
+  document.removeEventListener("pointerdown", S.foraClique, true);
+  clearInterval(S.tRec);
   window.removeEventListener("lv:layout", S.aoLayout);
+  window.removeEventListener("lv:veu", S.aoVeu);
   S.gravador?.liberar();
   S.miniMapa?.remove?.();
+  if (S.el?.grade?.classList.contains("prova-aberta") && document.getElementById("tecnico")?.hidden !== false) document.getElementById("veu-global").hidden = true;
+  // fora da fiscalização não há barra da demonstração: a marca volta para a faixa do topo
+  document.body.classList.remove("com-roteiro");
+  window.dispatchEvent(new Event("lv:topo"));
   S = null;
   secaoTecnica("fis", null);
 }
 
 export async function telaFiscalizacao(raiz, fisId, { irLaudo, saude, campo = null }) {
   sairFiscalizacao();
-  raiz.replaceChildren(h("p", { class: "carregando" }, "Carregando a fiscalização…"));
+  raiz.replaceChildren(h("div", { class: "fis carregando", "aria-busy": "true" }, h("p", { class: "so-leitor" }, "Carregando a fiscalização…"),
+    h("div", { class: "esq-chat" }, h("div", { class: "cartao esqueleto" }), h("div", { class: "cartao esqueleto alto" }))));
   let estado;
   try { estado = await api.estado(fisId); } catch (e) {
-    raiz.replaceChildren(h("div", { class: "vazio grande" }, h("p", {}, `Não encontrei a fiscalização ${fisId}.`), h("p", { class: "nota" }, e.message),
-      h("a", { class: "btn btn-pri", href: "#/carteira" }, "Voltar à carteira")));
+    definirTela("fis");
+    definirTopo({ trilha: [{ rot: "Carteira", href: "#/carteira" }, { rot: "Fiscalização" }], titulo: "Fiscalização", voltar: "#/" });
+    raiz.replaceChildren(h("div", { class: "pagina estreita" }, h("div", { class: "vazio" }, h("h1", { class: "t-titulo" }, "Não encontrei esta fiscalização."),
+      h("p", { class: "t-sec" }, e.message), h("a", { class: "btn btn-pri", href: "#/" }, "Voltar ao início"))));
     return;
   }
-  S = { id: fisId, estado, raiz, selecionado: null, painel: "laudo", movel: "conversa", ocupado: false, eventos: [],
-    metaTurno: {}, gravador: null, saude, irLaudo, confirmacao: estado.confirmacao_pendente || null, evTurno: {},
-    pendente: null, progresso: null, ultimoLat: "", falhou: null, expandido: {}, confirmarReinicio: false, alvosChat: null };
-  carregarEventos(estado);
+  definirTela("fis", { demo: !!estado.demonstracao });
+  S = { id: fisId, estado, raiz, ocupado: false, pendente: null, falhou: null, progresso: null, expandido: {}, resposta: {},
+    confirmacao: estado.confirmacao_pendente || null, saude, irLaudo, gravador: null, gruposAbertos: null, ultimoPronto: null,
+    realce: null, eventosVivos: {}, timers: [], confirmarReinicio: false, ultimoLat: "", provaCampo: null, eco: lerEco(fisId),
+    retomar: precisaRetomar(estado) };
   montar();
-  atualizar(estado, estado.ultimos_eventos || []);
-  if (campo && (estado.matriz || []).some((l) => l.campo === campo)) selecionar(campo);
+  atualizar(estado);
+  if (campo && (estado.matriz || []).some((l) => l.campo === campo)) abrirProva(campo);
   atualizarSaude();
-}
-
-// Os cartões de sistema de cada turno ficam guardados nesta aba do navegador (sessionStorage): a API devolve só os
-// eventos do último turno.
-function chaveEv() { return `lv.ev.${S.id}`; }
-function carregarEventos(estado) {
-  try { S.evTurno = JSON.parse(sessionStorage.getItem(chaveEv()) || "{}") || {}; } catch { S.evTurno = {}; }
-  const conv = estado.conversa || [];
-  if (!conv.length) S.evTurno = {};
-  const ult = conv.at(-1)?.turno;
-  if (ult !== undefined && estado.ultimos_eventos?.length && !S.evTurno[ult]) S.evTurno[ult] = estado.ultimos_eventos;
-}
-function salvarEventos() {
-  try { sessionStorage.setItem(chaveEv(), JSON.stringify(S.evTurno)); } catch { /* armazenamento indisponível */ }
 }
 
 // ---------------------------------------------------------------- montagem
 function montar() {
   const el = {};
   S.el = el;
-  el.opCab = h("div", { class: "op-cab", id: "op-cab" });
-
-  // conversa
+  el.progresso = h("button", { class: "progresso-m", type: "button", "aria-controls": "col-itens", "aria-expanded": "false",
+    onclick: () => abrirItens(true) });
+  el.cab = h("div", { class: "conv-cab" });
   el.chat = h("div", { class: "chat", role: "log", "aria-label": "Conversa com o agente", "aria-live": "off" });
-  el.texto = h("textarea", { id: "fala", rows: "1", placeholder: "Escreva para o agente…", title: "Enter envia; Shift+Enter quebra a linha", "aria-label": "Mensagem para o agente" });
-  el.texto.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviarTexto(); }
-  });
-  el.texto.addEventListener("input", () => ajustarAltura(el.texto));
-  el.enviar = h("button", { class: "btn btn-pri btn-enviar", type: "button", onclick: enviarTexto, "aria-label": "Enviar mensagem", title: "Enviar (Enter)" },
-    icone("enviar"));
-  const motivoMic = Gravador.motivoIndisponivel();
-  const asrOk = S.saude?.asr?.disponivel !== false;
-  el.falar = h("button", { class: "btn btn-mic", type: "button", "aria-pressed": "false", disabled: motivoMic || !asrOk ? true : null,
-    "aria-label": "Segure para falar",
-    title: motivoMic || (!asrOk ? "Voz desligada neste modo: digite a mensagem" : "Segure para falar (ou segure a barra de espaço)") },
-  icone("mic"), h("span", { class: "so-leitor rot-mic" }, "Segure para falar"));
-  el.nivel = h("div", { class: "gravando", hidden: true, role: "status" }, h("span", { class: "rec", "aria-hidden": "true" }),
-    h("span", {}, "Gravando… solte para enviar"), h("div", { class: "nivel", "aria-hidden": "true" }, h("i")));
+  // celular: quem rola a conversa para cima ganha espaço (a régua recolhe numa linha); um turno novo abre a régua de novo
+  el.chat.addEventListener("scroll", () => {
+    if (!S || !ehMovel() || performance.now() < (S.rolagemProgramada || 0)) return;
+    const longe = el.chat.scrollHeight - el.chat.clientHeight - el.chat.scrollTop > 48;
+    if (longe) S.el.grade.classList.add("rolou");
+  }, { passive: true });
+  // compositor: "+" (anexar), campo, microfone (vira "Enviar" com texto digitado)
+  el.texto = h("textarea", { id: "fala", rows: "1", placeholder: "Mensagem para o agente", "aria-label": "Mensagem para o agente" });
+  el.texto.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviarTexto(); } });
+  el.texto.addEventListener("input", () => { ajustarAltura(el.texto); renderCompositor(); });
+  el.anexar = h("button", { class: "anexar", type: "button", "aria-label": "Anexar foto, vídeo ou documento", "aria-haspopup": "dialog",
+    "aria-expanded": "false", onclick: () => abrirAnexar() }, icone("mais"));
+  el.falar = h("button", { class: "falar", type: "button", "aria-label": "Segure para falar", title: "Segure para falar" }, icone("mic"));
   ligarFalar(el.falar);
-  el.anexos = h("div", { class: "anexos", role: "group", "aria-label": "Anexar evidência" },
-    ANEXOS.map((d) => h("button", { class: "chip-anexo", type: "button", "aria-haspopup": "dialog", dataset: { k: d.k },
-      title: `Anexar ${d.rot}`, onclick: (e) => abrirMenuAnexo(d, e.currentTarget) }, icone(d.ic), h("span", { class: "rot-chip" }, d.rot))));
-  // no celular, um botão de clipe no lugar da fileira de chips: abre a folha com Foto, Vídeo, NF-e, GTA e Nota
-  el.clipe = h("button", { class: "btn btn-clipe", type: "button", "aria-haspopup": "dialog", "aria-expanded": "false",
-    "aria-label": "Anexar evidência (foto, vídeo, NF-e, GTA ou nota)", title: "Anexar evidência", onclick: (e) => abrirMenuTodos(e.currentTarget) },
-  icone("clipe"));
-  el.menu = h("div", { class: "menu-anexo", hidden: true, role: "dialog", "aria-label": "Anexar evidência" });
-  el.menuVoz = h("div", { class: "menu-voz", hidden: true, role: "dialog", "aria-label": "Preferências de voz" });
-  el.btnVoz = h("button", { class: "btn btn-fantasma btn-peq", type: "button", "aria-expanded": "false",
-    onclick: () => alternarMenuVoz() }, icone("ajustes"), h("span", { class: "rot" }, "Voz"));
-  el.confNum = h("input", { type: "checkbox", id: "confnum", checked: true });
-  el.ttsChk = h("input", { type: "checkbox", id: "tts", checked: tts.ligado() ? true : null, disabled: tts.disponivel() ? null : true });
-  el.ttsChk.addEventListener("change", () => tts.ligar(el.ttsChk.checked));
-  el.vozSel = h("select", { id: "voz-sel", "aria-label": "Voz do agente" });
-  preencherVozes(el.vozSel);
-  if ("speechSynthesis" in window) speechSynthesis.addEventListener?.("voiceschanged", () => preencherVozes(el.vozSel));
-  el.vozSel.addEventListener("change", () => tts.escolher(el.vozSel.value));
-  el.menuVoz.append(
-    h("div", { class: "menu-cab" }, h("strong", {}, "Voz"),
-      h("button", { class: "btn btn-icone btn-fantasma btn-peq fechar-menu", type: "button", "aria-label": "Fechar", onclick: () => alternarMenuVoz(false) },
-        icone("fechar"))),
-    h("label", { class: "opcao", for: "tts" }, el.ttsChk, h("span", {}, icone("som"), "Resposta falada")),
-    h("div", { class: "campo" }, h("label", { for: "voz-sel" }, "Voz do agente"), el.vozSel),
-    h("label", { class: "opcao", for: "confnum" }, el.confNum, h("span", {}, "Confirmar números falados antes de enviar")));
-
-  const avisoLongo = "Sessão gravada: a fala é transcrita neste computador e entra na trilha. Avise quem estiver presente.";
-  const colConversa = h("section", { class: "col col-conversa", "aria-labelledby": "t-conv", id: "col-conversa" },
-    h("div", { class: "conv-cab" },
-      h("div", { class: "conv-tt" }, h("span", { class: "avatar ag", "aria-hidden": "true" }, icone("agente")),
-        h("div", {}, h("h2", { id: "t-conv" }, "Conversa com o agente"),
-          h("p", { class: "nota" }, "O agente pede evidências e confere; o status vem do verificador, não do modelo."))),
-      h("div", { class: "conv-acoes" }, el.btnVoz)),
-    el.menuVoz,
-    el.chat,
-    h("div", { class: "compositor" },
-      el.menu,
-      el.nivel,
-      h("div", { class: "linha-comp" },
-        el.anexos,
-        h("div", { class: "escrever" }, el.clipe, el.texto, el.falar, el.enviar)),
-      h("p", { class: "aviso-gravacao", role: "note", title: avisoLongo }, icone("mic"),
-        h("span", { class: "ag-longo" }, avisoLongo),
-        h("span", { class: "ag-curto", "aria-hidden": "true" }, "Sessão gravada: a fala entra na trilha. Avise quem estiver presente."))));
-  el.veu = h("div", { class: "veu-menu", hidden: true, "aria-hidden": "true", onclick: () => { fecharMenus(); alternarMenuVoz(false); } });
-
-  // painel do laudo
-  el.progTxt = h("span", { class: "prog-txt" });
-  el.barra = h("div", { class: "barra-prog", role: "img" });
-  el.contadores = h("div", { class: "contadores" });
-  el.matriz = h("div", { class: "matriz-wrap" });
-  el.emitir = h("div", { class: "emitir" });
-  // no tablet e no modo apresentação o painel alterna entre Laudo e Evidências por este botão do cabeçalho
-  el.paraEvid = h("button", { class: "btn btn-sec btn-peq troca-painel", type: "button", "aria-controls": "col-evid",
-    onclick: () => trocarPainel("evid") }, icone("galeria"), h("span", { class: "rot-troca" }, "Evidências"));
-  el.paraLaudo = h("button", { class: "btn btn-sec btn-peq troca-painel", type: "button", "aria-controls": "col-itens",
-    onclick: () => trocarPainel("laudo") }, icone("voltar"), "Laudo");
-  const colItens = h("section", { class: "col col-itens painel", "aria-labelledby": "t-itens", id: "col-itens" },
-    h("div", { class: "painel-cab" }, h("div", { class: "painel-tt" }, h("h2", { id: "t-itens" }, "Laudo"), el.progTxt), el.paraEvid),
-    h("div", { class: "painel-resumo" }, el.barra, el.contadores),
-    el.matriz,
-    el.emitir);
-
-  // evidências
-  el.evid = h("div", { class: "evid-corpo" });
-  el.evidN = h("span", { class: "nota" });
-  const colEvid = h("section", { class: "col col-evid painel", "aria-labelledby": "t-evid", id: "col-evid" },
-    h("div", { class: "painel-cab" }, h("h2", { id: "t-evid" }, "Evidências"), el.evidN, el.paraLaudo), el.evid);
-
-  // abas do celular
-  el.abasMovel = h("div", { class: "abas-movel", role: "tablist", "aria-label": "Partes da tela" });
-
-  // gaveta da prova do item
-  el.prova = h("div", { class: "prova-corpo", id: "painel-dir" });
-  el.fecharProva = h("button", { class: "btn btn-icone btn-fantasma fechar-prova", type: "button", "aria-label": "Fechar a prova (Esc)",
-    title: "Fechar (Esc)", onclick: () => abrirGaveta(false) }, icone("fechar"));
-  const colProva = h("section", { class: "gaveta-prova", "aria-labelledby": "t-prova", id: "col-prova" },
-    h("div", { class: "gaveta-cab" }, h("div", {}, h("p", { class: "sobre" }, "Prova do item"), h("h2", { id: "t-prova" }, "—")), el.fecharProva),
-    el.prova);
-  el.tituloProva = colProva.querySelector("#t-prova");
-
-  el.grade = h("div", { class: "fis", dataset: { painel: "laudo", movel: "conversa" } }, colEvid, colConversa, colItens, colProva);
+  el.enviar = h("button", { class: "enviar btn-pri", type: "button", "aria-label": "Enviar", hidden: true, onclick: enviarTexto }, icone("enviar"));
+  el.gravando = h("div", { class: "gravando", hidden: true, role: "status" }, h("span", { class: "rec", "aria-hidden": "true" }),
+    h("span", { class: "rec-txt" }, "Gravando… solte para enviar"), h("span", { class: "rec-t" }, "0:00"));
+  el.avisoVoz = h("p", { class: "aviso-voz", hidden: true, role: "note" }, icone("info"),
+    h("span", {}, "A fala é transcrita neste aparelho e entra na trilha. Avise quem estiver presente."),
+    h("button", { class: "btn-icone", type: "button", "aria-label": "Fechar o aviso", onclick: () => { el.avisoVoz.hidden = true; } }, icone("x")));
+  el.compositor = h("div", { class: "compositor" }, el.anexar, h("div", { class: "campo-txt" }, el.texto, el.gravando), el.falar, el.enviar);
+  el.notaAnalista = h("p", { class: "nota-analista", hidden: true }, icone("info"), "Só a fiscal envia provas e conversa com o agente nesta fiscalização.");
+  el.notaSelado = h("p", { class: "nota-selado", hidden: true }, icone("cadeado"), "Laudo selado: o agente responde, mas nada muda.");
+  el.menuAnexar = h("div", { class: "folha-m menu-anexar", id: "menu-anexar", role: "dialog", "aria-label": "Anexar", "aria-hidden": "true" });
+  el.baseConv = h("div", { class: "base-conv" }, el.avisoVoz, el.notaSelado, el.compositor, el.notaAnalista, el.menuAnexar);
+  const colConversa = h("section", { class: "col-conv", id: "col-conversa", "aria-label": "Conversa com o agente" }, el.cab, el.chat, el.baseConv);
   el.roteiro = h("div", { class: "roteiro", hidden: true, role: "region", "aria-label": "Controle da demonstração" });
-  // a tela reserva embaixo a altura real da barra (--rot-h): ela nunca cobre as colunas
-  if ("ResizeObserver" in window) {
-    S.obsRoteiro = new ResizeObserver(() => document.documentElement.style.setProperty("--rot-h", `${el.roteiro.offsetHeight || 0}px`));
-    S.obsRoteiro.observe(el.roteiro);
-  }
-  el.tela = h("div", { class: "tela-fis" }, el.opCab, el.abasMovel, el.grade, el.roteiro, el.veu);
-  S.raiz.replaceChildren(el.tela);
+  el.basePalco = h("div", { class: "base-palco" }, el.roteiro);
+  // painel do laudo (no celular, uma folha aberta pelo indicador)
+  el.painelCab = h("div", { class: "painel-cab" });
+  el.painelCorpo = h("div", { class: "painel-corpo" });
+  el.painelPe = h("div", { class: "painel-pe" });
+  el.itens = h("aside", { class: "painel folha-m", id: "col-itens", "aria-label": "Laudo", "aria-hidden": "false" },
+    h("div", { class: "alca", "aria-hidden": "true" }), el.painelCab, el.painelCorpo, el.painelPe);
+  // gaveta da prova
+  el.tituloProva = h("h2", { id: "t-prova" }, "Prova");
+  el.subProva = h("p", { class: "t-sec" }, "Prova do item");
+  el.prova = h("div", { class: "prova-corpo" });
+  el.colProva = h("section", { class: "gaveta-prova folha-m", id: "col-prova", "aria-labelledby": "t-prova", "aria-hidden": "true" },
+    h("div", { class: "alca", "aria-hidden": "true" }),
+    h("div", { class: "gaveta-cab" }, h("div", {}, el.subProva, el.tituloProva),
+      h("button", { class: "btn-icone fechar-prova", type: "button", "aria-label": "Fechar a prova (Esc)", onclick: () => fecharProva() }, icone("x"))),
+    el.prova);
+  el.grade = h("div", { class: "fis", dataset: { papel: papel() } }, el.progresso,
+    h("div", { class: "col-principal" }, colConversa, el.basePalco, el.colProva), el.itens);
+  S.raiz.replaceChildren(el.grade);
 
   S.teclaDown = (e) => {
+    if (!S || document.getElementById("modal").open) return;
     const alvo = e.target;
     const editavel = alvo && (alvo.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(alvo.tagName));
-    if (document.getElementById("modal").open) return;
     if (e.key === "Escape") {
-      if (!S.el.menu.hidden) { fecharMenus(true); return; }
-      if (!S.el.menuVoz.hidden) { alternarMenuVoz(false); return; }
-      if (S.el.grade.classList.contains("prova-aberta")) { abrirGaveta(false); return; }
-      const amostra = S.el.opCab.querySelector("details[open]");
-      if (amostra) { amostra.open = false; amostra.querySelector("summary")?.focus(); return; }
+      if (S.el.menuAnexar.classList.contains("aberta")) { fecharAnexar(true); return; }
+      if (S.el.grade.classList.contains("prova-aberta")) { fecharProva(); return; }
+      if (S.el.itens.classList.contains("aberta")) { abrirItens(false); return; }
+      if (S.el.roteiro.classList.contains("aberta")) { S.el.roteiro.classList.remove("aberta"); return; }
     }
-    if (!editavel && (e.key === "ArrowRight" || e.key === "PageDown") && S.estado.roteiro && !e.repeat) {
+    if (!editavel && (e.key === "ArrowRight" || e.key === "PageDown") && S.estado.roteiro && !e.repeat && papel() === "fiscal") {
       e.preventDefault(); proximoPasso();
-    } else if (!editavel && e.code === "Space" && !alvo.closest?.("button, a, tr, summary, label, [role=tab]") && !e.repeat && !el.falar.disabled) {
+    } else if (!editavel && e.code === "Space" && !alvo.closest?.("button, a, summary, label, [role=button]") && !e.repeat && vozDisponivel() && papel() === "fiscal") {
       e.preventDefault(); iniciarGravacao();
     }
   };
-  S.teclaUp = (e) => {
-    if (e.code === "Space" && S.gravando) { e.preventDefault(); pararGravacao(); }
+  S.teclaUp = (e) => { if (e.code === "Space" && S?.gravando) { e.preventDefault(); pararGravacao(); } };
+  S.aoLayout = () => { if (S) { renderTudo(); } };
+  S.aoVeu = () => { if (!S) return; fecharAnexar(); abrirItens(false); fecharProva(); S.el.roteiro.classList.remove("aberta"); };
+  // no computador, clicar fora fecha o menu "Anexar" (popover) e a gaveta da prova
+  S.foraClique = (e) => {
+    if (!S || ehMovel()) return;
+    const t = e.target;
+    if (S.el.menuAnexar.classList.contains("aberta") && !S.el.menuAnexar.contains(t) && !S.el.anexar.contains(t)) fecharAnexar();
+    if (S.el.grade.classList.contains("prova-aberta") && !S.el.colProva.contains(t) && !t.closest?.(".ver-prova, .res-prova, #modal, .leaflet-container")
+      && S.el.grade.contains(t) && !S.el.itens.contains(t)) fecharProva();
   };
-  S.foraMenu = (e) => {
-    if (!S) return;
-    const dono = (el) => el.contains(e.target);
-    if (!S.el.menu.hidden && !dono(S.el.menu) && !dono(S.el.anexos) && !dono(S.el.clipe)) fecharMenus();
-    if (!S.el.menuVoz.hidden && !dono(S.el.menuVoz) && !dono(S.el.btnVoz) && !dono(S.el.menu)) alternarMenuVoz(false);
-    const amostra = S.el.opCab.querySelector("details[open]");
-    if (amostra && !dono(amostra)) amostra.open = false;
-  };
-  S.aoLayout = () => { if (S) renderAbas(); };
+  document.addEventListener("pointerdown", S.foraClique, true);
   document.addEventListener("keydown", S.teclaDown);
   document.addEventListener("keyup", S.teclaUp);
-  document.addEventListener("pointerdown", S.foraMenu, true);
   window.addEventListener("lv:layout", S.aoLayout);
+  window.addEventListener("lv:veu", S.aoVeu);
 }
 
-function ajustarAltura(t) {
-  t.style.height = "auto";
-  t.style.height = `${Math.min(t.scrollHeight + 2, 160)}px`;
+// ---------------------------------------------------------------- modo gravação (replay) e demonstração
+// No replay, cada resposta do agente vem de uma gravação casada pelo histórico da conversa: um pedido fora do roteiro
+// desalinha tudo o que vem depois. Então, no replay, só passa o que corresponde ao próximo passo do roteiro; o resto
+// ganha um aviso ("use Executar passo").
+function emReplay() { return S?.saude?.llm?.tipo === "replay" && !!S?.estado?.roteiro; }
+function passoAtual() { const r = S?.estado?.roteiro; return r?.passos?.[r.proximo - 1] || null; }
+function arquivoDoPasso(p) { return p?.evidencia ? (S.estado.roteiro?.arquivos || []).find((a) => a.nome === p.evidencia) || null : null; }
+const norm = (t) => String(t || "").toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/[^a-z0-9]+/g, " ").trim();
+function avisoRoteiro() {
+  avisar("Esta demonstração roda uma gravação: siga o roteiro com “Executar passo” (ou a tecla →).");
 }
 
-function preencherVozes(sel) {
-  const vozes = tts.vozes();
-  sel.replaceChildren(...(vozes.length ? vozes : [{ name: "voz padrão pt-BR", lang: "pt-BR" }]).map((v) =>
-    h("option", { value: v.name, selected: tts.voz()?.name === v.name ? true : null }, `${v.name} (${v.lang})`)));
+// eco do que a fiscal leu no papel (a API guarda os campos, não a frase): fica na sessão do navegador
+function lerEco(id) { try { return JSON.parse(sessionStorage.getItem(`lv.eco.${id}`) || "{}"); } catch { return {}; } }
+function guardarEco() { try { sessionStorage.setItem(`lv.eco.${S.id}`, JSON.stringify(S.eco)); } catch { /* */ } }
+
+// demonstração aberta no meio, num navegador que ainda não a viu: "Continuar do passo 11 · Recomeçar"
+function precisaRetomar(e) {
+  const r = e?.roteiro;
+  if (!r || r.proximo <= 1 || r.proximo > r.total) return false;
+  try { return sessionStorage.getItem(`lv.demoVista.${e.id}`) !== "1"; } catch { return false; }
 }
-
-function alternarMenuVoz(abrir) {
-  const m = S.el.menuVoz;
-  const vai = abrir === undefined ? m.hidden : abrir;
-  fecharMenus();
-  m.hidden = !vai;
-  S.el.btnVoz.setAttribute("aria-expanded", vai ? "true" : "false");
-  S.el.veu.hidden = !vai;
-  if (vai) m.querySelector("input, select")?.focus({ preventScroll: true });
-}
-
-// No celular os menus viram uma folha que sobe de baixo, com o fundo escurecido (o véu).
-function ehMovel() { return window.matchMedia("(max-width: 767px)").matches; }
-
-function fecharMenus(devolverFoco = false) {
+function marcarVista() {
   if (!S) return;
-  const estavaAberto = !S.el.menu.hidden;
-  S.el.menu.hidden = true;
-  S.el.veu.hidden = S.el.menuVoz.hidden;
-  S.el.anexos.querySelectorAll(".chip-anexo").forEach((b) => b.setAttribute("aria-expanded", "false"));
-  S.el.clipe.setAttribute("aria-expanded", "false");
-  if (estavaAberto && devolverFoco) (S.botaoMenu || S.el.texto).focus({ preventScroll: true });
+  S.retomar = false;
+  try { sessionStorage.setItem(`lv.demoVista.${S.id}`, "1"); } catch { /* */ }
 }
 
-// ---------------------------------------------------------------- abas (celular) e troca do painel
-function renderAbas() {
-  // a mesma conta em todo lugar: evidências que a fiscal enviou (os quadros-chave e o rascunho são do sistema)
-  const n = evidenciasEnviadas().length;
-  const falta = pendTotal();
-  const tab = (k, t, atual, onclick, controla) => h("button", { type: "button", role: "tab", "aria-selected": atual === k ? "true" : "false",
-    "aria-controls": controla, onclick: () => onclick(k) }, t);
-  S.el.paraEvid.querySelector(".rot-troca").replaceChildren("Evidências", n ? h("span", { class: "contagem", title: `${n} enviada(s)` }, n) : "");
-  S.el.abasMovel.replaceChildren(
-    tab("conversa", "Conversa", S.movel, trocarMovel, "col-conversa"),
-    tab("laudo", h("span", {}, "Laudo", falta && S.estado.etapa !== "BRIEFING"
-      ? h("span", { class: "contagem alerta", title: `${falta} pendência(s) para emitir` }, `${falta} ${falta === 1 ? "falta" : "faltam"}`) : null),
-    S.movel, trocarMovel, "col-itens"),
-    tab("evid", h("span", {}, "Evidências", n ? h("span", { class: "contagem", title: `${n} enviada(s)` }, n) : null), S.movel, trocarMovel, "col-evid"));
+function ctxFala() {
+  const itens = S.estado.operacao.itens || [];
+  const animal = itens.find((i) => i.categoria_animal)?.categoria_animal?.split(" ")[0];
+  return { itens: itens.map((it) => ({ id: it.id, nome: R.nomeItem(it, true) })), animal: animal ? `${animal}s`.replace(/ss$/, "s") : "animais" };
 }
-
-function evidenciasEnviadas() {
-  return (S.estado.evidencias || []).filter((e) => e.tipo !== "quadro_chave" && !e.laudo && !/^rascunho_/.test(e.nome || ""));
+function falaDoAgente(t) { return semProximoPasso(falaSimples(t, ctxFala())); }
+// Um único "agora": a próxima ação está só no cartão AGORA. O "Próximo passo: …" que o agente escreve sai da fala na
+// conversa (o texto original continua em Detalhes técnicos → Conversa), para a tela nunca mostrar duas ordens.
+function semProximoPasso(t) {
+  const s = String(t || "");
+  const r = s.replace(/(^|[.!?]\s+|\n)\s*(?:O\s+)?[Pp]r[óo]ximo passo(?:\s+é|\s*:)[^\n]*?(?:[.!?](?=\s|$)|$)/g, "$1").replace(/[ \t]{2,}/g, " ").trim();
+  return r.length >= 12 ? r : s;
 }
+// título do passo na barra da demonstração, nas palavras da tela
+function tituloPasso(t) { return String(t || "").replace(/\bglebas?\b/gi, "área").replace(/\s*\(DANFE\)/g, "").replace(/\s*\(PIN \+ hash\)/g, " (PIN)"); }
 
-function pendTotal() { return faltas(S.estado).length; }
-
-function trocarPainel(k) {
-  const veioDoBotao = document.activeElement === S.el.paraEvid || document.activeElement === S.el.paraLaudo;
-  S.painel = k;
-  S.el.grade.dataset.painel = k;
-  renderAbas();
-  if (veioDoBotao) (k === "evid" ? S.el.paraLaudo : S.el.paraEvid).focus({ preventScroll: true });
-}
-
-function trocarMovel(k) {
-  S.movel = k;
-  S.el.grade.dataset.movel = k;
-  renderAbas();
-  if (k === "conversa") rolarChat();
-  if (k === "laudo") ajustarMatriz();
-}
+function ajustarAltura(t) { t.style.height = "auto"; t.style.height = `${Math.min(t.scrollHeight + 2, 160)}px`; }
+function vozDisponivel() { return S?.saude?.asr?.disponivel !== false && !Gravador.motivoIndisponivel(); }
+function ehDemo() { return !!S?.estado?.demonstracao; }
+function ehFiscal() { return papel() === "fiscal"; }
 
 // ---------------------------------------------------------------- atualização
-function atualizar(estado, eventos, resp) {
+function atualizar(estado, eventos = null, resp = null) {
   const anterior = S.estado;
-  S.antes = Object.fromEntries((anterior?.matriz || []).map((l) => [l.campo, l.status]));
   S.estado = estado;
-  if (eventos) S.eventos = eventos;
-  if (resp && resp.turno !== undefined) {
-    const chave = resp.turno || (resp.acoes?.[0]?.acao === "assinar" ? "assinatura" : "rascunho");
-    S.metaTurno[chave] = resp;
+  S.chkTurno = R.checagensPorTurno(estado);
+  S.evPorTurno = R.evidenciaPorTurno(estado);
+  S.guardas = R.guardasReconstruidas(estado);
+  if (resp && eventos) {
+    const ult = estado.conversa?.at(-1)?.turno;
+    if (ult !== undefined) S.eventosVivos[ult] = eventos;
   }
-  const nav = document.getElementById("nav-fis");
-  nav.hidden = false; nav.href = `#/fis/${estado.id}`;
-  const navL = document.getElementById("nav-laudo");
-  navL.hidden = !estado.laudo; navL.href = `#/fis/${estado.id}/laudo`;
-  renderCabecalho();
-  renderChat();
-  renderPainel(anterior);
-  renderEvidencias();
-  renderAbas();
-  if (S.el.grade.classList.contains("prova-aberta")) renderProva();
-  renderRoteiro();
+  // o grupo de prontos que abre é o do último item que ficou pronto
+  if (anterior && anterior !== estado) {
+    const antes = Object.fromEntries((anterior.matriz || []).map((l) => [l.campo, R.pronta(l)]));
+    const novo = R.linhas(estado).filter((l) => R.pronta(l) && !antes[l.campo]).at(-1);
+    if (novo) { S.ultimoPronto = novo.campo; S.gruposAbertos = null; }
+  }
+  definirDemo(estado.demonstracao);
+  renderTudo(anterior);
   secaoTecnica("fis", secaoFis);
 }
 
-const UN = { cabeca: "cabeças", UA_450kg: "UA", m: "m", ha: "ha", un: "un", m2: "m²" };
-// "Aquisição de 29 vacas leiteiras (matrizes) — Sicor: …" vira "29 vacas leiteiras (matrizes)"
-function nomeItem(desc, max = 60) {
-  const c = curto(desc, 200).replace(/^(Aquisição|Construção|Compra|Implantação|Reforma) de /i, "");
-  return c.length > max ? `${c.slice(0, max - 1).trimEnd()}…` : c;
+function renderTudo(anterior = null) {
+  if (!S) return;
+  S.el.grade.dataset.papel = papel();
+  renderTopo();
+  renderCab();
+  renderChat();
+  renderPainel(anterior);
+  renderProgressoMovel();
+  if (S.el.grade.classList.contains("prova-aberta")) renderProva();
+  renderRoteiro();
+  renderCompositor();
 }
-const ROT_ITEM = { bovinos: "bovinos", cerca: "cerca" };
 
-function renderCabecalho() {
+function renderTopo() {
   const e = S.estado; const op = e.operacao;
-  definirDemo(e.demonstracao);
-  const itens = op.itens.map((i) => `${fmtNum(i.quantidade)} ${UN[i.unidade] ?? i.unidade ?? ""}${ROT_ITEM[i.tipo] ? ` (${ROT_ITEM[i.tipo]})` : ""}`);
-  const tri = e.triagem || {};
-  const nivel = tri.prioridade_nivel || (e.amostra?.tem_triagem ? "media" : null);
-  const rotNivel = { alta: "alta", media: "média", baixa: "baixa" }[nivel] || nivel;
-  S.el.opCab.replaceChildren(
-    h("div", { class: "op-id" },
-      h("h1", { title: op.instituicao || null }, h("span", { class: "op-num" }, `Operação ${op.ref_bacen}`),
-        e.demonstracao ? h("span", { class: "etiqueta fake" }, "fictícia") : null),
-      h("div", { class: "op-meta" },
-        h("span", { class: "op-mun" }, icone("pino"), h("span", {}, `${op.municipio_nome || "município ?"}/${op.uf}`)),
-        h("span", { class: "op-valor" }, op.valor_fmt),
-        h("span", { class: "op-itens", title: op.itens.map((i) => i.descricao).join("\n") }, `${op.itens.length} ${op.itens.length === 1 ? "item" : "itens"}: ${itens.join(" · ")}`),
-        e.metodo ? h("span", { class: "op-metodo", title: "método de fiscalização definido pela regra" }, icone("lista"), e.metodo_rotulo || e.metodo) : null,
-        h("span", { class: "op-inst" }, op.instituicao || ""))),
-    h("div", { class: "op-lado" },
-      nivel ? h("span", { class: `prio ${nivel}`, title: `Prioridade de verificação ${rotNivel} (não é indício de irregularidade)` },
-        h("span", { class: `marcador mini ${nivel}`, "aria-hidden": "true" }, h("span", {}, { alta: "A", media: "M", baixa: "B" }[nivel] || "")),
-        h("span", { class: "prio-rot" }, `Prioridade ${rotNivel}`),
-        tri.prioridade_verificacao !== undefined ? h("span", { class: "prio-pt" }, `${tri.prioridade_verificacao} pt`) : null) : null,
-      e.amostra?.tem_triagem ? aberturaAmostra(e.amostra, { titulo: "Por que está na amostra" })
-        : tri.motivos?.length ? h("span", { class: "nota" }, tri.motivos.join("; ")) : null));
+  definirTopo({
+    trilha: [{ rot: "Carteira", href: "#/carteira" }, { rot: `Op. ${op.ref_bacen}` }],
+    titulo: R.nomeOperacao(op, true), sub: R.localOperacao(op),
+    voltar: ehFiscal() ? "#/fiscalizacoes" : "#/carteira",
+    mais: () => [
+      { rot: "Por que está na amostra", ic: "info", acao: porQueAmostra },
+      { rot: "Voz", sub: "Resposta falada e microfone", ic: "mic", acao: () => preferenciasVoz() },
+      { rot: "Detalhes técnicos", ic: "codigo", acao: () => abrirTecnico(true) },
+      { rot: document.body.classList.contains("apresentacao") ? "Sair do modo apresentação" : "Modo apresentação", ic: "compartilhar",
+        acao: () => window.dispatchEvent(new CustomEvent("lv:apresentacao", { detail: !document.body.classList.contains("apresentacao") })) },
+    ],
+  });
+}
+
+function renderCab() {
+  const op = S.estado.operacao;
+  const inst = R.instituicaoLimpa(op.instituicao);
+  S.el.cab.replaceChildren(h("h1", { class: "t-titulo" }, R.nomeOperacao(op)),
+    h("p", { class: "t-sec" }, [R.localOperacao(op), op.valor_fmt, inst].filter(Boolean).join(" · ")));
+}
+
+function porQueAmostra() {
+  const e = S.estado;
+  const animal = (e.operacao.itens || []).find((i) => i.categoria_animal)?.categoria_animal?.split(" ")[0];
+  const motivos = (e.triagem?.motivos || []).map((m) => R.motivoSimples(m, animal ? `${animal}s` : "animais"));
+  abrirModal("Por que está na amostra", h("div", { class: "texto" },
+    motivos.length ? h("ul", {}, motivos.map((m) => h("li", {}, m.endsWith(".") ? m : `${m}.`))) : h("p", {}, "Sem motivo de triagem registrado."),
+    h("p", { class: "aviso-linha" }, icone("info"), "Prioridade não é indício de irregularidade: só orienta onde a visita rende mais.")));
 }
 
 // ---------------------------------------------------------------- conversa
-// Rolagem do chat depois de cada turno: se o turno inteiro cabe, vai até o fim; se não cabe, o começo do turno fica à
-// vista (a fala do fiscal, a resposta do agente ou, quando há, o cartão que importa: bloqueio, divergência, "Complete
-// a nota"). Nunca deixa o título do cartão mais importante cortado em cima.
-function rolarChat(alvos) {
-  if (alvos !== undefined) S.alvosChat = alvos;
-  const aplicar = () => {
-    if (!S) return;
-    const chat = S.el.chat;
-    const fim = Math.max(0, chat.scrollHeight - chat.clientHeight);
-    const { ancora, agente, forte, forteFim } = S.alvosChat || {};
-    if (!ancora || !ancora.isConnected || !chat.clientHeight) { chat.scrollTop = fim; return; }
-    const base = chat.getBoundingClientRect().top - chat.scrollTop;
-    const y = (el) => el.getBoundingClientRect().top - base - 8; // 8 px de folga em cima
-    const alt = chat.clientHeight;
-    if (chat.scrollHeight - y(ancora) <= alt) { chat.scrollTop = fim; return; }
-    // até onde precisa caber: o cabeçalho do último cartão importante (com dois, como a instrução ignorada e a
-    // divergência da GTA, os dois títulos ficam à vista), ou o começo da resposta do agente
-    const fimImp = forteFim && forteFim.isConnected ? forteFim : forte;
-    const limite = fimImp ? y(fimImp) + 8 + Math.min(fimImp.offsetHeight, fimImp === forte ? 110 : 56)
-      : agente ? y(agente) + 8 + Math.min(agente.offsetHeight, 150) : chat.scrollHeight;
-    const cands = [ancora, agente, forte].filter((c) => c && c.isConnected);
-    const alvo = cands.find((c) => limite - y(c) <= alt) || cands.at(-1);
-    chat.scrollTop = Math.max(0, Math.min(fim, y(alvo)));
-  };
-  aplicar();
-  requestAnimationFrame(aplicar);
-}
-
 function hora(iso) {
-  if (!iso) return "";
   const d = new Date(iso);
-  return isNaN(d) ? "" : d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 }
 
-function anexoChip(tipo, nome) {
-  return h("div", { class: "anexo-msg" }, icone(IC_TIPO[tipo] || "doc"),
-    h("span", {}, h("strong", {}, ROT_TIPO[tipo] || tipo), nome ? h("small", {}, nome) : null));
-}
-
-function bolhaFiscal(texto, { evidencia = null, nome = null, em = null, voz = false, pendente = false } = {}) {
-  return h("div", { class: `msg fiscal${pendente ? " enviando" : ""}` },
-    h("div", { class: "bolha" }, evidencia ? anexoChip(evidencia, nome) : null, texto ? h("div", { class: "txt" }, texto) : null),
-    h("div", { class: "meta" }, voz ? h("span", { class: "etiqueta" }, "voz") : null, "Fiscal", em ? ` · ${hora(em)}` : "",
-      pendente ? " · enviando…" : ""));
-}
-
-function ferramentasDoTurno(acoes) {
-  const nomes = [];
-  for (const a of acoes || []) {
-    const [nome, st] = typeof a === "string" ? a.split(":") : [a.acao, a.permitido === false || a.ok === false ? "negado" : "ok"];
-    if (!nome || st === "negado" || ["guarda", "evento", "assinar", "emitir_rascunho", "solicitar_assinatura"].includes(nome)) continue;
-    const r = rotuloFerramenta(nome);
-    if (!nomes.includes(r)) nomes.push(r);
+function renderChat() {
+  const e = S.estado;
+  const conversa = e.conversa || [];
+  const nos = [];
+  let tAnterior = null;
+  let ancora = null; let agenteNo = null;
+  // o rótulo "Laudo Vivo" aparece uma vez por sequência (no começo e depois de cada separador de hora); nas outras
+  // mensagens do agente ele fica só para o leitor de tela (a posição à esquerda já diz quem fala)
+  let rotuloVisto = false;
+  if (!conversa.length && !S.pendente) { nos.push(boasVindas()); rotuloVisto = true; }
+  for (const c of conversa) {
+    const t = new Date(c.em).getTime();
+    if (c.em && (tAnterior === null || t - tAnterior >= 5 * 60 * 1000)) { nos.push(h("div", { class: "sep-hora ok-pequeno" }, hora(c.em))); rotuloVisto = false; }
+    if (c.em) tAnterior = t;
+    const ult = c === conversa.at(-1);
+    const fala = falaFiscal(c.fiscal) || S.eco[c.turno] || "";
+    if (fala || c.evidencia) {
+      const b = bolhaFiscal(fala, { turno: c.turno, tipo: c.evidencia, ev: S.evPorTurno[c.turno], em: c.em });
+      nos.push(b);
+      if (ult) ancora = b;
+    }
+    if (c.agente) {
+      const a = bolhaAgente(c, !rotuloVisto);
+      rotuloVisto = true;
+      nos.push(a);
+      if (ult) { agenteNo = a; ancora = ancora || a; }
+    }
   }
-  return nomes;
+  if (S.falhou) { const b = bolhaFalhou(S.falhou); nos.push(b); ancora = b; agenteNo = null; }
+  if (S.pendente) {
+    const b = bolhaFiscal(S.pendente.texto, { tipo: S.pendente.evidencia, nome: S.pendente.nome, enviando: true });
+    nos.push(b); ancora = b; agenteNo = null;
+  }
+  if (S.ocupado) {
+    nos.push(h("div", { class: "msg agente digitando", id: "pensando", role: "status" }, avatarAgente(),
+      h("div", { class: "bolha" }, h("span", { class: "pontos", "aria-hidden": "true" }, h("i"), h("i"), h("i")),
+        h("span", { class: "pensando-txt" }, S.ocupadoTexto || "Conferindo…"),
+        S.progresso !== null ? h("div", { class: "barra-envio" }, h("i", { style: { width: `${Math.round(S.progresso * 100)}%` } }))
+          : /vídeo|foto|nota|GTA/i.test(S.ocupadoTexto || "") ? h("div", { class: "barra-envio indet" }, h("i")) : null)));
+  } else nos.push(cartaoAgora());
+  S.el.chat.replaceChildren(h("div", { class: "chat-int" }, nos));
+  S.el.grade.classList.remove("rolou");
+  requestAnimationFrame(() => { marcarVerMais(); rolarChat(ancora, agenteNo); });
 }
 
-// `recolher`: quando o turno traz um cartão forte (bloqueio, divergência), a resposta do agente fica em 2 linhas com
-// "ver mais" — o cartão já mostra o que importa e a conversa não vira um muro de texto.
-function bolhaAgente(c, { recolher = false } = {}) {
-  const meta = S.metaTurno[c.turno] || null;
-  const acoes = meta?.acoes || c.acoes || [];
-  const ferr = ferramentasDoTurno(acoes);
-  // a chave ilegível da foto ("??????…????????") vira "(ilegível)"; o texto original fica no title
-  const limpo = semIds(c.agente).replace(/\?{3,}[?…]*/g, "(ilegível)");
-  const podeRecolher = recolher && limpo.length > 150;
-  const recolhido = podeRecolher && !S.expandido[c.turno];
-  const txt = h("div", { class: `txt${recolhido ? " recolhido" : ""}`, title: c.agente !== limpo ? c.agente : null }, limpo);
-  const alternar = podeRecolher ? h("button", { class: "link-btn ver-mais", type: "button", "aria-expanded": recolhido ? "false" : "true",
-    onclick: () => {
+function boasVindas() {
+  const op = S.estado.operacao;
+  if (!ehFiscal()) return h("p", { class: "sis-linha" }, "A fiscal ainda não começou esta fiscalização.");
+  return h("div", { class: "msg agente boas-vindas" }, avatarAgente(),
+    h("div", { class: "bolha" },
+      h("p", {}, `Olá, ${primeiroNome()}! Vamos fiscalizar `, h("strong", {}, R.nomeOperacao(op)), ". Eu peço as provas, confiro cada item e preparo o laudo."),
+      h("ol", { class: "passos-ini" }, h("li", {}, "Você envia as provas"), h("li", {}, "Eu confiro cada item"), h("li", {}, "Você assina o laudo")),
+      // na gravação, a pergunta livre desalinharia as respostas gravadas: a sugestão só aparece ao vivo
+      emReplay() ? h("p", { class: "t-sec" }, "Comece pelo cartão abaixo.")
+        : h("button", { class: "btn btn-sec sugestao", type: "button", onclick: () => { marcarVista(); enviarFala("O que preciso enviar?"); } }, "O que preciso enviar?")));
+}
+
+// Rolagem depois de cada turno: o cartão AGORA (o último da conversa) fica sempre inteiro, logo acima do campo de
+// mensagem. O que vem antes sobe por baixo do topo fixo (fundo sólido com filete); se do item de cima só sobrar uma
+// lasca (um pedaço de cartão ou meia linha), um calço no fim da conversa empurra a lasca para fora, e o primeiro item
+// visível entra inteiro.
+function rolarChat() {
+  if (!S) return;
+  const chat = S.el.chat;
+  const int = chat.firstElementChild;
+  S.rolagemProgramada = performance.now() + 400;
+  const fim = () => { chat.scrollTop = Math.max(0, chat.scrollHeight - chat.clientHeight); };
+  fim();
+  if (!int || !chat.clientHeight || chat.scrollHeight <= chat.clientHeight + 1) return;
+  const t0 = chat.getBoundingClientRect().top;
+  const folga = parseFloat(getComputedStyle(int).rowGap) || 12;
+  let calco = 0;
+  // até 6 ajustes: esconder uma linha cortada pode deixar outra (na coluna ao lado) cortada na nova borda
+  for (let i = 0; i < 6; i++) {
+    const cortado = [...int.children].find((el) => { const r = el.getBoundingClientRect(); return r.height > 0 && r.top < t0 - 1 && r.bottom > t0 + 1; });
+    if (!cortado) break;
+    const r = cortado.getBoundingClientRect();
+    const visivel = r.bottom - t0;
+    let mais = 0;
+    if (visivel <= Math.min(chat.clientHeight * 0.24, Math.max(64, r.height * 0.45))) {
+      // só uma lasca do item de cima: ela sai inteira
+      mais = Math.ceil(visivel + folga - Math.min(6, folga));
+    } else {
+      // o item aparece quase todo: o corte não pode cair no meio de uma linha de texto (meia linha lê como defeito)
+      const linha = linhaCortada(cortado, t0);
+      // até o pé exato da linha: a linha seguinte começa abaixo dela (com a entrelinha) e não fica cortada
+      if (linha) mais = Math.round(linha.bottom - t0 + 0.5);
+    }
+    if (mais <= 0 || calco + mais > chat.clientHeight * 0.3) break;
+    calco += mais;
+    int.style.paddingBottom = `${calco}px`;
+    fim();
+  }
+}
+
+// a linha de texto (do item cortado) que a borda de cima da conversa corta ao meio, se houver; o texto recolhido
+// ("ver mais", "Resposta do agente" fechada) e o que é só para o leitor de tela não contam. Uma lasca de imagem conta.
+function linhaCortada(el, t0) {
+  // primeiro, uma faixa fina de foto, vídeo ou mapa no alto: sai a imagem inteira, com os rótulos sobre ela (uma imagem
+  // bem cortada continua, como num álbum)
+  let faixa = null;
+  for (const m of el.querySelectorAll(".res-quadro, .res-mapa, .anexo-msg img, .anexo-msg .play, .anexo-msg .anexo-ic")) {
+    const q = m.getBoundingClientRect();
+    if (q.height < 2 || q.top >= t0 - 0.5 || q.bottom <= t0 + 0.5) continue;
+    if (q.bottom - t0 <= Math.max(48, q.height * 0.4) && (!faixa || q.bottom > faixa.bottom)) faixa = q;
+  }
+  if (faixa) return faixa;
+  const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const rg = document.createRange();
+  let achou = null;
+  for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+    const pai = n.parentElement;
+    if (!n.textContent.trim() || !pai || pai.closest(".so-leitor, .resposta-txt:not(.aberta)")) continue;
+    const clip = pai.closest(".fala, .res-quadro")?.getBoundingClientRect();
+    // número grande (Condensed 800): o desenho da letra passa da caixa da linha; se a caixa começa abaixo da borda, a
+    // linha está inteira
+    if (pai.getBoundingClientRect().top >= t0 - 0.5) continue;
+    rg.selectNodeContents(n);
+    for (const q of rg.getClientRects()) {
+      if (q.height < 2 || (clip && (q.top >= clip.bottom - 1 || q.bottom <= clip.top + 1))) continue;
+      if (q.top < t0 - 0.5 && q.bottom > t0 + 0.5 && (!achou || q.bottom > achou.bottom)) achou = q;
+    }
+  }
+  return achou;
+}
+
+// "ver mais" só quando o texto passa de 3 linhas de verdade
+function marcarVerMais() {
+  S?.el.chat.querySelectorAll(".bolha .fala.clamp").forEach((f) => {
+    const b = f.parentElement.querySelector(".ver-mais");
+    if (b && f.scrollHeight <= f.clientHeight + 2 && !f.classList.contains("aberta")) b.hidden = true;
+  });
+}
+
+function rotuloAnexo(tipo, ev, nome) {
+  if (tipo === "video") {
+    const arq = (S.estado.roteiro?.arquivos || []).find((a) => a.nome === (ev?.nome || nome));
+    const dur = Number((String(arq?.rotulo || "").match(/\(([\d.,]+)\s*s\)/) || [])[1]?.replace(",", "."));
+    return dur ? `Vídeo do lote · ${Math.floor(dur / 60)}:${String(Math.round(dur % 60)).padStart(2, "0")}` : "Vídeo do lote";
+  }
+  if (tipo === "foto") return ev?.gps?.precisao_m ? `Foto · GPS ±${R.fmtDec(ev.gps.precisao_m)} m` : "Foto";
+  if (tipo === "documento") return "Foto da nota";
+  if (tipo === "nfe_xml") return "Arquivo da NF-e";
+  if (tipo === "gta") return /\.pdf$/i.test(ev?.nome || nome || "") ? "Foto da guia" : "Arquivo da GTA";
+  return "Arquivo";
+}
+
+function miniaturaAnexo(tipo, ev) {
+  if ((tipo === "foto" || tipo === "documento") && ev?.url && !/\.pdf$/i.test(ev.nome || "")) return h("img", { src: ev.url, alt: "", loading: "lazy" });
+  if (tipo === "video") {
+    const q = (S.estado.checagens || []).find((c) => c.ferramenta === "contar_bovinos_video" && c.evidencias?.includes(ev?.id))?.prova?.quadros?.[1];
+    return h("span", { class: "play" }, q ? h("img", { src: q.url, alt: "", loading: "lazy" }) : null, icone("play"));
+  }
+  return h("span", { class: "anexo-ic" }, icone(tipo === "gta" ? "gta" : tipo === "nfe_xml" ? "arquivo" : "nota"));
+}
+
+function bolhaFiscal(texto, { tipo = null, ev = null, nome = null, em = null, enviando = false } = {}) {
+  return h("div", { class: `msg fiscal${enviando ? " enviando" : ""}`, title: em ? fmtData(em) : null },
+    h("div", { class: "bolha" },
+      tipo ? h("div", { class: "anexo-msg" }, miniaturaAnexo(tipo, ev), h("span", {}, rotuloAnexo(tipo, ev, nome))) : null,
+      texto ? h("div", { class: "fala" }, texto) : null,
+      enviando ? h("span", { class: "enviando-txt ok-pequeno" }, "enviando…") : null));
+}
+
+function guardaDoTurno(turno) {
+  const vivos = S.eventosVivos[turno];
+  const g = vivos ? R.guardaDoTurno(vivos) : null;
+  if (g) return g;
+  const rec = (S.guardas[turno] || []).find((x) => x.tipo !== "bloqueio" && x.tipo !== "negado");
+  return rec ? { tipo: rec.tipo, ev: rec } : null;
+}
+
+function bolhaAgente(c, comRotulo = true) {
+  const texto = falaDoAgente(c.agente);
+  const card = cartaoResultado(c);
+  const g = guardaDoTurno(c.turno);
+  const aberta = !!S.expandido[c.turno];
+  const nos = [];
+  const bolha = h("div", { class: `bolha${card ? " com-cartao" : ""}` });
+  if (card) {
+    const fala = h("div", { class: `fala resposta-txt${S.resposta[c.turno] ? " aberta" : ""}`, id: `resp-${c.turno}` }, texto);
+    const tog = h("button", { class: "resposta", type: "button", "aria-expanded": S.resposta[c.turno] ? "true" : "false", "aria-controls": `resp-${c.turno}`,
+      onclick: () => { S.resposta[c.turno] = !S.resposta[c.turno]; fala.classList.toggle("aberta", !!S.resposta[c.turno]);
+        tog.setAttribute("aria-expanded", S.resposta[c.turno] ? "true" : "false"); } },
+    icone("balao"), h("span", {}, "Resposta do agente"), icone("baixo", "seta"));
+    // "Resposta do agente" vai na mesma linha de "Ver prova" (no computador, lado a lado): o cartão fica baixo o
+    // bastante para caber inteiro com o AGORA no telão
+    const acoes = card.querySelector(".res-acoes");
+    if (acoes) { acoes.insertBefore(tog, acoes.querySelector(".res-item")); nos.push(card, fala); } else nos.push(card, tog, fala);
+  } else {
+    const fala = h("div", { class: `fala clamp${aberta ? " aberta" : ""}` }, texto);
+    const ver = h("button", { class: "ver-mais", type: "button", "aria-expanded": aberta ? "true" : "false" },
+      h("span", {}, aberta ? "ver menos" : "ver mais"), icone("baixo", "seta"));
+    const alternar = () => {
       S.expandido[c.turno] = !S.expandido[c.turno];
-      txt.classList.toggle("recolhido", !S.expandido[c.turno]);
-      alternar.textContent = S.expandido[c.turno] ? "ver menos" : "ver mais";
-      alternar.setAttribute("aria-expanded", S.expandido[c.turno] ? "true" : "false");
-    } }, recolhido ? "ver mais" : "ver menos") : null;
-  return h("div", { class: "msg agente" },
-    h("span", { class: "avatar ag", "aria-hidden": "true" }, icone("agente")),
-    h("div", { class: "corpo-msg" },
-      h("div", { class: "bolha" }, txt, alternar,
-        ferr.length ? h("div", { class: "conferido" }, icone("verificado"), `Conferido com: ${ferr.join(" · ")}`) : null),
-      h("div", { class: "meta" }, "Agente", c.em ? ` · ${hora(c.em)}` : "")));
-}
-
-// Cartão de sistema: cabeçalho (ícone, título, regra) e corpo. `destaque` pinta a faixa do título (o momento que a
-// banca precisa ver); o corpo fica sempre em fundo claro para ler.
-function cartaoSis({ tipo, titulo: tt, regra = null, texto = null, dica = null, extra = [], destaque = false, forte = false,
-  novo = false, compacto = false, icone: ic = "info", alerta = false }) {
-  return h("div", { class: `sis sis-${tipo}${destaque ? " destaque" : ""}${forte ? " forte" : ""}${novo ? " novo" : ""}${compacto ? " compacto" : ""}`,
-    role: alerta ? "alert" : null },
-  h("div", { class: "sis-cab" }, h("span", { class: "sis-ic" }, icone(ic)), h("span", { class: "sis-tt" }, tt), regra ? chipRegra(regra) : null),
-  texto || extra.length ? h("div", { class: "sis-corpo" }, texto ? h("div", { class: "sis-tx", title: dica || null }, texto) : null, extra) : null);
-}
-
-function cartaoSelado(c) {
-  return cartaoSis({ tipo: "ok", icone: "selo", titulo: "Laudo assinado e selado",
-    texto: semIds(c.agente) || "Assinatura humana com PIN e hash conferido.",
-    extra: [h("a", { class: "btn btn-sec btn-peq", href: `#/fis/${encodeURIComponent(S.id)}/laudo` }, icone("doc"), "Ver laudo selado")] });
-}
-
-// Mensagem que não chegou ao servidor (4G ruim, servidor fora do ar): fica no chat com "Tentar de novo".
-function bolhaFalhou(f) {
-  const acoes = h("div", { class: "acoes-falha" },
-    h("button", { class: "btn btn-sec btn-peq", type: "button", onclick: tentarDeNovo }, icone("reiniciar"), "Tentar de novo"),
-    h("button", { class: "btn btn-fantasma btn-peq", type: "button", onclick: descartarFalha }, "Descartar"));
-  if (!f.texto && !f.evidencia) {
-    return cartaoSis({ tipo: "falha", icone: "semrede", titulo: "O pedido não chegou ao servidor", texto: f.erro, extra: [acoes], alerta: true });
+      fala.classList.toggle("aberta", !!S.expandido[c.turno]);
+      ver.setAttribute("aria-expanded", S.expandido[c.turno] ? "true" : "false");
+      ver.firstChild.textContent = S.expandido[c.turno] ? "ver menos" : "ver mais";
+    };
+    ver.addEventListener("click", (ev) => { ev.stopPropagation(); alternar(); });
+    bolha.addEventListener("click", (ev) => { if (!ev.target.closest("button, a") && !ver.hidden) alternar(); });
+    nos.push(fala, ver);
   }
-  return h("div", { class: "msg fiscal falhou", role: "alert" },
-    h("div", { class: "bolha" }, f.evidencia ? anexoChip(f.evidencia, f.nome) : null, f.texto ? h("div", { class: "txt" }, f.texto) : null),
-    h("div", { class: "meta falha" }, icone("semrede"), h("span", {}, `Não enviada · ${f.erro}`)),
-    acoes);
+  if (g) nos.push(rodapeGuarda(c.turno, g));
+  bolha.append(...nos);
+  const rot = avatarAgente();
+  if (!comRotulo) rot.classList.add("so-leitor");
+  return h("div", { class: `msg agente${comRotulo ? "" : " seguida"}`, dataset: { turno: String(c.turno) }, title: c.em ? fmtData(c.em) : null }, rot, bolha);
 }
 
+function rodapeGuarda(turno, g) {
+  const def = R.GUARDAS[g.tipo] || R.GUARDAS.negado;
+  const realce = S.realce === turno && document.body.classList.contains("apresentacao");
+  const b = h("button", { class: `guarda-rod${realce ? " realce" : ""}`, type: "button", onclick: () => porQueGuarda(g) },
+    icone(def.ic), h("span", { class: "g-txt" }, def.texto), h("span", { class: "g-porque" }, "Por quê?"), icone("direita"));
+  if (realce) {
+    S.timers.push(setTimeout(() => { b.classList.remove("realce"); if (S) S.realce = null; }, 3000));
+  }
+  return b;
+}
+
+function porQueGuarda(g) {
+  const e = S.estado;
+  const rid = String(g.ev?.rule_id || "");
+  const pol = (rid.match(/POL-\d+/) || [])[0];
+  const corpo = [];
+  if (g.tipo === "pressao") {
+    corpo.push(h("p", { class: "destaque" }, "O número só muda com nova prova."),
+      h("p", {}, "O agente não muda um resultado por pedido. Se algo mudou em campo, envie um vídeo, uma foto ou um documento novo."));
+    const o = (e.ocorrencias || []).find((x) => x.tipo === "pressao");
+    if (o) corpo.push(h("p", {}, h("strong", {}, "Registrado no laudo: "), R.textoOcorrencia(e, o)));
+  } else if (g.tipo === "injecao") {
+    const o = (e.ocorrencias || []).find((x) => x.tipo === "injecao");
+    const pads = (String(o?.descricao || "").match(/padrões:\s*([^)]*)/) || [])[1];
+    const pede = pads ? pads.split(/,\s*/).map((p) => ({ ignorar_regras: "ignorar as regras", aprovar_laudo: "aprovar o laudo" }[p] || p.replaceAll("_", " "))).join(" e ") : null;
+    const campo = /observa/i.test(o?.descricao || "") ? "no campo de observação do documento" : "no documento";
+    corpo.push(h("p", { class: "destaque" }, "Instrução escondida no documento: ignorada."),
+      h("p", {}, `O documento trazia um texto ${campo}${pede ? ` pedindo para ${pede}` : ""}. O agente tratou esse texto como dado, não como ordem, e registrou a ocorrência.`));
+  } else if (g.tipo === "assinatura") {
+    corpo.push(h("p", { class: "destaque" }, "O agente não assina. A assinatura é sua."),
+      h("p", {}, "Só a fiscal assina, com o PIN, depois de revisar o laudo. O agente prepara e confere; quem responde pelo laudo é quem assina."));
+  } else if (g.tipo === "selado") {
+    corpo.push(h("p", { class: "destaque" }, "Laudo selado: nada muda."), h("p", {}, "Depois do selo, nenhum item muda. Correção abre uma nova fiscalização."));
+  } else corpo.push(h("p", {}, semIds(g.ev?.texto || "A política não permitiu este pedido.")));
+  if (pol) {
+    corpo.push(h("div", { class: "regra-bloco" }, h("p", {}, TEXTO_POL[pol] || semIds(g.ev?.texto || ""))),
+      h("details", { class: "regra-det" }, h("summary", {}, "Regra e detalhes"), kv([["Regra", pol, "mono"], g.ev?.texto ? ["Registro", semIds(g.ev.texto)] : null])));
+  }
+  abrirModal("Por quê?", h("div", { class: "texto" }, corpo));
+}
+
+// ---------------------------------------------------------------- cartão de resultado (um número, um status)
+function linhaDaChecagem(chk, sufixos) {
+  const ls = R.linhas(S.estado);
+  return ls.find((l) => (l.checagens || []).includes(chk.id) && (!sufixos || sufixos.some((s) => l.campo.endsWith(s))))
+    || ls.find((l) => l.item_id === chk.item_id && sufixos?.some((s) => l.campo.endsWith(s))) || null;
+}
+
+function cartaoResultado(c) {
+  const chks = S.chkTurno[c.turno] || [];
+  const chk = ORDEM_CARTAO.map((f) => chks.find((x) => x.ferramenta === f)).find(Boolean);
+  if (!chk) return null;
+  const p = chk.prova || {};
+  const e = S.estado;
+  let midia = null; let numero = null; let pill = null; let legenda = null; let campo = null; let falta = null; let contador = null;
+  // O cartão não dá ordem: a próxima ação é só o cartão AGORA. Ele diz o que ficou faltando enquanto o item falta (o
+  // cartão é de um turno passado; o estado é o de agora) e, depois, que a divergência foi justificada.
+  const faltaLinha = (l, texto) => (l && R.ehFalta(l) ? { texto, feito: false } : l && R.justificada(l) ? { texto: "Divergência justificada.", feito: true } : null);
+  if (chk.ferramenta === "contar_bovinos_video") {
+    const l = linhaDaChecagem(chk, [":quantidade"]);
+    campo = l?.campo;
+    const it = (e.operacao.itens || []).find((i) => i.id === (l?.item_id || chk.item_id));
+    const fin = it?.quantidade;
+    if (p.abstencao || chk.status === "indeterminado" || chk.status === "erro" || p.contagem === undefined || p.contagem === null) {
+      // a causa de verdade: arquivo que não abriu não é "câmera tremida"
+      const causa = [chk.resumo, ...(p.motivos || [])].join(" ");
+      const arquivoRuim = /ileg[ií]vel|corromp|inv[aá]lid|n[aã]o (?:abriu|foi poss[ií]vel abrir|consegui abrir)|formato/i.test(causa);
+      numero = h("span", { class: "num-g" }, arquivoRuim ? "Arquivo não abriu" : "Sem contagem");
+      pill = chipStatus("abstencao");
+      legenda = arquivoRuim ? "O vídeo não abriu. Envie de novo." : (p.pedidos_recaptura || [])[0] || "O vídeo não permitiu contar. Apoie o celular e deixe a câmera parada.";
+    } else {
+      numero = h("span", { class: "num-g" }, R.fmtInt(p.contagem), h("small", {}, ` de ${R.fmtInt(fin)}`));
+      pill = chipStatus(l?.status || "verificado");
+      const min = Array.isArray(p.intervalo) ? p.intervalo[0] : p.contagem;
+      const max = Array.isArray(p.intervalo) ? p.intervalo[1] : p.contagem;
+      const faixa = Number(min) === Number(max) ? `${R.fmtInt(max)} animais` : `de ${R.fmtInt(min)} a ${R.fmtInt(max)} animais`;
+      legenda = Number(max) >= Number(fin) ? `Contamos ${faixa} no vídeo; o financiado é ${R.fmtInt(fin)}: confere.`
+        : `Contamos ${faixa} no vídeo; o financiado é ${R.fmtInt(fin)}.`;
+      falta = faltaLinha(l, "Falta a justificativa ou um vídeo novo.");
+      contador = contadorMarcas(p.contagem, max, fin);
+    }
+    // o quadro limpo do próprio vídeo (as caixas com id e confiança do detector ficam em "Ver prova" e em Detalhes técnicos)
+    const qs = p.quadros || [];
+    const melhor = qs.reduce((a, q) => (!a || q.contagem_ate_aqui > a.contagem_ate_aqui ? q : a), null);
+    if (melhor && p.video_url) midia = quadroLimpo(chk, p.video_url, melhor);
+  } else if (chk.ferramenta === "geofence") {
+    const l = linhaDaChecagem(chk, [":localizacao", ":existencia"]);
+    campo = l?.campo;
+    const d = p.distancia_borda_m;
+    const dentro = chk.status === "ok";
+    numero = h("span", { class: "num-g" }, dentro ? "Dentro da área" : `a ${R.fmtInt(R.arred10(d))} m`);
+    pill = dentro ? chipStatus("verificado") : chipStatus("pendente");
+    legenda = dentro ? "A foto foi tirada dentro da área financiada." : "da borda da área financiada. A foto precisa ser de dentro.";
+    if (!dentro) falta = faltaLinha(l, "Falta uma foto de dentro da área ou a justificativa.");
+    midia = h("div", { class: "res-mapa" }, svgMiniMapa(p.glebas || e.operacao.glebas, p.gps, dentro ? null : d,
+      { w: 260, h: 128, rotulo: dentro ? null : `${R.fmtInt(R.arred10(d))} m` }));
+  } else if (chk.ferramenta === "conciliar_gta") {
+    const l = linhaDaChecagem(chk, [":gta"]);
+    campo = l?.campo;
+    numero = h("span", { class: "num-m" }, l && l.status === "divergente" ? R.motivoGta(l) : "GTA da compra");
+    pill = chipStatus(l?.status || (chk.status === "ok" ? "verificado" : chk.status));
+    legenda = l?.status === "verificado" ? "Confere com a compra." : l?.status === "divergente" ? "A guia não pode sair antes da compra." : null;
+    if (l?.status === "divergente") falta = faltaLinha(l, "Falta a justificativa ou a GTA certa.");
+  } else if (chk.ferramenta === "conciliar_nfe") {
+    if (!["ok", "divergente"].includes(chk.status)) return null;
+    const l = linhaDaChecagem(chk, [":comprovante_nfe", ":nfe"]);
+    campo = l?.campo;
+    numero = h("span", { class: "num-m" }, "Nota fiscal da compra");
+    pill = chipStatus(l?.status || (chk.status === "ok" ? "verificado" : "divergente"));
+    legenda = chk.status === "ok" ? "Confere com a compra." : legivel((p.motivos || [])[0] || chk.resumo || "");
+    if (l?.status === "divergente") falta = faltaLinha(l, "Falta a justificativa ou a nota certa.");
+  } else if (chk.ferramenta === "ler_documento_foto") {
+    const l = linhaDaChecagem(chk, [":comprovante_nfe", ":nfe"]);
+    campo = l?.campo;
+    const ev = (e.evidencias || []).find((x) => x.id === chk.evidencias?.[0]);
+    if (ev?.url) midia = h("div", { class: "res-quadro doc" }, h("img", { src: ev.url, alt: "Foto da nota impressa", loading: "lazy" }));
+    numero = h("span", { class: "num-m" }, "Nota lida pela foto");
+    const resid = e.residual && e.residual.checagem_id === chk.id;
+    pill = resid || l?.status === "pendente" ? chipStatus("pendente") : chipStatus(l?.status || "verificado");
+    const n = (e.residual?.campos || []).length;
+    legenda = resid ? `${n === 1 ? "Falta 1 campo" : `Faltam ${n} campos`} do papel.` : l?.status === "pendente" ? "Falta o arquivo da NF-e para fechar a nota." : "Confere com a compra.";
+  }
+  const verProva = campo ? h("button", { class: "res-prova", type: "button", onclick: () => abrirProva(campo) }, h("span", {}, "Ver prova"), icone("direita")) : null;
+  // a etiqueta do item, como numa ficha de campo: "Item 02", na ordem do laudo (os itens que pedem prova da fiscal)
+  const us = R.unidades(e).filter((u) => !u.agente);
+  const iu = campo ? us.findIndex((u) => u.campos.includes(campo)) : -1;
+  // no celular a etiqueta abre o cartão; no computador ela fecha a linha de ações (o cartão fica baixo para o telão)
+  const etq = (onde) => (iu >= 0 ? h("span", { class: `res-item ${onde}`, role: "note", "aria-label": `Item ${iu + 1} de ${us.length}` }, h("span", { "aria-hidden": "true" }, "Item "),
+    h("b", { "aria-hidden": "true" }, String(iu + 1).padStart(2, "0")), h("span", { class: "de", "aria-hidden": "true" }, `/${String(us.length).padStart(2, "0")}`)) : null);
+  return h("div", { class: `res${midia ? " com-midia" : ""}${midia?.classList.contains("res-mapa") ? " com-mapa" : ""}` },
+    midia,
+    h("div", { class: "res-txt" }, etq("so-movel"), h("div", { class: "res-linha" }, numero, pill), legenda ? h("p", { class: "res-leg" }, legenda) : null, contador,
+      falta ? h("p", { class: `res-falta${falta.feito ? " feito" : ""}` }, icone(falta.feito ? "diverge" : "falta"), h("span", {}, falta.texto)) : null,
+      h("div", { class: "res-acoes" }, verProva, etq("so-computador"))));
+}
+
+const mmss = (s) => `${Math.floor(Number(s) / 60)}:${String(Math.floor(Number(s) % 60)).padStart(2, "0")}`;
+
+// Quadro do vídeo no instante da última contagem, tirado do próprio vídeo (sem as caixas de depuração do detector), com
+// a etiqueta "12 contados até 0:12 de 0:17". O elemento é guardado por checagem: o vídeo não recarrega a cada turno.
+function quadroLimpo(chk, url, q) {
+  S.quadros ||= {};
+  const chave = `${chk.id}:${q.t_s}`;
+  if (S.quadros[chave]) return S.quadros[chave];
+  const t = Number(q.t_s) || 0;
+  const ev = (S.estado.evidencias || []).find((x) => x.id === chk.evidencias?.[0]);
+  const arq = (S.estado.roteiro?.arquivos || []).find((a) => a.nome === ev?.nome);
+  const dur0 = Number((String(arq?.rotulo || "").match(/\(([\d.,]+)\s*s\)/) || [])[1]?.replace(",", "."));
+  const rotulo = (dur) => `até ${mmss(t)}${dur ? ` de ${mmss(dur)}` : ""}`;
+  const resto = document.createTextNode(rotulo(dur0));
+  const v = h("video", { muted: true, playsinline: true, preload: "auto", src: `${url}#t=${t}`, tabindex: "-1", "aria-hidden": "true", disablepictureinpicture: true });
+  v.muted = true;
+  v.addEventListener("loadedmetadata", () => { if (!dur0 && Number.isFinite(v.duration)) resto.textContent = rotulo(v.duration); });
+  v.addEventListener("error", () => v.remove(), { once: true });
+  const el = h("div", { class: "res-quadro video", role: "img", "aria-label": `Quadro do vídeo em ${mmss(t)}: ${q.contagem_ate_aqui} animais contados até aqui` },
+    v, h("span", { class: "res-etq", "aria-hidden": "true" }, h("span", { class: "l1" }, h("b", {}, R.fmtInt(q.contagem_ate_aqui)), " contados"), h("span", { class: "l2" }, resto)));
+  S.quadros[chave] = el;
+  return el;
+}
+
+// Contador: uma marca por animal financiado (cheia = contado; listrada = até o teto da incerteza; vazia = falta)
+function contadorMarcas(c, max, fin) {
+  const n = Number(fin); const k = Number(c); const m = Math.min(n, Math.max(k, Number(max) || k));
+  if (!Number.isFinite(n) || !Number.isFinite(k) || n < 2 || n > 80) return null;
+  const marcas = Array.from({ length: n }, (_, i) => h("i", { class: i < k ? "c" : i < m ? "t" : null }));
+  return h("div", { class: "contador", role: "img", "aria-label": `${k} contados, até ${m} com a incerteza, de ${n} financiados` },
+    h("div", { class: "marcas", style: { "--n": String(n) } }, marcas),
+    h("p", { class: "leg", "aria-hidden": "true" }, h("span", {}, h("b", {}, R.fmtInt(k)), " contados"), m > k ? h("span", {}, "até ", h("b", {}, R.fmtInt(m))) : null,
+      h("span", {}, h("b", {}, R.fmtInt(n)), " financiados")));
+}
+
+function bolhaFalhou(f) {
+  return h("div", { class: "msg sistema", role: "alert" },
+    h("div", { class: "bolha" }, h("p", {}, f.rede ? "Sem conexão. Nada foi enviado." : "Não consegui falar com o servidor. Tente de novo."),
+      f.texto ? h("p", { class: "t-sec" }, `Sua mensagem: “${f.texto}”`) : null,
+      h("div", { class: "acoes-linha" }, h("button", { class: "btn btn-sec", type: "button", onclick: tentarDeNovo }, icone("recomecar"), "Tentar de novo"),
+        h("button", { class: "btn btn-ter", type: "button", onclick: () => { S.falhou = null; renderChat(); } }, "Descartar"))));
+}
 function tentarDeNovo() {
   const f = S?.falhou;
   if (!f || S.ocupado) return;
@@ -499,741 +681,707 @@ function tentarDeNovo() {
   f.repetir();
 }
 
-function descartarFalha() {
-  S.falhou = null;
-  renderChat();
+// ---------------------------------------------------------------- cartão "Agora" (sempre o último da conversa)
+function passoEmissao() {
+  const r = S.estado.roteiro;
+  const p = r?.passos?.[r.proximo - 1];
+  return !!p && !S.ocupado && /emiss|emitir/i.test(`${p.titulo} ${p.fala}`) && !/bloquead/i.test(p.titulo);
 }
 
-function renderChat() {
-  const conversa = S.estado.conversa || [];
-  const ultimo = conversa.at(-1)?.turno;
-  const nos = [];
-  if (!conversa.length && !S.pendente) {
-    nos.push(h("div", { class: "boas-vindas" },
-      h("span", { class: "avatar ag grande", "aria-hidden": "true" }, icone("agente")),
-      h("h3", {}, "Pronto para começar a fiscalização"),
-      h("p", {}, "Cumprimente o agente e pergunte o que a regra pede. Ele explica por que a operação está na amostra, define o método e diz quais evidências faltam."),
-      h("button", { class: "btn btn-sec", type: "button", onclick: () => { S.el.texto.value = "Bom dia. Por que esta operação caiu na amostra e qual método a regra pede?"; ajustarAltura(S.el.texto); S.el.texto.focus(); } },
-        "Sugestão: “Por que esta operação caiu na amostra?”")));
+function cartaoAgora() {
+  const a = R.agora(S.estado, { papel: papel(), confirmacao: S.confirmacao });
+  const cls = `agora${a.acomp ? " acomp" : ""}${a.selado ? " selado" : ""}${a.bloqueio ? " bloqueio" : ""}`;
+  const extra = [];
+  if (a.bloqueio) {
+    extra.push(h("p", { class: "t-sec so-computador" }, a.apoio),
+      h("ul", { class: "faltas-curtas so-movel" }, a.faltasCurtas.map((f) => h("li", {}, h("span", { class: `si si-${f.tipo === "div" ? "div" : "falta"}` }, icone(f.ic)), f.titulo))),
+      h("p", { class: "t-sec so-movel" }, a.apoioMovel));
+  } else if (a.apoio) extra.push(h("p", { class: "t-sec agora-apoio" }, a.apoio));
+  if (a.residual) extra.push(camposResidual(a.residual));
+  if (a.confirmacao) {
+    S.el.confTexto = h("input", { type: "text", class: "entrada", value: a.confirmacao.texto || "", "aria-label": "O que entendi (pode corrigir)" });
+    extra.push(h("label", { class: "campo-agora" }, h("span", { class: "t-sec" }, "O que entendi (pode corrigir)"), S.el.confTexto));
   }
-  // alvos da rolagem: começo do último turno, resposta do agente e o cartão que importa
-  let ancora = null; let agente = null; let forte = null; let forteFim = null;
-  for (const c of conversa) {
-    const meta = S.metaTurno[c.turno] || null;
-    const ehUltimo = c.turno === ultimo;
-    if (c.turno === "assinatura") {
-      const n = cartaoSelado(c);
-      nos.push(n);
-      if (ehUltimo) { ancora = n; agente = null; forte = null; }
-      continue;
-    }
-    const evs = S.evTurno[c.turno];
-    const cartoes = evs?.length ? cartoesSistema(evs, ehUltimo) : [];
-    const imps = ehUltimo ? cartoes.filter((n) => n.classList.contains("forte") || n.classList.contains("destaque")) : [];
-    const importante = imps[0] || null;
-    if (c.fiscal || c.evidencia) {
-      const b = bolhaFiscal(c.fiscal, { evidencia: c.evidencia, em: c.em, voz: meta?._origem === "asr" });
-      nos.push(b);
-      if (ehUltimo) ancora = b;
-    }
-    if (c.agente) {
-      const a = bolhaAgente(c, { recolher: ehUltimo && cartoes.some((n) => n.classList.contains("forte")) });
-      nos.push(a);
-      if (ehUltimo) { agente = a; ancora = ancora || a; }
-    }
-    nos.push(...cartoes);
-    if (ehUltimo) { forte = importante; forteFim = imps.at(-1) || null; ancora = ancora || cartoes[0] || null; }
-  }
-  if (S.falhou) { const b = bolhaFalhou(S.falhou); nos.push(b); ancora = b; agente = null; forte = null; forteFim = null; }
-  if (S.pendente) {
-    const b = bolhaFiscal(S.pendente.texto, { evidencia: S.pendente.evidencia, nome: S.pendente.nome, pendente: true });
-    nos.push(b); ancora = b; agente = null; forte = null; forteFim = null;
-  }
-  if (S.confirmacao) { const n = cartaoConfirmacao(S.confirmacao); nos.push(n); forte = forte || n; forteFim = n; ancora = ancora || n; }
-  else if (S.estado.residual && !S.ocupado) { const n = cartaoResidual(S.estado.residual); nos.push(n); forte = forte || n; forteFim = n; ancora = ancora || n; }
-  if (S.ocupado) {
-    nos.push(h("div", { class: "msg agente digitando", id: "pensando", role: "status" },
-      h("span", { class: "avatar ag", "aria-hidden": "true" }, icone("agente")),
-      h("div", { class: "corpo-msg" }, h("div", { class: "bolha" }, h("span", { class: "pontos", "aria-hidden": "true" }, h("i"), h("i"), h("i")),
-        h("span", {}, S.ocupadoTexto || "O agente está trabalhando…"),
-        S.progresso !== null ? h("div", { class: "progresso" }, h("i", { style: `width:${Math.round(S.progresso * 100)}%` })) : null))));
-  }
-  S.el.chat.replaceChildren(h("div", { class: "chat-interno" }, nos));
-  rolarChat({ ancora, agente, forte, forteFim });
-}
-
-// Uma faixa por campo (L98): de vários eventos do mesmo campo no turno, fica o mais importante.
-function eventosUmPorCampo(eventos) {
-  const ordenados = [...(eventos || [])].sort((a, b) => (PRIORIDADE_EVENTO[a.tipo] ?? 9) - (PRIORIDADE_EVENTO[b.tipo] ?? 9));
-  const vistos = new Set();
-  return ordenados.filter((ev) => {
-    if (!ev.campo) return true;
-    if (vistos.has(ev.campo)) return false;
-    vistos.add(ev.campo);
-    return true;
+  const acoes = a.acoes.map((ac, i) => {
+    const pri = i === 0;
+    const realce = ac.acao === "emitir" && passoEmissao();
+    const b = h("button", { class: `btn ${pri ? "btn-pri" : "btn-sec"}${realce ? " realce" : ""}`, type: "button", id: ac.acao === "emitir" ? "btn-rascunho" : null,
+      dataset: { acao: ac.acao }, disabled: S.ocupado ? true : null, onclick: () => executarAcao(ac.acao, b) }, ac.ic ? icone(ac.ic) : null, ac.rot);
+    if (ac.acao === "falar") ligarFalar(b, true);
+    return b;
   });
+  return h("section", { class: cls, id: "agora", role: "region", "aria-label": a.acomp ? "Acompanhamento" : "Próxima ação" },
+    h("div", { class: "agora-txt" }, h("span", { class: "rot" }, a.rot), h("h3", {}, a.titulo), ...extra),
+    acoes.length ? h("div", { class: "acoes" }, acoes) : null);
 }
 
-function titulo(t) {
-  const s = String(t || "").replace(/\b[A-ZÁÉÍÓÚÂÊÔÃÕÇ]{4,}\b/g, (w) => w.toLowerCase());
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-function aspectoDoTexto(texto) {
-  const partes = String(texto || "").split(" — ");
-  return legivel(partes.at(-1));
-}
-
-function rotuloCampoLaudo(campo) {
-  const l = (S.estado.matriz || []).find((x) => x.campo === campo);
-  return l ? l.aspecto : String(campo || "").split(":").pop().replaceAll("_", " ");
-}
-
-// Cartões de sistema de um turno: avisos da política e das guardas, divergências, itens verificados, rascunho.
-function cartoesSistema(eventos, recente) {
-  const evs = eventosUmPorCampo(eventos);
-  const ocorr = evs.some((e) => e.tipo === "ocorrencia");
-  const verif = evs.filter((e) => e.tipo === "verificado");
-  const nos = [];
-  let marcouOcorr = false;
-  for (const ev of evs) {
-    if (ev.tipo === "verificado" || ev.tipo === "ocorrencia") continue;
-    const guarda = GUARDA.has(ev.tipo);
-    // forte: bloqueio por falta de evidência, divergência ou abstenção no último turno (recolhe a resposta do agente);
-    // destaque: a faixa do título pintada (bloqueio e guardas do último turno)
-    const forte = recente && !guarda && (ev.tipo === "bloqueio" || NIVEL_FORTE.includes(ev.nivel));
-    const destaque = recente && (guarda || ev.tipo === "bloqueio");
-    let tx = EXPLICA[ev.tipo] || null;
-    const extra = [];
-    if (ev.tipo === "bloqueio") {
-      const n = ev.pendencias?.length || 0;
-      tx = `${n || ""} pendência(s) antes de emitir. A política só libera o rascunho com a evidência mínima e as divergências justificadas.`.trim();
-      if (n) {
-        extra.push(h("ul", { class: "sis-lista pendencias" }, ev.pendencias.slice(0, 6).map((p) => h("li", { title: legivel(p.falta || "") },
-          h("span", { class: `pt-st ${p.status}`, "aria-hidden": "true" }),
-          h("span", { class: "pend-txt" }, h("strong", {}, `${rotuloCampoLaudo(p.campo)}: `), curtoFalta(p.falta, p.status)),
-          h("button", { class: "link-btn ver-item", type: "button", title: "Abrir a prova deste item", onclick: () => verItem(p.campo) },
-            "ver item", icone("direita"))))));
-      }
-    } else if (ev.tipo === "divergencia" || ev.tipo === "pendente" || ev.tipo === "justificativa" || ev.tipo === "abstencao") {
-      tx = aspectoDoTexto(ev.texto);
-    } else if (ev.tipo === "emitido") {
-      tx = "Confira o hash e assine com o PIN; o agente não assina.";
-      if (["RASCUNHO", "ASSINATURA"].includes(S.estado.etapa)) {
-        extra.push(h("a", { class: "btn btn-sec btn-peq", href: `#/fis/${encodeURIComponent(S.id)}/laudo` }, icone("assinar"), "Revisar e assinar"));
-      }
-    } else if (!tx) tx = semIds(ev.texto);
-    if (ocorr && !marcouOcorr && ["pressao", "injecao", "negado", "assinatura"].includes(ev.tipo)) {
-      extra.push(h("p", { class: "sis-nota" }, icone("hash"), "Ocorrência registrada na trilha auditável (cadeia de hash)."));
-      marcouOcorr = true;
-    }
-    nos.push(cartaoSis({ tipo: guarda ? "guarda" : ev.nivel, icone: guarda ? (ev.tipo === "selado" ? "cadeado" : "escudo") : IC_EVENTO[ev.tipo] || "info",
-      titulo: titulo(ev.titulo), regra: ev.rule_id || null, texto: tx, dica: ev.texto || null, extra, destaque, forte, novo: recente,
-      alerta: forte || destaque }));
-  }
-  if (ocorr && !marcouOcorr) {
-    nos.push(cartaoSis({ tipo: "info", icone: "hash", titulo: "Ocorrência registrada na trilha auditável", compacto: true }));
-  }
-  if (verif.length) {
-    const nomes = [...new Set(verif.map((v) => aspectoDoTexto(v.texto)))];
-    nos.push(cartaoSis({ tipo: "ok", icone: "verificado", compacto: true, novo: recente,
-      titulo: verif.length === 1 ? "Item verificado" : `${verif.length} itens verificados`, texto: nomes.join(" · ") }));
-  }
-  return nos;
-}
-
-// Abre a prova de um item a partir da conversa (no celular, troca para a aba Laudo).
-function verItem(campo) {
-  if (ehMovel()) trocarMovel("laudo");
-  else if (S.painel !== "laudo") trocarPainel("laudo");
-  selecionar(campo);
-}
-
-// O que falta, em uma frase: "nova captura ou justificativa do fiscal (foto fora da gleba, a 649,9 m da borda)". A
-// instrução longa depois dos dois-pontos e as faixas "(entre 100 e 1000 m)" ficam no title.
-function curtoFalta(falta, status) {
-  if (status === "divergente") return "justificar a divergência ou enviar nova evidência";
-  let t = semIds(String(falta || "evidência").replace(/^evidência ausente:\s*/i, "")).replace(/\s*\((?:bov|cerca|item)\w*\)$/, "");
-  const m = t.match(/^(.*?)\s*\((.*)\)\s*$/);
-  if (m && m[1]) {
-    const dentro = m[2].split(/:\s/)[0].replace(/\s*\(entre [^()]*\)?/g, "").replace(/[()]/g, "").trim();
-    t = dentro ? `${m[1]} (${dentro})` : m[1];
-  }
-  return t;
-}
-
-function cartaoConfirmacao(c) {
-  const campo = h("input", { type: "text", value: c.texto || "", "aria-label": "Texto reconhecido (pode corrigir)" });
-  const nums = (c.numeros || []).filter((n) => n.critico);
-  setTimeout(() => campo.focus(), 50);
-  return h("div", { class: "msg agente" }, h("span", { class: "avatar ag", "aria-hidden": "true" }, icone("agente")),
-    h("div", { class: "corpo-msg" }, h("div", { class: "cartao-acao", role: "group", "aria-label": "Confirmar números falados" },
-      h("div", { class: "acao-tt" }, icone("alerta"), "Confirme os números antes de enviar"),
-      h("p", {}, c.pergunta),
-      nums.length ? h("div", { class: "numeros" }, nums.map((n) => h("span", { class: "num" }, n.rotulo))) : null,
-      campo,
-      h("div", { class: "grupo-btn" },
-        h("button", { class: "btn btn-pri", type: "button", onclick: () => confirmar(true, campo.value) }, icone("verificado"), "Confirmar e enviar"),
-        h("button", { class: "btn btn-sec", type: "button", onclick: () => confirmar(false) }, "Descartar")),
-      h("p", { class: "nota" }, "Também dá para responder por voz: “sim” ou “não”."))));
-}
-
-// Pedido do residual: só os campos do DANFE/GTA que a foto não validou. A fiscal fala (segurar para falar) ou
-// digita; o agente confere cada valor com as mesmas regras da leitura (DV da chave, somas, datas) antes de aceitar.
-function cartaoResidual(p) {
-  const doc = p.tipo_documento === "gta" ? "GTA" : "nota (DANFE)";
-  const entradas = [];
+function camposResidual(p) {
+  S.el.residual = [];
   const linhas = (p.campos || []).map((c) => {
-    const nomes = c.campos || [];
-    const alvo = c.formato === "municipio" ? nomes.slice(0, 1) : nomes;
-    const inputs = (c.confirmar ? alvo.flatMap((n) => [n, `${n}#2`]) : alvo).map((n) => {
+    const alvo = c.formato === "municipio" ? (c.campos || []).slice(0, 1) : (c.campos || []);
+    const nomes = c.confirmar ? alvo.flatMap((n) => [n, `${n}#2`]) : alvo;
+    return h("li", {}, h("span", { class: "t-sec" }, R.maiuscula(c.instrucao || c.rotulo)), nomes.map((n) => {
       const numerico = ["digitos", "numero", "grade", "documento"].includes(c.formato);
-      const inp = h("input", { type: "text", "data-campo": n, inputmode: numerico ? "numeric" : null,
-        autocomplete: "off", placeholder: rotuloCampo(n), "aria-label": `${c.rotulo}: ${rotuloCampo(n)}` });
-      entradas.push(inp);
-      return inp;
-    });
-    return h("li", {}, h("div", {}, c.instrucao, c.modo === "digitacao" ? h("span", { class: "etiqueta" }, "digitar") : null),
-      h("div", { class: "residual-campos" }, inputs));
+      const inp = h("input", { type: "text", class: "entrada", "data-campo": n, inputmode: numerico ? "numeric" : null, autocomplete: "off",
+        "aria-label": `${c.rotulo}${n.endsWith("#2") ? " (repita)" : ""}`, placeholder: n.endsWith("#2") ? "repita para conferir" : c.n_digitos ? `${c.n_digitos} dígitos` : "" });
+      S.el.residual.push(inp);
+      inp.addEventListener("input", () => { const m = inp.parentElement?.querySelector(`.erro-campo[data-de="${CSS.escape(n)}"]`); if (m) m.hidden = true; });
+      return [inp, h("p", { class: "erro-campo", "data-de": n, role: "alert", hidden: true })];
+    }));
   });
-  const enviar = () => {
-    const residual = Object.fromEntries(entradas.map((i) => [i.dataset.campo, i.value.trim()]).filter(([, v]) => v));
-    if (!Object.keys(residual).length) { avisar("Preencha ao menos um campo, ou responda por voz.", true); return; }
-    executar(() => api.turno(S.id, "", residual), { texto: "Conferindo os campos…", fala: `Completei ${Object.keys(residual).length} campo(s) da ${doc}.` },
-      { origem: "texto" });
-  };
-  return h("div", { class: "msg agente" }, h("span", { class: "avatar ag", "aria-hidden": "true" }, icone("agente")),
-    h("div", { class: "corpo-msg" }, h("div", { class: "cartao-acao residual", role: "group", "aria-label": `Completar a ${doc}` },
-      h("div", { class: "acao-tt" }, icone("nota"), `Complete a ${doc}: leia no papel só estes campos`,
-        p.tentativa > 1 ? h("span", { class: "etiqueta" }, `tentativa ${p.tentativa}`) : null),
-      p.refazer_foto ? h("p", { class: "nota" }, "A foto ficou ruim em muitos campos: refazer a foto (de cima, sem sombra) pode ser mais rápido.") : null,
-      h("ol", { class: "residual-lista" }, linhas),
-      h("div", { class: "grupo-btn" },
-        h("button", { class: "btn btn-pri", type: "button", onclick: enviar }, icone("verificado"), "Enviar para conferir")),
-      h("p", { class: "nota" }, "Pode também falar os valores, na ordem. CPF/CNPJ só digitado. Nada é aceito sem passar pelo dígito verificador, pelas somas e pelas datas."))));
+  return h("ol", { class: "residual" }, linhas);
 }
 
-function rotuloCampo(n) {
-  if (n.endsWith("#2")) return "repita (confere a digitação)";
-  const r = { quantidade: "quantidade", valor_unitario: "valor unitário", valor_total: "valor total", chave: "dígitos da chave",
-    total: "total", total_machos: "machos", total_femeas: "fêmeas", municipio: "município (ou código IBGE)", emitente_doc: "CNPJ/CPF do emitente" };
-  const folha = n.split(".").pop();
-  return r[folha] || folha.replaceAll("_", " ");
+// ---------------------------------------------------------------- ações do "Agora" e da lista de faltas
+function itemPara(tipo) {
+  const itens = S.estado.operacao.itens || [];
+  const bov = itens.find((i) => R.ehBovino(i));
+  if (["video", "nfe_xml", "gta", "documento"].includes(tipo)) return bov?.id || itens[0]?.id;
+  return (itens.find((i) => !R.ehBovino(i)) || itens[0])?.id;
+}
+
+const ACAO_ARQ = {
+  filmar: { tipo: "video", accept: "video/*", capture: true }, "galeria-video": { tipo: "video", accept: "video/*" },
+  "fotografar-nota": { tipo: "documento", accept: "image/*", capture: true }, "arquivo-nfe": { tipo: "nfe_xml", accept: ACEITA.nfe_xml },
+  "fotografar-gta": { tipo: "documento", accept: "image/*", capture: true, item: "gta" }, "arquivo-gta": { tipo: "gta", accept: ACEITA.gta },
+  "fotografar-cerca": { tipo: "foto", accept: "image/*", capture: true }, "refazer-foto": { tipo: "foto", accept: "image/*", capture: true },
+  "galeria-foto": { tipo: "foto", accept: "image/*" },
+};
+const COMPATIVEL = { video: ["video"], documento: ["documento"], nfe_xml: ["nfe_xml"], gta: ["gta", "documento"], foto: ["foto"] };
+
+function executarAcao(acao, botao = null) {
+  if (!S || S.ocupado) return;
+  const p = passoAtual();
+  const replay = emReplay();
+  if (ACAO_ARQ[acao]) { capturar(ACAO_ARQ[acao]); return; }
+  if (acao.startsWith("justificar:")) {
+    const campo = acao.slice(11);
+    const suf = campo.split(":").pop();
+    // na gravação, a justificativa é a do roteiro (o agente responde à frase gravada): ela vem pronta no campo
+    if (replay) {
+      const doPasso = p && p.acao === "turno" && !p.evidencia && /^confirmo a diverg|justific/i.test(norm(p.fala))
+        && (suf !== "quantidade" || /contagem/i.test(p.fala)) && (suf !== "gta" || /gta/i.test(p.fala));
+      if (doPasso) { marcarVista(); escrever(p.fala); } else avisoRoteiro();
+      return;
+    }
+    const modelo = suf === "quantidade" ? "Confirmo a divergência na contagem: " : suf === "gta" ? "Confirmo a divergência da GTA: "
+      : suf === "localizacao" ? "Justifico a foto fora da área: " : "Confirmo a divergência: ";
+    escrever(modelo);
+    return;
+  }
+  if (acao.startsWith("escrever:")) { if (replay) { avisoRoteiro(); return; } escrever(acao.slice(9)); return; }
+  if (acao.startsWith("perguntar:")) { if (replay) { avisoRoteiro(); return; } enviarFala(acao.slice(10)); return; }
+  if (acao === "declarar") {
+    if (replay) { if (p && /declaro/i.test(p.fala || "")) proximoPasso(); else avisoRoteiro(); return; }
+    enviarFala("Declaro que não presto assistência técnica ao produtor nem tenho vínculo com empresa dele.");
+    return;
+  }
+  if (acao === "confirmar") { confirmar(true, S.el.confTexto?.value || S.confirmacao?.texto || ""); return; }
+  if (acao === "corrigir") { const t = S.el.confTexto?.value || ""; confirmar(false).then(() => escrever(t)); return; }
+  if (acao === "completar-nota") {
+    if (replay) { if (p?.acao === "residual") proximoPasso(); else avisoRoteiro(); return; }
+    enviarResidual();
+    return;
+  }
+  if (acao === "emitir") {
+    // na gravação, "Emitir" é o passo da emissão do roteiro (o pedido de emissão gravado)
+    if (replay) { if (p && !p.evidencia && p.acao !== "assinar" && /emiti/i.test(p.fala || "") && !R.faltas(S.estado).length) proximoPasso(); else avisoRoteiro(); return; }
+    pedirRascunho();
+    return;
+  }
+  if (acao === "revisar-assinar") { S.irLaudo(S.id, true); return; }
+  if (acao === "ver-laudo") { location.hash = `#/fis/${encodeURIComponent(S.id)}/laudo`; return; }
+  if (acao === "baixar-pacote") { location.hash = `#/fis/${encodeURIComponent(S.id)}/laudo?pacote=1`; return; }
+  if (acao === "anexar") { abrirAnexar(); return; }
+  if (acao === "falar") return;
+  if (botao) avisar("Ação indisponível.");
+}
+
+// Fotografar, filmar, nota, GTA. Na demonstração, quando o caso tem o arquivo pronto do próximo passo, o botão pede
+// confirmação e mostra a mensagem que vai junto (nada sai sozinho); fora dela, abre a câmera ou o seletor do aparelho.
+const ICONE_TIPO = { video: "video", foto: "camera", documento: "nota", nfe_xml: "arquivo", gta: "gta" };
+function capturar(d) {
+  const p = passoAtual();
+  const doPasso = arquivoDoPasso(p);
+  const arq = doPasso && (COMPATIVEL[d.tipo] || []).includes(doPasso.tipo) ? doPasso : null;
+  if (!S.estado.roteiro) { doAparelho(d); return; }
+  if (emReplay() && !arq) { avisoRoteiro(); return; }
+  if (!arq) { doAparelho(d); return; }
+  marcarVista();
+  const corpo = h("div", { class: "texto demo-arquivo" },
+    h("p", {}, "Nesta demonstração, o arquivo vem pronto do caso:"),
+    h("p", { class: "arq-demo" }, h("span", { class: "ic-quadro" }, icone(ICONE_TIPO[arq.tipo] || "arquivo")), h("strong", {}, rotuloArquivoDemo(arq))),
+    p.fala ? h("p", { class: "t-sec" }, "Vai junto a mensagem: ", h("q", {}, p.fala)) : null,
+    h("div", { class: "acoes-linha" },
+      h("button", { class: "btn btn-pri", type: "button", onclick: () => { fecharModal(); proximoPasso(); } }, icone("enviar"), "Enviar este arquivo"),
+      emReplay() ? null : h("button", { class: "btn btn-sec", type: "button", onclick: () => { fecharModal(); doAparelho(d); } },
+        icone(d.tipo === "video" ? "video" : "camera"), "Usar um meu")),
+    emReplay() ? h("p", { class: "t-sec" }, "Esta demonstração roda uma gravação: só o arquivo do roteiro.") : null);
+  abrirModal("Arquivo da demonstração", corpo);
+}
+function doAparelho(d) {
+  escolherArquivo(d, (f) => { const tipo = d.tipo === "gta" && /\.pdf$/i.test(f.name) ? "documento" : d.tipo; enviarArquivo(f, tipo, itemPara(tipo)); });
+}
+
+function escrever(texto) {
+  abrirItens(false);
+  S.el.texto.value = texto;
+  ajustarAltura(S.el.texto);
+  renderCompositor();
+  S.el.texto.focus();
+  S.el.texto.setSelectionRange(texto.length, texto.length);
+}
+
+function escolherArquivo(d, aoEscolher) {
+  const inp = h("input", { type: "file", accept: d.accept, hidden: true, ...(d.capture ? { capture: "environment" } : {}) });
+  inp.addEventListener("change", () => { const f = inp.files[0]; inp.remove(); if (f) aoEscolher(f); });
+  document.body.append(inp);
+  inp.click();
+}
+
+// ---------------------------------------------------------------- compositor
+function renderCompositor() {
+  if (!S) return;
+  const fiscal = ehFiscal();
+  const selado = S.estado.etapa === "SELADO";
+  S.el.compositor.hidden = !fiscal;
+  S.el.notaAnalista.hidden = fiscal;
+  S.el.notaSelado.hidden = !fiscal || !selado;
+  const tem = !!S.el.texto.value.trim();
+  S.el.enviar.hidden = !tem;
+  S.el.falar.hidden = tem;
+  S.el.falar.setAttribute("aria-disabled", vozDisponivel() ? "false" : "true");
+  S.el.falar.title = vozDisponivel() ? "Segure para falar" : "Voz desligada nesta execução: digite a mensagem";
+  S.el.texto.disabled = S.ocupado;
+  S.el.enviar.disabled = S.ocupado;
+  S.el.anexar.disabled = S.ocupado || selado;
+  if (!fiscal) fecharAnexar();
+}
+
+// Folha "Anexar": para o que o agente não pediu (o que ele pediu está no "Agora").
+function abrirAnexar(sub = null) {
+  const m = S.el.menuAnexar;
+  if (!sub && m.classList.contains("aberta") && !m.dataset.sub) { fecharAnexar(); return; }
+  m.dataset.sub = sub || "";
+  const linha = (rot, apoio, ic, onclick, cls = "") => h("button", { class: `linha-anexo ${cls}`, type: "button", onclick },
+    h("span", { class: "ic-quadro" }, icone(ic)), h("span", { class: "txt" }, h("strong", {}, rot), apoio ? h("span", {}, apoio) : null), icone("direita"));
+  const arq = (acao) => () => { fecharAnexar(); executarArquivo(acao); };
+  let corpo;
+  if (sub === "nota") corpo = [linha("Fotografar a nota", "A nota impressa (DANFE)", "camera", arq("fotografar-nota")), linha("Arquivo da NF-e (.xml)", "O arquivo que o vendedor enviou", "arquivo", arq("arquivo-nfe"))];
+  else if (sub === "gta") corpo = [linha("Fotografar a guia", "A GTA impressa", "camera", arq("fotografar-gta")), linha("Arquivo da GTA", "O arquivo da guia eletrônica", "arquivo", arq("arquivo-gta"))];
+  else if (sub === "demo") {
+    corpo = (S.estado.roteiro?.arquivos || []).map((a) => linha(rotuloArquivoDemo(a), a.disponivel === false ? "simulado nesta execução" : null,
+      { video: "video", foto: "camera", documento: "nota", nfe_xml: "arquivo", gta: "gta" }[a.tipo] || "arquivo", () => { fecharAnexar(); enviarDoCaso(a.nome, a.tipo); }));
+  } else {
+    corpo = [linha("Fotografar", "Cerca, obra ou animais", "camera", arq("fotografar-cerca")),
+      linha("Filmar", "O lote passando no corredor", "video", arq("filmar")),
+      linha("Nota fiscal", "Foto da nota ou arquivo da NF-e", "nota", () => abrirAnexar("nota")),
+      linha("GTA", "Foto da guia ou arquivo", "gta", () => abrirAnexar("gta")),
+      S.estado.roteiro?.arquivos?.length ? linha("Arquivo da demonstração", "Usar um arquivo pronto do caso", "info", () => abrirAnexar("demo"), "demo") : null].filter(Boolean);
+  }
+  const titulo = { nota: "Nota fiscal", gta: "GTA", demo: "Arquivo da demonstração" }[sub] || "Anexar";
+  m.replaceChildren(...[h("div", { class: "alca", "aria-hidden": "true" }),
+    h("div", { class: "folha-cab" }, sub ? h("button", { class: "btn-icone", type: "button", "aria-label": "Voltar", onclick: () => abrirAnexar() }, icone("voltar")) : null,
+      h("h2", { class: "t-sub" }, titulo), h("button", { class: "btn-icone", type: "button", "aria-label": "Fechar", onclick: () => fecharAnexar(true) }, icone("x"))),
+    h("div", { class: "lista-anexo" }, corpo),
+    sub === "demo" ? null : h("p", { class: "gps-linha", id: "gps-linha" }, icone("gps"), h("span", {}, "A localização vai junto com a foto."))].filter(Boolean));
+  alternarFolha(m, true, { foco: m.querySelector(".linha-anexo") });
+  S.el.anexar.setAttribute("aria-expanded", "true");
+  estadoGps();
+}
+function fecharAnexar(devolver = false) {
+  if (!S) return;
+  const m = S.el.menuAnexar;
+  if (!m.classList.contains("aberta")) return;
+  alternarFolha(m, false);
+  S.el.anexar.setAttribute("aria-expanded", "false");
+  if (devolver) S.el.anexar.focus({ preventScroll: true });
+}
+function executarArquivo(acao) { capturar(ACAO_ARQ[acao]); }
+async function estadoGps() {
+  const el = document.getElementById("gps-linha");
+  if (!el || !navigator.permissions?.query) return;
+  try {
+    const st = await navigator.permissions.query({ name: "geolocation" });
+    const span = el.querySelector("span");
+    if (st.state === "granted") span.textContent = "Localização ligada: vai junto com a foto.";
+    else if (st.state === "denied") span.textContent = "Localização desligada: a foto vai sem local. Ligue nas configurações para conferir a área.";
+    else span.textContent = "A localização é pedida ao enviar a foto.";
+  } catch { /* sem a API de permissões */ }
+}
+function rotuloArquivoDemo(a) {
+  const n = (String(a.nome).match(/_(\d+)\./) || [])[1];
+  if (a.tipo === "video") {
+    const dur = Number((String(a.rotulo || "").match(/\(([\d.,]+)\s*s\)/) || [])[1]?.replace(",", "."));
+    // dois vídeos no caso: o nome do arquivo diferencia ("curral", "retiro")
+    const videos = (S.estado.roteiro?.arquivos || []).filter((x) => x.tipo === "video");
+    if (videos.length > 1) {
+      const dica = String(a.nome).replace(/\.[^.]+$/, "").split(/[_-]+/).filter((w) => w && !/^(lote|video|vídeo|s\d+|\d+)$/i.test(w)).join(" ");
+      return `Vídeo do lote · ${dica || `nº ${videos.indexOf(a) + 1}`}${dur ? ` (${Math.round(dur)} s)` : ""}`;
+    }
+    return `Vídeo do curral${dur ? ` (${Math.round(dur)} s)` : ""}`;
+  }
+  if (a.tipo === "documento") return "Nota impressa (foto)";
+  if (a.tipo === "nfe_xml") return "Arquivo da NF-e";
+  if (a.tipo === "gta") return "GTA";
+  if (a.tipo === "foto") {
+    const s = (String(a.nome).match(/^foto_([a-z]+)_/) || [])[1];
+    return `Foto ${{ cerca: "da cerca", lote: "do lote", curral: "do curral" }[s] || ""}${n ? ` ${n}` : ""}`.replace(/\s+/g, " ").trim();
+  }
+  return String(a.rotulo || a.nome);
 }
 
 // ---------------------------------------------------------------- painel do laudo
-const ROT_CONT = { verificado: "Verificado", divergente: "Divergente", pendente: "Pendente", abstencao: "Abstenção" };
-const IC_CONT = { verificado: "verificado", divergente: "divergente", pendente: "pendente", abstencao: "abstencao" };
-const IC_ITEM = { bovinos: "pessoa", cerca: "mapa" };
-
-// O que falta para emitir: aspectos pendentes e divergências sem justificativa (o que as políticas POL-01 e POL-02
-// conferem). O texto do pedido vem das pendências do servidor quando há; a política continua sendo quem decide.
-function faltas(e) {
-  const linhas = (e.matriz || []).filter((l) => !l.agregado);
-  const doServidor = Object.fromEntries((Array.isArray(e.pendencias) ? e.pendencias : []).map((p) => [p.campo, p]));
-  return linhas.filter((l) => l.status === "pendente" || (l.status === "divergente" && !l.justificativa)).map((l) => ({
-    campo: l.campo, aspecto: l.aspecto, status: l.status,
-    falta: l.status === "divergente" ? "justificar a divergência ou enviar nova evidência"
-      : curtoFalta(doServidor[l.campo]?.falta || l.pedido || "evidência", "pendente"),
-    regra: doServidor[l.campo]?.regra_id || null,
-  }));
+function renderProgressoMovel() {
+  const ind = R.indicador(S.estado);
+  S.el.progresso.setAttribute("aria-label", R.ariaIndicador(ind));
+  S.el.progresso.replaceChildren(h("span", { class: "txt" }, linhaIndicador(ind)), icone("baixo", "seta"));
 }
 
-function grupos(e) {
-  const linhas = e.matriz || [];
-  const itens = e.operacao.itens || [];
-  const ag = Object.fromEntries(linhas.filter((l) => l.agregado).map((l) => [l.campo, l]));
-  const out = [];
-  for (const it of itens) {
-    const filhos = linhas.filter((l) => !l.agregado && l.item_id === it.id);
-    if (filhos.length) out.push({ titulo: nomeItem(it.descricao), descricao: it.descricao, tipo: it.tipo, agregado: ag[`item:${it.id}`] || null, linhas: filhos });
-  }
-  const resto = linhas.filter((l) => !l.agregado && !itens.some((it) => it.id === l.item_id));
-  if (resto.length) out.push({ titulo: "Requisitos do laudo", descricao: "Registros que o MCR exige em todo laudo", tipo: "laudo", agregado: null, linhas: resto });
-  return out;
+function abrirItens(abrir) {
+  if (!S || !ehMovel()) return;
+  const vai = alternarFolha(S.el.itens, abrir);
+  S.el.progresso.setAttribute("aria-expanded", vai ? "true" : "false");
+  if (!vai && abrir === false && document.activeElement && S.el.itens.contains(document.activeElement)) S.el.progresso.focus({ preventScroll: true });
 }
 
 function renderPainel(anterior) {
   const e = S.estado;
-  const linhas = (e.matriz || []).filter((l) => !l.agregado);
-  const c = { verificado: 0, divergente: 0, pendente: 0, abstencao: 0 };
-  linhas.forEach((l) => { c[l.status] = (c[l.status] || 0) + 1; });
-  const total = linhas.length;
-  const concl = total - c.pendente;
-  // sem denominador: o total cresce quando o agente define o método ou chega evidência de outro item, e "2 de 9" →
-  // "4 de 10" parecia retrocesso
-  const semMetodo = !e.metodo || !total;
-  S.el.progTxt.textContent = semMetodo ? "aguardando o método"
-    : `${concl} ${concl === 1 ? "aspecto concluído" : "aspectos concluídos"} · ${c.pendente} em aberto`;
-  S.el.progTxt.title = "Aspectos concluídos (verificados, divergentes ou com abstenção) e em aberto. Novos aspectos entram quando o agente define o método e quando chega evidência de outro item.";
-  S.el.barra.classList.toggle("indet", semMetodo);
-  S.el.barra.setAttribute("aria-label", semMetodo ? "aguardando o método"
-    : `${c.verificado} verificados, ${c.divergente} divergentes, ${c.pendente} pendentes, ${c.abstencao} abstenções`);
-  S.el.barra.replaceChildren(...(semMetodo ? [h("i", { class: "indet" })] : Object.keys(ROT_CONT).filter((k) => c[k]).map((k) =>
-    h("i", { class: k, style: `flex-grow:${c[k]}`, title: `${ROT_CONT[k]}: ${c[k]}` }))));
-  // placar com rótulo por extenso (no telão, ⊘ e ⏱ sozinhos não se leem)
-  const rot = { verificado: ["verificado", "verificados"], divergente: ["divergente", "divergentes"], pendente: ["pendente", "pendentes"],
-    abstencao: ["abstenção", "abstenções"] };
-  S.el.contadores.replaceChildren(...Object.keys(ROT_CONT).map((k) =>
-    h("span", { class: `contador ${k}${c[k] ? "" : " zero"}`, role: "img", "aria-label": `${c[k]} ${rot[k][c[k] === 1 ? 0 : 1]}`, title: DICA_CONT[k] },
-      icone(IC_CONT[k]), h("b", {}, c[k]), h("span", { class: "rot-cont" }, rot[k][c[k] === 1 ? 0 : 1]))));
-  renderMatriz(anterior);
-  renderEmitir();
-  ajustarMatriz(); // depois do "O que falta" (que muda a altura da tabela)
-}
-
-const DICA_CONT = { verificado: "Verificado: a evidência confere com o financiado", divergente: "Divergente: a evidência não confere com o financiado",
-  pendente: "Pendente: falta evidência para concluir", abstencao: "Abstenção: a evidência não permite concluir (o sistema não chuta)" };
-
-function renderMatriz(anterior) {
-  const linhas = S.estado.matriz || [];
-  const antes = Object.fromEntries((anterior?.matriz || []).map((l) => [l.campo, l.status]));
-  if (!linhas.length) {
-    S.el.matriz.replaceChildren(h("p", { class: "vazio" }, "Os itens aparecem quando o agente define o método."));
-    return;
-  }
-  const corpo = h("tbody");
-  // a linha fica marcada só enquanto a prova dela está aberta na gaveta (senão disputava com o realce de "mudou")
-  const aberta = S.el.grade.classList.contains("prova-aberta");
-  const linhaTr = (l, extraCls, conteudo) => {
-    const mudou = anterior && antes[l.campo] !== undefined && antes[l.campo] !== l.status;
-    const sel = aberta && S.selecionado === l.campo;
-    return h("tr", { class: `linha${extraCls}${sel ? " selecionada" : ""}${mudou ? " mudou" : ""}`, tabindex: "0",
-      "aria-selected": sel ? "true" : "false", dataset: { campo: l.campo },
-      onclick: () => selecionar(l.campo), onkeydown: (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); selecionar(l.campo); } } },
-    conteudo);
-  };
-  for (const g of grupos(S.estado)) {
-    const cab = [h("td", { class: "c-item" }, h("div", { class: "grupo-tt", title: g.descricao },
-      icone(IC_ITEM[g.tipo] || "doc"), h("span", {}, g.titulo))),
-    h("td", { class: "c-st" }, g.agregado ? chipStatus(g.agregado.status) : null)];
-    if (g.agregado) corpo.append(linhaTr(g.agregado, " grupo", cab));
-    else {
-      const primeiro = g.linhas[0]?.campo;
-      corpo.append(h("tr", { class: "secao", onclick: () => primeiro && selecionar(primeiro) }, cab));
-    }
-    for (const l of g.linhas) {
-      const valor = valorLegivel(l);
-      corpo.append(linhaTr(l, "", [
-        h("td", { class: "c-item" },
-          h("div", { class: "aspecto", title: l.aspecto }, l.aspecto),
-          (valor || l.regra_id || l.justificativa) ? h("div", { class: "sub" },
-            valor ? h("span", { class: `valor${valor.rot === "Referência" ? " ref" : ""}`, title: l.valor_fmt || null }, `${valor.rot}: ${valor.txt}`) : null,
-            l.justificativa ? h("span", { class: "etiqueta etq-just", title: `Justificativa do fiscal: “${l.justificativa}”` }, "justificado") : null,
-            chipRegra(l.regra_id)) : null,
-          l.motivo && l.status !== "verificado" ? h("div", { class: "motivo", title: l.motivo }, motivoLegivel(l)) : null),
-        h("td", { class: "c-st" }, chipStatus(l.status))]));
-    }
-  }
-  const topo = S.el.matriz.scrollTop;
-  S.el.matriz.replaceChildren(h("table", { class: "matriz" },
-    h("caption", { class: "so-leitor" }, "Itens do laudo com o status de cada aspecto; Enter abre a prova"),
-    h("colgroup", {}, h("col", {}), h("col", { class: "col-st" })),
-    h("thead", { class: "so-leitor" }, h("tr", {}, h("th", { scope: "col" }, "Item e aspecto"), h("th", { scope: "col" }, "Status"))),
-    corpo));
-  S.el.matriz.scrollTop = topo;
-}
-
-// A tabela não abre com uma linha cortada em cima: encaixa no começo da primeira linha à vista e, se um status mudou
-// neste turno, traz a linha que mudou (com o cabeçalho do grupo dela).
-function ajustarMatriz() {
-  const wrap = S.el.matriz;
-  if (!wrap.clientHeight) return;
-  const base = wrap.getBoundingClientRect().top - wrap.scrollTop;
-  for (const tr of wrap.querySelectorAll("tbody tr")) {
-    const topo = tr.getBoundingClientRect().top - base;
-    if (topo + tr.offsetHeight > wrap.scrollTop + 1) {
-      // a primeira linha de um grupo leva junto o cabeçalho do grupo (o item a que o aspecto pertence)
-      const cab = tr.previousElementSibling?.matches(".grupo, .secao") ? tr.previousElementSibling : null;
-      if (topo < wrap.scrollTop - 1 || (cab && topo <= wrap.scrollTop + 1)) wrap.scrollTop = cab ? cab.getBoundingClientRect().top - base : topo;
-      break;
-    }
-  }
-  rolarMatrizMudou();
-}
-
-// Depois de um turno, a linha que mudou de status fica à vista, com o cabeçalho do grupo dela quando cabe.
-function rolarMatrizMudou() {
-  const wrap = S.el.matriz;
-  const tr = wrap.querySelector("tr.mudou:not(.grupo)") || wrap.querySelector("tr.mudou");
-  if (!tr || !wrap.clientHeight) return;
-  let cab = tr.matches(".grupo, .secao") ? tr : tr.previousElementSibling;
-  while (cab && !cab.matches(".grupo, .secao")) cab = cab.previousElementSibling;
-  const base = wrap.getBoundingClientRect().top - wrap.scrollTop;
-  const topoTr = tr.getBoundingClientRect().top - base;
-  const fimTr = topoTr + tr.offsetHeight;
-  const topoCab = cab ? cab.getBoundingClientRect().top - base : topoTr;
-  const ini = fimTr - topoCab <= wrap.clientHeight ? topoCab : topoTr;
-  if (ini >= wrap.scrollTop && fimTr <= wrap.scrollTop + wrap.clientHeight) return; // já à vista
-  wrap.scrollTop = ini < wrap.scrollTop ? ini : Math.min(ini, fimTr - wrap.clientHeight);
-}
-
-function renderEmitir() {
-  const e = S.estado;
-  const lista = faltas(e);
+  const ind = R.indicador(e);
+  const est = R.estadoLaudo(e);
+  const movel = ehMovel();
+  const faltam = ind.F;
+  S.el.painelCab.replaceChildren(
+    h("div", { class: "rot" }, movel ? h("h2", { class: "t-sub" }, ind.antes ? "Itens do laudo" : R.textoIndicador(ind)) : h("h2", { class: "rotulo" }, "Laudo"),
+      movel ? h("button", { class: "btn-icone", type: "button", "aria-label": "Fechar a lista", onclick: () => abrirItens(false) }, icone("x"))
+        : chipNeutro(est.rot, est.ic, est.cls === "st-neutro" ? "st-neutro" : est.cls)),
+    movel ? (ind.antes ? h("p", { class: "t-sec" }, "A lista sai com a sua primeira prova.") : h("div", {}, linhaIndicador(ind).querySelector(".prog") || "",
+      R.textoMarcaDiv(ind) ? h("p", { class: `div-txt${ind.D ? "" : " div-j"}` }, icone("diverge"), R.textoMarcaDiv(ind)) : null,
+      faltam ? h("p", { class: "t-sec" }, faltam === 1 ? "Falta 1 para emitir o laudo." : `Faltam ${faltam} para emitir o laudo.`) : null)) : h("div", { class: "painel-ind" }, linhaIndicador(ind, { grande: true }), trilhaEtapas(e, { fiscal: PERFIS.fiscal.nome })));
   const nos = [];
-  const emitido = ["RASCUNHO", "ASSINATURA"].includes(e.etapa) && e.laudo;
-  const reemitir = emitido && e.laudo?.valido_para_assinar === false;
-  if (e.etapa === "SELADO") {
-    nos.push(h("div", { class: "pronto ok" }, icone("selo"), h("span", {}, h("strong", {}, "Laudo selado."), " Nada mais muda nesta fiscalização.")),
-      h("div", { class: "emitir-acoes" },
-        h("a", { class: "btn btn-pri btn-bloco", href: `#/fis/${encodeURIComponent(e.id)}/laudo` }, icone("doc"), "Ver laudo selado"),
-        h("a", { class: "btn btn-sec", href: `#/fis/${encodeURIComponent(e.id)}/laudo?pacote=1`, title: "ZIP com manifest sha256 para o BCB ou a Justiça" },
-          icone("baixar"), "Pacote de exibição")));
-  } else if (emitido && !reemitir) {
-    nos.push(h("div", { class: "pronto" }, icone("doc"), h("span", {}, h("strong", {}, "Rascunho emitido."), " Confira o hash e assine com o PIN.")),
-      h("a", { class: "btn btn-pri btn-bloco", href: `#/fis/${encodeURIComponent(e.id)}/laudo` }, icone("assinar"), "Revisar e assinar"));
-  } else {
-    let motivo = "";
-    if (e.etapa === "BRIEFING") motivo = "Comece pela conversa: o agente define o método antes.";
-    else if (S.ocupado) motivo = "Aguarde o agente terminar.";
-    else if (lista.length) motivo = `Faltam ${lista.length} ${lista.length === 1 ? "pendência" : "pendências"}.`;
-    if (lista.length && e.etapa !== "BRIEFING") {
-      // no telão e em tela baixa (tablet deitado) a lista começa fechada: o cartão da conversa já a mostra e a tabela
-      // precisa da altura
-      const telao = document.body.classList.contains("apresentacao") || !window.matchMedia("(min-height: 821px)").matches;
-      nos.push(h("details", { class: "falta", open: (lista.length <= 3 && !telao) || null },
-        h("summary", {}, icone("direita", "seta-det"), h("h3", {}, "O que falta para emitir"), h("span", { class: "contagem alerta" }, lista.length)),
-        h("ul", {}, lista.map((f) => h("li", {}, h("button", { class: "link-falta", type: "button", onclick: () => selecionar(f.campo), title: "Abrir a prova do item" },
-          h("span", { class: `pt-st ${f.status}`, "aria-hidden": "true" }), h("span", {}, h("strong", {}, f.aspecto), h("small", {}, f.falta))))))));
-    } else if (!lista.length && e.etapa !== "BRIEFING") {
-      nos.push(h("div", { class: "pronto ok" }, icone("verificado"), h("span", {}, reemitir ? "Há evidência nova depois do rascunho: emita de novo." : "Tudo pronto para emitir o rascunho.")));
-    }
-    // na demonstração, quando o próximo passo do roteiro é a emissão, este é o botão em destaque (o "Executar passo"
-    // da barra fica discreto): emitir por aqui também avança o roteiro
-    const realce = !motivo && passoEmissao();
-    nos.push(h("button", { class: `btn btn-pri btn-bloco${realce ? " realce" : ""}`, type: "button", id: "btn-rascunho", onclick: pedirRascunho,
-      disabled: motivo ? true : null, "aria-describedby": motivo ? "motivo-emitir" : null }, icone("doc"), reemitir ? "Emitir rascunho de novo" : "Emitir rascunho"));
-    if (motivo) nos.push(h("p", { class: "motivo-btn", id: "motivo-emitir" }, motivo, lista.length ? " A política confere tudo antes de liberar." : ""));
+  const oc = e.ocorrencias || [];
+  if (oc.length) {
+    const mudou = anterior && (anterior.ocorrencias || []).length !== oc.length && document.body.classList.contains("apresentacao");
+    const b = h("button", { class: `recusas${mudou ? " realce" : ""}`, type: "button", onclick: listaRecusas },
+      h("span", { class: "si si-guarda" }, icone("escudo-cheio")), h("span", { class: "rec-txt" }, R.textoRecusas(oc.length)), icone("direita"));
+    if (mudou) S.timers.push(setTimeout(() => b.classList.remove("realce"), 3000));
+    nos.push(b);
   }
-  S.el.emitir.replaceChildren(...nos);
+  if (ind.antes) {
+    // antes do plano: o que o laudo já sabe que vai pedir (a lista completa, com a conta, sai com a primeira mensagem)
+    const aFazer = R.unidades(e).filter((u) => !u.agente);
+    if (aFazer.length) {
+      nos.push(h("h3", { class: "rotulo-secao" }, "O laudo vai pedir"),
+        h("ol", { class: "a-fazer" }, aFazer.map((u) => h("li", {}, h("span", { class: "q", "aria-hidden": "true" }), h("span", { class: "txt" }, R.rotuloUnidade(e, u).titulo)))),
+        h("p", { class: "t-sec painel-vazio" }, "O agente fecha a lista e a conta com a primeira mensagem. Comece pelo cartão Agora."));
+    } else nos.push(h("p", { class: "t-sec painel-vazio" }, "O agente monta a lista do laudo com a primeira mensagem. Comece pelo cartão Agora."));
+  }
+  const grupos = R.faltasAgrupadas(e);
+  if (grupos.length && !ind.antes) {
+    const pisca = R.ultimoTurnoBloqueado(e) && S.eventosVivos[e.conversa?.at(-1)?.turno];
+    nos.push(h("h3", { class: `rotulo-secao${pisca ? " pisca" : ""}` }, movel ? `Falta (${grupos.length})` : `Falta para emitir (${grupos.length})`));
+    grupos.forEach((g, i) => nos.push(linhaFalta(g, i === 0)));
+  }
+  const us = R.unidades(e).filter((u) => u.pronta);
+  const daFiscal = us.filter((u) => !u.agente);
+  const doAgente = us.filter((u) => u.agente);
+  if (daFiscal.length && !ind.antes) {
+    nos.push(h("h3", { class: "rotulo-secao" }, `Prontos (${daFiscal.length})`));
+    nos.push(...gruposProntos(daFiscal));
+  }
+  if (doAgente.length && !ind.antes) {
+    nos.push(h("h3", { class: "rotulo-secao" }, `O agente verificou (${doAgente.length})`),
+      h("p", { class: "t-sec nota-agente" }, "Com os dados da operação, sem prova sua."),
+      h("div", { class: "sub-itens agente" }, doAgente.map((u) => linhaPronta(u))));
+  }
+  const topo = S.el.painelCorpo.scrollTop;
+  S.el.painelCorpo.replaceChildren(...nos);
+  S.el.painelCorpo.scrollTop = topo;
+  renderRodapePainel(ind);
 }
 
-// O próximo passo do roteiro é pedir o rascunho, e o painel já pode emitir?
-function passoEmissao() {
-  const r = S.estado.roteiro;
-  const p = r?.passos?.[r.proximo - 1];
-  if (!p || S.ocupado || !/emiss|emitir/i.test(`${p.titulo} ${p.fala}`) || /bloquead/i.test(p.titulo)) return false;
+// Pé do painel: o botão de emitir fica sempre à vista, desligado com o motivo até não faltar nada (o principal,
+// verde, continua no cartão Agora). Depois do rascunho, "Revisar e assinar"; depois do selo, "Ver laudo".
+function renderRodapePainel(ind) {
   const e = S.estado;
-  return !["BRIEFING", "SELADO"].includes(e.etapa) && !(["RASCUNHO", "ASSINATURA"].includes(e.etapa) && e.laudo) && !faltas(e).length;
-}
-
-// ---------------------------------------------------------------- evidências
-function ehImagem(e) { return ["foto", "quadro_chave"].includes(e.tipo) || /\.(jpe?g|png|webp)$/i.test(e.nome || ""); }
-
-function renderEvidencias() {
-  const evs = [...S.estado.evidencias].reverse();
-  const itens = Object.fromEntries((S.estado.operacao.itens || []).map((i) => [i.id, nomeItem(i.descricao, 40)]));
-  const env = new Set(evidenciasEnviadas());
-  const enviadas = evs.filter((e) => env.has(e));
-  const geradas = evs.filter((e) => !env.has(e));
-  S.el.evidN.textContent = enviadas.length ? `${enviadas.length} ${enviadas.length === 1 ? "enviada" : "enviadas"}` : "";
-  if (!evs.length) {
-    S.el.evid.replaceChildren(h("div", { class: "vazio" }, icone("clipe"), h("p", {}, "Nenhuma evidência ainda."),
-      h("p", { class: "nota" }, "Use Foto, Vídeo, NF-e, GTA ou Nota impressa embaixo da conversa.")));
+  const n = ind.F;
+  let corpo;
+  // depois do rascunho, no computador, o cartão Agora (ao lado) já leva a "Revisar e assinar" / "Ver laudo"
+  if (!ehMovel() && (e.etapa === "SELADO" || (["RASCUNHO", "ASSINATURA"].includes(e.etapa) && e.laudo && e.laudo.valido_para_assinar !== false))) {
+    S.el.painelPe.replaceChildren();
     return;
   }
-  const cartao = (e, peq) => h("li", { class: `ev-card${peq ? " peq" : ""}` },
-    h("a", { href: e.url || "#", target: "_blank", rel: "noopener", title: `${e.nome || ""}\nsha256 ${e.sha256 || ""}` },
-      h("div", { class: "ev-mini" }, ehImagem(e) && e.url ? h("img", { src: e.url, alt: "", loading: "lazy" }) : icone(IC_TIPO[e.tipo] || "doc")),
-      h("div", { class: "ev-txt" }, h("strong", {}, ROT_TIPO[e.tipo] || e.tipo),
-        itens[e.item_id] ? h("small", {}, itens[e.item_id]) : null,
-        h("small", {}, fmtData(e.recebida_em)),
-        e.gps ? h("small", { class: "ev-gps" }, icone("pino"), "com GPS") : null)));
-  const nos = [h("ul", { class: "galeria" }, enviadas.map((e) => cartao(e, false)))];
-  if (geradas.length) {
-    nos.push(h("p", { class: "rotulo-sec" }, "Gerados pelo sistema"), h("ul", { class: "galeria peq" }, geradas.map((e) => cartao(e, true))));
+  if (e.etapa === "SELADO") {
+    corpo = [h("a", { class: "btn btn-sec btn-cheio", href: `#/fis/${encodeURIComponent(S.id)}/laudo` }, icone("nota"), "Ver laudo selado")];
+  } else if (["RASCUNHO", "ASSINATURA"].includes(e.etapa) && e.laudo && e.laudo.valido_para_assinar !== false) {
+    corpo = ehFiscal() ? [h("button", { class: "btn btn-sec btn-cheio", type: "button", onclick: () => executarAcao("revisar-assinar") }, icone("caneta"), "Revisar e assinar")]
+      : [h("p", { class: "t-sec" }, "Rascunho emitido: aguardando a assinatura da fiscal.")];
+  } else if (ind.antes) {
+    corpo = [h("button", { class: "btn btn-sec btn-cheio", type: "button", disabled: true, "aria-describedby": "motivo-emitir" }, icone("nota"), "Emitir laudo"),
+      h("p", { class: "t-sec motivo", id: "motivo-emitir" }, "Sai quando todos os itens estiverem prontos.")];
+  } else {
+    const pode = n === 0 && ehFiscal() && !S.ocupado;
+    corpo = [h("button", { class: "btn btn-sec btn-cheio", type: "button", disabled: pode ? null : true, "aria-describedby": "motivo-emitir",
+      dataset: { acao: "emitir" }, onclick: () => executarAcao("emitir") }, icone("nota"), "Emitir laudo"),
+    h("p", { class: "t-sec motivo", id: "motivo-emitir" }, n ? (n === 1 ? "Falta 1 item para emitir." : `Faltam ${n} itens para emitir.`)
+      : ehFiscal() ? "Tudo pronto: o agente confere de novo antes de emitir." : "Só a fiscal emite o laudo.")];
   }
-  nos.push(h("p", { class: "nota ev-rodape" }, icone("hash"), "Cada arquivo entra na cadeia com o seu sha256 (passe o mouse para ver)."));
-  S.el.evid.replaceChildren(...nos);
+  S.el.painelPe.replaceChildren(...corpo);
+}
+
+function temProva(l) { return (l.checagens || []).length > 0 || (l.evidencias || []).length > 0; }
+function unidadeTemProva(u) { return u.linhas.some(temProva); }
+
+function linhaFalta(g, primeira) {
+  const e = S.estado;
+  const u = g.unidade;
+  const pl = R.planoFalta(e, g.alvo);
+  const cls = g.tipo === "div" ? "si-div" : g.tipo === "sem" ? "si-sem" : "si-falta";
+  const acoes = ehFiscal() ? pl.acoes.slice(0, 2).map((ac, i) => h("button", { class: `btn ${primeira && i === 0 ? "btn-pri" : "btn-sec"}`, type: "button",
+    dataset: { acao: ac.acao }, onclick: () => executarAcao(ac.acao) }, i === 0 && ac.ic ? icone(ac.ic) : null, ac.rot)) : [];
+  const linha = h("div", { class: `item falta-item ${g.tipo}${primeira && g.tipo !== "div" ? " vez" : ""}`, dataset: { campo: g.principal.campo, campos: g.campos.join(" ") } },
+    h("div", { class: "l1" }, h("span", { class: `si ${cls}` }, icone(g.ic)),
+      h("div", { class: "txt" }, h("strong", { class: "item-titulo" }, g.titulo), h("span", { class: "item-estado t-sec" }, g.apoio)),
+      unidadeTemProva(u) ? botaoProva(g.principal.campo) : null),
+    acoes.length ? h("div", { class: "item-acoes" }, acoes) : null);
+  return unidadeTemProva(u) ? linhaAbreProva(linha, g.principal.campo) : linha;
+}
+
+// "Ver prova" da lista: a seta no fim da linha (o nome continua para o leitor de tela); a linha inteira também abre
+function botaoProva(campo) {
+  return h("button", { class: "ver-prova", type: "button", "aria-label": "Ver prova", title: "Ver prova", onclick: (ev) => { ev.stopPropagation(); abrirProva(campo); } },
+    h("span", { class: "vp-txt" }, "Ver prova"), icone("direita"));
+}
+function linhaAbreProva(el, campo) {
+  el.classList.add("com-prova");
+  el.addEventListener("click", (ev) => { if (!ev.target.closest("button, a, input")) abrirProva(campo); });
+  return el;
+}
+
+// Linha de um item pronto: ✓ verde (verificado) ou △ vermelho (divergência justificada: pronto, mas a marca fica).
+function linhaPronta(u) {
+  const r = R.rotuloUnidade(S.estado, u);
+  const div = r.tipo === "divj";
+  const prova = unidadeTemProva(u);
+  const linha = h("div", { class: `item pronto${div ? " divj" : ""}`, dataset: { campo: u.principal.campo }, title: div ? null : r.prontoApoio },
+    h("span", { class: `si ${div ? "si-div" : "si-ok"}` }, icone(div ? "diverge" : "check-cheio")),
+    h("span", { class: "txt" }, h("span", { class: "item-titulo" }, r.pronto), div ? h("span", { class: "item-estado" }, r.prontoApoio) : null),
+    prova ? botaoProva(u.principal.campo) : null);
+  return prova ? linhaAbreProva(linha, u.principal.campo) : linha;
+}
+
+// Prontos por objeto financiado (sem sanfona: são poucos itens; o nome do objeto é só um rótulo)
+function gruposProntos(prontos) {
+  const e = S.estado;
+  const itens = e.operacao.itens || [];
+  const grupos = itens.map((it) => ({ chave: it.id, nome: R.nomeItem(it), ic: R.ehBovino(it) ? "vaca" : "cerca", us: prontos.filter((u) => u.item_id === it.id) }))
+    .concat([{ chave: "laudo", nome: "Requisitos da fiscalização", ic: "lista", us: prontos.filter((u) => !itens.some((i) => i.id === u.item_id)) }])
+    .filter((g) => g.us.length);
+  return grupos.flatMap((g) => [h("p", { class: "obj-rot" }, h("span", {}, g.nome)), h("div", { class: "sub-itens" }, g.us.map((u) => linhaPronta(u)))]);
+}
+
+function listaRecusas() {
+  const e = S.estado;
+  const turnos = Object.entries(S.guardas).filter(([, v]) => v.some((x) => x.tipo === "pressao" || x.tipo === "injecao"));
+  abrirModal(R.maiuscula(R.textoRecusas((e.ocorrencias || []).length)), h("div", { class: "texto" },
+    h("ul", { class: "lista-recusas" }, (e.ocorrencias || []).map((o) => {
+      const t = turnos.find(([, v]) => v.some((x) => x.tipo === o.tipo))?.[0];
+      return h("li", {}, h("span", { class: "si si-guarda" }, icone("escudo-cheio")), h("span", { class: "txt" }, R.textoOcorrencia(e, o)),
+        t ? h("button", { class: "btn btn-ter", type: "button", onclick: () => verNaConversa(t) }, "Ver na conversa") : null);
+    })),
+    h("p", { class: "t-sec" }, "Cada pedido recusado fica registrado no laudo, com a hora e a regra.")));
+}
+
+function verNaConversa(turno) {
+  fecharModal();
+  abrirItens(false);
+  const alvo = S.el.chat.querySelector(`.msg.agente[data-turno="${CSS.escape(String(turno))}"]`);
+  if (!alvo) return;
+  alvo.scrollIntoView({ block: "center", behavior: "smooth" });
+  alvo.classList.add("lembrar");
+  S.timers.push(setTimeout(() => alvo.classList.remove("lembrar"), 2000));
 }
 
 // ---------------------------------------------------------------- prova do item (gaveta)
-function marcarSelecao(campo) {
-  S.el.matriz.querySelectorAll("tr.linha").forEach((tr) => {
-    const sel = !!campo && tr.dataset.campo === campo;
-    tr.classList.toggle("selecionada", sel);
-    tr.setAttribute("aria-selected", sel ? "true" : "false");
-  });
-}
-
-function selecionar(campo) {
-  S.selecionado = campo;
-  marcarSelecao(campo);
-  abrirGaveta(true);
-}
-
-function abrirGaveta(abrir) {
+function abrirProva(campo) {
   if (!S) return;
-  const estava = S.el.grade.classList.contains("prova-aberta");
-  S.el.grade.classList.toggle("prova-aberta", !!abrir);
-  if (abrir) {
-    renderProva();
-    S.el.fecharProva.focus({ preventScroll: true });
-  } else {
-    S.miniMapa?.remove?.(); S.miniMapa = null;
-    // o foco volta para a linha; a marcação de selecionada sai junto com a gaveta
-    if (estava) S.el.matriz.querySelector(`tr[data-campo="${CSS.escape(S.selecionado || "")}"]`)?.focus({ preventScroll: true });
-    S.selecionado = null;
-    marcarSelecao(null);
-  }
+  S.provaCampo = campo;
+  abrirItens(false);
+  S.el.grade.classList.add("prova-aberta");
+  S.el.colProva.setAttribute("aria-hidden", "false");
+  if (ehMovel()) alternarFolha(S.el.colProva, true);
+  else document.getElementById("veu-global").hidden = false;
+  renderProva();
+  S.el.colProva.querySelector(".fechar-prova")?.focus({ preventScroll: true });
+}
+function fecharProva() {
+  if (!S || !S.el.grade.classList.contains("prova-aberta")) return;
+  S.el.grade.classList.remove("prova-aberta");
+  S.el.colProva.setAttribute("aria-hidden", "true");
+  alternarFolha(S.el.colProva, false);
+  if (!ehMovel() && document.getElementById("tecnico")?.hidden !== false) document.getElementById("veu-global").hidden = true;
+  S.miniMapa?.remove?.(); S.miniMapa = null;
+  const volta = S.el.painelCorpo.querySelector(`[data-campo="${CSS.escape(S.provaCampo || "")}"] .ver-prova`);
+  S.provaCampo = null;
+  volta?.focus({ preventScroll: true });
 }
 
+// A prova do item como a fiscal o vê (a foto da cerca junta integridade, localização e conclusão). Um status só, no
+// topo; cada bloco mostra o que a checagem viu, sem repetir status. Fonte, regra, tolerância e sha256 ficam no fim, em
+// "Regra e detalhes".
 function renderProva() {
   S.miniMapa?.remove?.(); S.miniMapa = null;
-  const l = (S.estado.matriz || []).find((x) => x.campo === S.selecionado);
-  S.el.tituloProva.textContent = l ? l.aspecto : "—";
-  S.el.prova.replaceChildren(painelProva(l));
+  const e = S.estado;
+  const l0 = (e.matriz || []).find((x) => x.campo === S.provaCampo);
+  if (!l0) { S.el.prova.replaceChildren(h("p", {}, "Item não encontrado.")); return; }
+  const u = R.unidadeDoCampo(e, l0.campo) || { linhas: [l0], principal: l0, alvo: l0, pronta: R.pronta(l0), justificada: R.justificada(l0) };
+  const ls = u.linhas;
+  const r = u.campos ? R.rotuloUnidade(e, u) : R.rotuloItem(e, l0);
+  const it = (e.operacao.itens || []).find((i) => i.id === l0.item_id);
+  S.el.tituloProva.textContent = u.pronta ? r.pronto : r.titulo;
+  S.el.subProva.textContent = it ? R.nomeItem(it) : u.agente ? "O agente verificou" : "Requisitos da fiscalização";
+  const status = u.pronta ? (u.justificada ? "divergente-j" : "verificado") : u.divAberta ? "divergente" : u.alvo?.status || l0.status;
+  const apoio = u.pronta ? (u.justificada ? "Divergência justificada." : r.prontoApoio || r.apoio) : r.apoio;
+  const nos = [h("div", { class: "prova-st" }, chipStatus(status), h("span", { class: "t-sec" }, apoio))];
+  for (const l of ls) if (l.justificativa) nos.push(justificativa(l.justificativa));
+  const vistos = new Set();
+  const chks = ls.flatMap((l) => R.checagensDaLinha(e, l)).filter((c) => !vistos.has(c.id) && vistos.add(c.id)).slice().reverse();
+  if (!chks.length) {
+    const pl = R.planoFalta(e, u.alvo || l0);
+    nos.push(h("div", { class: "vazio" }, h("p", {}, u.pronta ? (u.agente ? "O agente verificou com os dados da operação." : "Este item foi registrado na conversa.")
+      : "Ainda não há prova para este item."),
+    !u.pronta && ehFiscal() ? h("button", { class: "btn btn-sec", type: "button", onclick: () => { fecharProva(); executarAcao(pl.acoes[0].acao); } },
+      pl.acoes[0].ic ? icone(pl.acoes[0].ic) : null, pl.acoes[0].rot) : null));
+  }
+  const varias = chks.length > 1;
+  const nGeo = chks.filter((c) => c.ferramenta === "geofence").length;
+  let kGeo = nGeo;
+  chks.forEach((c) => nos.push(blocoProva(c, { varias, ordem: c.ferramenta === "geofence" && nGeo > 1 ? kGeo-- : 0 })));
+  // regra e detalhes (auditoria): por linha do laudo
+  const det = [];
+  for (const l of ls) {
+    const v = l.valor && typeof l.valor === "object" ? l.valor : null;
+    det.push(kv([ls.length > 1 ? ["Linha do laudo", R.rotuloItem(e, l).pronto] : null, ["Regra", l.regra_id || "—", "mono"], l.regra_id ? ["Em resumo", regraCurta(l.regra_id)] : null,
+      v?.limite_inferior !== undefined ? ["Mínimo aceito", `${fmtNum(v.limite_inferior)} (tolerância de ${fmtNum(v.tolerancia_pct)}%)`] : null,
+      ["Motivo do verificador", legivel(l.motivo || "—")], l.proveniencia?.length ? ["Origem", l.proveniencia.join("; ")] : null]));
+  }
+  for (const c of chks) {
+    det.push(kv([["Checagem", `${rotuloFerramenta(c.ferramenta)} · ${ROTULO_STATUS_CHK[c.status] || c.status}`], ["Fonte", c.fonte_versao || "—", "mono"],
+      ...(c.prova?.motivos || []).slice(0, 4).map((m, i) => [i ? "" : "Notas", legivel(m)])]));
+  }
+  const evs = [...new Set(ls.flatMap((l) => l.evidencias || []))];
+  if (evs.length) det.push(kv(evs.map((id) => { const ev = (e.evidencias || []).find((x) => x.id === id); return ev ? [`sha256 · ${ev.nome}`, ev.sha256 || "—", "mono"] : null; })));
+  nos.push(h("details", { class: "regra-det" }, h("summary", {}, "Regra e detalhes"), det));
+  S.el.prova.replaceChildren(...nos);
   S.el.prova.scrollTop = 0;
 }
 
-function painelProva(l) {
-  if (!l) return h("p", { class: "vazio" }, "Escolha um item no painel do laudo para ver a prova.");
-  const chks = S.estado.checagens.filter((c) => l.checagens.includes(c.id));
-  const valor = valorLegivel(l);
-  const motivo = l.motivo ? motivoLegivel(l) : "";
-  const cab = h("div", { class: "cab-prova" },
-    h("p", { class: "nota", title: l.item_descricao }, curto(l.item_descricao, 90)),
-    h("div", { class: "prova-st" }, chipStatus(l.status, true),
-      valor ? h("span", { class: `valor${valor.rot === "Referência" ? " ref" : ""}`, title: l.valor_fmt || null }, `${valor.rot}: ${valor.txt}`) : null),
-    h("dl", { class: "kv" },
-      h("dt", {}, "Motivo"), h("dd", { title: l.motivo || "" }, motivo || "—"),
-      l.proveniencia?.length ? [h("dt", {}, "Origem do valor"), h("dd", {}, l.proveniencia.join("; "))] : null,
-      l.justificativa ? [h("dt", {}, "Justificativa"), h("dd", {}, `“${l.justificativa}”`)] : null,
-      l.ressalvas?.length ? [h("dt", {}, "Ressalvas"), h("dd", {}, l.ressalvas.map(legivel).join("; "))] : null,
-      // a regra com o nome curto ("MCR 2-7", "Regra operacional"); o id completo fica na dica e em Detalhes técnicos
-      l.regra_id ? [h("dt", {}, "Regra"), h("dd", { class: "regra", title: l.regra_id }, chipRegra(l.regra_id))] : null));
-  const nos = [cab];
-  if (!chks.length) {
-    nos.push(h("div", { class: "vazio" }, h("p", {}, l.pedido ? `Falta: ${curtoFalta(l.pedido, l.status)}` : "Ainda sem checagem para este item."),
-      h("button", { class: "btn btn-sec", type: "button", onclick: () => {
-        abrirGaveta(false); trocarMovel("conversa");
-        (ehMovel() ? S.el.clipe : S.el.anexos.querySelector(".chip-anexo"))?.focus();
-      } }, icone("clipe"), "Enviar evidência")));
-  }
-  for (const c of chks) nos.push(blocoProva(c));
-  return h("div", { class: "prova" }, nos);
-}
+const ROTULO_STATUS_CHK = { ok: "verificado", divergente: "divergente", indeterminado: "sem conclusão", erro: "erro", pendente: "falta" };
 
-function blocoProva(c) {
+function blocoProva(c, { varias = false, ordem = 0 } = {}) {
   const p = c.prova || {};
-  const cab = h("div", { class: "bloco-cab" },
-    h("strong", { title: c.ferramenta }, rotuloFerramenta(c.ferramenta)),
-    h("span", { class: "bloco-st" }, chipStatus(c.status),
-      p.fake ? h("span", { class: "etiqueta fake", title: "ferramenta simulada nesta execução" }, "simulada") : null,
-      c.span_id ? h("button", { class: "link-btn", type: "button", onclick: () => abrirSpan(c.span_id), title: "Abrir o registro desta checagem no trace" },
-        icone("trace"), "trace") : null));
-  const corpo = [cab];
+  // um status só por tela (o do topo): o bloco diz o que a checagem viu. Com várias checagens no mesmo item (a foto da
+  // cerca), cada bloco mostra o seu resultado em palavras, sem pílula de status.
+  let resultado = null;
+  if (c.ferramenta === "geofence") resultado = c.status === "ok" ? "dentro da área" : "fora da área";
+  else if (varias) resultado = c.status === "ok" ? "verificado" : ROTULO_STATUS_CHK[c.status] || c.status;
+  const titulo = `${rotuloFerramenta(c.ferramenta)}${ordem ? ` · ${ordem}ª foto` : ""}`;
+  const corpo = [h("div", { class: "bloco-cab" }, h("strong", {}, titulo), resultado ? h("span", { class: `resultado${c.status === "ok" ? " ok" : ""}` }, resultado) : null)];
   if (p.tipo === "contagem") {
-    corpo.push(h("div", { class: "contagem-grande" },
-      h("span", { class: "numero-grande" }, fmtNum(p.contagem)),
-      h("span", {}, Array.isArray(p.intervalo) && p.intervalo[1] !== p.contagem ? `animais contados (pode chegar a ${fmtNum(p.intervalo[1])})` : "animais contados"), p.lote ? h("span", { class: "nota" }, `lote ${p.lote}`) : null));
+    corpo.push(h("p", { class: "contagem-grande" }, h("span", { class: "num-g" }, fmtNum(p.contagem)),
+      h("span", {}, Array.isArray(p.intervalo) ? ` contados · de ${p.intervalo[0]} a ${p.intervalo[1]} com a incerteza` : Number(p.contagem) === 1 ? " animal" : " animais")));
     if (p.quadros?.length) {
-      corpo.push(h("div", { class: "quadros" }, p.quadros.map((q) => h("figure", {},
-        h("img", { src: q.url, alt: `Quadro-chave em ${q.t_s} s com as caixas dos animais; contados até aqui: ${q.contagem_ate_aqui}`, loading: "lazy" }),
-        h("figcaption", {}, `${q.t_s} s · ${q.contagem_ate_aqui} contados`)))));
-    } else if (p.video_url) {
-      corpo.push(h("video", { src: p.video_url, controls: true, preload: "metadata", muted: true }),
-        h("p", { class: "nota" }, p.fake ? "Contagem simulada (sem quadros-chave nesta execução)." : "Sem quadros-chave."));
+      const contados = (n) => `${R.fmtInt(n)} ${Number(n) === 1 ? "contado" : "contados"}`;
+      const quando = (q) => `${mmss(q.t_s)}`;
+      const melhor = p.quadros.reduce((a, q) => (!a || q.contagem_ate_aqui > a.contagem_ate_aqui ? q : a), null);
+      const quadro = (q, grande) => h("figure", { class: grande ? "q-grande" : "q-peq" },
+        h("span", { class: "q-img" }, h("img", { src: q.url, alt: `Quadro do vídeo em ${quando(q)}, com as caixas do detector em cada animal; ${contados(q.contagem_ate_aqui)} até aqui`, loading: "lazy" })),
+        h("figcaption", {}, h("b", {}, contados(q.contagem_ate_aqui)), ` até ${quando(q)}`));
+      corpo.push(quadro(melhor, true));
+      const resto = p.quadros.filter((q) => q !== melhor);
+      if (resto.length) corpo.push(h("div", { class: "quadros", style: { "--n": String(resto.length) } }, resto.map((q) => quadro(q, false))));
     }
-    if (p.pedidos_recaptura?.length) corpo.push(h("ul", { class: "nota" }, p.pedidos_recaptura.map((x) => h("li", {}, x))));
+    if (p.video_url) corpo.push(h("a", { class: "btn btn-ter", href: p.video_url, target: "_blank", rel: "noopener" }, icone("video"), "Ver o vídeo"));
   } else if (p.tipo === "foto_mapa") {
-    if (p.foto_url) corpo.push(h("img", { class: "foto", src: p.foto_url, alt: "Foto enviada como evidência", loading: "lazy" }));
-    corpo.push(h("dl", { class: "kv" },
-      p.gps ? [h("dt", {}, "GPS"), h("dd", {}, `${p.gps.lat.toFixed(6)}, ${p.gps.lon.toFixed(6)} (±${p.gps.precisao_m ?? "?"} m, ${p.gps.fonte})`)] : [h("dt", {}, "GPS"), h("dd", {}, "sem GPS")],
-      p.distancia_borda_m !== undefined && p.distancia_borda_m !== null ? [h("dt", {}, "Distância à borda"), h("dd", {}, `${fmtNum(p.distancia_borda_m)} m`)] : null,
-      p.status_ferramenta ? [h("dt", {}, "Resultado"), h("dd", {}, p.status_ferramenta)] : null));
-    if (p.glebas?.length || p.gps) {
-      const mm = h("div", { class: "mini-mapa", role: "img", "aria-label": "Gleba da operação e ponto da foto" });
+    if (p.foto_url) corpo.push(h("img", { class: "foto", src: p.foto_url, alt: "Foto enviada como prova", loading: "lazy" }));
+    corpo.push(kv([p.gps ? ["Local", `${p.gps.lat.toFixed(6)}, ${p.gps.lon.toFixed(6)} (±${String(p.gps.precisao_m ?? "?").replace(".", ",")} m)`] : ["Local", "sem GPS"],
+      p.distancia_borda_m !== undefined && p.distancia_borda_m !== null && c.ferramenta === "geofence"
+        ? ["Distância da borda", c.status === "ok" ? "dentro da área" : `${String(p.distancia_borda_m).replace(".", ",")} m`] : null]));
+    if (c.ferramenta === "geofence" && (p.glebas?.length || p.gps)) {
+      const mm = h("div", { class: "mini-mapa", role: "img", "aria-label": "Área financiada e o ponto da foto" });
       corpo.push(mm);
-      setTimeout(() => { if (!S || !mm.isConnected) return; S.miniMapa?.remove?.(); S.miniMapa = miniMapa(mm, p.glebas || [], p.gps); }, 30);
+      setTimeout(() => { if (!S || !mm.isConnected) return; S.miniMapa?.remove?.(); S.miniMapa = miniMapa(mm, p.glebas || [], p.gps, c.status === "ok" ? null : p.distancia_borda_m); }, 30);
     }
   } else if (p.tipo === "documento") {
     if (p.criterios?.length) {
-      corpo.push(h("table", { class: "crit" }, h("thead", {}, h("tr", {}, h("th", {}, "Critério"), h("th", {}, "Status"), h("th", {}, "Motivo"))),
-        h("tbody", {}, p.criterios.map((k) => h("tr", {}, h("td", { title: k.regra_id || "" }, String(k.campo || "").split(":").pop().replaceAll("_", " ")),
-          h("td", {}, chipStatus(k.status)), h("td", { title: k.motivo || null }, legivel(k.motivo)))))));
-    }
-    if (p.nao_verificado_offline?.length) {
-      corpo.push(h("p", { class: "nota" }, "Não verificável offline (vira ressalva, não divergência): " +
-        p.nao_verificado_offline.map((a) => a.regra_id).join(", ")));
+      corpo.push(h("ul", { class: "criterios" }, p.criterios.map((k) => h("li", {}, chipStatus(k.status === "ok" ? "verificado" : k.status),
+        h("span", {}, legivel(k.motivo))))));
     }
     if (p.trecho_url) {
       const alvo = h("div");
-      corpo.push(h("button", { class: "btn btn-sec btn-peq", type: "button", onclick: async () => {
-        try { alvo.replaceChildren(renderTrecho(await api.trecho(p.trecho_url))); } catch (e) { alvo.textContent = e.message; }
-      } }, icone("doc"), "Ver trecho do documento"), alvo);
+      corpo.push(h("button", { class: "btn btn-sec", type: "button", onclick: async (ev) => {
+        ev.currentTarget.disabled = true;
+        try { alvo.replaceChildren(trechoDoc(await api.trecho(p.trecho_url))); } catch (er) { alvo.textContent = er.message; }
+      } }, icone("nota"), "Ver trecho do documento"), alvo);
     }
-  } else if (p.tipo === "plano") {
-    corpo.push(h("p", {}, h("strong", {}, `Método: ${p.metodo || "—"}. `), p.justificativa || ""));
   } else if (p.dados) {
-    corpo.push(h("dl", { class: "kv" }, Object.entries(p.dados).map(([k, v]) => [h("dt", {}, k.replaceAll("_", " ")), h("dd", {}, fmtNum(v))])));
-  }
-  if (p.motivos?.length && p.tipo !== "documento") corpo.push(h("ul", { class: "nota" }, p.motivos.slice(0, 5).map((m) => h("li", { title: m }, legivel(m)))));
-  if (p.erro) corpo.push(h("p", { class: "nota" }, `Erro da ferramenta: ${p.erro}`));
-  corpo.push(h("div", { class: "fonte", title: `${c.id} · evidência ${c.evidencias.join(", ") || "—"}` }, `Fonte/versão: ${c.fonte_versao || "—"}`));
-  return h("div", { class: "bloco" }, corpo);
+    corpo.push(kv(Object.entries(p.dados).filter(([, v]) => typeof v !== "object").slice(0, 8).map(([k, v]) => [k.replaceAll("_", " "), fmtNum(v)])));
+  } else if (p.tipo === "plano") corpo.push(h("p", {}, p.justificativa || ""));
+  return h("div", { class: "bloco-prova" }, corpo);
 }
 
-function renderTrecho(t) {
-  const nos = [h("dl", { class: "kv" }, (t.campos || []).map((c) => [h("dt", {}, c.rotulo), h("dd", {}, c.valor)]))];
-  if (t.produtos?.length) {
-    nos.push(h("table", { class: "crit" },
-      h("thead", {}, h("tr", {}, ["Produto", "NCM", "CFOP", "Qtd", "Valor"].map((x) => h("th", {}, x)))),
-      h("tbody", {}, t.produtos.map((p) => h("tr", {}, [p.descricao, p.ncm, p.cfop, `${p.quantidade || ""} ${p.unidade || ""}`, p.valor].map((x) => h("td", {}, x || "—")))))));
-  }
-  if (t.xml) nos.push(h("pre", { class: "xml" }, t.xml));
+function trechoDoc(t) {
+  const nos = [kv((t.campos || []).map((c) => [c.rotulo, c.valor]))];
+  if (t.produtos?.length) nos.push(h("ul", { class: "t-sec" }, t.produtos.map((p) => h("li", {}, `${p.descricao || "—"} · ${p.quantidade || ""} ${p.unidade || ""} · ${p.valor || ""}`))));
   return h("div", { class: "trecho" }, nos);
 }
 
-export async function abrirSpan(spanId) {
-  if (!spanId || !S) return;
-  try {
-    const r = await api.spans(S.id, spanId);
-    const corpo = h("div", {}, (r.spans || []).map((s) => h("div", { class: `span${s.span_id === spanId ? " alvo" : ""}` },
-      h("h3", {}, s.name),
-      h("div", { class: "nota mono" }, `${s.span_id} · ${s.status} · ${s.duration_ms ?? "?"} ms · ${fmtData(s.start)}`),
-      h("dl", { class: "kv" }, Object.entries(s.attributes || {}).map(([k, v]) => [h("dt", { class: "mono" }, k), h("dd", { class: "mono" }, String(v))])))),
-    h("a", { class: "btn btn-sec btn-peq", href: `/api/fiscalizacoes/${encodeURIComponent(S.id)}/trace`, target: "_blank", rel: "noopener" }, icone("trace"), "Trace completo (JSONL)"));
-    abrirModal(`Trace — registro ${spanId}`, corpo);
-  } catch (e) { avisar(`Trace indisponível: ${e.message}`, true); }
-}
-
-// ---------------------------------------------------------------- detalhes técnicos (gaveta)
+// ---------------------------------------------------------------- detalhes técnicos
 function secaoFis() {
   const e = S.estado;
-  const idx = e.etapas.findIndex((x) => x.id === e.etapa);
-  const etapas = h("ol", { class: "tec-etapas", "aria-label": "Etapas da máquina de estados" }, e.etapas.map((x, i) =>
-    h("li", { class: `${i < idx ? "feita" : ""}${i === idx ? " atual" : ""}`, "aria-current": i === idx ? "step" : null, title: x.rotulo }, x.id)));
-  const turnos = (e.conversa || []).slice(-8).reverse().map((c) => {
-    const meta = S.metaTurno[c.turno] || null;
-    const acoes = meta?.acoes || c.acoes || [];
-    return h("li", {}, h("div", { class: "tec-turno" }, h("strong", {}, `Turno ${c.turno}`), h("span", { class: "nota" }, c.etapa || ""),
-      meta?.fala_origem ? h("span", { class: "etiqueta" }, `fala: ${meta.fala_origem}`) : null,
-      meta?._lat >= 0 ? h("span", { class: "nota" }, `${(meta._lat / 1000).toFixed(1).replace(".", ",")} s`) : null),
-    h("ul", { class: "tec-acoes" }, acoes.map(linhaAcao)));
-  });
+  const idx = (e.etapas || []).findIndex((x) => x.id === e.etapa);
   const g = [...(e.governanca || [])].reverse();
   return h("div", {},
-    blocoTec("Máquina de estados", etapas,
-      h("dl", { class: "kv" }, h("dt", {}, "Etapa"), h("dd", { class: "mono" }, e.etapa),
-        h("dt", {}, "Método"), h("dd", {}, e.metodo ? `${e.metodo_rotulo || ""} (${e.metodo})` : "—"),
-        h("dt", {}, "Rulebook"), h("dd", { class: "mono" }, e.rulebook || "—"),
-        h("dt", {}, "Fiscalização"), h("dd", { class: "mono" }, e.id),
-        S.ultimoLat ? [h("dt", {}, "Último turno"), h("dd", {}, S.ultimoLat)] : null)),
-    blocoTec(`Decisões da política (${g.length})`, g.length ? h("ol", { class: "tec-gov" }, g.map((d) => h("li", {},
-      h("span", { class: `regra-chip ${String(d.resultado || "").split("+")[0]}`, translate: "no" }, d.rule_id),
-      h("span", {}, h("strong", {}, `${rotuloFerramenta(d.acao)} · ${d.resultado}: `), d.motivo || ""),
-      d.span_id ? h("button", { class: "link-btn", type: "button", onclick: () => abrirSpan(d.span_id) }, "trace") : null)))
-      : h("p", { class: "nota" }, "Nenhuma decisão registrada ainda.")),
-    blocoTec("Ações do agente (últimos turnos)", turnos.length ? h("ol", { class: "tec-turnos" }, turnos) : h("p", { class: "nota" }, "Sem turnos ainda.")),
-    blocoTec("Trace", h("p", { class: "nota" }, `${e.n_spans} registros (spans) nesta fiscalização.`),
-      h("div", { class: "grupo-btn" },
-        h("a", { class: "btn btn-sec btn-peq", href: e.trace_url || `/api/fiscalizacoes/${encodeURIComponent(e.id)}/trace`, target: "_blank", rel: "noopener" }, icone("trace"), "Trace completo (JSONL)"),
-        h("a", { class: "btn btn-sec btn-peq", href: `/api/fiscalizacoes/${encodeURIComponent(e.id)}`, target: "_blank", rel: "noopener" }, icone("codigo"), "Estado (JSON)"))));
-}
-
-function linhaAcao(a) {
-  if (typeof a === "string") {
-    const [nome, st] = a.split(":");
-    return h("li", { class: st === "negado" ? "negado" : "" }, st === "negado" ? "✖ " : "✔ ", rotuloFerramenta(nome), st ? ` · ${st}` : "");
-  }
-  const neg = !a.permitido || a.ok === false;
-  let txt = rotuloFerramenta(a.acao);
-  if (a.rule_id) txt += ` [${a.rule_id}]`;
-  if (neg) txt += ` — ${semIds(a.resultado).slice(0, 140)}`;
-  else if (a.checagem_id) txt += ` — ${semIds(String(a.resultado || "").split(".")[0]).slice(0, 90)}`;
-  return h("li", { class: neg ? "negado" : "", title: `${a.acao}${a.checagem_id ? ` · ${a.checagem_id}` : ""}${a.span_id ? ` · span ${a.span_id}` : ""}` },
-    neg ? "✖ " : "✔ ", h("span", { class: "etiqueta" }, a.origem), " ", txt);
+    blocoTec(`Decisões da política (${g.length})`, g.length ? h("ol", { class: "tec-lista" }, g.map((d) => h("li", {},
+      h("strong", { class: "mono" }, d.rule_id), ` · ${rotuloFerramenta(d.acao)} · ${d.resultado}: ${d.motivo || ""}`))) : h("p", { class: "t-sec" }, "Nenhuma decisão ainda.")),
+    blocoTec("Conversa (texto original do agente)", h("p", { class: "t-sec" }, "Na conversa, a fala aparece em linguagem de campo; aqui fica o texto como a API devolveu."),
+      h("ol", { class: "tec-lista" }, (e.conversa || []).filter((c) => c.agente).slice().reverse().map((c) => h("li", {},
+        h("strong", {}, `Turno ${c.turno}`), ` · ${c.agente}`, (c.acoes || []).length ? h("div", { class: "t-sec mono" }, (c.acoes || []).map((a) => (typeof a === "string" ? a : a.acao)).join(" · ")) : null)))),
+    blocoTec("Checagens e ferramentas", h("ol", { class: "tec-lista" }, (e.checagens || []).slice().reverse().map((c) => h("li", {},
+      h("strong", {}, rotuloFerramenta(c.ferramenta)), ` (${c.ferramenta}) · ${c.status} · ${c.fonte_versao || ""}`,
+      h("div", { class: "t-sec mono" }, `${c.id}${c.span_id ? ` · span ${c.span_id}` : ""}`))))),
+    blocoTec("Etapas", h("ol", { class: "tec-etapas" }, (e.etapas || []).map((x, i) => h("li", { class: `${i < idx ? "feita" : ""}${i === idx ? " atual" : ""}`,
+      "aria-current": i === idx ? "step" : null }, x.id))),
+    kv([["Etapa", e.etapa, "mono"], ["Método", e.metodo ? `${e.metodo_rotulo || ""} (${e.metodo})` : "—"], ["Regras", e.rulebook || "—", "mono"],
+      ["Fiscalização", e.id, "mono"], S.ultimoLat ? ["Último turno", S.ultimoLat] : null])),
+    blocoTec("Evidências", h("ol", { class: "tec-lista" }, (e.evidencias || []).map((x) => h("li", {}, `${x.nome} · ${x.tipo} · ${fmtData(x.recebida_em)}`,
+      h("div", { class: "t-sec mono" }, `sha256 ${x.sha256 || "—"}`))))),
+    blocoTec("Trace", h("p", { class: "t-sec" }, `${e.n_spans ?? "?"} registros nesta fiscalização.`),
+      h("div", { class: "acoes-linha" }, h("a", { class: "btn btn-sec", href: e.trace_url || `/api/fiscalizacoes/${encodeURIComponent(e.id)}/trace`, target: "_blank", rel: "noopener" }, icone("codigo"), "Trace completo"),
+        h("a", { class: "btn btn-sec", href: `/api/fiscalizacoes/${encodeURIComponent(e.id)}`, target: "_blank", rel: "noopener" }, icone("codigo"), "Estado (JSON)"))),
+    blocoAmostra(e.amostra, e.triagem?.motivos || []));
 }
 
 // ---------------------------------------------------------------- controle da demonstração (roteiro)
 function renderRoteiro() {
   const r = S.estado.roteiro;
   const bar = S.el.roteiro;
-  if (!r) { bar.hidden = true; S.el.tela.classList.remove("com-roteiro"); return; }
-  bar.hidden = false;
-  S.el.tela.classList.add("com-roteiro");
+  const ativo = !!r && ehFiscal();
+  bar.hidden = !ativo;
+  S.el.grade.classList.toggle("com-roteiro", ativo);
+  // no celular a marca da demonstração passa para a barra (uma marca só; a faixa do topo some enquanto a barra existe)
+  document.body.classList.toggle("com-roteiro", ativo);
+  window.dispatchEvent(new Event("lv:topo"));
+  if (!ativo) return;
   const p = r.passos[r.proximo - 1];
-  const tinhaFoco = bar.contains(document.activeElement) ? document.activeElement.dataset.k : null;
-  // "Executar passo" fica discreto quando o painel mostra a mesma ação em destaque (emitir o rascunho)
-  const mesmoPainel = !!p && passoEmissao();
-  const confirma = S.confirmarReinicio;
-  bar.replaceChildren(...[ // sem filtro, o null de um botão ausente virava o texto "null" na barra
-    h("div", { class: "roteiro-id", title: "Controle da demonstração (não faz parte do produto)" },
-      h("span", { class: "pos" }, `Passo ${Math.min(r.proximo, r.total)}/${r.total}`)),
-    h("span", { class: "titulo", title: p?.fala || null }, h("span", { class: "tt" }, p ? p.titulo : "Roteiro concluído"),
-      mesmoPainel ? h("small", {}, "ou clique em “Emitir rascunho” no painel do laudo")
-        : p?.fala ? h("small", {}, `“${p.fala}”`) : p?.evidencia ? h("small", {}, rotuloEnvio(p, r))
-          : p?.acao === "residual" ? h("small", {}, "a fiscal lê no papel só o que o agente pediu")
-            : !p ? h("small", {}, "use “Recomeçar” para rodar de novo") : null),
-    p ? h("button", { class: `btn btn-pri${mesmoPainel ? " discreto" : ""}`, type: "button", onclick: proximoPasso, disabled: S.ocupado ? true : null,
-      dataset: { k: "executar" } },
-    icone("play"), p.acao === "assinar" ? "Ir para assinatura" : "Executar passo", h("kbd", {}, "→")) : null,
-    p && p.acao !== "assinar" ? h("button", { class: "btn btn-escuro", type: "button", onclick: pularPasso, disabled: S.ocupado ? true : null,
-      dataset: { k: "pular" }, "aria-label": "Pular passo",
-      title: "Avança o roteiro sem executar o passo (use quando o passo já foi feito pelo microfone ou por um botão)" },
-    icone("pular"), h("span", { class: "rot" }, h("span", { class: "rot-curta" }, "Pular"), h("span", { class: "rot-longa" }, " passo"))) : null,
-    // recomeçar pede confirmação no próprio botão (sem o confirm() do navegador no telão)
-    h("button", { class: `btn btn-escuro${confirma ? " confirmar" : ""}`, type: "button", onclick: reiniciarDemo, dataset: { k: "reiniciar" },
-      "aria-label": confirma ? "Clique de novo para recomeçar a demonstração" : "Recomeçar demo",
-      title: confirma ? "Apaga a fiscalização de demonstração e recomeça do passo 1" : "Apaga esta fiscalização de demonstração e recomeça" },
-    icone(confirma ? "alerta" : "reiniciar"),
-    confirma ? h("span", { class: "rot rot-sempre" }, "Clique de novo para recomeçar")
-      : h("span", { class: "rot" }, h("span", { class: "rot-curta" }, "Recomeçar"), h("span", { class: "rot-longa" }, " demo")))].filter(Boolean));
-  if (tinhaFoco) bar.querySelector(`[data-k="${tinhaFoco}"]`)?.focus({ preventScroll: true });
+  const movel = ehMovel();
+  // no telão a barra fica recolhida; quando a demonstração abre no meio, ela fica aberta para o operador escolher
+  const recolhida = document.body.classList.contains("apresentacao") && !movel && !S.retomar;
+  bar.classList.toggle("recolhida", recolhida);
+  bar.classList.toggle("retomar", !!S.retomar);
+  const foco = usaTeclado && bar.contains(document.activeElement) ? document.activeElement.dataset.k : null;
+  const fala = p ? (p.fala ? `“${p.fala}”` : p.evidencia ? rotuloEnvio(p, r) : p.acao === "residual" ? "a fiscal lê no papel só o que o agente pediu"
+    : p.acao === "assinar" ? "a fiscal revisa e assina com o PIN" : "") : "Use “Recomeçar” no ⋯ para rodar de novo.";
+  const rotExec = p?.acao === "assinar" ? "Ir para assinatura" : S.retomar ? `Continuar do passo ${r.proximo}` : movel ? "Executar" : "Executar passo";
+  const exec = p ? h("button", { class: "btn btn-pri", type: "button", onclick: proximoPasso, disabled: S.ocupado ? true : null, dataset: { k: "executar" },
+    title: "Executar o passo (→)" }, icone("play"), h("span", { class: "rot-exec" }, rotExec)) : null;
+  const pular = p && p.acao !== "assinar" && !movel && !S.retomar ? h("button", { class: "btn btn-esc ok-alvo", type: "button", onclick: pularPasso, disabled: S.ocupado ? true : null,
+    dataset: { k: "pular" }, "aria-label": "Pular este passo", title: "Pular este passo (avança sem executar)" }, icone("pular")) : null;
+  const recomecar = S.retomar ? h("button", { class: "btn btn-esc com-texto", type: "button", dataset: { k: "recomecar" }, disabled: S.ocupado ? true : null,
+    onclick: () => { S.confirmarReinicio = true; reiniciarDemo(null); } }, icone("recomecar"), h("span", {}, "Recomeçar do passo 1")) : null;
+  const mais = h("button", { class: "btn btn-esc ok-alvo", type: "button", dataset: { k: "mais" }, "aria-label": "Mais opções da demonstração", "aria-haspopup": "menu",
+    title: "Mais opções", onclick: (ev) => menuRoteiro(ev.currentTarget) }, icone("opcoes"));
+  // o menu é um nó só (no celular ele vai para o <body> enquanto está aberto, como folha acima do véu)
+  S.el.menuRoteiro ||= h("div", { class: "menu roteiro-menu", id: "menu-roteiro", role: "menu", hidden: true });
+  const titulo = S.retomar ? `A demonstração parou no passo ${r.proximo}` : p ? tituloPasso(p.titulo) : "Demonstração concluída";
+  const apoio = S.retomar ? `Continue de onde parou ou recomece do início. Próximo: ${tituloPasso(p?.titulo || "")}.` : fala;
+  bar.replaceChildren(
+    ehDemo() ? h("p", { class: "roteiro-marca marca-demo so-movel" }, "Demonstração · dados sintéticos") : null,
+    h("div", { class: "roteiro-barra ok-pequeno" },
+      h("span", { class: "pos" }, `${Math.min(r.proximo, r.total)} / ${r.total}`),
+      h("span", { class: "titulo", title: p?.fala || null }, titulo, apoio ? h("span", { class: "fala-passo" }, apoio) : null),
+      exec, recomecar, pular, mais,
+      S.el.menuRoteiro.parentElement === document.body ? null : S.el.menuRoteiro));
+  if (foco) bar.querySelector(`[data-k="${foco}"]`)?.focus({ preventScroll: true });
 }
 
-// "evidência: gta_1.json" não diz nada para a banca: a barra diz o que a fiscal envia.
+function menuRoteiro(botao) {
+  const r = S.estado.roteiro;
+  const menu = S.el.menuRoteiro;
+  const p = r?.passos?.[r.proximo - 1];
+  const itemRecomecar = { rot: S.confirmarReinicio ? "Recomeçar a demo? Toque de novo" : "Recomeçar a demonstração", ic: "recomecar", perigo: S.confirmarReinicio, manter: !S.confirmarReinicio,
+    acao: () => reiniciarDemo(botao) };
+  const proximos = (r?.passos || []).filter((x) => x.n > r.proximo && x.acao !== "assinar" && (x.n < (r.passos.find((y) => y.acao === "assinar")?.n || 99)));
+  abrirMenu(menu, botao, [
+    p && p.acao !== "assinar" ? { rot: "Pular este passo", sub: "Avança sem executar", ic: "pular", acao: () => pularPasso() } : null,
+    itemRecomecar,
+    proximos.length ? { rot: "Avançar até o passo…", ic: "pular", manter: true, acao: () => abrirMenu(menu, botao, proximos.map((x) => ({ rot: `${x.n} · ${tituloPasso(x.titulo)}`, acao: () => avancarAte(x.n) })),
+      { titulo: ehMovel() ? "Avançar até o passo" : null }) } : null,
+  ], { titulo: ehMovel() ? "Controle da demonstração" : null });
+}
+
 function rotuloEnvio(p, r) {
   const a = (r.arquivos || []).find((x) => x.nome === p.evidencia);
   const base = ENVIO_TIPO[a?.tipo] || "a fiscal envia o arquivo do caso";
-  return a?.tipo === "gta" && /instru/i.test(p.titulo) ? `${base}; o campo de observação traz uma instrução escondida` : base;
+  return a?.tipo === "gta" && /instru/i.test(p.titulo) ? `${base}; o documento traz uma instrução escondida` : base;
 }
 
 async function proximoPasso() {
-  if (S.ocupado) return;
+  if (!S || S.ocupado) return;
   const r = S.estado.roteiro;
   const p = r?.passos[r.proximo - 1];
   if (!p) return;
+  marcarVista();
+  fecharMenus();
   if (p.acao === "assinar") { S.irLaudo(S.id, true); return; }
   const arq = p.evidencia ? (r.arquivos || []).find((a) => a.nome === p.evidencia) : null;
+  // o texto do roteiro que estava no compositor (o "Justificar" na gravação) vai pelo passo: sai do campo
+  if (p.fala && norm(S.el.texto.value) === norm(p.fala)) { S.el.texto.value = ""; ajustarAltura(S.el.texto); }
   await executar(() => api.proximoPasso(S.id), {
-    fala: p.fala || (p.acao === "residual" ? `${p.fala_prefixo || ""}…` : ""),
-    evidencia: arq?.tipo || null, nome: p.evidencia || null,
-    texto: arq ? STATUS_ENVIO[arq.tipo] : p.acao === "residual" ? "Conferindo os campos lidos…" : null,
-  });
+    fala: p.fala || (p.acao === "residual" ? `${p.fala_prefixo || ""}…` : ""), evidencia: arq?.tipo || null, nome: p.evidencia || null,
+    texto: arq ? STATUS_ENVIO[arq.tipo] : p.acao === "residual" ? "Conferindo os campos lidos…" : "Conferindo…" });
+}
+
+async function avancarAte(n) {
+  while (S && S.estado.roteiro && S.estado.roteiro.proximo < n) {
+    const antes = S.estado.roteiro.proximo;
+    await proximoPasso();
+    if (!S || S.falhou || S.estado.roteiro?.proximo === antes) break;
+  }
 }
 
 async function pularPasso() {
-  if (S.ocupado) return;
+  if (!S || S.ocupado) return;
+  marcarVista();
   try {
     const r = await api.pularPasso(S.id);
-    atualizar(r.estado, S.eventos);
+    atualizar(r.estado);
     avisar(r.aviso || "Passo pulado.");
   } catch (e) { avisar(e.message, true); }
 }
 
-async function reiniciarDemo() {
+async function reiniciarDemo(botao) {
   const r = S.estado.roteiro;
   if (!r) return;
-  if (!S.confirmarReinicio) { // 1º clique: o botão pede confirmação por 5 s
+  if (!S.confirmarReinicio) {
     S.confirmarReinicio = true;
-    renderRoteiro();
+    menuRoteiro(botao);
     clearTimeout(S.tReinicio);
-    S.tReinicio = setTimeout(() => { if (S?.confirmarReinicio) { S.confirmarReinicio = false; renderRoteiro(); } }, 5000);
+    S.tReinicio = setTimeout(() => { if (S?.confirmarReinicio) { S.confirmarReinicio = false; fecharMenus(); } }, 3000);
     return;
   }
   S.confirmarReinicio = false;
   clearTimeout(S.tReinicio);
+  fecharMenus();
+  marcarVista();
   try {
     const e = await api.abrirCaso(r.caso_id, true);
-    S.metaTurno = {}; S.eventos = []; S.selecionado = null; S.confirmacao = null; S.evTurno = {}; S.falhou = null; S.expandido = {};
-    salvarEventos();
-    abrirGaveta(false);
-    atualizar(e, []);
+    S.eco = {}; guardarEco();
+    Object.assign(S, { confirmacao: null, falhou: null, expandido: {}, resposta: {}, eventosVivos: {}, gruposAbertos: null, ultimoPronto: null, realce: null });
+    fecharProva();
+    atualizar(e);
     avisar("Demonstração recomeçada.");
-  } catch (e) { avisar(e.message, true); renderRoteiro(); }
+  } catch (e) { avisar(e.message, true); }
   atualizarSaude();
 }
 
@@ -1243,50 +1391,37 @@ function ocupar(opcoes) {
   S.ocupadoTexto = opcoes?.texto || "";
   S.pendente = opcoes && (opcoes.fala || opcoes.evidencia) ? { texto: opcoes.fala, evidencia: opcoes.evidencia, nome: opcoes.nome } : null;
   if (!opcoes) S.progresso = null;
-  S.el.enviar.disabled = S.ocupado;
-  S.el.texto.disabled = S.ocupado;
-  S.el.falar.classList.toggle("ocupado", S.ocupado && !S.gravando);
-  const travar = S.ocupado || S.estado.etapa === "SELADO";
-  S.el.anexos.querySelectorAll("button").forEach((b) => { b.disabled = travar; });
-  S.el.clipe.disabled = travar;
   renderChat();
   renderRoteiro();
-  renderEmitir();
+  renderCompositor();
 }
 
-// `opcoes`: { texto: status no indicador, fala: mensagem do fiscal (mostrada já), evidencia: tipo anexado, nome,
-// restaurar: texto digitado que volta para a caixa se o envio falhar }
-async function executar(fn, opcoes = {}, extraMeta = {}) {
+async function executar(fn, opcoes = {}, extra = {}) {
   if (!S) return null;
   S.falhou = null;
-  ocupar({ texto: opcoes.texto || "O agente está trabalhando…", fala: opcoes.fala, evidencia: opcoes.evidencia, nome: opcoes.nome });
+  ocupar({ texto: opcoes.texto || "Conferindo…", fala: opcoes.fala, evidencia: opcoes.evidencia, nome: opcoes.nome });
   const t0 = performance.now();
-  let r = null;
-  try {
-    r = await fn();
-  } catch (e) {
+  let r;
+  try { r = await fn(); } catch (e) {
     if (!S) return null;
-    // a mensagem não se perde: fica no chat como "não enviada" com "Tentar de novo", e o texto volta para a caixa
-    S.falhou = { texto: opcoes.fala, evidencia: opcoes.evidencia, nome: opcoes.nome, erro: e.message, rede: !!e.rede,
-      restaurar: opcoes.restaurar || null, repetir: () => executar(fn, opcoes, extraMeta) };
+    S.falhou = { texto: opcoes.fala, erro: e.message, rede: !!e.rede, restaurar: opcoes.restaurar || null, repetir: () => executar(fn, opcoes, extra) };
     if (opcoes.restaurar && !S.el.texto.value.trim()) { S.el.texto.value = opcoes.restaurar; ajustarAltura(S.el.texto); }
     ocupar(null);
-    avisar(e.message, true);
     atualizarSaude();
     return null;
   }
   if (!S) return r;
-  ocupar(null);
-  atualizarSaude(); // estado do modelo em dia depois de cada turno (L34)
-  tratarResposta(r, Math.round(performance.now() - t0), extraMeta);
+  S.ocupado = false; S.pendente = null; S.progresso = null;
+  atualizarSaude();
+  tratarResposta(r, Math.round(performance.now() - t0), extra);
   return r;
 }
 
-function tratarResposta(r, latTotal, extraMeta = {}) {
+function tratarResposta(r, latTotal, extra = {}) {
   if (r.confirmacao) {
     S.confirmacao = r.confirmacao;
     if (r.estado) S.estado = r.estado;
-    renderChat();
+    renderTudo();
     tts.falar(r.fala_voz || r.confirmacao.pergunta);
     anunciar(r.confirmacao.pergunta);
     return;
@@ -1294,158 +1429,104 @@ function tratarResposta(r, latTotal, extraMeta = {}) {
   if (r.aviso && !r.resposta) {
     avisar(r.aviso);
     tts.falar(r.fala_voz || r.aviso);
-    if (r.estado) atualizar(r.estado, S.eventos);
+    if (r.estado) atualizar(r.estado); else renderTudo();
     return;
   }
   S.confirmacao = null;
   if (r.aviso) avisar(r.aviso);
   const resp = r.resposta;
-  if (resp) {
-    resp._lat = r.latencia_ms;
-    resp._origem = r.transcricao ? "asr" : extraMeta.origem;
-    resp._asr_ms = r.transcricao?.latencia_ms;
-  }
-  const ult = r.estado?.conversa?.at(-1)?.turno;
-  if (ult !== undefined && r.eventos?.length) { S.evTurno[ult] = r.eventos; salvarEventos(); }
-  S.ultimoLat = `turno ${((r.latencia_ms || 0) / 1000).toFixed(1)} s` +
-    (r.transcricao ? ` · ASR ${(r.transcricao.latencia_ms / 1000).toFixed(1)} s` : "") + ` · total ${(latTotal / 1000).toFixed(1)} s`;
+  S.ultimoLat = `turno ${((r.latencia_ms || 0) / 1000).toFixed(1)} s · total ${(latTotal / 1000).toFixed(1)} s${extra.origem ? ` · ${extra.origem}` : ""}`;
+  const g = R.guardaDoTurno(r.eventos || []);
+  const ultimo = r.estado?.conversa?.at(-1);
+  const ult = ultimo?.turno;
+  S.realce = g ? ult : null;
+  if (extra.eco && ultimo && !String(ultimo.fiscal || "").trim()) { S.eco[ult] = extra.eco; guardarEco(); }
   atualizar(r.estado, r.eventos || [], resp);
-  if (resp?.fala) {
-    tts.falar(r.fala_voz || resp.fala);
-    const urg = (r.eventos || []).some((e) => ["bloqueio", "abstencao"].includes(e.nivel));
-    anunciar(resp.fala, urg);
-  }
-  const passo = r.passo;
-  if (r.acao_humana === "assinar" || passo?.acao === "assinar") S.irLaudo(S.id, true);
+  if (g) anunciar(R.GUARDAS[g.tipo]?.anuncio || "O agente recusou o pedido e registrou.");
+  else if (resp?.fala) anunciar(falaDoAgente(resp.fala), (r.eventos || []).some((x) => ["bloqueio", "abstencao"].includes(x.nivel)));
+  if (resp?.fala) tts.falar(r.fala_voz || resp.fala);
+  if (r.acao_humana === "assinar" || r.passo?.acao === "assinar") S.irLaudo(S.id, true);
 }
+
+function enviarFala(t) { return executar(() => api.turno(S.id, t), { fala: t }, { origem: "texto" }); }
 
 async function enviarTexto() {
   const t = S.el.texto.value.trim();
   if (!t || S.ocupado) return;
+  if (emReplay()) {
+    // na gravação, só a fala do próximo passo (a mesma frase): ela vai pelo roteiro; o resto fica no campo, com o aviso
+    const p = passoAtual();
+    if (p && p.acao === "turno" && !p.evidencia && p.fala && norm(t) === norm(p.fala)) { proximoPasso(); return; }
+    avisoRoteiro();
+    return;
+  }
+  marcarVista();
   S.el.texto.value = "";
   ajustarAltura(S.el.texto);
+  renderCompositor();
   await executar(() => api.turno(S.id, t), { fala: t, restaurar: t }, { origem: "texto" });
-  S?.el.texto.focus();
+  S?.el.texto.focus({ preventScroll: true });
 }
 
 async function confirmar(aceitar, texto) {
   S.confirmacao = null;
-  await executar(() => api.confirmar(S.id, aceitar, texto), aceitar ? { fala: texto } : { texto: "Descartando…" }, { origem: "asr" });
+  await executar(() => api.confirmar(S.id, aceitar, texto), aceitar ? { fala: texto } : { texto: "Descartando…" }, { origem: "voz" });
 }
 
-async function pedirRascunho() {
-  await executar(() => api.rascunho(S.id), { texto: "Pedindo o rascunho do laudo à política…" });
+// "Enviar leitura": confere cada campo antes (todos pedidos; dígitos no tamanho certo; as duas digitações iguais) e mostra
+// na conversa o que a fiscal leu ("Chave: …9439 · CNPJ/CPF do emitente: 12.345…").
+function validarResidual() {
+  const campos = S.estado.residual?.campos || [];
+  let primeiro = null; const eco = [];
+  for (const inp of S.el.residual || []) {
+    const nome = inp.dataset.campo;
+    const base = nome.replace(/#2$/, "");
+    const c = campos.find((x) => (x.campos || []).includes(base)) || {};
+    const v = inp.value.trim();
+    const digitos = v.replace(/\D/g, "");
+    let erro = "";
+    if (!v) erro = "Preencha este campo.";
+    else if (c.formato === "digitos" && c.n_digitos && digitos.length !== c.n_digitos) erro = `São ${c.n_digitos} dígitos; você digitou ${digitos.length}.`;
+    else if (c.formato === "documento" && ![11, 14].includes(digitos.length)) erro = "O CNPJ tem 14 dígitos e o CPF, 11.";
+    else if (nome.endsWith("#2")) {
+      const outro = (S.el.residual || []).find((x) => x.dataset.campo === base);
+      if (outro && outro.value.replace(/\s/g, "") !== v.replace(/\s/g, "")) erro = "As duas digitações não batem.";
+    }
+    const msg = inp.parentElement.querySelector(`.erro-campo[data-de="${CSS.escape(nome)}"]`);
+    if (msg) { msg.textContent = erro; msg.hidden = !erro; }
+    inp.setAttribute("aria-invalid", erro ? "true" : "false");
+    if (erro && !primeiro) primeiro = inp;
+    if (!nome.endsWith("#2") && v) {
+      const rot = R.maiuscula(String(c.rotulo || base).replace(/^(o|a) /, ""));
+      eco.push(`${rot}: ${c.formato === "digitos" && digitos.length > 4 ? `…${digitos.slice(-4)}` : v}`);
+    }
+  }
+  if (primeiro) { primeiro.focus(); primeiro.scrollIntoView({ block: "center" }); return null; }
+  return eco.join(" · ");
 }
+
+function enviarResidual() {
+  const eco = validarResidual();
+  if (eco === null) return;
+  const residual = Object.fromEntries((S.el.residual || []).map((i) => [i.dataset.campo, i.value.trim()]).filter(([, v]) => v));
+  marcarVista();
+  const fala = `Li no papel: ${eco}`;
+  executar(() => api.turno(S.id, "", residual), { texto: "Conferindo os campos…", fala }, { origem: "texto", eco: fala });
+}
+
+async function pedirRascunho() { await executar(() => api.rascunho(S.id), { texto: "Conferindo tudo antes de emitir…" }); }
 
 async function enviarDoCaso(nome, tipo) {
-  fecharMenus();
+  if (emReplay()) {
+    const p = passoAtual();
+    if (p?.evidencia === nome) proximoPasso(); else avisoRoteiro();
+    return;
+  }
+  marcarVista();
   const texto = S.el.texto.value.trim();
   S.el.texto.value = "";
   ajustarAltura(S.el.texto);
   await executar(() => api.evidenciaCaso(S.id, nome, texto), { fala: texto, evidencia: tipo, nome, texto: STATUS_ENVIO[tipo], restaurar: texto });
-}
-
-// Menu de anexo: arquivo do aparelho (câmera no celular), item financiado e, na demonstração, os arquivos do caso.
-// No celular vira uma folha que sobe de baixo (o menu dentro da conversa ficava cortado), aberta sempre do topo.
-function abrirMenuAnexo(def, botao, { daFolha = false } = {}) {
-  const m = S.el.menu;
-  const jaAberto = !m.hidden && m.dataset.k === def.k;
-  fecharMenus();
-  alternarMenuVoz(false);
-  if (jaAberto && !daFolha) return;
-  m.dataset.k = def.k;
-  S.botaoMenu = botao;
-  botao?.setAttribute("aria-expanded", "true");
-  const itens = S.estado.operacao.itens;
-  const selItem = h("select", { id: "ev-item" }, h("option", { value: "" }, "Automático (o agente escolhe)"),
-    itens.map((i) => h("option", { value: i.id, title: i.descricao }, nomeItem(i.descricao, 48))));
-  const opcoes = def.opcoes.map((o) => {
-    const inp = h("input", { type: "file", accept: ACEITA[o.tipo], hidden: true, ...(o.captura ? { capture: "environment" } : {}) });
-    inp.addEventListener("change", () => {
-      const f = inp.files[0];
-      inp.value = "";
-      if (!f) return;
-      fecharMenus();
-      enviarArquivo(f, o.tipo, selItem.value || itemPadrao(o.tipo === "documento" ? "nfe_xml" : o.tipo));
-    });
-    return h("span", { class: "opcao-arq" }, inp, h("button", { class: "btn btn-pri btn-bloco btn-grande", type: "button", onclick: () => inp.click() },
-      icone(IC_TIPO[o.tipo] || "doc"), o.rot));
-  });
-  const prontos = (S.estado.roteiro?.arquivos || []).filter((a) => TIPOS_ANEXO[def.k].includes(a.tipo));
-  const nome = def.rot.toLowerCase() === "nf-e" ? "NF-e" : def.rot === "GTA" ? "GTA" : def.rot.toLowerCase();
-  m.replaceChildren(...[
-    h("div", { class: "menu-cab" },
-      daFolha ? h("button", { class: "btn btn-icone btn-fantasma btn-peq", type: "button", "aria-label": "Voltar aos tipos de evidência",
-        onclick: () => abrirMenuTodos(S.el.clipe) }, icone("voltar")) : null,
-      h("strong", {}, `Anexar ${nome}`),
-      h("button", { class: "btn btn-icone btn-fantasma btn-peq fechar-menu", type: "button", "aria-label": "Fechar", onclick: () => fecharMenus(true) }, icone("fechar"))),
-    ...opcoes,
-    h("div", { class: "campo" }, h("label", { for: "ev-item" }, "Para qual item?"), selItem),
-    ["foto", "video"].includes(def.k) ? h("p", { class: "nota" }, icone("pino"), "O GPS do aparelho é lido no envio.") : null,
-    h("p", { class: "nota" }, "O que estiver escrito na caixa de mensagem vai junto como comentário."),
-    prontos.length ? h("div", { class: "prontos" }, h("p", { class: "rotulo-sec" }, "Arquivos do caso de demonstração"),
-      prontos.map((a) => h("button", { class: "btn btn-sec btn-bloco", type: "button", title: a.nome, onclick: () => enviarDoCaso(a.nome, a.tipo) },
-        icone(IC_TIPO[a.tipo] || "doc"), h("span", { class: "rot-arq" }, rotuloArquivo(a)),
-        a.disponivel === false ? h("span", { class: "etiqueta fake" }, "simulado") : null))) : null,
-  ].filter(Boolean)); // replaceChildren escreveria "null" para um nó ausente
-  abrirFolha();
-  m.querySelector("button.btn-pri")?.focus({ preventScroll: true });
-}
-
-// Celular: o clipe abre a folha com os tipos de evidência (e as preferências de voz, que no celular saem do topo).
-function abrirMenuTodos(botao) {
-  const m = S.el.menu;
-  const jaAberto = !m.hidden && m.dataset.k === "todos";
-  fecharMenus();
-  alternarMenuVoz(false);
-  if (jaAberto) return;
-  m.dataset.k = "todos";
-  S.botaoMenu = botao;
-  botao?.setAttribute("aria-expanded", "true");
-  m.replaceChildren(
-    h("div", { class: "menu-cab" }, h("strong", {}, "Anexar evidência"),
-      h("button", { class: "btn btn-icone btn-fantasma btn-peq fechar-menu", type: "button", "aria-label": "Fechar", onclick: () => fecharMenus(true) }, icone("fechar"))),
-    h("div", { class: "tipos-anexo" }, ANEXOS.map((d) => h("button", { class: "btn btn-sec btn-bloco btn-grande tipo-anexo", type: "button",
-      onclick: () => abrirMenuAnexo(d, botao, { daFolha: true }) }, icone(d.ic), h("span", { class: "rot-arq" }, d.rot), icone("direita")))),
-    h("button", { class: "btn btn-fantasma btn-bloco btn-grande", type: "button", onclick: () => { fecharMenus(); alternarMenuVoz(true); } },
-      icone("ajustes"), h("span", { class: "rot-arq" }, "Preferências de voz")));
-  abrirFolha();
-  m.querySelector(".tipo-anexo")?.focus({ preventScroll: true });
-}
-
-function abrirFolha() {
-  const m = S.el.menu;
-  m.hidden = false;
-  m.scrollTop = 0;
-  S.el.veu.hidden = false;
-}
-
-// Rótulo legível do arquivo do caso ("Foto da cerca nº 1 — item: 1200 m de cerca…"); o nome do arquivo vai no title.
-function rotuloArquivo(a) {
-  const item = (S.estado.operacao.itens || []).find((i) => i.id === a.item_id);
-  const doItem = item ? ` — item: ${nomeItem(item.descricao, 34)}` : "";
-  const n = (String(a.nome).match(/_(\d+)\./) || [])[1];
-  const sujeito = (String(a.nome).match(/^foto_([a-z]+)_/) || [])[1];
-  const DE = { cerca: "da cerca", lote: "do lote", curral: "do curral" };
-  if (a.tipo === "foto") return `Foto ${DE[sujeito] || ""}${n ? ` nº ${n}` : ""}`.replace(/\s+/g, " ").trim() + doItem;
-  if (a.tipo === "nfe_xml") return `XML da NF-e${n ? ` nº ${n}` : ""}${doItem}`;
-  if (a.tipo === "gta") {
-    const num = (String(a.rotulo || "").match(/\(([^)]+)\)/) || [])[1];
-    return `e-GTA${num ? ` ${num}` : ""}${doItem}`;
-  }
-  if (a.tipo === "documento") return `Foto da nota impressa (DANFE)${doItem}`;
-  if (a.tipo === "video") {
-    const dur = (String(a.rotulo || "").match(/\(([\d.,]+)\s*s\)/) || [])[1];
-    return `Vídeo do lote no curral${dur ? ` (${Math.round(Number(dur.replace(",", ".")))} s)` : ""}${doItem}`;
-  }
-  return String(a.rotulo || a.nome).replace(/\s*\([a-z]+\d+\)$/i, "");
-}
-
-function itemPadrao(tipo) {
-  const itens = S.estado.operacao.itens;
-  const bov = itens.find((i) => i.tipo === "bovinos");
-  if (["video", "nfe_xml", "gta"].includes(tipo)) return bov?.id || itens[0]?.id;
-  return (itens.find((i) => i.tipo !== "bovinos") || itens[0])?.id;
 }
 
 async function enviarArquivo(arquivo, tipo, itemId) {
@@ -1461,49 +1542,59 @@ async function enviarArquivo(arquivo, tipo, itemId) {
   if (arquivo.lastModified) form.append("capturada_em", new Date(arquivo.lastModified).toISOString());
   const base = { fala: comentario, evidencia: tipo, nome: arquivo.name };
   if (tipo === "foto" || tipo === "video") {
-    ocupar({ ...base, texto: "Lendo o GPS do aparelho…" });
+    ocupar({ ...base, texto: "Lendo a localização…" });
     const g = await lerGPS();
     if (!S) return;
-    if (g.erro) avisar(`GPS do navegador indisponível (${g.erro}); vale o GPS do EXIF, se houver.`);
-    else {
-      form.append("lat", g.lat); form.append("lon", g.lon); form.append("precisao_m", g.precisao_m);
-      form.append("gps_capturado_em", g.capturado_em);
-    }
+    if (!g.erro) { form.append("lat", g.lat); form.append("lon", g.lon); form.append("precisao_m", g.precisao_m); form.append("gps_capturado_em", g.capturado_em); }
     ocupar(null);
   }
   S.progresso = 0;
-  await executar(() => postFormProgresso(`/api/fiscalizacoes/${encodeURIComponent(S.id)}/evidencias`, form,
-    (f) => {
-      if (!S) return;
-      S.progresso = f;
-      if (f >= 1) { S.ocupadoTexto = STATUS_ENVIO[tipo] || "Arquivo recebido; o agente está conferindo…"; S.progresso = null; }
-      renderChat();
-    }),
-  { ...base, texto: `Enviando ${ROT_TIPO[tipo] || tipo} (${(arquivo.size / 1e6).toFixed(1)} MB)…` });
+  await executar(() => postFormProgresso(`/api/fiscalizacoes/${encodeURIComponent(S.id)}/evidencias`, form, (f) => {
+    if (!S) return;
+    S.progresso = f;
+    if (f >= 1) { S.ocupadoTexto = STATUS_ENVIO[tipo] || "Conferindo…"; S.progresso = null; }
+    const t = document.querySelector("#pensando .pensando-txt");
+    if (t) t.textContent = S.ocupadoTexto;
+    const i = document.querySelector("#pensando .barra-envio i");
+    if (i && S.progresso !== null) i.style.width = `${Math.round(S.progresso * 100)}%`;
+  }), { ...base, texto: `Enviando (${(arquivo.size / 1e6).toFixed(1)} MB)…` });
 }
 
-// ---------------------------------------------------------------- voz
-function ligarFalar(btn) {
-  btn.addEventListener("pointerdown", (e) => { if (e.button !== 0) return; e.preventDefault(); btn.setPointerCapture?.(e.pointerId); iniciarGravacao(); });
+// ---------------------------------------------------------------- voz (segurar para falar)
+function ligarFalar(btn, residual = false) {
+  btn.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    if (!vozDisponivel()) { avisar("Voz desligada nesta execução: digite a mensagem."); return; }
+    e.preventDefault(); btn.setPointerCapture?.(e.pointerId); iniciarGravacao(residual);
+  });
   const parar = (e) => { if (S?.gravando) { e.preventDefault(); pararGravacao(); } };
   btn.addEventListener("pointerup", parar);
   btn.addEventListener("pointercancel", parar);
-  btn.addEventListener("keydown", (e) => { if ((e.key === " " || e.key === "Enter") && !e.repeat) { e.preventDefault(); iniciarGravacao(); } });
+  btn.addEventListener("keydown", (e) => { if ((e.key === " " || e.key === "Enter") && !e.repeat) { e.preventDefault(); if (vozDisponivel()) iniciarGravacao(residual); else avisar("Voz desligada nesta execução: digite a mensagem."); } });
   btn.addEventListener("keyup", (e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); pararGravacao(); } });
   btn.addEventListener("contextmenu", (e) => e.preventDefault());
 }
 
 function mostrarGravando(sim) {
+  S.el.falar.classList.toggle("gravando-on", sim);
   S.el.falar.setAttribute("aria-pressed", sim ? "true" : "false");
-  S.el.nivel.hidden = !sim;
+  S.el.gravando.hidden = !sim;
+  S.el.texto.hidden = sim;
+  clearInterval(S.tRec);
+  if (sim) {
+    const t0 = Date.now();
+    S.tRec = setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); S.el.gravando.querySelector(".rec-t").textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }, 500);
+  }
 }
 
 async function iniciarGravacao() {
-  if (!S || S.gravando || S.ocupado || S.el.falar.disabled) return;
+  if (!S || S.gravando || S.ocupado) return;
+  if (emReplay()) { avisoRoteiro(); return; }
+  try { if (localStorage.getItem("lv.avisoVoz") !== "1") { S.el.avisoVoz.hidden = false; localStorage.setItem("lv.avisoVoz", "1"); } } catch { /* */ }
   S.gravando = true;
   mostrarGravando(true);
   try {
-    if (!S.gravador) S.gravador = new Gravador({ aoNivel: (v) => { const i = S?.el.nivel.querySelector("i"); if (i) i.style.width = `${Math.round(v * 100)}%`; } });
+    if (!S.gravador) S.gravador = new Gravador();
     await S.gravador.iniciar();
   } catch (e) {
     S.gravando = false;
@@ -1520,6 +1611,6 @@ async function pararGravacao() {
   if (!r || r.duracaoMs < 450) { avisar("Segure o botão enquanto fala."); return; }
   const form = new FormData();
   form.append("audio", r.blob, `fala.${r.ext}`);
-  form.append("confirmar_numeros", S.el.confNum.checked ? "true" : "false");
-  await executar(() => postForm(`/api/fiscalizacoes/${encodeURIComponent(S.id)}/turno-audio`, form), { texto: "Transcrevendo a fala…" }, { origem: "asr" });
+  form.append("confirmar_numeros", confirmarNumeros() ? "true" : "false");
+  await executar(() => postForm(`/api/fiscalizacoes/${encodeURIComponent(S.id)}/turno-audio`, form), { texto: "Transcrevendo a fala…" }, { origem: "voz" });
 }

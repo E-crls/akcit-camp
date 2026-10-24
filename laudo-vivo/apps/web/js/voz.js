@@ -1,6 +1,8 @@
 // Voz no navegador: gravação "segurar para falar" (MediaRecorder) e resposta falada (Web Speech API).
 // Nada é instalado no servidor para o TTS: a voz pt-BR é a do sistema/navegador.
 
+import { abrirModal, h } from "./ui.js";
+
 const PREF_VOZES = [/Francisca/i, /Thalita/i, /Antonio/i, /Google português do Brasil/i, /Luciana/i, /Maria/i, /Daniel/i];
 let vozes = [];
 let vozEscolhida = null;
@@ -146,4 +148,26 @@ export function lerGPS(timeoutMs = 9000) {
       { enableHighAccuracy: true, timeout: timeoutMs, maximumAge: 15000 },
     );
   });
+}
+
+// ---------------------------------------------------------------- preferências (menu do usuário e ⋯ → Voz)
+export function confirmarNumeros() {
+  try { return localStorage.getItem("lv.confnum") !== "0"; } catch { return true; }
+}
+
+export function preferenciasVoz() {
+  const tChk = h("input", { type: "checkbox", id: "pref-tts", checked: tts.ligado() ? true : null, disabled: tts.disponivel() ? null : true });
+  tChk.addEventListener("change", () => tts.ligar(tChk.checked));
+  const cChk = h("input", { type: "checkbox", id: "pref-conf", checked: confirmarNumeros() ? true : null });
+  cChk.addEventListener("change", () => { try { localStorage.setItem("lv.confnum", cChk.checked ? "1" : "0"); } catch { /* */ } });
+  const sel = h("select", { id: "pref-voz" });
+  const vs = tts.vozes();
+  sel.replaceChildren(...(vs.length ? vs : [{ name: "voz padrão pt-BR", lang: "pt-BR" }]).map((v) =>
+    h("option", { value: v.name, selected: tts.voz()?.name === v.name ? true : null }, `${v.name} (${v.lang})`)));
+  sel.addEventListener("change", () => tts.escolher(sel.value));
+  abrirModal("Voz", h("div", { class: "form-pref" },
+    h("label", { class: "opcao", for: "pref-tts" }, tChk, h("span", {}, "Resposta falada", h("small", {}, "O agente lê a resposta em voz alta."))),
+    h("div", { class: "campo" }, h("label", { for: "pref-voz" }, "Voz do agente"), sel),
+    h("label", { class: "opcao", for: "pref-conf" }, cChk, h("span", {}, "Confirmar números falados", h("small", {}, "Antes de enviar, o agente repete os números que entendeu."))),
+    h("p", { class: "t-sec" }, "A fala é transcrita neste aparelho e entra na trilha da fiscalização. Avise quem estiver presente.")));
 }
