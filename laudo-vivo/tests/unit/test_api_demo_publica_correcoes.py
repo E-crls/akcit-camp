@@ -64,7 +64,7 @@ def _eventos(capsys) -> list[dict]:
     return [json.loads(x) for x in capsys.readouterr().out.splitlines() if x.startswith("{")]
 
 
-def _rodar(c: TestClient) -> list[dict]:
+def _rodar(c: TestClient, ate: int | None = None) -> list[dict]:
     out = []
     while True:
         r = c.post(f"/api/fiscalizacoes/{FIS}/roteiro/proximo")
@@ -77,6 +77,8 @@ def _rodar(c: TestClient) -> list[dict]:
             h = j["estado"]["laudo"]["hash_raiz"]
             assert c.post(f"/api/fiscalizacoes/{FIS}/assinar", json={"pin": PIN_DEMO, "hash_confirmado": h}).status_code \
                 == 200
+        if ate and j["passo"]["n"] >= ate:
+            return out
 
 
 def _ids(c: TestClient) -> list[str]:
@@ -264,6 +266,24 @@ def test_arquivo_e_pergunta_do_visitante_nao_mudam_o_roteiro(publico):
     assert _ids(a) == _ids(b)  # a cadeia igual à do roteiro limpo
     assert [x["status"] for x in fa["matriz"]] == [x["status"] for x in fb["matriz"]]
     assert sum(1 for x in fa["conversa"] if x.get("livre")) == 2  # a conversa guarda o que o visitante fez
+
+
+def test_acao_livre_nao_avanca_o_roteiro_e_o_residual_no_passo_vira_o_passo(publico):
+    app, visitante = publico()
+    c = visitante()
+    passos = c.get(f"/api/fiscalizacoes/{FIS}").json()["roteiro"]["passos"]
+    n_res = next(i for i, p in enumerate(passos, 1) if p.get("acao") == "residual")
+    _rodar(c, ate=n_res - 1)
+    r = c.post(f"/api/fiscalizacoes/{FIS}/turno", json={"texto": "", "residual": {"chave": "123"}})
+    assert r.status_code == 200 and r.json()["passo"]["n"] == n_res  # "Completar a nota" no passo é o passo
+    assert c.get(f"/api/fiscalizacoes/{FIS}").json()["roteiro"]["proximo"] == n_res + 1
+    assert _uso(c)["turnos"] == 0
+    f = app.state.gerenciador.fachada(c.cookies.get(publica.COOKIE))
+    with f._ativo() as srv, f.sessao.modo(livre=True):  # ação livre que mexe no ponteiro: ele volta
+        m = srv.meta(FIS)
+        m["proximo_passo"] = 2
+        srv._salvar_meta(FIS, m)
+    assert c.get(f"/api/fiscalizacoes/{FIS}").json()["roteiro"]["proximo"] == n_res + 1
 
 
 # --------------------------------------------------------------------------------- VA-05: foto sem GPS
@@ -599,3 +619,14 @@ def test_pergunta_e_foto_do_visitante_nao_tiram_os_passos_da_gravacao(tmp_path, 
     assert len(vivo.chamadas) == n_livre  # nenhum passo do roteiro chamou o LLM ao vivo
     assert (sujo["passos"], sujo["etapa"], sujo["fora"], sujo["substituicoes"]) == (19, "SELADO", 0, 0)
     assert sujo["matriz"] == limpo["matriz"] and sujo["ids"] == limpo["ids"]
+    # o visitante completa a nota pelo cartão no passo do residual (em vez de "Executar passo")
+    g = ger.fachada(publica.novo_token())
+    while (atual := g.estado(FIS)["roteiro"])["passos"][atual["proximo"] - 1].get("acao") != "residual":
+        g.passo_roteiro(FIS)
+    assert g.estado(FIS)["residual"]  # o pedido dos campos da foto do DANFE está na tela
+    r = g.turno(FIS, "", residual={"chave": "5226 0499 9999 9959 9948 5500 1000 0086 6415 5942 9439"})
+    assert r["passo"]["acao"] == "residual"
+    res = publica.rodar_roteiro(g, FIS)
+    assert (res["etapa"], res["fora"], res["substituicoes"]) == ("SELADO", 0, 0)
+    assert res["matriz"] == limpo["matriz"] and res["ids"] == limpo["ids"]
+    assert len(vivo.chamadas) == n_livre

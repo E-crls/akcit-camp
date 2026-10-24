@@ -21,7 +21,8 @@ uma ação livre (`Sessao.modo`):
 - antes da primeira ação livre depois de um passo, o estado do roteiro (fiscalização e índices) é guardado; o
   passo seguinte volta a ele. O visitante vê o efeito da pergunta ou do arquivo dele até tocar em "Executar
   passo"; o roteiro segue com os arquivos do caso e o laudo sai igual ao do roteiro limpo.
-O texto (ou a fala transcrita) igual à fala do próximo passo, e o arquivo pronto do próximo passo, viram o passo.
+O texto (ou a fala transcrita) igual à fala do próximo passo, o arquivo pronto do próximo passo e os campos da nota
+completados no passo do residual viram o passo; fora disso, a ação livre não avança o roteiro.
 As perguntas frequentes do visitante (o que o projeto financiou, o que falta para emitir o laudo, o que é pressão,
 divergência ou residual) têm resposta pronta, dos dados do caso, sem LLM (`pergunta_frequente`).
 
@@ -238,6 +239,7 @@ class Sessao:
     def __post_init__(self) -> None:
         self._ids_roteiro = self.contexto.ids  # o dicionário que `ids_deterministicos` reinicia no lugar
         self._modos: list[bool] = []  # pilha de `modo` (True = livre)
+        self._passo_rodou = False  # um passo do roteiro rodou dentro da ação livre em curso
         self._foto: dict[str, Any] | None = None  # estado do roteiro guardado antes da 1ª ação livre
 
     @property
@@ -249,7 +251,8 @@ class Sessao:
         """Ação livre do visitante ou passo do roteiro. Aninhável: volta ao modo anterior.
 
         - livre: ids próprios (`ids_livres`), turno marcado na conversa, a cadeia inteira de LLM (gravação e o LLM
-          ao vivo) e, antes da 1ª ação livre depois de um passo, o estado do roteiro guardado (`_guardar_roteiro`);
+          ao vivo), antes da 1ª ação livre depois de um passo, o estado do roteiro guardado (`_guardar_roteiro`), e
+          o ponteiro do roteiro parado (`_repor_ponteiro`), salvo se um passo rodou dentro da ação;
         - passo: ids da gravação, histórico sem os turnos livres, só a gravação (sem LLM ao vivo; ver
           `ServicoPublico.elos`) e o estado do roteiro de volta (`_restaurar_roteiro`), se uma ação livre o mudou.
         """
@@ -260,6 +263,12 @@ class Sessao:
         self.contexto.ids = self.ids_livres if livre else self._ids_roteiro
         if antes is not None:
             repo.marcar_livre, repo.ocultar_livres = livre, not livre  # type: ignore[union-attr]
+        externo_livre = livre and not any(self._modos)  # a ação livre de fora (não aninhada noutra)
+        if not livre:
+            self._passo_rodou = True
+        elif externo_livre:
+            self._passo_rodou = False
+        ponteiro = self._ponteiro() if externo_livre and srv is not None else None
         self._modos.append(livre)
         desfazer: Callable[[], None] | None = None
         try:
@@ -274,6 +283,8 @@ class Sessao:
             if desfazer is not None:
                 desfazer()
             self._modos.pop()
+            if ponteiro is not None and not self._passo_rodou:
+                self._repor_ponteiro(ponteiro)  # o estado da ação livre volta no passo seguinte: o ponteiro fica
             self.contexto.ids = antes_ids
             if antes is not None:
                 repo.marcar_livre, repo.ocultar_livres = antes  # type: ignore[union-attr]
@@ -287,6 +298,23 @@ class Sessao:
             return srv.caso(srv.caso_padrao).fis_id if srv is not None else None
         except (FileNotFoundError, ErroServico):
             return None
+
+    def _ponteiro(self) -> int | None:
+        srv, fis_id = self.servico, self._fis_id()
+        if srv is None or not fis_id:
+            return None
+        return srv.meta(fis_id).get("proximo_passo")
+
+    def _repor_ponteiro(self, ponteiro: int) -> None:
+        """A ação livre não avança o roteiro (o efeito dela no estado sai no passo seguinte): o ponteiro que ela
+        moveu (ex.: o residual completado fora do passo) volta para o passo de antes."""
+        srv, fis_id = self.servico, self._fis_id()
+        if srv is None or not fis_id:
+            return
+        m = srv.meta(fis_id)
+        if m.get("caso_id") and m.get("proximo_passo") != ponteiro:
+            m["proximo_passo"] = ponteiro
+            srv._salvar_meta(fis_id, m)
 
     def _guardar_roteiro(self) -> None:
         """Guarda o estado do roteiro (a fiscalização, os índices de fotos e documentos e a lista das pastas de
@@ -806,6 +834,10 @@ class FachadaSessao:
               residual: dict[str, str] | None = None) -> dict[str, Any]:
         with self._ativo() as srv:
             if not residual and srv.passo_do_texto(fis_id, texto):
+                return self._passo(fis_id, canal="texto")
+            atual = srv._passo_atual(fis_id)
+            if residual and atual is not None and atual[2].acao == "residual":
+                # "Completar a nota" no passo do residual é o passo: os campos vêm do papel do caso, como na gravação
                 return self._passo(fis_id, canal="texto")
             self._tocar()
             with self._cota("turnos", self._ger.limites.max_turnos, self._msg_turnos()):
