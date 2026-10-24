@@ -125,39 +125,10 @@ class ReplayContado(ReplayProvider):
             raise
 
 
-# códigos de ErroLLM que passam ao próximo provedor da cadeia (os mesmos de `provider.ProvedorEmCadeia`)
-_PASSA_ADIANTE = frozenset({"REPLAY_AUSENTE", "INDISPONIVEL", "TIMEOUT", "HTTP", "LIMITE"})
-
-
-class _CadeiaMinima:
-    """Só enquanto `laudo.llm.provider.ProvedorEmCadeia` não existe neste ramo: tenta os provedores em ordem;
-    REPLAY_AUSENTE, INDISPONIVEL, TIMEOUT, HTTP e LIMITE passam ao próximo; se todos falham, relança o último
-    ErroLLM (o condutor cai no plano mínimo e na fala por template)."""
-
-    def __init__(self, provedores: list[Any]):
-        self.provedores = list(provedores)
-        self.nome = "cadeia"
-        self.modelo = getattr(self.provedores[0], "modelo", "") if self.provedores else ""
-        # um elo externo basta para o condutor mascarar a PII antes de enviar (a chave do replay já é mascarada)
-        self.externo = any(getattr(p, "externo", False) for p in self.provedores)
-
-    def chat(self, mensagens, ferramentas=None, formato=None, metadados=None):
-        ultimo: ErroLLM | None = None
-        for p in self.provedores:
-            try:
-                return p.chat(mensagens, ferramentas, formato, metadados)
-            except ErroLLM as e:
-                if e.codigo not in _PASSA_ADIANTE:
-                    raise
-                ultimo = e
-        raise ultimo or ErroLLM("INDISPONIVEL", "nenhum provedor na cadeia")
-
-
 def _cadeia(provedores: list[Any]) -> Any:
-    from laudo.llm import provider
+    from laudo.llm.provider import ProvedorEmCadeia
 
-    classe = getattr(provider, "ProvedorEmCadeia", None) or _CadeiaMinima
-    return classe(provedores)
+    return ProvedorEmCadeia(provedores)
 
 
 RESPOSTA_LIVRE_TESTE = (
@@ -179,14 +150,10 @@ def provedor_livre(cfg: Config) -> Any | None:
         from laudo.llm.provider import ProvedorRoteirizado, RespostaLLM
 
         return ProvedorRoteirizado(lambda *_: RespostaLLM(conteudo=RESPOSTA_LIVRE_TESTE), modelo="roteiro-livre")
-    from laudo.llm import provider
+    from laudo.llm.provider import VertexProvider
 
-    classe = getattr(provider, "VertexProvider", None)
-    if classe is None:
-        _avisar_uma_vez("LLM ao vivo: VertexProvider ausente neste ramo; fora da gravação, plano mínimo e template")
-        return None
     try:
-        return classe()
+        return VertexProvider()
     except Exception as e:  # noqa: BLE001 - sem credencial, a demo segue pela gravação e pelo template
         _avisar_uma_vez(f"LLM ao vivo indisponível ({type(e).__name__}: {e})")
         return None

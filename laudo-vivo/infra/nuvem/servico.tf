@@ -52,8 +52,8 @@ resource "google_cloud_run_v2_service" "site" {
         value = var.projeto
       }
       env {
-        name  = "LAUDO_VERTEX_REGIAO"
-        value = var.regiao
+        name  = "LAUDO_VERTEX_LOCAL"
+        value = var.local_gemini
       }
       env {
         name  = "LAUDO_VERTEX_MODELO"

@@ -67,7 +67,13 @@ variable "concorrencia" {
 variable "modelo_gemini" {
   description = "Modelo do Gemini no Vertex AI para o texto livre (os passos gravados saem do replay, sem custo)"
   type        = string
-  default     = "gemini-2.5-flash-lite"
+  default     = "gemini-3.1-flash-lite"
+}
+
+variable "local_gemini" {
+  description = "Local do endpoint do Gemini. Os Flash-Lite não estão em southamerica-east1 neste projeto: global"
+  type        = string
+  default     = "global"
 }
 
 variable "tokens_llm_por_dia" {
