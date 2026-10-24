@@ -871,13 +871,16 @@ class VertexProvider:
                 self._assinaturas[self._chave_chamada(fn.get("name", ""), args)] = assinatura
             chamadas.append(ChamadaFerramenta(nome=fn.get("name", ""), argumentos=args))
         uso = dados.get("usage") or {}
+        # o raciocínio (reasoning_effort) é cobrado como saída, mas o endpoint compatível com a OpenAI o informa à
+        # parte: sem somá-lo, o custo do painel e o teto diário ficavam ~22% abaixo do real
+        raciocinio = int((uso.get("completion_tokens_details") or {}).get("reasoning_tokens") or 0)
         return RespostaLLM(
             conteudo=msg.get("content") or "",
             chamadas=chamadas,
             modelo=self.modelo,
             provedor="vertex",
             tokens_entrada=int(uso.get("prompt_tokens") or 0),
-            tokens_saida=int(uso.get("completion_tokens") or 0),
+            tokens_saida=int(uso.get("completion_tokens") or 0) + raciocinio,
         )
 
 

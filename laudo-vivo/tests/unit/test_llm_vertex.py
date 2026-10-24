@@ -105,6 +105,13 @@ def test_chat_le_chamadas_guarda_assinatura_e_reusa(capsys, monkeypatch):
     assert evento["custo_usd"] == pytest.approx((1000 * 0.25 + 100 * 1.50) / 1e6)
 
 
+def test_raciocinio_conta_como_saida():
+    dados = _resposta("oi", entrada=100, saida=10)
+    dados["usage"]["completion_tokens_details"] = {"reasoning_tokens": 40}
+    r = _provedor([dados], []).chat(HIST[:2])
+    assert (r.tokens_entrada, r.tokens_saida) == (100, 50)
+
+
 def test_evento_so_na_demo_publica(capsys, monkeypatch):
     monkeypatch.delenv("LAUDO_DEMO_PUBLICA", raising=False)
     _provedor([_resposta("oi")], []).chat(HIST[:2])
