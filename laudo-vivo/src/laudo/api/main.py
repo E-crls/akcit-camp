@@ -20,8 +20,6 @@ Rotas (todas sob `/api`):
 | POST | `/fiscalizacoes/{id}/auditoria` | Agente Auditor: parecer antes de assinar (só lê; não muda status) |
 | POST | `/fiscalizacoes/{id}/assinar` | assinatura humana: PIN + hash raiz conferido |
 | GET | `/agentes` | agentes, guarda-corpos e interoperabilidade (MCP, A2A) — `laudo.agentes` |
-
-Fora de `/api`: `GET /.well-known/agent.json`, o cartão de agente A2A (aberto também com a senha da demo pública).
 | GET | `/fiscalizacoes/{id}/laudo`, `/laudo.html` | laudo JSON / HTML (links item → evidência → trace) |
 | POST | `/fiscalizacoes/{id}/pacote` | pacote de exibição BCB/Justiça (só SELADO; ação humana, sem LLM) |
 | GET | `/fiscalizacoes/{id}/pacote.zip` | ZIP do pacote (manifest sha256, GeoJSON, cenas, checklist…) |
@@ -29,6 +27,9 @@ Fora de `/api`: `GET /.well-known/agent.json`, o cartão de agente A2A (aberto t
 | GET | `/fiscalizacoes/{id}/evidencias/{ev}/arquivo` · `/trecho` | arquivo / trecho da NF-e ou GTA |
 | GET | `/fiscalizacoes/{id}/checagens/{chk}/quadros/{i}` | quadro-chave anotado da contagem |
 | POST | `/voz/aquecer` · `/llm/aquecer` | carrega o Whisper / o modelo do Ollama antes da demo |
+
+Fora de `/api`: `GET /.well-known/agent.json` (e `/.well-known/agent-card.json`, o caminho do A2A 0.3), o cartão de
+agente A2A (aberto também com a senha da demo pública).
 
 Limites de tamanho: o corpo de cada requisição é conferido enquanto chega (Content-Length declarado e
 bytes recebidos): upload de evidência até o maior limite por tipo (`servico.LIMITE_UPLOAD_MB`, o vídeo) mais a
@@ -463,7 +464,9 @@ def criar_app(cfg: Config | None = None, transcritor: Any | None = None) -> Fast
     def agentes():
         return descrever_agentes()
 
+    # o mesmo cartão no caminho que o A2A 0.3 procura (`agent-card.json`) e no anterior (`agent.json`)
     @app.get("/.well-known/agent.json")
+    @app.get("/.well-known/agent-card.json")
     def cartao_a2a(request: Request):
         return cartao_agente(base_publica(request))
 

@@ -1054,22 +1054,25 @@ class Servico:
     # -- Agente Auditor (revisão antes de assinar; não muda nada) ---------------------------------------------
     def _llm_do_auditor(self) -> Any | None:
         """O LLM do condutor, salvo quando chamá-lo mexeria no caminho gravado: o roteiro fixo dos testes (a
-        próxima resposta do roteiro seria gasta) e a gravação pura (a substituição gastaria a gravação de outro
-        passo). Nesses modos o parecer sai das regras do verificador."""
-        from laudo.llm.provider import ProvedorRoteirizado
+        próxima resposta do roteiro seria gasta) e a gravação (a substituição gastaria a gravação de outro passo, e
+        nenhuma gravação tem o Auditor). Na cadeia da demo pública, só os elos ao vivo: o Auditor nunca consulta a
+        gravação. Sem LLM ao vivo, o parecer sai das regras do verificador."""
+        from laudo.llm.provider import ProvedorEmCadeia, ProvedorRoteirizado
 
         p = self.provedor
         if isinstance(p, ProvedorRoteirizado) and self.roteiro_llm is not None and p._respostas is self.roteiro_llm:
             return None
         if isinstance(p, ReplayProvider):
             return None
+        if isinstance(p, ProvedorEmCadeia):
+            vivos = [x for x in p.provedores if not isinstance(x, ReplayProvider)]
+            return ProvedorEmCadeia(vivos) if vivos else None  # `externo` sai dos elos ao vivo (a máscara da PII)
         return p
 
     def auditoria(self, fis_id: str) -> dict[str, Any]:
         """Parecer do Agente Auditor sobre o rascunho (`laudo.agent.auditor`). Só lê: não grava na fiscalização, na
         conversa nem no trace dela (o span vai ao trace geral)."""
         from laudo.agent import auditor
-        from laudo.llm.provider import ProvedorEmCadeia
 
         with self.lock:
             est_ = self.estado(fis_id)
@@ -1081,18 +1084,8 @@ class Servico:
                 except (ErroServico, OSError, ValueError):
                     texto = None
             prov = self._llm_do_auditor()
-            # na cadeia, a gravação só responde pela chave: nunca entrega a resposta de outro passo ao Auditor
-            reps = [x for x in getattr(prov, "provedores", []) if isinstance(x, ReplayProvider)] \
-                if isinstance(prov, ProvedorEmCadeia) else []
-            antes = [x.sequencial_se_ausente for x in reps]
-            for x in reps:
-                x.sequencial_se_ausente = False
-            try:
-                with otel.span("agente.auditor", **{"laudo.auditoria_de": fis_id}):
-                    out = auditor.auditar(est_, prov, texto)
-            finally:
-                for x, v in zip(reps, antes, strict=True):
-                    x.sequencial_se_ausente = v
+            with otel.span("agente.auditor", **{"laudo.auditoria_de": fis_id}):
+                out = auditor.auditar(est_, prov, texto)
             out["etapa"] = est_.get("etapa")
             return out
 

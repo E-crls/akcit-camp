@@ -86,13 +86,27 @@ def test_api_agentes_e_cartao_a2a(cli):
     for s in card["skills"]:
         assert s["name"] and s["description"] and s["tags"] and s["examples"]
     assert "a construir" in card["description"]  # honestidade: o recebimento de tarefas ainda não existe
+    # o caminho do A2A 0.3 (`agent-card.json`) devolve o mesmo cartão
+    assert c.get("/.well-known/agent-card.json", headers={"x-forwarded-proto": "https", "x-forwarded-host": "lv.exemplo"}).json() == card
 
 
-def test_cartao_a2a_aberto_com_senha_da_demo_publica(monkeypatch):
+def test_cartao_a2a_aberto_com_senha_da_demo_publica(tmp_path, monkeypatch):
     from laudo.api import acesso
 
-    assert acesso.aberto("/.well-known/agent.json")
+    assert acesso.aberto("/.well-known/agent.json") and acesso.aberto("/.well-known/agent-card.json")
     assert not acesso.aberto("/api/agentes")
+    # com a senha da demo pública: só o cartão fica aberto; o registro e o Auditor pedem a senha
+    monkeypatch.setenv("LAUDO_DEMO_PUBLICA", "1")
+    monkeypatch.setenv("LAUDO_DEMO_DIR", str(tmp_path / "copias"))
+    monkeypatch.setenv(acesso.ENV, "curral26")
+    c = TestClient(criar_app(Config(dados=tmp_path / "api", caso="DEMO-0001", asr="desligado")), follow_redirects=False)
+    assert c.get("/.well-known/agent.json").json()["name"] == "Laudo Vivo"
+    assert c.get("/.well-known/agent-card.json").json()["name"] == "Laudo Vivo"
+    assert c.get("/api/agentes").status_code == 401
+    r = c.post("/api/fiscalizacoes/fis_demo_0001/auditoria")
+    assert r.status_code == 401 and "lv_sessao" not in r.cookies
+    assert c.post("/api/entrar", json={"senha": "curral26"}).status_code == 200
+    assert len(c.get("/api/agentes").json()["agentes"]) == 6
 
 
 def _estado_completo(c):
@@ -196,6 +210,28 @@ def test_auditor_cai_nas_regras_com_erro_ou_saida_invalida():
     assert sem["origem"] == "regras" and sem["parecer"]["recomendacao"] == "revisar_antes"
 
 
+def test_auditor_conta_o_item_fora_do_escopo_e_a_matriz_inteira():
+    # o campo de item com a regra de escopo (item sem fluxo no rulebook: bloqueia o laudo) não é agregação: a tela o
+    # marca como "agregado" pelo nome (item:X), mas é uma pendência própria e o Auditor não pode dizer "pode assinar"
+    e = _estado()
+    e["matriz"].append({"campo": "item:lav1", "item_id": "lav1", "item_descricao": "Lavoura", "aspecto": "Lavoura",
+                        "agregado": True, "status": "pendente", "regra_id": "OP-escopo-itens-regional",
+                        "motivo": "item do tipo 'lavoura' sem fluxo no rulebook", "evidencias": [], "checagens": []})
+    e["matriz"].append({"campo": "item:bov", "item_id": "bov", "item_descricao": "Bovinos", "aspecto": "Bovinos",
+                        "agregado": True, "status": "pendente", "regra_id": "OP-agregacao-item", "motivo": "pendente",
+                        "evidencias": [], "checagens": []})
+    regras = auditor.auditar(e, None)
+    assert regras["parecer"]["recomendacao"] == "revisar_antes"
+    assert [i["item_id"] for i in regras["parecer"]["itens"]] == ["item:lav1"]  # a agregação do item não conta
+    assert auditor.auditar(e, ProvedorRoteirizado([_resp("pode_assinar")]))["parecer"]["recomendacao"] == "revisar_antes"
+    # a pendência depois do limite de itens que vai ao LLM conta do mesmo jeito
+    longo = _estado()
+    longo["matriz"] = [dict(longo["matriz"][1], campo=f"item:b{n}:gta") for n in range(auditor.MAX_ITENS + 5)]
+    longo["matriz"][-1] = dict(longo["matriz"][-1], status="pendente")
+    assert auditor.auditar(longo, ProvedorRoteirizado([_resp("pode_assinar")]))["parecer"]["recomendacao"] == "revisar_antes"
+    assert auditor.auditar(longo, None)["parecer"]["recomendacao"] == "revisar_antes"
+
+
 def test_auditor_mascara_pii_para_provedor_externo():
     class Externo(ProvedorRoteirizado):
         externo = True
@@ -260,3 +296,65 @@ def test_auditor_na_demo_publica_e_livre_conta_na_cota_e_nao_desalinha_o_roteiro
 def _sem_volateis(e):
     # o uso da cota e o relógio da sessão mudam; a fiscalização não
     return json.dumps({k: v for k, v in e.items() if k not in ("roteiro",)}, sort_keys=True, ensure_ascii=False)
+
+
+def test_auditor_na_cadeia_da_demo_publica_vai_so_ao_vivo_com_pii_mascarada(tmp_path, monkeypatch):
+    # a configuração da nuvem (llm=publico: gravação → LLM ao vivo externo): o Auditor nunca consulta a gravação (o
+    # contador "fora da gravação" não sobe), o LLM ao vivo recebe a entrada sem PII e o roteiro segue alinhado
+    from laudo.agent.pii import contem_pii
+    from laudo.api import casos as casos_mod
+    from laudo.api.servico import PIN_DEMO
+    from laudo.llm.provider import RespostaLLM
+
+    if casos_mod.localizar_caso("DEMO-0001") is None:
+        pytest.skip("DEMO-0001 ausente")
+
+    class AoVivo(ProvedorRoteirizado):
+        externo = True
+
+        def __init__(self):
+            def f(msgs, *_a, **_k):
+                if "Agente Auditor" in msgs[0]["content"]:
+                    return RespostaLLM(conteudo=_resp("pode_assinar"))
+                return RespostaLLM(conteudo="Resposta do modelo ao vivo.")
+
+            super().__init__(f, modelo="ao-vivo-teste")
+
+    monkeypatch.setenv("LAUDO_DEMO_PUBLICA", "1")
+    monkeypatch.setenv("LAUDO_DEMO_DIR", str(tmp_path / "copias"))
+    vivo = AoVivo()
+    app = criar_app(Config(llm="publico", ferramentas="falsas", caso="DEMO-0001", asr="desligado",
+                           dados=tmp_path / "api", provedor_livre=vivo))
+    fis = "fis_demo_0001"
+
+    def rodar(c, ate=None):
+        while True:
+            r = c.post(f"/api/fiscalizacoes/{fis}/roteiro/proximo")
+            if r.status_code == 409:
+                return
+            j = r.json()
+            if j.get("acao_humana") == "assinar":
+                c.post(f"/api/fiscalizacoes/{fis}/assinar",
+                       json={"pin": PIN_DEMO, "hash_confirmado": j["estado"]["laudo"]["hash_raiz"]})
+            if ate and j["passo"]["n"] >= ate:
+                return
+
+    def ids(c):
+        e = c.get(f"/api/fiscalizacoes/{fis}").json()
+        return [x["id"] for k in ("evidencias", "falas", "checagens") for x in e[k]], e["etapa"]
+
+    a, b = TestClient(app), TestClient(app)
+    rodar(a, ate=15)
+    rodar(b, ate=15)
+    assert a.get(f"/api/fiscalizacoes/{fis}").json()["laudo"]["tipo"] == "rascunho"
+    fora = a.get("/api/saude").json()["llm"]["fora_da_gravacao"]
+    n = len(vivo.chamadas)
+    out = a.post(f"/api/fiscalizacoes/{fis}/auditoria").json()
+    assert out["origem"] == "llm" and out["modelo"] == "ao-vivo-teste"
+    assert len(vivo.chamadas) == n + 1
+    enviado = vivo.chamadas[-1]["mensagens"][-1]["content"]
+    assert "Revise este rascunho" in enviado and not contem_pii(enviado)
+    assert a.get("/api/saude").json()["llm"]["fora_da_gravacao"] == fora  # a gravação não foi consultada
+    rodar(a)
+    rodar(b)
+    assert ids(a) == ids(b) and ids(a)[1] == "SELADO"

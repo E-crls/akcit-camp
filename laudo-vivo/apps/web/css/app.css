@@ -1345,9 +1345,9 @@ html.apresentacao { font-size: clamp(18px, min(calc(100vw / 72), calc(100vh / 45
 .ag-papel { font-size: .9375rem; color: var(--grafite); margin: .25rem 0 .375rem; }
 .ag-kv { display: grid; grid-template-columns: auto 1fr; gap: .125rem .625rem; font-size: .875rem; }
 .ag-kv dt { color: var(--pedra); font-weight: 600; }
-.ag-kv dd { color: var(--carvao); overflow-wrap: anywhere; }
+.ag-kv dd { margin: 0; color: var(--carvao); overflow-wrap: anywhere; }
 .ag-seta { font-family: var(--f-titulo); font-weight: 600; font-size: .875rem; color: var(--pedra); padding-left: 1rem; border-left: 2.5px solid var(--carvao); margin-left: 1rem; }
-.ag-especialistas { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: .5rem; }
+.ag-especialistas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: .5rem; }
 .ag-especialistas .ag-kv { grid-template-columns: 1fr; }
 .ag-guardas { list-style: none; display: flex; flex-direction: column; gap: .375rem; font-size: .9375rem; }
 .ag-guardas li { display: flex; gap: .5rem; align-items: flex-start; }
@@ -1374,3 +1374,10 @@ html.apresentacao { font-size: clamp(18px, min(calc(100vw / 72), calc(100vh / 45
 .aud-nota .ic { width: 1.125rem; height: 1.125rem; flex: none; margin-top: .125rem; }
 .aud-origem { font-size: .8125rem; }
 .apresentacao .ag-chip { font-size: .875rem; }
+/* desktop estreito (1100 a 1279 px): Agentes e Detalhes técnicos só com o ícone (o nome fica no title e no
+   aria-label), para a trilha não encostar na pílula da demo */
+@media (min-width: 1100px) and (max-width: 1279.98px) {
+  #btn-agentes { width: 2.75rem; padding: 0; justify-content: center; flex: none; }
+  #btn-tecnico { padding: 0 .625rem; gap: .25rem; flex: none; }
+  #btn-agentes .rot, #btn-tecnico .rot { display: none; }
+}

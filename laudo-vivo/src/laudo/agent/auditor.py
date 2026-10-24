@@ -28,6 +28,7 @@ Risco = Literal["alto", "medio", "baixo"]
 Recomendacao = Literal["pode_assinar", "revisar_antes"]
 NOTA = "O Auditor não muda nenhum status; quem decide é o verificador, citando o MCR. A assinatura é sua."
 MAX_ITENS = 40
+REGRA_AGREGACAO = "OP-agregacao-item"  # o status do item = o pior dos aspectos (`laudo.tools.regras._agregar_item`)
 
 
 class ItemAuditoria(BaseModel):
@@ -62,8 +63,7 @@ SISTEMA = (
 def montar_entrada(estado: dict[str, Any], texto_rascunho: str | None = None) -> dict[str, Any]:
     """A entrada do Auditor a partir do estado da fiscalização (`Servico.estado`): os itens do laudo com o status
     do verificador, as pendências, as divergências, as checagens com abstenção e o texto do rascunho."""
-    linhas = list(estado.get("matriz") or [])[:MAX_ITENS]
-    itens = [
+    todas = [
         {
             "item_id": ln.get("campo"),
             "item": ln.get("item_descricao"),
@@ -74,14 +74,17 @@ def montar_entrada(estado: dict[str, Any], texto_rascunho: str | None = None) ->
             "motivo": (ln.get("motivo") or "")[:240],
             "justificativa_da_fiscal": (ln.get("justificativa") or "")[:240] or None,
             "evidencias": list(ln.get("evidencias") or []) + list(ln.get("checagens") or []),
-            "agregado": bool(ln.get("agregado")),
+            # só a agregação repete o status dos aspectos; o campo de item com outra regra (o item fora do escopo do
+            # rulebook, OP-escopo-itens-regional) é uma exigência própria e conta
+            "agregado": ln.get("regra_id") == REGRA_AGREGACAO,
         }
-        for ln in linhas
+        for ln in estado.get("matriz") or []
         if ln.get("campo")
     ]
+    itens = todas[:MAX_ITENS]  # o que vai ao LLM; as pendências e as divergências contam a matriz inteira
     # o resultado agregado do item repete o status dos aspectos (a justificativa fica no aspecto): conta só o aspecto
-    pend = [i for i in itens if i["status_do_verificador"] in ("pendente", "abstencao") and not i["agregado"]]
-    div = [i for i in itens if i["status_do_verificador"] == "divergente" and not i["agregado"]]
+    pend = [i for i in todas if i["status_do_verificador"] in ("pendente", "abstencao") and not i["agregado"]]
+    div = [i for i in todas if i["status_do_verificador"] == "divergente" and not i["agregado"]]
     chks = [
         {"id": c.get("id"), "ferramenta": c.get("ferramenta"), "status": c.get("status"), "item_id": c.get("item_id"),
          "resumo": (c.get("resumo") or "")[:200]}
