@@ -34,7 +34,7 @@ o resto.
 Demo pública (`LAUDO_DEMO_PUBLICA=1`, `laudo.api.publica`): cada rota atende a cópia da fiscalização do visitante
 (cookie `lv_sessao`); sem documentação da API, sem as rotas de aquecimento, sem abrir operação real; POST com
 `Origin` de outro site é recusado (403) e não há cabeçalho CORS (só a própria origem lê as respostas); limites de
-upload e de fala menores; cópias novas limitadas por IP (o primeiro de X-Forwarded-For); CSP mínima
+upload e de fala menores; cópias novas limitadas por IP (o último de X-Forwarded-For, o que o Cloud Run acrescenta); CSP mínima
 (`frame-ancestors`, `object-src`, `base-uri`); erro de validação (422) sem ecoar a entrada; XML enviado servido para
 baixar; trace e laudo JSON sem caminho interno. Sem a variável, tudo como acima.
 

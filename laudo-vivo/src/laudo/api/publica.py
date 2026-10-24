@@ -69,6 +69,7 @@ from typing import Any
 
 from laudo import isolamento
 from laudo.agent import estado as est
+from laudo.agent.condutor import residual_pendente
 from laudo.api import eventos
 from laudo.api.servico import REPO, Config, ErroServico, Servico, fala_corresponde
 from laudo.contracts import CodigoErro, Envelope, Ferramenta, hash_entrada, sha256_arquivo
@@ -415,9 +416,11 @@ def _termos(texto: str) -> list[str]:
     return [k for k, rx in _TERMOS.items() if rx.search(t)]
 
 
-def residual_do_papel(srv: Any, meta: dict[str, Any], residual: dict[str, str]) -> bool:
+def residual_do_papel(srv: Any, meta: dict[str, Any], residual: dict[str, str], pedido: Any = None) -> bool:
     """O que o visitante digitou no cartão "Complete a nota" é o que está impresso no DANFE do caso (só letras e
-    dígitos; a cópia de confirmação "#2", se veio, tem de ser igual). Na dúvida, False (vira ação livre)."""
+    dígitos; a cópia de confirmação "#2", se veio, tem de ser igual). Na chave, vale a chave inteira ou só os blocos
+    que o `pedido` pendente pede (o cartão pede os 12 últimos dígitos, como na gravação). Na dúvida, False (vira
+    ação livre)."""
     try:
         papel = srv.caso(meta["caso_id"]).papel_danfe or {}
     except Exception:  # noqa: BLE001 - sem caso, não há papel com que comparar
@@ -426,11 +429,19 @@ def residual_do_papel(srv: Any, meta: dict[str, Any], residual: dict[str, str]) 
     def limpo(v: Any) -> str:
         return re.sub(r"[^0-9A-Za-z]", "", str(v or "")).upper()
 
+    def aceitos(k: str) -> set[str]:
+        alvo = limpo(papel.get(k))
+        out = {alvo}
+        pc = next((c for c in getattr(pedido, "campos", None) or [] if list(c.campos) == [k]), None)
+        if k == "chave" and pc is not None and getattr(pc, "n_digitos", 44) != 44:
+            out.add("".join(alvo[4 * (b - 1):4 * b] for b in pc.blocos_chave))  # como resposta_do_papel
+        return out
+
     campos = {k: v for k, v in residual.items() if not str(k).endswith("#2")}
     if not campos or not papel:
         return False
     for k, v in campos.items():
-        if papel.get(k) is None or limpo(v) != limpo(papel[k]):
+        if papel.get(k) is None or limpo(v) not in aceitos(k):
             return False
         if f"{k}#2" in residual and limpo(residual[f"{k}#2"]) != limpo(v):
             return False
@@ -464,6 +475,7 @@ def _fala_financiado(fis: Any) -> str:
     partes = []
     for i in fis.operacao.itens:
         d = re.split(r"\s+[—(]", i.descricao or "", maxsplit=1)[0].strip() or i.tipo
+        d = re.sub(r"\b\d{4,}\b", lambda x: fmt_milhar(int(x.group(0))), d)  # "1200 m" → "1.200 m", como na tela
         if i.quantidade is not None and fmt_milhar(i.quantidade) not in d and str(int(i.quantidade)) not in d:
             d = f"{fmt_milhar(i.quantidade)} {i.unidade or ''} de {d}".replace("  ", " ")
         d = d[:1].lower() + d[1:]
@@ -867,8 +879,9 @@ class FachadaSessao:
             if not residual and srv.passo_do_texto(fis_id, texto):
                 return self._passo(fis_id, canal="texto")
             atual = srv._passo_atual(fis_id)
-            if residual and atual is not None and atual[2].acao == "residual" and residual_do_papel(srv, atual[0],
-                                                                                                  residual):
+            pend = residual_pendente(srv.carregar(fis_id)) if residual and atual is not None else None
+            if (residual and atual is not None and atual[2].acao == "residual"
+                    and residual_do_papel(srv, atual[0], residual, pend.pedido if pend else None)):
                 # "Completar a nota" com o que está no papel, no passo do residual, é o passo (como na gravação);
                 # com outro valor, é ação livre, e as regras dizem o que não validou (dígito verificador, soma)
                 return self._passo(fis_id, canal="texto")
@@ -877,6 +890,8 @@ class FachadaSessao:
                 t0, fora0 = time.perf_counter(), self._fora()
                 with self._s.modo(livre=True):
                     out = srv.turno(fis_id, texto, origem=origem, residual=residual)
+                if isinstance(out, dict) and "estado" in out:
+                    out["estado"] = srv.estado(fis_id)
         self._evento_turno("texto", out, t0, fora0, livre=True)
         return out
 

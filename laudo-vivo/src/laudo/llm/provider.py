@@ -652,17 +652,29 @@ def evento_llm(**campos: Any) -> None:
 
 
 class _CotaDiaria:
-    """Teto de tokens por dia (UTC) no processo, somado entre todos os provedores Vertex da instância."""
+    """Teto de tokens por dia (UTC) no processo, somado entre todos os provedores Vertex da instância, e uma fatia
+    por hora: quem gira cookies para gastar o teto derruba no máximo a hora corrente, não a tarde inteira."""
 
     def __init__(self) -> None:
         self.dia = ""
         self.usados = 0
+        self.hora = ""
+        self.usados_hora = 0
 
-    def restante(self, teto: int) -> int:
-        hoje = datetime.now(UTC).strftime("%Y-%m-%d")
+    def restante(self, teto: int, teto_hora: int = 0) -> int:
+        agora = datetime.now(UTC)
+        hoje, hora = agora.strftime("%Y-%m-%d"), agora.strftime("%Y-%m-%dT%H")
         if hoje != self.dia:
             self.dia, self.usados = hoje, 0
+        if hora != self.hora:
+            self.hora, self.usados_hora = hora, 0
+        if teto_hora > 0:
+            return min(teto - self.usados, teto_hora - self.usados_hora)
         return teto - self.usados
+
+    def somar(self, tokens: int) -> None:
+        self.usados += tokens
+        self.usados_hora += tokens
 
 
 _COTA = _CotaDiaria()
@@ -685,8 +697,9 @@ class VertexProvider:
         modelo: str | None = None,
         projeto: str | None = None,
         local: str | None = None,
-        timeout_s: float = 30.0,
+        timeout_s: float | None = None,
         tokens_dia: int | None = None,
+        tokens_hora: int | None = None,
         hoje: date | None = None,
         cliente: httpx.Client | None = None,
         espera_falha_s: float = 60.0,
@@ -701,7 +714,12 @@ class VertexProvider:
             f"https://{host}/v1/projects/{self.projeto}/locations/{self.local}/endpoints/openapi/chat/completions"
         )
         self.tokens_dia = int(tokens_dia or os.environ.get("LAUDO_LLM_TOKENS_DIA") or 3_000_000)
+        # fatia por hora (padrão: 1/4 do dia); 0 desliga
+        th = tokens_hora if tokens_hora is not None else os.environ.get("LAUDO_LLM_TOKENS_HORA")
+        self.tokens_hora = int(th) if th not in (None, "") else self.tokens_dia // 4
         self.hoje = hoje
+        # leitura curta: o visitante não fica esperando um Vertex travado; o condutor segue pelo template
+        timeout_s = float(timeout_s or os.environ.get("LAUDO_VERTEX_TIMEOUT_S") or 30.0)
         self.timeout = httpx.Timeout(connect=5.0, read=timeout_s, write=10.0, pool=5.0)
         self._cliente = cliente or httpx.Client(timeout=self.timeout)
         self._relogio = relogio
@@ -786,20 +804,27 @@ class VertexProvider:
     # -- chamada ------------------------------------------------------------
     def chat(self, mensagens, ferramentas=None, formato=None, metadados=None) -> RespostaLLM:
         if self._relogio() < self._fora_ate:
+            evento_llm(detalhe="erro", codigo="INDISPONIVEL", modelo=self.modelo, tokens=0, custo_usd=0.0,
+                       latencia_ms=0)
             raise ErroLLM("INDISPONIVEL", "Vertex AI falhou há pouco; tentando de novo em instantes")
-        if _COTA.restante(self.tokens_dia) <= 0:
+        if _COTA.restante(self.tokens_dia, self.tokens_hora) <= 0:
             evento_llm(detalhe="limite", modelo=self.modelo, tokens=0, custo_usd=0.0)
-            raise ErroLLM("LIMITE", f"teto diário de {self.tokens_dia} tokens do LLM atingido")
+            raise ErroLLM("LIMITE", f"teto de tokens do LLM atingido ({self.tokens_dia}/dia, {self.tokens_hora}/hora)")
         corpo = self.montar_requisicao(mensagens, ferramentas, formato)
         with otel.span_llm("vertex", self.modelo, **{"llm.n_tools": len(ferramentas or []), **(metadados or {})}) as s:
             t0 = time.perf_counter()
-            dados = self._post(corpo, s)
-            resp = self._parse(dados)
+            try:
+                dados = self._post(corpo, s)
+                resp = self._parse(dados)
+            except ErroLLM as e:  # a falha também vai ao painel (o gráfico de chamadas por origem)
+                evento_llm(detalhe="erro", codigo=e.codigo, modelo=self.modelo, tokens=0, custo_usd=0.0,
+                           latencia_ms=int((time.perf_counter() - t0) * 1000))
+                raise
             resp.latencia_ms = int((time.perf_counter() - t0) * 1000)
             resp.span_id = otel.id_span(s)
             ent, sai = PRECOS_GEMINI_USD_MTOK.get(self.modelo, (0.0, 0.0))
             custo = (resp.tokens_entrada * ent + resp.tokens_saida * sai) / 1e6
-            _COTA.usados += resp.tokens_entrada + resp.tokens_saida
+            _COTA.somar(resp.tokens_entrada + resp.tokens_saida)
             otel.definir(
                 s,
                 **{

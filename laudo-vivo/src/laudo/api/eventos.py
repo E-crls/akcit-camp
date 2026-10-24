@@ -60,6 +60,9 @@ def evento(nome: str, **campos: Any) -> dict[str, Any] | None:
             if linha.get(k) is not None:
                 linha["detalhe"] = str(linha[k])
                 break
+        else:
+            if isinstance(linha.get("ok"), bool):  # assinatura: aceita ou PIN recusado
+                linha["detalhe"] = "ok" if linha["ok"] else "falhou"
     texto = json.dumps(linha, ensure_ascii=False, default=str)
     with _lock:
         sys.stdout.write(texto + "\n")

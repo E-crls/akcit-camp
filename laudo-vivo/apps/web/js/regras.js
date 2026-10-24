@@ -753,7 +753,8 @@ export function acoesAgoraPublica(acoes, passo, { doPasso = () => false, ehArqui
   const lista = acoes || [];
   if (!passo || passo.acao === "assinar" || !lista.length) return lista;
   const pri = lista[0];
-  if (!ehArquivo(pri.acao) || doPasso(pri.acao)) return lista;
+  // antes do passo de assinar, "Revisar e assinar" também cede o primário (assinar cedo pulava os passos do rascunho)
+  if ((!ehArquivo(pri.acao) && pri.acao !== "revisar-assinar") || doPasso(pri.acao)) return lista;
   return [{ rot: "Executar passo", acao: "executar-passo", ic: "play" }, ...lista];
 }
 

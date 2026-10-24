@@ -63,6 +63,14 @@ resource "google_cloud_run_v2_service" "site" {
         name  = "LAUDO_LLM_TOKENS_DIA"
         value = tostring(var.tokens_llm_por_dia)
       }
+      env {
+        name  = "LAUDO_LLM_TOKENS_HORA"
+        value = tostring(var.tokens_llm_por_hora)
+      }
+      env {
+        name  = "LAUDO_VERTEX_TIMEOUT_S"
+        value = tostring(var.timeout_gemini_s)
+      }
 
       startup_probe {
         http_get {

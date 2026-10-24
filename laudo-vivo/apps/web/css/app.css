@@ -1057,6 +1057,7 @@ p.div-txt { margin-top: .375rem; }
   body.demo-publica .roteiro .titulo { flex: 1 1 calc(100% - 4.5rem); white-space: normal; }
   body.demo-publica .roteiro .titulo-txt, body.demo-publica .roteiro .fala-passo { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
     line-clamp: 2; overflow: hidden; white-space: normal; overflow-wrap: break-word; }
+  body.demo-publica .roteiro .fala-passo { -webkit-line-clamp: 3; line-clamp: 3; }
   body.demo-publica .roteiro .btn-pri { flex: 1 1 auto; }
 }
 @media (min-width: 1100px) {

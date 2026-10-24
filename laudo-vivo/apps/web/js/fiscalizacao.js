@@ -1460,7 +1460,7 @@ function tratarResposta(r, latTotal, extra = {}) {
     return;
   }
   S.confirmacao = null;
-  if (r.aviso) avisar(r.aviso);
+  if (r.aviso) avisar(r.aviso, false, Math.max(3000, 60 * r.aviso.length));
   const resp = r.resposta;
   S.ultimoLat = `turno ${((r.latencia_ms || 0) / 1000).toFixed(1)} s · total ${(latTotal / 1000).toFixed(1)} s${extra.origem ? ` · ${extra.origem}` : ""}`;
   const g = R.guardaDoTurno(r.eventos || []);

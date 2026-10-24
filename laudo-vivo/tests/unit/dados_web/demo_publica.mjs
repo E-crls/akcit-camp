@@ -52,6 +52,12 @@ await teste("ação principal que não abre arquivo, roteiro no fim e passo da a
   assert.deepEqual(R.acoesAgoraPublica([], { n: 1, acao: "turno" }), []);
 });
 
+await teste("antes do passo de assinar, Revisar e assinar cede o primário ao Executar passo", () => {
+  const rev = [{ rot: "Revisar e assinar", acao: "revisar-assinar" }];
+  assert.deepEqual(R.acoesAgoraPublica(rev, { n: 16, acao: "turno" }).map((a) => a.acao), ["executar-passo", "revisar-assinar"]);
+  assert.equal(R.acoesAgoraPublica(rev, { n: 18, acao: "assinar" }), rev); // no passo de assinar, continua o primário
+});
+
 // ------------------------------------------------------------------ VA-04: tamanho e duração antes de enviar
 await teste("limites padrão iguais aos da API e a dica do vídeo", () => {
   assert.deepEqual(R.limitesPublicos(), { upload_mb: { foto: 10, video: 30, nfe_xml: 2 }, video_max_s: 20 });

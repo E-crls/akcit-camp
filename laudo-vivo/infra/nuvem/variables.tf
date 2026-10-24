@@ -82,6 +82,18 @@ variable "tokens_llm_por_dia" {
   default     = 5000000
 }
 
+variable "tokens_llm_por_hora" {
+  description = "Fatia por hora do teto de tokens: quem gira cookies para gastar o teto derruba só a hora corrente"
+  type        = number
+  default     = 1250000
+}
+
+variable "timeout_gemini_s" {
+  description = "Espera máxima por uma resposta do Gemini; estourou, o condutor responde pelo template"
+  type        = number
+  default     = 12
+}
+
 variable "intervalo_verificacao" {
   description = "Intervalo da verificação de disponibilidade (mantém a instância aquecida; cada chamada custa ~0)"
   type        = string

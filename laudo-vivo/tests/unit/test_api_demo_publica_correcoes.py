@@ -81,6 +81,23 @@ def _rodar(c: TestClient, ate: int | None = None) -> list[dict]:
             return out
 
 
+def test_assinou_antes_do_passo_de_assinar_o_roteiro_segue(publico):
+    # quem toca "Revisar e assinar" antes do passo 18 assina cedo; o passo de assinar não pode virar um laço
+    _, visitante = publico()
+    c = visitante()
+    passos = c.get(f"/api/fiscalizacoes/{FIS}").json()["roteiro"]["passos"]
+    n_ass = next(i for i, p in enumerate(passos, 1) if p.get("acao") == "assinar")
+    feitos = _rodar(c, ate=n_ass - 2)
+    h = feitos[-1]["estado"]["laudo"]["hash_raiz"]
+    assert c.post(f"/api/fiscalizacoes/{FIS}/assinar", json={"pin": PIN_DEMO, "hash_confirmado": h}).status_code == 200
+    assert c.get(f"/api/fiscalizacoes/{FIS}").json()["etapa"] == "SELADO"
+    resto = _rodar(c)
+    assert [r["passo"]["n"] for r in resto] == list(range(n_ass - 1, len(passos) + 1))
+    no_passo = next(r for r in resto if r["passo"]["acao"] == "assinar")
+    assert not no_passo.get("acao_humana") and "selado" in no_passo["aviso"]
+    assert c.post(f"/api/fiscalizacoes/{FIS}/roteiro/proximo").status_code == 409  # roteiro concluído
+
+
 def _ids(c: TestClient) -> list[str]:
     e = c.get(f"/api/fiscalizacoes/{FIS}").json()
     return [x["id"] for k in ("evidencias", "falas", "checagens") for x in e[k]]
@@ -508,6 +525,22 @@ def test_residual_do_papel():
     assert not publica.residual_do_papel(Srv(), m, {})
 
 
+def test_residual_do_papel_com_os_blocos_que_o_cartao_pede():
+    chave = "52260499999999599948550010000086641559429439"
+
+    class Srv:
+        def caso(self, cid):
+            return type("C", (), {"papel_danfe": {"chave": chave}})()
+
+    pc = type("PC", (), {"campos": ["chave"], "n_digitos": 12, "blocos_chave": [9, 10, 11]})()
+    pedido = type("P", (), {"campos": [pc]})()
+    m = {"caso_id": "DEMO-0001"}
+    assert publica.residual_do_papel(Srv(), m, {"chave": "6415 5942 9439"}, pedido)  # os 12 que o cartão pede
+    assert publica.residual_do_papel(Srv(), m, {"chave": chave}, pedido)  # a chave inteira também vale
+    assert not publica.residual_do_papel(Srv(), m, {"chave": "6415 5942 9438"}, pedido)
+    assert not publica.residual_do_papel(Srv(), m, {"chave": "6415 5942 9439"})  # sem pedido, só a inteira
+
+
 def test_pergunta_frequente_e_conservadora(tmp_path):
     pf = publica.pergunta_frequente
     assert pf("quantas cabecas o projeto financiou") == "financiado"
@@ -666,6 +699,23 @@ def test_pergunta_e_foto_do_visitante_nao_tiram_os_passos_da_gravacao(tmp_path, 
     r = g.turno(FIS, "", residual={"chave": "5226 0499 9999 9959 9948 5500 1000 0086 6415 5942 9439"})
     assert r["passo"]["acao"] == "residual"
     res = publica.rodar_roteiro(g, FIS)
+    assert (res["etapa"], res["fora"], res["substituicoes"]) == ("SELADO", 0, 0)
+    assert res["matriz"] == limpo["matriz"] and res["ids"] == limpo["ids"]
+    # o cartão pede só os 12 últimos dígitos da chave: com eles (o que está no papel), também é o passo
+    h = ger.fachada(publica.novo_token())
+    while (atual := h.estado(FIS)["roteiro"])["passos"][atual["proximo"] - 1].get("acao") != "residual":
+        h.passo_roteiro(FIS)
+    n_res = h.estado(FIS)["roteiro"]["proximo"]
+    r = h.turno(FIS, "", residual={"chave": "6415 5942 9439"})
+    assert r["passo"]["acao"] == "residual" and h.estado(FIS)["roteiro"]["proximo"] == n_res + 1
+    # com a chave errada, é ação livre: as regras recusam, e o roteiro fica no passo (o estado da resposta também)
+    k = ger.fachada(publica.novo_token())
+    while (atual := k.estado(FIS)["roteiro"])["passos"][atual["proximo"] - 1].get("acao") != "residual":
+        k.passo_roteiro(FIS)
+    r = k.turno(FIS, "", residual={"chave": "6415 5942 9438"})
+    assert not r.get("passo") and r["estado"]["roteiro"]["proximo"] == n_res
+    assert "Não aceitei" in (r["resposta"]["fala"] or "")
+    res = publica.rodar_roteiro(k, FIS)
     assert (res["etapa"], res["fora"], res["substituicoes"]) == ("SELADO", 0, 0)
     assert res["matriz"] == limpo["matriz"] and res["ids"] == limpo["ids"]
     assert len(vivo.chamadas) == n_livre

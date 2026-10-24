@@ -126,6 +126,32 @@ def test_teto_diario_de_tokens():
     assert e.value.codigo == "LIMITE"
 
 
+def test_fatia_por_hora_do_teto(monkeypatch):
+    p = _provedor([_resposta("oi", entrada=80, saida=30)], [], tokens_dia=1000, tokens_hora=100)
+    p.chat(HIST[:2])
+    with pytest.raises(ErroLLM) as e:  # a hora estourou, o dia não
+        p.chat(HIST[:2])
+    assert e.value.codigo == "LIMITE"
+    prov._COTA.hora = "outra"  # virou a hora: a fatia volta
+    assert prov._COTA.restante(1000, 100) == 100 and prov._COTA.usados == 110
+    assert VertexProvider(projeto="p", tokens_dia=800).tokens_hora == 200  # padrão: 1/4 do dia
+
+
+def test_timeout_pela_variavel(monkeypatch):
+    monkeypatch.setenv("LAUDO_VERTEX_TIMEOUT_S", "12")
+    assert VertexProvider(projeto="p").timeout.read == 12.0
+    monkeypatch.delenv("LAUDO_VERTEX_TIMEOUT_S")
+    assert VertexProvider(projeto="p").timeout.read == 30.0
+
+
+def test_falha_vira_evento_para_o_painel(capsys, monkeypatch):
+    monkeypatch.setenv("LAUDO_DEMO_PUBLICA", "1")
+    with pytest.raises(ErroLLM):
+        _provedor([400], []).chat(HIST[:2])
+    ev = json.loads(capsys.readouterr().out.splitlines()[-1])
+    assert ev["laudo_evento"] == "llm" and ev["detalhe"] == "erro" and ev["codigo"] == "HTTP" and ev["tokens"] == 0
+
+
 def test_repete_uma_vez_em_5xx_e_desiste():
     pedidos: list = []
     with pytest.raises(ErroLLM) as e:

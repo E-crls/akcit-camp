@@ -648,6 +648,14 @@ class Servico:
         if not 1 <= n <= len(caso.roteiro):
             raise ErroServico(409, "roteiro concluído")
         p = caso.roteiro[n - 1]
+        if p.acao == "assinar" and self.estado(fis_id).get("etapa") == "SELADO":
+            # assinado antes de o roteiro chegar aqui: o passo está feito e o roteiro segue (sem laço no passo)
+            m["proximo_passo"] = n + 1
+            self._salvar_meta(fis_id, m)
+            est_ = self.estado(fis_id)
+            est_["roteiro"] = self._roteiro_visao(fis_id)
+            return {"passo": p.model_dump(), "estado": est_, "eventos": [], "resposta": None,
+                    "aviso": "O laudo já está assinado e selado; o roteiro segue."}
         if p.acao == "assinar":
             return {
                 "passo": p.model_dump(),

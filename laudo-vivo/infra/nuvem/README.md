@@ -40,7 +40,7 @@ Preços do catálogo do Cloud Billing, consultado em 24/10/2026:
 | Instância atendendo sem parar | US$ 0,58 por hora (4 × 0,0000336 + 8 × 0,0000035 por segundo) |
 | Turno de texto livre | ~11 mil tokens (até 3 chamadas) ≈ US$ 0,003 |
 | Dia de evento (50 visitantes, 500 turnos, 200 falas) | Cloud Run ~US$ 0,5 + Gemini ~US$ 1,5 ≈ **US$ 2 (~R$ 11)** |
-| Teto de LLM por dia | 5 milhões de tokens ≈ US$ 1,40 |
+| Teto de LLM | 5 milhões de tokens por dia ≈ US$ 1,40, em fatias de 1,25 milhão por hora (um abuso derruba só a hora) |
 | Pior caso (instância ocupada 24 h + teto do LLM) | ~US$ 15 por dia |
 | Registro (2 imagens) | ~US$ 0,10 por GB-mês acima de 0,5 GB |
 
